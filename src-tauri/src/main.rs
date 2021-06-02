@@ -11,26 +11,25 @@ fn main() {
   config::create_initial_config_if_necessary();
 
   Command::new("lair-keystore")
-    .arg(format!(
-      "-d {}",
+    .arg("-d")
+    .arg(
       config::keystore_data_path()
         .into_os_string()
         .to_str()
-        .unwrap()
-    ))
+        .unwrap(),
+    )
     .spawn()
     .expect("failed to execute process");
-
   thread::sleep(Duration::from_millis(1000));
 
   Command::new("holochain")
-    .arg(format!(
-      "-c {}",
+    .arg("-c")
+    .arg(
       config::conductor_config_path()
         .into_os_string()
         .to_str()
-        .unwrap()
-    ))
+        .unwrap(),
+    )
     .spawn()
     .expect("failed to execute process");
 

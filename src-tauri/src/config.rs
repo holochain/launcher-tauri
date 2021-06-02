@@ -18,7 +18,7 @@ pub fn holochain_data_path() -> PathBuf {
 }
 
 pub fn keystore_data_path() -> PathBuf {
-  holochain_data_path().join("keystore")
+  data_dir().expect("Could not get config dir").join("lair")
 }
 
 pub fn create_initial_config_if_necessary() -> () {
@@ -54,7 +54,6 @@ fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
         bootstrap_service: https://bootstrap-staging.holo.host
         transport_pool:
             - type: quic
-
     "#,
     environment_path.into_os_string().to_str().unwrap(),
     keystore_data_path().into_os_string().to_str().unwrap(),

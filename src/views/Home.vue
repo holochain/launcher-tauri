@@ -1,5 +1,8 @@
 <template>
-  <ActiveApps></ActiveApps>
+  <div class="column">
+    <InstallApp style="margin: 16px"></InstallApp>
+    <ActiveApps></ActiveApps>
+  </div>
 </template>
 
 <script lang="ts">
