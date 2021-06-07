@@ -11,6 +11,10 @@ pub fn conductor_config_path() -> PathBuf {
   holochain_config_path().join("conductor-config.yml")
 }
 
+pub fn uis_data_path() -> PathBuf {
+  holochain_data_path().join("uis")
+}
+
 pub fn holochain_data_path() -> PathBuf {
   data_dir()
     .expect("Could not get config dir")
@@ -26,6 +30,7 @@ pub fn create_initial_config_if_necessary() -> () {
     let _result = fs::create_dir(holochain_config_path());
     let _result = fs::create_dir(holochain_data_path());
     let _result = fs::create_dir(keystore_data_path());
+    let _result = fs::create_dir(uis_data_path());
     fs::write(
       conductor_config_path(),
       initial_config(8889, holochain_data_path()),

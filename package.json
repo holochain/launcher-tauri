@@ -13,6 +13,7 @@
   "dependencies": {
     "@holochain/admin-ui": "git+https://github.com/holochain/admin-ui.git#build",
     "@holochain/conductor-api": "0.0.4",
+    "@tauri-apps/api": "^1.0.0-beta.1",
     "core-js": "^3.6.5",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",

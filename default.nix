@@ -18,4 +18,19 @@ let
     };
     holochainOtherDepsNames = ["lair-keystore"];
   };
-in holonix.main
+  nixpkgs = holonix.pkgs;
+in nixpkgs.mkShell {
+  inputsFrom = [ holonix.main ];
+  buildInputs = with nixpkgs; [
+    caddy
+    glib
+    cairo
+    pango
+    atk
+    gdk-pixbuf
+    libsoup
+    gtk3
+    pkgconfig
+    webkitgtk
+  ];
+}

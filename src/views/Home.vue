@@ -6,10 +6,13 @@
 </template>
 
 <script lang="ts">
+import InstallApp from "@/components/InstallApp.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Home",
-  components: {},
+  components: {
+    InstallApp,
+  },
 });
 </script>

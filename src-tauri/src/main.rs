@@ -2,10 +2,11 @@
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
-use std::process::Command;
-use std::{thread, time::Duration};
+use std::{process::Command, thread, time::Duration};
+use tauri;
 
 mod config;
+mod install_ui;
 
 fn main() {
   config::create_initial_config_if_necessary();
@@ -20,6 +21,7 @@ fn main() {
     )
     .spawn()
     .expect("failed to execute process");
+    
   thread::sleep(Duration::from_millis(1000));
 
   Command::new("holochain")
@@ -34,6 +36,7 @@ fn main() {
     .expect("failed to execute process");
 
   tauri::Builder::default()
+    .invoke_handler(tauri::generate_handler![install_ui::install_ui])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
