@@ -1,27 +1,39 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
 authors = ["you"]
-license = ""
-repository = ""
-default-run = "app"
-edition = "2018"
 build = "src/build.rs"
+default-run = "app"
+description = "A Tauri App"
+edition = "2018"
+license = ""
+name = "app"
+repository = ""
+version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.0.0-beta.0" }
+tauri-build = {version = "1.0.0-beta.0"}
 
 [dependencies]
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.0.0-beta.1", features = ["api-all"] }
 base64 = "0.13.0"
 flate2 = "1.0.20"
+holochain_conductor_api_rust = {git = "https://github.com/holochain/conductor-api-rust", branch = "main"}
+serde = {version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.8"
+tauri = {version = "1.0.0-beta.1", features = ["api-all"] }
 zip = "0.5"
+futures = "0.3"
+tokio = { version = "1", features = [ "full" ] }
 
 [features]
-default = [ "custom-protocol" ]
-custom-protocol = [ "tauri/custom-protocol" ]
+custom-protocol = ["tauri/custom-protocol"]
+default = ["custom-protocol"]
+
+
+[patch.crates-io]
+rkv = { git = "https://github.com/holochain/rkv.git", branch = "master" }
+lmdb-rkv = { git = "https://github.com/holochain/lmdb-rs.git" }
+holochain_zome_types = {git = "https://github.com/holochain/holochain", rev = "753ea0873cd6e4c7b3ba30ead2d815d5f61b5373", package = "holochain_zome_types"}
+holo_hash = {git = "https://github.com/holochain/holochain", rev = "753ea0873cd6e4c7b3ba30ead2d815d5f61b5373", package = "holo_hash"}
+hdk_derive = {git = "https://github.com/holochain/holochain", rev = "753ea0873cd6e4c7b3ba30ead2d815d5f61b5373", package = "hdk_derive"}

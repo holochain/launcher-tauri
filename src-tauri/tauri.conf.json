@@ -25,7 +25,7 @@
       "externalBin": [
         "/home/guillem/.cargo/bin/holochain",
         "/home/guillem/.cargo/bin/lair-keystore",
-        "/nix/store/wmcvmswxg529n2lrykxqkri7k5xyc5zv-caddy-2.3.0/bin/caddy"
+        "/usr/bin/caddy"
       ],
       "copyright": "",
       "category": "DeveloperTool",
