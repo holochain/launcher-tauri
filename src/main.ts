@@ -11,21 +11,22 @@ async function setup() {
     `ws://localhost:${ADMIN_PORT}`
   );
 
-  const appWebsocket = await connectAppWebsocket(adminWebsocket);
+  const appInterfaces = await adminWebsocket.listAppInterfaces();
+
+  const port = appInterfaces[0];
+
+  const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`);
 
   createApp(App)
     .use(store)
     .use(router)
     .use(HcAdminPlugin, { store, appWebsocket, adminWebsocket })
     .mount("#app");
-}
 
-async function connectAppWebsocket(adminWebsocket: AdminWebsocket) {
-  const appInterfaces = await adminWebsocket.listAppInterfaces();
-
-  const port = appInterfaces[0];
-
-  return AppWebsocket.connect(`ws://localhost:${port}`);
+  store.commit(
+    "log",
+    `Connected to Holochain, Admin port = ${ADMIN_PORT}, App port = ${port}`
+  );
 }
 
 setup();
