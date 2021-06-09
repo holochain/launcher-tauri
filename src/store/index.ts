@@ -1,38 +1,20 @@
 import { createStore } from "vuex";
-import { invoke } from "@tauri-apps/api/tauri";
+
 export interface LauncherAdminState {
-  localAppsPorts: {
-    loading: boolean;
-    portMapping: { [key: string]: number };
-  };
+  logs: Array<string>;
 }
 
 export default createStore({
   state(): LauncherAdminState {
     return {
-      localAppsPorts: {
-        loading: false,
-        portMapping: {},
-      },
+      logs: [],
     };
   },
   mutations: {
-    loadLocalAppsPorts(state: LauncherAdminState) {
-      state.localAppsPorts.loading = true;
-    },
-    setLocalAppsPorts(state: LauncherAdminState, portMapping) {
-      state.localAppsPorts.loading = false;
-      state.localAppsPorts.portMapping = portMapping;
+    log(state: LauncherAdminState, log: string) {
+      state.logs.push(`${new Date().toLocaleTimeString()} - ${log}`);
     },
   },
-  actions: {
-    async fetchLocalAppsPorts({ commit }) {
-      console.log("asdf");
-      commit("loadLocalAppsPorts");
-
-      const portMapping = await invoke("get_port_mapping");
-      commit("setLocalAppsPorts", portMapping);
-    },
-  },
+  actions: {},
   modules: {},
 });

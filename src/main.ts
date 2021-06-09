@@ -23,11 +23,7 @@ async function setup() {
 async function connectAppWebsocket(adminWebsocket: AdminWebsocket) {
   const appInterfaces = await adminWebsocket.listAppInterfaces();
 
-  let port = appInterfaces[0];
-  if (appInterfaces.length === 0) {
-    await adminWebsocket.attachAppInterface({ port: DEFAULT_APP_PORT });
-    port = DEFAULT_APP_PORT;
-  }
+  const port = appInterfaces[0];
 
   return AppWebsocket.connect(`ws://localhost:${port}`);
 }

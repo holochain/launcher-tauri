@@ -1,19 +1,23 @@
 <template>
-  <div class="row">
-    <span>Install App</span>
+  <div class="row center">
+    <span style="margin-right: 16px">Install App</span>
+    <span style="margin-right: 8px">hApp file: </span>
     <input
       type="file"
       name="Happ file"
       @change="happFile = $event.target.files[0]"
       accept=".happ"
       class="input-file"
+      style="margin-right: 16px"
     />
+    <span style="margin-right: 8px">UI file: </span>
     <input
       type="file"
       name="UI ZIP file"
       @change="uiFile = $event.target.files[0]"
       accept=".zip"
       class="input-file"
+      style="margin-right: 16px"
     />
 
     <button :disabled="!uiFile || !happFile" @click="installApp()">
@@ -38,22 +42,35 @@ export default defineComponent({
   },
   methods: {
     async installApp() {
-      const appBundle = await AdminUI.processors.fileToHappBundle(
-        this.happFile as File
-      );
-      const appId = appBundle.manifest.name;
+      let appId = "";
+      this.$store.commit("log", "Installing hApp...");
 
-      const bytes = await (this.uiFile as File).arrayBuffer();
-      const base64Bytes = await arrayBufferToBase64(bytes);
-      const response = await invoke("install_ui", {
-        base64Bytes,
-        appId,
-      });
+      try {
+        const appBundle = await AdminUI.processors.fileToHappBundle(
+          this.happFile as File
+        );
+        appId = appBundle.manifest.name;
+        this.$store.commit("log", "Converted .happ file to AppBundle");
 
-      this.$store.dispatch(
-        `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.installApp}`,
-        appBundle
-      );
+        const bytes = await (this.uiFile as File).arrayBuffer();
+        const base64Bytes = await arrayBufferToBase64(bytes);
+        const response = await invoke("install_ui", {
+          base64Bytes,
+          appId,
+        });
+        this.$store.commit("log", "Installed UI");
+
+        await this.$store.dispatch(
+          `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.installApp}`,
+          appBundle
+        );
+        this.$store.commit("log", "Installed app");
+      } catch (e) {
+        this.$store.commit(
+          "log",
+          `Error installing hApp ${appId}: ${JSON.stringify(e)}`
+        );
+      }
     },
   },
 });
@@ -71,5 +88,9 @@ export default defineComponent({
 
 .cell-row {
   margin-top: 8px;
+}
+.center {
+  align-items: center;
+  justify-content: center;
 }
 </style>

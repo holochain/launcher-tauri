@@ -1,5 +1,8 @@
 use super::port_mapping::app_ui_folder_path;
-use crate::{config::uis_data_path, uis::{activate::activate_app_ui, port_mapping::PortMapping}};
+use crate::{
+  config::uis_data_path,
+  uis::{activate::activate_app_ui, port_mapping::PortMapping},
+};
 use std::{
   fs::{self, File},
   io,
@@ -8,6 +11,12 @@ use std::{
 
 #[tauri::command]
 pub fn install_ui(app_id: String, base64_bytes: String) -> Result<u16, String> {
+  let mut port_mapping = PortMapping::read_port_mapping()?;
+
+  if let Some(_) = port_mapping.get_ui_port_for_app(&app_id) {
+    return Err(String::from("App is already installed"));
+  }
+
   let bytes = base64::decode(base64_bytes).or(Err("Failed to decode base64"))?;
 
   let ui_folder_path = app_ui_folder_path(app_id.clone());
@@ -19,8 +28,6 @@ pub fn install_ui(app_id: String, base64_bytes: String) -> Result<u16, String> {
     File::open(ui_zip_path).or(Err("Failed to read file"))?,
     ui_folder_path,
   )?;
-
-  let mut port_mapping = PortMapping::read_port_mapping()?;
 
   let port = port_mapping.set_available_ui_port_for_app(app_id.clone())?;
 

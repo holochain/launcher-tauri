@@ -17,23 +17,23 @@ tauri-build = {version = "1.0.0-beta.0"}
 [dependencies]
 base64 = "0.13.0"
 flate2 = "1.0.20"
-holochain_conductor_api_rust = {git = "https://github.com/holochain/conductor-api-rust", branch = "main"}
+futures = "0.3"
+holochain_conductor_api_rust = {git = "https://github.com/holochain/conductor-api-rust", rev = "4edf406b674d676f076bb19fdbe79fe5a1077c0d"}
+open = "1"
 serde = {version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
-tauri = {version = "1.0.0-beta.1", features = ["api-all"] }
+tauri = {version = "1.0.0-beta.1", features = ["api-all", "menu", "system-tray"] }
+tokio = {version = "1", features = ["full"] }
 zip = "0.5"
-futures = "0.3"
-tokio = { version = "1", features = [ "full" ] }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
 default = ["custom-protocol"]
 
-
 [patch.crates-io]
-rkv = { git = "https://github.com/holochain/rkv.git", branch = "master" }
-lmdb-rkv = { git = "https://github.com/holochain/lmdb-rs.git" }
-holochain_zome_types = {git = "https://github.com/holochain/holochain", rev = "753ea0873cd6e4c7b3ba30ead2d815d5f61b5373", package = "holochain_zome_types"}
-holo_hash = {git = "https://github.com/holochain/holochain", rev = "753ea0873cd6e4c7b3ba30ead2d815d5f61b5373", package = "holo_hash"}
 hdk_derive = {git = "https://github.com/holochain/holochain", rev = "753ea0873cd6e4c7b3ba30ead2d815d5f61b5373", package = "hdk_derive"}
+holo_hash = {git = "https://github.com/holochain/holochain", rev = "753ea0873cd6e4c7b3ba30ead2d815d5f61b5373", package = "holo_hash"}
+holochain_zome_types = {git = "https://github.com/holochain/holochain", rev = "753ea0873cd6e4c7b3ba30ead2d815d5f61b5373", package = "holochain_zome_types"}
+lmdb-rkv = {git = "https://github.com/holochain/lmdb-rs.git"}
+rkv = {git = "https://github.com/holochain/rkv.git", branch = "master"}

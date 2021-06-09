@@ -1,10 +1,11 @@
 use std::{fs, path::PathBuf};
 use tauri::api::path::{config_dir, data_dir};
 
-const ADMIN_PORT: u16 = 8889;
+pub const DEFAULT_ADMIN_PORT: u16 = 8889;
+pub const DEFAULT_APP_PORT: u16 = 8888;
 
 pub fn admin_url() -> String {
-  format!("ws://localhost:{}", ADMIN_PORT)
+  format!("ws://localhost:{}", DEFAULT_ADMIN_PORT)
 }
 
 pub fn holochain_config_path() -> PathBuf {
@@ -39,7 +40,7 @@ pub fn create_initial_config_if_necessary() -> () {
     let _result = fs::create_dir(uis_data_path());
     fs::write(
       conductor_config_path(),
-      initial_config(ADMIN_PORT, holochain_data_path()),
+      initial_config(DEFAULT_ADMIN_PORT, holochain_data_path()),
     )
     .expect("Could not write conductor config");
   }

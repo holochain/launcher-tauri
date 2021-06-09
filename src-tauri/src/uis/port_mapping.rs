@@ -57,11 +57,3 @@ impl PortMapping {
 pub fn app_ui_folder_path(app_id: String) -> PathBuf {
   uis_data_path().join(app_id)
 }
-
-#[tauri::command]
-pub fn get_port_mapping() -> Result<PortMapping, String> {
-  println!("asd0");
-  println!("asdf {:?}", PortMapping::read_port_mapping()?);
-
-  PortMapping::read_port_mapping()
-}
