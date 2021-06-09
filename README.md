@@ -41,6 +41,8 @@ To reset the launcher, it is enough to remove all the folders mentioned above an
 
 Right now only Linux amd64 is supported. MacOS will be available soon. Windows support will be blocked until Holochain core supports it.
 
+There is a known issue that prevents the UIs from opening in chromium based browsers. For now the launcher will only open UIs in Firefox.
+
 ## Developer Setup
 
 See [Developer Setup](/dev-setup.md).

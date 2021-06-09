@@ -101,24 +101,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28b2cd92db5cbd74e8e5028f7e27dd7aa3090e89e4f2a197cc7c8dfb69c7063b"
 
 [[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "base64",
- "flate2",
- "futures",
- "holochain_conductor_api_rust",
- "open",
- "serde",
- "serde_json",
- "serde_yaml",
- "tauri",
- "tauri-build",
- "tokio",
- "zip",
-]
-
-[[package]]
 name = "arbitrary"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2062,6 +2044,24 @@ dependencies = [
  "serde",
  "serde_bytes",
  "thiserror",
+]
+
+[[package]]
+name = "holochain-launcher"
+version = "0.1.0"
+dependencies = [
+ "base64",
+ "flate2",
+ "futures",
+ "holochain_conductor_api_rust",
+ "open",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tauri",
+ "tauri-build",
+ "tokio",
+ "zip",
 ]
 
 [[package]]

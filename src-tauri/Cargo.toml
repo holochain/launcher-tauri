@@ -1,11 +1,11 @@
 [package]
-authors = ["you"]
+authors = ["guillem.cordoba@gmail.com"]
 build = "src/build.rs"
-default-run = "app"
+default-run = "holochain-launcher"
 description = "A Tauri App"
 edition = "2018"
 license = ""
-name = "app"
+name = "holochain-launcher"
 repository = ""
 version = "0.1.0"
 

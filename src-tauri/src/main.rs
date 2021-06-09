@@ -17,7 +17,7 @@ mod uis;
 
 use crate::setup::setup_conductor;
 use crate::state::HolochainLauncherState;
-use crate::uis::{install::install_ui, launch::launch_app_ui};
+use crate::uis::{install::install_ui, open::open_app_ui};
 
 #[tokio::main]
 async fn main() {
@@ -83,13 +83,15 @@ async fn launch() -> Result<(), String> {
         let mut inner_state = state.inner().child_processes.lock().unwrap();
         let child_processes: &mut Vec<Child> = inner_state.as_mut();
         for child_process in child_processes.into_iter() {
-          child_process.kill();
+          if let Err(error) = child_process.kill() {
+            println!("Error killing leftover child: {:?}", error);
+          }
         }
         std::process::exit(0);
       }
       _ => {}
     })
-    .invoke_handler(tauri::generate_handler![launch_app_ui, install_ui])
+    .invoke_handler(tauri::generate_handler![open_app_ui, install_ui])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 

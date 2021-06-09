@@ -1,4 +1,4 @@
 pub mod activate;
 pub mod install;
-pub mod launch;
+pub mod open;
 pub mod port_mapping;

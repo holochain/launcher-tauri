@@ -2,7 +2,7 @@
   <div class="column" style="flex: 1">
     <InstallApp style="margin: 16px"></InstallApp>
     <ActiveApps
-      @launch-app="launchApp($event)"
+      @open-app="openApp($event)"
       style="flex: 1; padding: 24px"
     ></ActiveApps>
     <Logs style="height: 220px"></Logs>
@@ -22,12 +22,12 @@ export default defineComponent({
     Logs,
   },
   methods: {
-    async launchApp(appId: string) {
+    async openApp(appId: string) {
       try {
         this.$store.commit("log", `Opening app ${appId}...`);
 
-        const result = await invoke("launch_app_ui", { appId });
-        this.$store.commit("log", `App ${appId} opened, ${result}`);
+        const result = await invoke("open_app_ui", { appId });
+        this.$store.commit("log", `App ${appId} opened`);
       } catch (e) {
         this.$store.commit(
           "log",
