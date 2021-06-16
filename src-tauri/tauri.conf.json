@@ -27,7 +27,7 @@
       ],
       "resources": [],
       "externalBin": [
-        "/home/guillem/.cargo/bin/holochain",
+        "/nix/store/myb7jbpg9kzv71w0pskdfh7fd0dxz6b9-holochain/bin/holochain",
         "/home/guillem/.cargo/bin/lair-keystore",
         "/usr/bin/caddy"
       ],

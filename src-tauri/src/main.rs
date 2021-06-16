@@ -2,8 +2,6 @@
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
 use std::{process::Command, thread, time::Duration};
 use tauri::Manager;
 use tauri::State;
@@ -17,14 +15,11 @@ mod uis;
 
 use crate::setup::setup_conductor;
 use crate::state::{get_logs, HolochainLauncherState};
-use crate::uis::{install::install_ui, open::open_app_ui};
+use crate::uis::{install::install_ui, open::open_app_ui, deactivate::deactivate_app_ui};
 
 #[tokio::main]
 async fn main() {
-  let mut launcher_state = HolochainLauncherState {
-    child_processes: Arc::new(Mutex::new(vec![])),
-    logs: Arc::new(Mutex::new(HashMap::new())),
-  };
+  let mut launcher_state = HolochainLauncherState::new();
 
   match launch_holochain(&mut launcher_state).await {
     Ok(()) => (),
@@ -84,7 +79,7 @@ async fn main() {
       }
       _ => {}
     })
-    .invoke_handler(tauri::generate_handler![open_app_ui, install_ui, get_logs])
+    .invoke_handler(tauri::generate_handler![open_app_ui, install_ui, get_logs, deactivate_app_ui])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
@@ -110,7 +105,11 @@ async fn launch_holochain(launcher_state: &mut HolochainLauncherState) -> Result
       "Failed to execute lair: clean the lair directory and try again",
     ));
   }
-  launcher_state.add_child_process(lair_child);
+  launcher_state
+    .lair_process
+    .lock()
+    .unwrap()
+    .replace(lair_child);
 
   let mut holochain_child = Command::new("holochain")
     .arg("-c")
@@ -131,7 +130,11 @@ async fn launch_holochain(launcher_state: &mut HolochainLauncherState) -> Result
     ));
   }
 
-  launcher_state.add_child_process(holochain_child);
+  launcher_state
+    .holochain_process
+    .lock()
+    .unwrap()
+    .replace(holochain_child);
 
   setup_conductor(&launcher_state).await?;
 

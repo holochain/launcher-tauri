@@ -1,10 +1,11 @@
 <template>
   <div class="column" style="flex: 1">
     <InstallApp style="margin: 16px"></InstallApp>
-    <ActiveApps
+    <InstalledApps
       @open-app="openApp($event)"
+      @app-deactivated="deactiveAppUI($event)"
       style="flex: 1; padding: 24px"
-    ></ActiveApps>
+    ></InstalledApps>
     <Logs style="height: 220px"></Logs>
   </div>
 </template>
@@ -31,6 +32,16 @@ export default defineComponent({
       } catch (e) {
         this.$store.commit("log", {
           log: `Error opening app ${appId}: ${JSON.stringify(e)}`,
+        });
+      }
+    },
+    async deactivateApp(appId: string) {
+      try {
+        await invoke("deactivate_app_ui", { appId });
+        this.$store.commit("log", { log: `App ${appId} deactivated` });
+      } catch (e) {
+        this.$store.commit("log", {
+          log: `Deactivated app ${appId} failed: ${JSON.stringify(e)}`,
         });
       }
     },

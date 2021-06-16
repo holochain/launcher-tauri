@@ -5,10 +5,12 @@ use std::{
   time::SystemTime,
 };
 
-
 #[derive(Clone)]
 pub struct HolochainLauncherState {
-  pub child_processes: Arc<Mutex<Vec<Child>>>,
+  pub lair_process: Arc<Mutex<Option<Child>>>,
+  pub holochain_process: Arc<Mutex<Option<Child>>>,
+  pub caddy_processes: Arc<Mutex<HashMap<String, Child>>>,
+
   pub logs: Arc<Mutex<HashMap<usize, String>>>,
 }
 
@@ -27,6 +29,15 @@ pub fn get_logs(state: tauri::State<HolochainLauncherState>) -> HashMap<usize, S
 }
 
 impl HolochainLauncherState {
+  pub fn new() -> Self {
+    HolochainLauncherState {
+      holochain_process: Arc::new(Mutex::new(None)),
+      lair_process: Arc::new(Mutex::new(None)),
+      caddy_processes: Arc::new(Mutex::new(HashMap::new())),
+      logs: Arc::new(Mutex::new(HashMap::new())),
+    }
+  }
+
   pub fn log(&self, log: String) -> () {
     let mut logs = self.logs.lock().unwrap();
 
@@ -37,14 +48,25 @@ impl HolochainLauncherState {
     logs.insert(now.as_millis() as usize, log);
   }
 
-  pub fn add_child_process(&self, child: Child) -> () {
-    self.child_processes.lock().unwrap().push(child);
-  }
-
   pub fn terminate_all_children(&self) -> () {
-    let mut inner_state = self.child_processes.lock().unwrap();
-    let child_processes: &mut Vec<Child> = inner_state.as_mut();
-    for child_process in child_processes.into_iter() {
+    let caddy_proccesses = Arc::clone(&self.caddy_processes);
+    let mut caddy_proccesses = caddy_proccesses.lock().unwrap();
+
+    let mut children_processes: Vec<&mut Child> = caddy_proccesses.values_mut().collect();
+
+    let hc = Arc::clone(&self.holochain_process);
+    let mut hc = hc.lock().unwrap();
+    if let Some(process) = hc.as_mut() {
+      children_processes.push(process);
+    }
+
+    let lair = Arc::clone(&self.holochain_process);
+    let mut lair = lair.lock().unwrap();
+    if let Some(process) = lair.as_mut() {
+      children_processes.push(process);
+    }
+
+    for child_process in children_processes.into_iter() {
       if let Err(error) = child_process.kill() {
         println!("Error killing leftover child: {:?}", error);
       }

@@ -2,7 +2,7 @@ use crate::state::HolochainLauncherState;
 
 use super::port_mapping::{app_ui_folder_path, PortMapping};
 use holochain_conductor_api_rust::AdminWebsocket;
-use std::process::Command;
+use std::{process::Command, sync::Arc};
 
 pub fn activate_app_ui(
   state: &HolochainLauncherState,
@@ -13,13 +13,19 @@ pub fn activate_app_ui(
     .arg("file-server")
     .args(&[
       "--root",
-      app_ui_folder_path(app_id).as_os_str().to_str().unwrap(),
+      app_ui_folder_path(app_id.clone())
+        .as_os_str()
+        .to_str()
+        .unwrap(),
     ])
     .args(&["--listen", format!("localhost:{}", port).as_str()])
     .spawn()
     .map_err(|err| format!("Failed to execute caddy file-server: {:?}", err))?;
 
-  state.add_child_process(child);
+  let arc = Arc::clone(&state.caddy_processes);
+  let mut caddy_processes = arc.lock().unwrap();
+
+  caddy_processes.insert(app_id, child);
 
   Ok(())
 }
