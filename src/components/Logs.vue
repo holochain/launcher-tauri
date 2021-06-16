@@ -6,11 +6,12 @@
         <div class="flex-scrollable-y">
           <div class="column">
             <span
-              v-for="(log, i) in $store.state.logs"
+              v-for="([date, log], i) in orderedLogs"
               :key="i"
               style="margin-bottom: 8px"
               ref="logs"
-              >{{ log }}</span
+              >{{ new Date(parseInt(date)).toLocaleTimeString() }} -
+              {{ log }}</span
             >
           </div>
         </div>
@@ -29,6 +30,13 @@ export default defineComponent({
     if (logs) {
       logs.scrollIntoView(false);
     }
+  },
+  computed: {
+    orderedLogs() {
+      return Object.entries(this.$store.state.logs).sort(
+        ([dateA, _], [dateB, __]) => parseInt(dateA) - parseInt(dateB)
+      );
+    },
   },
 });
 </script>

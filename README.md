@@ -6,6 +6,14 @@
 
 ## Installing the Launcher
 
+0. Install `libgtksourceview`:
+
+```bash
+sudo apt-get install libgtksourceview-3.0-dev
+```
+
+> This step should not be needed once [Tauri supports it](https://github.com/tauri-apps/tauri/issues/1986).
+
 1. Go to the [Releases page](https://github.com/holochain/launcher/releases).
 2. Download the appropriate executable for your platform.
 3. Execute the AppImage.

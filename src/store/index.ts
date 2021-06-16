@@ -1,18 +1,18 @@
 import { createStore } from "vuex";
 
 export interface LauncherAdminState {
-  logs: Array<string>;
+  logs: { [key: number]: string };
 }
 
 export default createStore({
   state(): LauncherAdminState {
     return {
-      logs: [],
+      logs: {},
     };
   },
   mutations: {
-    log(state: LauncherAdminState, log: string) {
-      state.logs.push(`${new Date().toLocaleTimeString()} - ${log}`);
+    log(state: LauncherAdminState, logData: { log: string; date?: number }) {
+      state.logs[logData.date || Date.now()] = logData.log;
     },
   },
   actions: {},

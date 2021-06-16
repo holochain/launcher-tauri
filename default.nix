@@ -32,5 +32,19 @@ in nixpkgs.mkShell {
     gtk3
     pkgconfig
     webkitgtk
+    gtksourceview3
+    llvmPackages.libclang
+    llvmPackages.libcxxClang
+    clang
+    zlib
+    libappindicator
+    squashfsTools
+    nix-index
   ];
+
+
+  shellHook = ''
+    export LIBCLANG_PATH="${nixpkgs.llvmPackages.libclang}/lib";
+    unset SOURCE_DATE_EPOCH;
+  '';
 }

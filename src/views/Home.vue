@@ -24,15 +24,14 @@ export default defineComponent({
   methods: {
     async openApp(appId: string) {
       try {
-        this.$store.commit("log", `Opening app ${appId}...`);
+        this.$store.commit("log", { log: `Opening app ${appId}...` });
 
         const result = await invoke("open_app_ui", { appId });
-        this.$store.commit("log", `App ${appId} opened`);
+        this.$store.commit("log", { log: `App ${appId} opened` });
       } catch (e) {
-        this.$store.commit(
-          "log",
-          `Error opening app ${appId}: ${JSON.stringify(e)}`
-        );
+        this.$store.commit("log", {
+          log: `Error opening app ${appId}: ${JSON.stringify(e)}`,
+        });
       }
     },
   },

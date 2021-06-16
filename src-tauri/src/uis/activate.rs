@@ -17,9 +17,9 @@ pub fn activate_app_ui(
     ])
     .args(&["--listen", format!("localhost:{}", port).as_str()])
     .spawn()
-    .expect("failed to execute process");
+    .map_err(|err| format!("Failed to execute caddy file-server: {:?}", err))?;
 
-  state.child_processes.lock().unwrap().push(child);
+  state.add_child_process(child);
 
   Ok(())
 }

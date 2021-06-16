@@ -43,14 +43,14 @@ export default defineComponent({
   methods: {
     async installApp() {
       let appId = "";
-      this.$store.commit("log", "Installing hApp...");
+      this.$store.commit("log", { log: "Installing hApp..." });
 
       try {
         const appBundle = await AdminUI.processors.fileToHappBundle(
           this.happFile as File
         );
         appId = appBundle.manifest.name;
-        this.$store.commit("log", "Converted .happ file to AppBundle");
+        this.$store.commit("log", { log: "Converted .happ file to AppBundle" });
 
         const bytes = await (this.uiFile as File).arrayBuffer();
         const base64Bytes = await arrayBufferToBase64(bytes);
@@ -58,18 +58,17 @@ export default defineComponent({
           base64Bytes,
           appId,
         });
-        this.$store.commit("log", "Installed UI");
+        this.$store.commit("log", { log: "Installed UI" });
 
         await this.$store.dispatch(
           `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.installApp}`,
           appBundle
         );
-        this.$store.commit("log", "Installed app");
+        this.$store.commit("log", { log: "Installed app" });
       } catch (e) {
-        this.$store.commit(
-          "log",
-          `Error installing hApp ${appId}: ${JSON.stringify(e)}`
-        );
+        this.$store.commit("log", {
+          log: `Error installing hApp ${appId}: ${JSON.stringify(e)}`,
+        });
       }
     },
   },

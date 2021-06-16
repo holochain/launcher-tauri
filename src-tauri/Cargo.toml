@@ -16,6 +16,7 @@ tauri-build = {version = "1.0.0-beta.0"}
 
 [dependencies]
 base64 = "0.13.0"
+chrono = {version = "0.4", features = ["serde"] }
 flate2 = "1.0.20"
 futures = "0.3"
 holochain_conductor_api_rust = {git = "https://github.com/holochain/conductor-api-rust", rev = "4edf406b674d676f076bb19fdbe79fe5a1077c0d"}
