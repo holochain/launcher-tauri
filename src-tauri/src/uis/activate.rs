@@ -4,11 +4,25 @@ use super::port_mapping::{app_ui_folder_path, PortMapping};
 use holochain_conductor_api_rust::AdminWebsocket;
 use std::{process::Command, sync::Arc};
 
+#[tauri::command]
 pub fn activate_app_ui(
-  state: &HolochainLauncherState,
+  state: tauri::State<HolochainLauncherState>,
   app_id: String,
-  port: u16,
 ) -> Result<(), String> {
+  let port_mapping = PortMapping::read_port_mapping()?;
+
+  inner_activate_app_ui(state.inner(), &port_mapping, app_id)
+}
+
+pub fn inner_activate_app_ui(
+  state: &HolochainLauncherState,
+  port_mapping: &PortMapping,
+  app_id: String,
+) -> Result<(), String> {
+  let port = port_mapping
+    .get_ui_port_for_app(&app_id)
+    .ok_or(String::from("Couldn't find active app in port mappings"))?;
+
   let child = Command::new("caddy")
     .arg("file-server")
     .args(&[
@@ -42,10 +56,7 @@ pub async fn activate_uis_for_active_apps(
   let port_mapping = PortMapping::read_port_mapping()?;
 
   for app_id in active_app_ids {
-    let port = port_mapping
-      .get_ui_port_for_app(&app_id)
-      .ok_or(String::from("Couldn't find active app in port mappings"))?;
-    activate_app_ui(state, app_id, port)?;
+    inner_activate_app_ui(state, &port_mapping, app_id)?;
   }
 
   Ok(())

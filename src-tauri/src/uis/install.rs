@@ -2,7 +2,7 @@ use super::port_mapping::app_ui_folder_path;
 use crate::{
   config::uis_data_path,
   state::HolochainLauncherState,
-  uis::{activate::activate_app_ui, port_mapping::PortMapping},
+  uis::{activate::inner_activate_app_ui, port_mapping::PortMapping},
 };
 use std::{
   fs::{self, File},
@@ -36,7 +36,7 @@ pub fn install_ui(
 
   let port = port_mapping.set_available_ui_port_for_app(app_id.clone())?;
 
-  activate_app_ui(state.inner(), app_id, port)?;
+  inner_activate_app_ui(state.inner(), &port_mapping, app_id)?;
 
   Ok(port)
 }

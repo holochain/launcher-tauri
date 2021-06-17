@@ -15,7 +15,9 @@ mod uis;
 
 use crate::setup::setup_conductor;
 use crate::state::{get_logs, HolochainLauncherState};
-use crate::uis::{install::install_ui, open::open_app_ui, deactivate::deactivate_app_ui};
+use crate::uis::{
+  activate::activate_app_ui, deactivate::deactivate_app_ui, install::install_ui, open::open_app_ui,
+};
 
 #[tokio::main]
 async fn main() {
@@ -79,7 +81,13 @@ async fn main() {
       }
       _ => {}
     })
-    .invoke_handler(tauri::generate_handler![open_app_ui, install_ui, get_logs, deactivate_app_ui])
+    .invoke_handler(tauri::generate_handler![
+      open_app_ui,
+      install_ui,
+      get_logs,
+      deactivate_app_ui,
+      activate_app_ui
+    ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
