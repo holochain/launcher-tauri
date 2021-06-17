@@ -1,7 +1,10 @@
-use crate::{config::{admin_url, DEFAULT_APP_PORT}, state::HolochainLauncherState, uis::activate::activate_uis_for_active_apps};
+use crate::{
+  config::{admin_url, DEFAULT_APP_PORT},
+  uis::activate::activate_uis_for_active_apps,
+};
 use holochain_conductor_api_rust::AdminWebsocket;
 
-pub async fn setup_conductor(state: &HolochainLauncherState) -> Result<(), String> {
+pub async fn setup_conductor() -> Result<(), String> {
   let mut ws = AdminWebsocket::connect(admin_url())
     .await
     .or(Err(String::from("Could not connect to conductor")))?;
@@ -17,5 +20,5 @@ pub async fn setup_conductor(state: &HolochainLauncherState) -> Result<(), Strin
       .or(Err(String::from("Could not attach app interface")))?;
   }
 
-  activate_uis_for_active_apps(state, &mut ws).await
+  activate_uis_for_active_apps(&mut ws).await
 }

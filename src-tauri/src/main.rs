@@ -2,10 +2,16 @@
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
-use std::{process::Command, thread, time::Duration};
+use std::{thread, time::Duration};
+use tauri;
+use tauri::api::process::Command;
+use tauri::Icon;
 use tauri::Manager;
 use tauri::State;
-use tauri::{self, WindowEvent};
+use tauri::SystemTray;
+use tauri::SystemTrayEvent;
+use tauri::SystemTrayMenu;
+use tauri::WindowUrl;
 use tauri::{CustomMenuItem, SystemTrayMenuItem};
 
 mod config;
@@ -21,64 +27,63 @@ use crate::uis::{
 
 #[tokio::main]
 async fn main() {
-  let mut launcher_state = HolochainLauncherState::new();
+  let launcher_state = HolochainLauncherState::new();
 
-  match launch_holochain(&mut launcher_state).await {
+  match launch_holochain().await {
     Ok(()) => (),
     Err(err) => {
       launcher_state.log(format!("There was an error launching holochain: {:?}", err));
-      launcher_state.terminate_all_children();
     }
   }
 
   let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-  let show_admin = CustomMenuItem::new("show_admin".to_string(), "Show Admin");
-  let hide_admin = CustomMenuItem::new("hide_admin".to_string(), "Hide Admin");
+  let show_hide_admin = CustomMenuItem::new("show_admin".to_string(), "Show/Hide Admin");
 
-  let tray_menu_items = vec![
-    SystemTrayMenuItem::Custom(show_admin),
-    SystemTrayMenuItem::Custom(hide_admin),
-    SystemTrayMenuItem::Separator,
-    SystemTrayMenuItem::Custom(quit),
-  ];
+  let sys_tray_menu = SystemTrayMenu::new()
+    .add_item(show_hide_admin)
+    .add_native_item(SystemTrayMenuItem::Separator)
+    .add_item(quit);
+
+  let sys_tray = SystemTray::new()
+    .with_icon(Icon::File("icons/holochain.png".into()))
+    .with_menu(sys_tray_menu);
 
   tauri::Builder::default()
     .manage(launcher_state.clone())
-    .system_tray(tray_menu_items)
-    .on_window_event(move |event| match event.event() {
-      WindowEvent::Destroyed | WindowEvent::CloseRequested => {
-        launcher_state.terminate_all_children();
+    .system_tray(sys_tray)
+    .on_system_tray_event(move |app, event| match event {
+      SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+        "quit" => {
+          let admin_window = app.get_window("admin");
+          if let Some(window) = admin_window {
+            println!("hii1");
+            let _r = window.close();
+          }
 
-        std::process::exit(0);
-      }
-      _ => {}
-    })
-    .on_system_tray_event(move |app, event| match event.menu_item_id().as_str() {
-      "quit" => {
-        let state: State<HolochainLauncherState> = app.state();
-
-        state.inner().terminate_all_children();
-
-        std::process::exit(0);
-      }
-      "show_admin" => {
-        if let Err(err) = app.get_window("admin").unwrap().show() {
-          let state: State<HolochainLauncherState> = app.state();
-
-          state
-            .inner()
-            .log(format!("Error trying to show the admin: {:?}", err));
+          let background_window = app.get_window("background");
+          if let Some(window) = background_window {
+            println!("hii2");
+            let _r = window.close();
+          }
         }
-      }
-      "hide_admin" => {
-        if let Err(err) = app.get_window("admin").unwrap().hide() {
-          let state: State<HolochainLauncherState> = app.state();
+        "show_hide_admin" => {
+          let admin_window = app.get_window("admin");
 
-          state
-            .inner()
-            .log(format!("Error trying to show the admin: {:?}", err));
+          if let Some(window) = admin_window {
+            if window.is_visible().unwrap() {
+              let _r = window.hide();
+            } else {
+              let _r = window.show();
+            }
+          } else {
+            // Window was closed: we need to recreate it
+            app.create_window("admin".into(), WindowUrl::new("index.html"), |w, w2| {
+              (w, w2)
+            });
+          }
         }
-      }
+        _ => {}
+      },
       _ => {}
     })
     .invoke_handler(tauri::generate_handler![
@@ -92,59 +97,38 @@ async fn main() {
     .expect("error while running tauri application");
 }
 
-async fn launch_holochain(launcher_state: &mut HolochainLauncherState) -> Result<(), String> {
+async fn launch_holochain() -> Result<(), String> {
   config::create_initial_config_if_necessary();
 
-  let mut lair_child = Command::new("lair-keystore")
-    .arg("-d")
-    .arg(
+  Command::new_sidecar("lair-keystore")
+    .or(Err(String::from("Can't find lair-keystore binary")))?
+    .args(&[
+      "-d",
       config::keystore_data_path()
         .into_os_string()
         .to_str()
         .unwrap(),
-    )
+    ])
     .spawn()
     .map_err(|err| format!("Failed to execute lair-keystore: {:?}", err))?;
 
   thread::sleep(Duration::from_millis(1000));
 
-  if let Ok(Some(_)) = lair_child.try_wait() {
-    return Err(String::from(
-      "Failed to execute lair: clean the lair directory and try again",
-    ));
-  }
-  launcher_state
-    .lair_process
-    .lock()
-    .unwrap()
-    .replace(lair_child);
-
-  let mut holochain_child = Command::new("holochain")
-    .arg("-c")
-    .arg(
+  Command::new_sidecar("holochain")
+    .or(Err(String::from("Can't find holochain binary")))?
+    .args(&[
+      "-c",
       config::conductor_config_path()
         .into_os_string()
         .to_str()
         .unwrap(),
-    )
+    ])
     .spawn()
     .map_err(|err| format!("Failed to execute holochain: {:?}", err))?;
 
   thread::sleep(Duration::from_millis(1000));
 
-  if let Ok(Some(_)) = holochain_child.try_wait() {
-    return Err(String::from(
-      "Failed to execute holochain: do you have anything running on ports 8888 or 8889?",
-    ));
-  }
-
-  launcher_state
-    .holochain_process
-    .lock()
-    .unwrap()
-    .replace(holochain_child);
-
-  setup_conductor(&launcher_state).await?;
+  setup_conductor().await?;
 
   Ok(())
 }

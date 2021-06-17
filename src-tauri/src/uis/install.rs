@@ -1,7 +1,6 @@
 use super::port_mapping::app_ui_folder_path;
 use crate::{
   config::uis_data_path,
-  state::HolochainLauncherState,
   uis::{activate::inner_activate_app_ui, port_mapping::PortMapping},
 };
 use std::{
@@ -11,11 +10,7 @@ use std::{
 };
 
 #[tauri::command]
-pub fn install_ui(
-  state: tauri::State<HolochainLauncherState>,
-  app_id: String,
-  base64_bytes: String,
-) -> Result<u16, String> {
+pub fn install_ui(app_id: String, base64_bytes: String) -> Result<u16, String> {
   let mut port_mapping = PortMapping::read_port_mapping()?;
 
   if let Some(_) = port_mapping.get_ui_port_for_app(&app_id) {
@@ -36,7 +31,7 @@ pub fn install_ui(
 
   let port = port_mapping.set_available_ui_port_for_app(app_id.clone())?;
 
-  inner_activate_app_ui(state.inner(), &port_mapping, app_id)?;
+  inner_activate_app_ui(&port_mapping, app_id)?;
 
   Ok(port)
 }

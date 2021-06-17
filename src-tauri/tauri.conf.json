@@ -15,7 +15,7 @@
     },
     "bundle": {
       "active": true,
-      "targets": ["deb"],
+      "targets": "all",
       "identifier": "org.holochain.developer",
       "icon": [
         "icons/holochain.png",
@@ -26,11 +26,7 @@
         "icons/icon.ico"
       ],
       "resources": [],
-      "externalBin": [
-        "/nix/store/myb7jbpg9kzv71w0pskdfh7fd0dxz6b9-holochain/bin/holochain",
-        "/home/guillem/.cargo/bin/lair-keystore",
-        "/usr/bin/caddy"
-      ],
+      "externalBin": ["bins/holochain", "bins/lair-keystore", "bins/caddy"],
       "copyright": "",
       "category": "DeveloperTool",
       "shortDescription": "",
@@ -62,7 +58,7 @@
     "windows": [
       {
         "label": "background",
-        "title": "Holochain",
+        "title": "Holochain Admin",
         "width": 1,
         "height": 1,
         "visible": false

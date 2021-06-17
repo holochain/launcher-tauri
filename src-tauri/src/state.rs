@@ -1,15 +1,9 @@
-use std::{
-  collections::HashMap,
-  process::Child,
-  sync::{Arc, Mutex},
-  time::SystemTime,
-};
+use std::{collections::HashMap, sync::{Arc, Mutex}, time::SystemTime};
+// use tauri::api::process::CommandChild;
 
 #[derive(Clone)]
 pub struct HolochainLauncherState {
-  pub lair_process: Arc<Mutex<Option<Child>>>,
-  pub holochain_process: Arc<Mutex<Option<Child>>>,
-  pub caddy_processes: Arc<Mutex<HashMap<String, Child>>>,
+//  pub caddy_processes: Arc<Mutex<HashMap<String, CommandChild>>>,
 
   pub logs: Arc<Mutex<HashMap<usize, String>>>,
 }
@@ -31,9 +25,7 @@ pub fn get_logs(state: tauri::State<HolochainLauncherState>) -> HashMap<usize, S
 impl HolochainLauncherState {
   pub fn new() -> Self {
     HolochainLauncherState {
-      holochain_process: Arc::new(Mutex::new(None)),
-      lair_process: Arc::new(Mutex::new(None)),
-      caddy_processes: Arc::new(Mutex::new(HashMap::new())),
+      // caddy_processes: Arc::new(Mutex::new(HashMap::new())),
       logs: Arc::new(Mutex::new(HashMap::new())),
     }
   }
@@ -47,22 +39,23 @@ impl HolochainLauncherState {
 
     logs.insert(now.as_millis() as usize, log);
   }
-
+/* 
   pub fn terminate_all_children(&self) -> () {
     let caddy_proccesses = Arc::clone(&self.caddy_processes);
-    let mut caddy_proccesses = caddy_proccesses.lock().unwrap();
+    let c = caddy_proccesses.lock().unwrap();
+    let caddy_proccesses = *c;
 
-    let mut children_processes: Vec<&mut Child> = caddy_proccesses.values_mut().collect();
+    let mut children_processes: Vec<CommandChild> = caddy_proccesses.values().map(|a| *a).collect();
 
     let hc = Arc::clone(&self.holochain_process);
     let mut hc = hc.lock().unwrap();
-    if let Some(process) = hc.as_mut() {
+    if let Some(process) = (*hc). {
       children_processes.push(process);
     }
 
     let lair = Arc::clone(&self.holochain_process);
     let mut lair = lair.lock().unwrap();
-    if let Some(process) = lair.as_mut() {
+    if let Some(process) = *lair {
       children_processes.push(process);
     }
 
@@ -71,5 +64,5 @@ impl HolochainLauncherState {
         println!("Error killing leftover child: {:?}", error);
       }
     }
-  }
+  } */
 }
