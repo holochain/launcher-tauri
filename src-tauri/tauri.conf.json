@@ -58,12 +58,11 @@
     "windows": [
       {
         "label": "background",
-        "title": "Holochain Admin",
+        "title": "Holochain",
         "width": 1,
         "height": 1,
         "visible": false
-      },
-      {
+      }, {
         "label": "admin",
         "title": "Holochain Admin",
         "width": 800,

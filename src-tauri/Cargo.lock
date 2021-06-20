@@ -5274,7 +5274,7 @@ dependencies = [
 [[package]]
 name = "tauri"
 version = "1.0.0-beta.1"
-source = "git+https://github.com/tauri-apps/tauri?branch=dev#1c97a151c1443266b931abf572534f1f9c53b1de"
+source = "git+https://github.com/tauri-apps/tauri?rev=645bf90a9b81e08256503fed8db28b52f55507bc#645bf90a9b81e08256503fed8db28b52f55507bc"
 dependencies = [
  "attohttpc",
  "base64",
@@ -5317,7 +5317,7 @@ dependencies = [
 [[package]]
 name = "tauri-build"
 version = "1.0.0-beta.0"
-source = "git+https://github.com/tauri-apps/tauri?branch=dev#1c97a151c1443266b931abf572534f1f9c53b1de"
+source = "git+https://github.com/tauri-apps/tauri?rev=645bf90a9b81e08256503fed8db28b52f55507bc#645bf90a9b81e08256503fed8db28b52f55507bc"
 dependencies = [
  "anyhow",
  "proc-macro2",
@@ -5330,7 +5330,7 @@ dependencies = [
 [[package]]
 name = "tauri-codegen"
 version = "1.0.0-beta.0"
-source = "git+https://github.com/tauri-apps/tauri?branch=dev#1c97a151c1443266b931abf572534f1f9c53b1de"
+source = "git+https://github.com/tauri-apps/tauri?rev=645bf90a9b81e08256503fed8db28b52f55507bc#645bf90a9b81e08256503fed8db28b52f55507bc"
 dependencies = [
  "blake3",
  "proc-macro2",
@@ -5373,7 +5373,7 @@ dependencies = [
 [[package]]
 name = "tauri-macros"
 version = "1.0.0-beta.1"
-source = "git+https://github.com/tauri-apps/tauri?branch=dev#1c97a151c1443266b931abf572534f1f9c53b1de"
+source = "git+https://github.com/tauri-apps/tauri?rev=645bf90a9b81e08256503fed8db28b52f55507bc#645bf90a9b81e08256503fed8db28b52f55507bc"
 dependencies = [
  "proc-macro2",
  "quote 1.0.9",
@@ -5384,7 +5384,7 @@ dependencies = [
 [[package]]
 name = "tauri-runtime"
 version = "0.1.1"
-source = "git+https://github.com/tauri-apps/tauri?branch=dev#1c97a151c1443266b931abf572534f1f9c53b1de"
+source = "git+https://github.com/tauri-apps/tauri?rev=645bf90a9b81e08256503fed8db28b52f55507bc#645bf90a9b81e08256503fed8db28b52f55507bc"
 dependencies = [
  "serde",
  "serde_json",
@@ -5397,7 +5397,7 @@ dependencies = [
 [[package]]
 name = "tauri-runtime-wry"
 version = "0.1.1"
-source = "git+https://github.com/tauri-apps/tauri?branch=dev#1c97a151c1443266b931abf572534f1f9c53b1de"
+source = "git+https://github.com/tauri-apps/tauri?rev=645bf90a9b81e08256503fed8db28b52f55507bc#645bf90a9b81e08256503fed8db28b52f55507bc"
 dependencies = [
  "ico",
  "infer",
@@ -5412,7 +5412,7 @@ dependencies = [
 [[package]]
 name = "tauri-utils"
 version = "1.0.0-beta.0"
-source = "git+https://github.com/tauri-apps/tauri?branch=dev#1c97a151c1443266b931abf572534f1f9c53b1de"
+source = "git+https://github.com/tauri-apps/tauri?rev=645bf90a9b81e08256503fed8db28b52f55507bc#645bf90a9b81e08256503fed8db28b52f55507bc"
 dependencies = [
  "heck",
  "html5ever",

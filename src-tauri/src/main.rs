@@ -5,13 +5,12 @@
 use std::{thread, time::Duration};
 use tauri;
 use tauri::api::process::Command;
-use tauri::Icon;
 use tauri::Manager;
-use tauri::State;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
 use tauri::SystemTrayMenu;
 use tauri::WindowUrl;
+use tauri::WindowBuilder;
 use tauri::{CustomMenuItem, SystemTrayMenuItem};
 
 mod config;
@@ -37,15 +36,14 @@ async fn main() {
   }
 
   let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-  let show_hide_admin = CustomMenuItem::new("show_admin".to_string(), "Show/Hide Admin");
+  let show_admin = CustomMenuItem::new("show_admin".to_string(), "Show Admin");
 
   let sys_tray_menu = SystemTrayMenu::new()
-    .add_item(show_hide_admin)
+    .add_item(show_admin)
     .add_native_item(SystemTrayMenuItem::Separator)
     .add_item(quit);
 
   let sys_tray = SystemTray::new()
-    .with_icon(Icon::File("icons/holochain.png".into()))
     .with_menu(sys_tray_menu);
 
   tauri::Builder::default()
@@ -54,32 +52,25 @@ async fn main() {
     .on_system_tray_event(move |app, event| match event {
       SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
         "quit" => {
-          let admin_window = app.get_window("admin");
-          if let Some(window) = admin_window {
-            println!("hii1");
-            let _r = window.close();
-          }
-
-          let background_window = app.get_window("background");
-          if let Some(window) = background_window {
-            println!("hii2");
+          // Closing all the windows exits the app and kills all the children processes
+          for window in app.windows().values() {
             let _r = window.close();
           }
         }
-        "show_hide_admin" => {
+        "show_admin" => {
           let admin_window = app.get_window("admin");
 
           if let Some(window) = admin_window {
-            if window.is_visible().unwrap() {
-              let _r = window.hide();
-            } else {
-              let _r = window.show();
-            }
+            let _r = window.set_focus();
           } else {
             // Window was closed: we need to recreate it
-            app.create_window("admin".into(), WindowUrl::new("index.html"), |w, w2| {
-              (w, w2)
-            });
+            let _r = app.create_window(
+              "admin".into(),
+              WindowUrl::App("index.html".into()),
+              move |window_builder, webview_attributes| {
+                (window_builder.title("Holochain Admin"), webview_attributes)
+              },
+            );
           }
         }
         _ => {}
