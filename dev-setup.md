@@ -1,5 +1,7 @@
 # Developer Setup
 
+Go through the [tauri developer setup](https://tauri.studio/en/docs/getting-started/intro#setting-up-your-environment).
+
 ## Project setup
 
 ```bash

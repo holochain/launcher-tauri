@@ -10,19 +10,17 @@ use std::{
 };
 
 #[tauri::command]
-pub fn install_ui(app_id: String, base64_bytes: String) -> Result<u16, String> {
+pub fn install_ui(app_id: String, ui_bundle_path: String) -> Result<u16, String> {
   let mut port_mapping = PortMapping::read_port_mapping()?;
 
   if let Some(_) = port_mapping.get_ui_port_for_app(&app_id) {
     return Err(String::from("App is already installed"));
   }
 
-  let bytes = base64::decode(base64_bytes).or(Err("Failed to decode base64"))?;
-
   let ui_folder_path = app_ui_folder_path(app_id.clone());
   let ui_zip_path = uis_data_path().join(format!("{}.zip", app_id));
 
-  fs::write(ui_zip_path.clone(), bytes).or(Err("Could not write the UI file"))?;
+  fs::copy(ui_bundle_path, ui_zip_path.clone()).or(Err("Failed to read UI ZIP file"))?;
 
   unzip_file(
     File::open(ui_zip_path).or(Err("Failed to read file"))?,

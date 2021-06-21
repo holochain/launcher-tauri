@@ -1,26 +1,42 @@
 <template>
   <div class="row center">
-    <span style="margin-right: 16px">Install App</span>
-    <span style="margin-right: 8px">hApp file: </span>
-    <input
-      type="file"
-      name="Happ file"
-      @change="happFile = $event.target.files[0]"
-      accept=".happ"
-      class="input-file"
-      style="margin-right: 16px"
-    />
-    <span style="margin-right: 8px">UI file: </span>
-    <input
-      type="file"
-      name="UI ZIP file"
-      @change="uiFile = $event.target.files[0]"
-      accept=".zip"
-      class="input-file"
-      style="margin-right: 16px"
-    />
+    <span style="margin-right: 24px">Install App</span>
 
-    <button :disabled="!uiFile || !happFile" @click="installApp()">
+    <span style="margin-right: 8px">hApp file: </span>
+    <button
+      v-if="!happBundlePath"
+      style="margin-right: 8px"
+      @click="selectHappFile()"
+    >
+      Select hApp bundle
+    </button>
+    <div v-else class="row center">
+      <span style="margin-right: 8px">{{ pathToFilename(happBundlePath) }}</span
+      ><button @click="happBundlePath = undefined" style="margin-right: 8px">
+        Remove
+      </button>
+    </div>
+
+    <span style="margin-right: 8px; margin-left: 8px">UI file: </span>
+    <button
+      v-if="!uiBundlePath"
+      style="margin-right: 8px"
+      @click="selectUIFile()"
+    >
+      Select UI bundle
+    </button>
+    <div v-else class="row center">
+      <span style="margin-right: 8px">{{ pathToFilename(uiBundlePath) }}</span
+      ><button @click="uiBundlePath = undefined" style="margin-right: 8px">
+        Remove
+      </button>
+    </div>
+
+    <button
+      :disabled="!happBundlePath || !uiBundlePath"
+      @click="installApp()"
+      style="margin-left: 24px"
+    >
       Install
     </button>
   </div>
@@ -30,46 +46,68 @@
 import { defineComponent } from "vue";
 import AdminUI from "@holochain/admin-ui";
 import { invoke } from "@tauri-apps/api/tauri";
-import { arrayBufferToBase64 } from "@/processors/buffer";
+import { open } from "@tauri-apps/api/dialog";
 
 export default defineComponent({
   name: "InstallApp",
-  data(): { happFile: File | undefined; uiFile: File | undefined } {
+  data(): {
+    happBundlePath: string | undefined;
+    uiBundlePath: string | undefined;
+  } {
     return {
-      happFile: undefined,
-      uiFile: undefined,
+      happBundlePath: undefined,
+      uiBundlePath: undefined,
     };
   },
   methods: {
+    async selectHappFile() {
+      this.happBundlePath = (await open({
+        filters: [{ name: "happ", extensions: ["happ"] }],
+      })) as string;
+    },
+    async selectUIFile() {
+      this.uiBundlePath = (await open({
+        filters: [{ name: "ui", extensions: ["zip"] }],
+      })) as string;
+    },
+    pathToFilename(path: string) {
+      const components = path.split("/");
+      console.log(components);
+      return components[components.length - 1];
+    },
+    pathToAppId(path: string) {
+      const filename = this.pathToFilename(path);
+      return filename.split(".")[0];
+    },
     async installApp() {
-      let appId = "";
+      const path = this.happBundlePath as string;
+      let appId = this.pathToAppId(path);
+
       this.$store.commit("log", { log: "Installing hApp..." });
 
       try {
-        const appBundle = await AdminUI.processors.fileToHappBundle(
-          this.happFile as File
+        await this.$store.dispatch(
+          `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.installApp}`,
+          {
+            appBundlePath: this.happBundlePath,
+            appId,
+          }
         );
-        appId = appBundle.manifest.name;
-        this.$store.commit("log", { log: "Converted .happ file to AppBundle" });
-
-        const bytes = await (this.uiFile as File).arrayBuffer();
-        const base64Bytes = await arrayBufferToBase64(bytes);
         const response = await invoke("install_ui", {
-          base64Bytes,
+          uiBundlePath: this.uiBundlePath,
           appId,
         });
         this.$store.commit("log", { log: "Installed UI" });
 
-        await this.$store.dispatch(
-          `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.installApp}`,
-          appBundle
-        );
         this.$store.commit("log", { log: "Installed app" });
       } catch (e) {
         this.$store.commit("log", {
           log: `Error installing hApp ${appId}: ${JSON.stringify(e)}`,
         });
       }
+
+      this.happBundlePath = undefined;
+      this.uiBundlePath = undefined;
     },
   },
 });

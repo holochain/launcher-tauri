@@ -9,7 +9,7 @@
 0. Install `libgtksourceview`:
 
 ```bash
-sudo apt-get install libgtksourceview-3.0-dev
+sudo apt-get install libgtksourceview-3.0-dev libwebkit2gtk-4.0-dev
 ```
 
 > This step should not be needed once [Tauri supports it](https://github.com/tauri-apps/tauri/issues/1986).

@@ -31,6 +31,8 @@ impl HolochainLauncherState {
   }
 
   pub fn log(&self, log: String) -> () {
+    println!("Log: {}", log);
+
     let mut logs = self.logs.lock().unwrap();
 
     let now = SystemTime::now()
@@ -39,30 +41,5 @@ impl HolochainLauncherState {
 
     logs.insert(now.as_millis() as usize, log);
   }
-/* 
-  pub fn terminate_all_children(&self) -> () {
-    let caddy_proccesses = Arc::clone(&self.caddy_processes);
-    let c = caddy_proccesses.lock().unwrap();
-    let caddy_proccesses = *c;
 
-    let mut children_processes: Vec<CommandChild> = caddy_proccesses.values().map(|a| *a).collect();
-
-    let hc = Arc::clone(&self.holochain_process);
-    let mut hc = hc.lock().unwrap();
-    if let Some(process) = (*hc). {
-      children_processes.push(process);
-    }
-
-    let lair = Arc::clone(&self.holochain_process);
-    let mut lair = lair.lock().unwrap();
-    if let Some(process) = *lair {
-      children_processes.push(process);
-    }
-
-    for child_process in children_processes.into_iter() {
-      if let Err(error) = child_process.kill() {
-        println!("Error killing leftover child: {:?}", error);
-      }
-    }
-  } */
 }

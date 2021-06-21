@@ -9,8 +9,8 @@ use tauri::Manager;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
 use tauri::SystemTrayMenu;
-use tauri::WindowUrl;
 use tauri::WindowBuilder;
+use tauri::WindowUrl;
 use tauri::{CustomMenuItem, SystemTrayMenuItem};
 
 mod config;
@@ -43,8 +43,7 @@ async fn main() {
     .add_native_item(SystemTrayMenuItem::Separator)
     .add_item(quit);
 
-  let sys_tray = SystemTray::new()
-    .with_menu(sys_tray_menu);
+  let sys_tray = SystemTray::new().with_menu(sys_tray_menu);
 
   tauri::Builder::default()
     .manage(launcher_state.clone())
@@ -103,6 +102,8 @@ async fn launch_holochain() -> Result<(), String> {
     .spawn()
     .map_err(|err| format!("Failed to execute lair-keystore: {:?}", err))?;
 
+  println!("Launched lair-keystore");
+
   thread::sleep(Duration::from_millis(1000));
 
   Command::new_sidecar("holochain")
@@ -116,6 +117,7 @@ async fn launch_holochain() -> Result<(), String> {
     ])
     .spawn()
     .map_err(|err| format!("Failed to execute holochain: {:?}", err))?;
+  println!("Launched holochain");
 
   thread::sleep(Duration::from_millis(1000));
 

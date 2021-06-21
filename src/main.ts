@@ -38,7 +38,7 @@ async function setup() {
       store.commit("log", { log, date });
     }
   } catch (e) {
-    console.warn(e);
+    store.commit("log", { log: `Error getting logs: ${e}` });
   }
 }
 
