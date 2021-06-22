@@ -18,6 +18,14 @@ pub fn conductor_config_path() -> PathBuf {
   holochain_config_path().join("conductor-config.yml")
 }
 
+pub fn logs_path() -> PathBuf {
+  holochain_data_path().join("launcher.log")
+}
+
+pub fn caddyfile_path() -> PathBuf {
+  uis_data_path().join("Caddyfile")
+}
+
 pub fn uis_data_path() -> PathBuf {
   holochain_data_path().join("uis")
 }
@@ -33,17 +41,15 @@ pub fn keystore_data_path() -> PathBuf {
 }
 
 pub fn create_initial_config_if_necessary() -> () {
-  if let Err(_) = fs::read(holochain_config_path()) {
-    let _result = fs::create_dir(holochain_config_path());
-    let _result = fs::create_dir(holochain_data_path());
-    let _result = fs::create_dir(keystore_data_path());
-    let _result = fs::create_dir(uis_data_path());
-    fs::write(
-      conductor_config_path(),
-      initial_config(DEFAULT_ADMIN_PORT, holochain_data_path()),
-    )
-    .expect("Could not write conductor config");
-  }
+  create_dir_if_necessary(holochain_config_path());
+  create_dir_if_necessary(holochain_data_path());
+  create_dir_if_necessary(keystore_data_path());
+  create_dir_if_necessary(uis_data_path());
+  fs::write(
+    conductor_config_path(),
+    initial_config(DEFAULT_ADMIN_PORT, holochain_data_path()),
+  )
+  .expect("Could not write conductor config");
 }
 
 fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
@@ -71,4 +77,10 @@ fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
     keystore_data_path().into_os_string().to_str().unwrap(),
     admin_port
   )
+}
+
+fn create_dir_if_necessary(path: PathBuf) {
+  if let Err(_) = fs::read(path.clone()) {
+    let _result = fs::create_dir(path);
+  }
 }

@@ -20,7 +20,7 @@ impl PortMapping {
     match fs::read_to_string(Self::path()) {
       Err(error) => match error.kind() {
         ErrorKind::NotFound => Ok(PortMapping(BTreeMap::new())),
-        _ => Err(format!("{:?}", error)),
+        _ => Err(format!("Error reading the UIs port mapping {:?}", error)),
       },
       Ok(contents) => {
         let mapping: PortMapping =

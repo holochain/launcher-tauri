@@ -28,17 +28,8 @@ async function setup() {
       log: `Connected to Holochain, Admin port = ${ADMIN_PORT}, App port = ${port}`,
     });
   } catch (e) {
+    store.commit("log", { log: `Error launching Holochain: ${e}` });
     app.mount("#app");
-  }
-
-  try {
-    const logs: { [key: number]: string } = await invoke("get_logs");
-    console.log(logs);
-    for (const [date, log] of Object.entries(logs)) {
-      store.commit("log", { log, date });
-    }
-  } catch (e) {
-    store.commit("log", { log: `Error getting logs: ${e}` });
   }
 }
 

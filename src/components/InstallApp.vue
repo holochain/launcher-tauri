@@ -72,7 +72,6 @@ export default defineComponent({
     },
     pathToFilename(path: string) {
       const components = path.split("/");
-      console.log(components);
       return components[components.length - 1];
     },
     pathToAppId(path: string) {
@@ -93,13 +92,15 @@ export default defineComponent({
             appId,
           }
         );
+        this.$store.commit("log", { log: "Installed app" });
+
         const response = await invoke("install_ui", {
           uiBundlePath: this.uiBundlePath,
           appId,
         });
-        this.$store.commit("log", { log: "Installed UI" });
-
-        this.$store.commit("log", { log: "Installed app" });
+        this.$store.commit("log", {
+          log: `Installed UI ${JSON.stringify(response)}`,
+        });
       } catch (e) {
         this.$store.commit("log", {
           log: `Error installing hApp ${appId}: ${JSON.stringify(e)}`,
