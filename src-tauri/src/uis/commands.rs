@@ -3,7 +3,6 @@ use crate::{
   config::uis_data_path,
   uis::{caddy, utils::unzip_file},
 };
-use log::trace;
 use open;
 use std::fs::{self, File};
 
@@ -61,9 +60,14 @@ pub fn open_app_ui(app_id: String) -> Result<(), String> {
     .ok_or("App not registered")?;
 
   let app_url = format!("http://localhost:{}", port);
-  log::info!("Opening app {} at {}...", app_id.clone(), app_url);
 
   let result = open::with_in_background(app_url.as_str(), "firefox");
+  log::info!(
+    "Opening app {} at {}, result: {:?}",
+    app_id.clone(),
+    app_url,
+    result
+  );
 
   Ok(())
 }

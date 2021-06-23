@@ -6,10 +6,10 @@
 
 ## Installing the Launcher
 
-0. Install `libgtksourceview`:
+0. Install the necessary dependencies:
 
 ```bash
-sudo apt-get install libgtksourceview-3.0-dev libwebkit2gtk-4.0-dev
+sudo apt-get install libgtksourceview-3.0-dev libwebkit2gtk-4.0-dev libappindicator3-dev
 ```
 
 > This step should not be needed once [Tauri supports it](https://github.com/tauri-apps/tauri/issues/1986).
@@ -18,10 +18,12 @@ sudo apt-get install libgtksourceview-3.0-dev libwebkit2gtk-4.0-dev
 2. Download the appropriate executable for your platform.
 3. Execute the AppImage.
 
+> Warning! This will replace your `$CONFIG_DIR/holochain/conductor-config.yaml`, if you have one from running `holochain -i`.
+
 ## Usage
 
 ### Preparing your UI
- 
+
 When your UI is served from the launcher, you will have the Holochain app interface available at `ws://localhost:8888`. 
 
 You will also have the admin interface available at `ws://localhost:8889`, but its usage is discouraged as newer versions of the launcher will block any admin requests not coming from the Holochain Admin UI itself. There will be a call available in `AppWebsocket` that will prompt the user to do an action in the Holochain Admin UI, or similar (To Be Defined).
@@ -45,11 +47,15 @@ The Holochain Launcher uses the same config and data locations as the main `holo
 
 To reset the launcher, it is enough to remove all the folders mentioned above and start the launcher again.
 
+### Logs 
+
+Logs can be found at `$DATA_DIR/holochain/launcher.log`. When reporting issues, please attach the contents of this file.
+
 ## Support
 
 Right now only Linux amd64 is supported. MacOS will be available soon. Windows support will be blocked until Holochain core supports it.
 
-There is a known issue that prevents the UIs from opening in chromium based browsers. For now the launcher will only open UIs in Firefox.
+There is a known issue that prevents the UIs from opening in Chromium based browsers. For now the launcher will only open UIs in Firefox.
 
 ## Developer Setup
 

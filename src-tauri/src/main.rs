@@ -24,14 +24,17 @@ use crate::uis::caddy;
 use crate::uis::commands::{activate_app_ui, deactivate_app_ui, install_ui, open_app_ui};
 
 fn main() {
-  setup_logs();
+  if let Err(err) = setup_logs() {
+    println!("Error setting up the logs: {:?}", err);
+  }
 
   let quit = CustomMenuItem::new("quit".to_string(), "Quit");
   let show_admin = CustomMenuItem::new("show_admin".to_string(), "Show Admin");
-  let show_logs = CustomMenuItem::new("show_logs".to_string(), "Show Logs");
+  let _show_logs = CustomMenuItem::new("show_logs".to_string(), "Show Logs");
 
   let sys_tray_menu = SystemTrayMenu::new()
-    .add_item(show_logs)
+    // TODO: uncomment when async runtime works well
+    // .add_item(show_logs)
     .add_item(show_admin)
     .add_native_item(SystemTrayMenuItem::Separator)
     .add_item(quit);
@@ -69,14 +72,14 @@ fn main() {
             }
           }
           "show_logs" => {
-            logs::open_logs();
+            // logs::open_logs();
           }
           _ => {}
         },
         _ => {}
       }
     })
-    .setup(|app| {
+    .setup(|_app| {
       tauri::async_runtime::block_on(async move {
         match launch_children_processes().await {
           Ok(()) => (),
@@ -100,6 +103,23 @@ fn main() {
 
 async fn launch_children_processes() -> Result<(), String> {
   config::create_initial_config_if_necessary();
+
+  Command::new_sidecar("lair-keystore")
+    .or(Err(String::from("Can't find lair-keystore binary")))?
+    .args(&[
+      "-d",
+      config::keystore_data_path()
+        .into_os_string()
+        .to_str()
+        .unwrap(),
+    ])
+    .spawn()
+    .map_err(|err| format!("Failed to execute lair-keystore: {:?}", err))?;
+
+  log::info!("Launched lair-keystore");
+
+  thread::sleep(Duration::from_millis(1000));
+
   Command::new_sidecar("holochain")
     .or(Err(String::from("Can't find holochain binary")))?
     .args(&[
@@ -114,7 +134,7 @@ async fn launch_children_processes() -> Result<(), String> {
 
   log::info!("Launched holochain");
 
-  thread::sleep(Duration::from_millis(100));
+  thread::sleep(Duration::from_millis(1000));
 
   setup_conductor().await?;
 

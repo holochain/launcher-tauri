@@ -94,12 +94,12 @@ export default defineComponent({
         );
         this.$store.commit("log", { log: "Installed app" });
 
-        const response = await invoke("install_ui", {
+        await invoke("install_ui", {
           uiBundlePath: this.uiBundlePath,
           appId,
         });
         this.$store.commit("log", {
-          log: `Installed UI ${JSON.stringify(response)}`,
+          log: `Installed UI`,
         });
       } catch (e) {
         this.$store.commit("log", {

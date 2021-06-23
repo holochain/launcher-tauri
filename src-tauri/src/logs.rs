@@ -1,4 +1,3 @@
-use edit;
 use log::LevelFilter;
 use log4rs::{
   self,
@@ -9,13 +8,6 @@ use log4rs::{
 };
 
 use crate::config::logs_path;
-
-pub fn open_logs() {
-  tauri::async_runtime::spawn(async move {
-    let _r = edit::edit_file(logs_path());
-    println!("{:?}", _r);
-  })
-}
 
 pub fn setup_logs() -> Result<(), String> {
   let logfile = FileAppender::builder()

@@ -71,7 +71,12 @@ fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
         network_type: quic_bootstrap
         bootstrap_service: https://bootstrap-staging.holo.host
         transport_pool:
-            - type: quic
+          - type: proxy
+            sub_transport:
+              type: quic
+            proxy_config:
+              type: remote_proxy_client
+              proxy_url: "kitsune-proxy://1IazkCHRw1DihmY89jQLcj5pqvyL4HD7EWggpk-NYEc/kitsune-quic/h/52.14.147.62/p/22224/--"
     "#,
     environment_path.into_os_string().to_str().unwrap(),
     keystore_data_path().into_os_string().to_str().unwrap(),
