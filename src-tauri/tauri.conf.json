@@ -7,8 +7,7 @@
     "distDir": "Set automatically by Vue CLI plugin",
     "devPath": "Set automatically by Vue CLI plugin",
     "beforeDevCommand": "",
-    "beforeBuildCommand": "",
-    "runner": "cross"
+    "beforeBuildCommand": ""
   },
   "tauri": {
     "systemTray": {
@@ -16,7 +15,7 @@
     },
     "bundle": {
       "active": true,
-      "targets": ["app"],
+      "targets": "all",
       "identifier": "org.holochain.developer",
       "icon": [
         "icons/holochain.png",
