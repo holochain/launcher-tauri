@@ -22,15 +22,19 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+    - name: download caddy (Windows only)
+      if: matrix.platform == 'windows-latest'
+      run: |
+        curl.exe --output src-tauri/bins/caddy-x86_64-pc-windows-msvc.exe https://caddyserver.com/api/download?os=windows&arch=amd64&idempotency=17685152431701
+    - name: download caddy (MacOS only)
+      if: matrix.platform == 'macos-latest'
+      run: |
+        curl --output src-tauri/bins/caddy-x86_64-apple-darwin https://caddyserver.com/api/download?os=darwin&arch=amd64&idempotency=30565467962387
     - name: install webkit2gtk (ubuntu only)
       if: matrix.platform == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install -y webkit2gtk-4.0
-    - name: install Holochain
-      run: |
-        cargo install --git https://github.com/holochain/holochain --rev 1eb5b70f64b2188e6ef0c876367838b8a6a2015d holochain --force
-        cargo install lair_keystore --version 0.0.1-alpha.12
     - name: install Caddy (ubuntu)
       if: matrix.platform == 'ubuntu-latest'
       run: |
@@ -39,8 +43,12 @@ jobs:
         curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
         sudo apt update
         sudo apt install caddy 
-    - name: setup binaries (ubuntu)
-      if: matrix.platform == 'ubuntu-latest'
+    - name: install Holochain
+      run: |
+        cargo install --git https://github.com/holochain/holochain --rev 1eb5b70f64b2188e6ef0c876367838b8a6a2015d holochain --force
+        cargo install lair_keystore --version 0.0.1-alpha.12
+    - name: setup binaries (ubuntu & MacOS)
+      if: matrix.platform != 'windows-latest'
       run: |
         sh scripts/setup-binaries.sh
     - name: install app dependencies and build it
