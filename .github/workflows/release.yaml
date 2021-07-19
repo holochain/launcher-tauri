@@ -25,7 +25,7 @@ jobs:
     - name: download caddy (Windows only)
       if: matrix.platform == 'windows-latest'
       run: |
-        curl.exe --output src-tauri/bins/caddy-x86_64-pc-windows-msvc.exe https://caddyserver.com/api/download?os=windows&arch=amd64&idempotency=17685152431701
+        curl.exe --output src-tauri/bins/caddy-x86_64-pc-windows-msvc.exe https://caddyserver.com/api/download?os=windows&arch=amd64
     - name: download caddy (MacOS only)
       if: matrix.platform == 'macos-latest'
       run: |
