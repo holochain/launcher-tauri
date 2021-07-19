@@ -1,15 +1,15 @@
 name: "publish"
 on:
-push:
-  branches:
-    - release
+  push:
+    branches:
+      - release
 
 jobs:
   publish-tauri:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-latest]
+        platform: [macos-latest, ubuntu-latest, windows-latest]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -37,4 +37,4 @@ jobs:
         releaseName: "App v__VERSION__"
         body: "See the assets to download this version and install."
         draft: true
-        prerelease: false
+        prerelease: true
