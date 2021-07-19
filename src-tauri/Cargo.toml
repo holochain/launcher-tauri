@@ -7,19 +7,19 @@ edition = "2018"
 license = ""
 name = "holochain-launcher"
 repository = ""
-version = "0.1.0"
+version = "0.0.1"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = {git = "https://github.com/tauri-apps/tauri", package = "tauri-build", rev = "74e36c21dd1e3e12830bdc31dbb5fa54c13ad425"}
+tauri-build = "1.0.0-beta.3"
 
 [dependencies]
 base64 = "0.13.0"
 chrono = {version = "0.4", features = ["serde"] }
 flate2 = "1.0.20"
 futures = "0.3"
-holochain_conductor_api_rust = {git = "https://github.com/holochain/conductor-api-rust", rev = "4edf406b674d676f076bb19fdbe79fe5a1077c0d"}
+holochain_conductor_client = {git = "https://github.com/holochain/conductor-client-rust", branch = "main"}
 log = "0.4.14"
 log4rs = "1.0.0"
 open = "1"
@@ -27,17 +27,10 @@ open-file = "0.1.0"
 serde = {version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
-tauri = {git = "https://github.com/tauri-apps/tauri", package = "tauri", rev = "74e36c21dd1e3e12830bdc31dbb5fa54c13ad425", features = ["api-all", "menu", "system-tray"] }
+tauri = {version = "1.0.0-beta.5", features = ["api-all", "menu", "system-tray"] }
 tokio = "1.7.0"
 zip = "0.5"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
 default = ["custom-protocol"]
-
-[patch.crates-io]
-hdk_derive = {git = "https://github.com/holochain/holochain", rev = "753ea0873cd6e4c7b3ba30ead2d815d5f61b5373", package = "hdk_derive"}
-holo_hash = {git = "https://github.com/holochain/holochain", rev = "753ea0873cd6e4c7b3ba30ead2d815d5f61b5373", package = "holo_hash"}
-holochain_zome_types = {git = "https://github.com/holochain/holochain", rev = "753ea0873cd6e4c7b3ba30ead2d815d5f61b5373", package = "holochain_zome_types"}
-lmdb-rkv = {git = "https://github.com/holochain/lmdb-rs.git"}
-rkv = {git = "https://github.com/holochain/rkv.git", branch = "master"}

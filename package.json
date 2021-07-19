@@ -13,9 +13,9 @@
   },
   "dependencies": {
     "@holochain/admin-ui": "github:holochain/admin-ui#build",
-    "@holochain/conductor-api": "github:holochain/holochain-conductor-api#develop",
-    "@tauri-apps/api": "file:../../../tauri/tooling/api/dist",
-    "@tauri-apps/cli": "file:../../../tauri/tooling/cli.js",
+    "@holochain/conductor-api": "0.1.1",
+    "@tauri-apps/api": "1.0.0-beta.5",
+    "@tauri-apps/cli": "1.0.0-beta.6",
     "core-js": "^3.6.5",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",

@@ -1,5 +1,5 @@
 use crate::config::{admin_url, DEFAULT_APP_PORT};
-use holochain_conductor_api_rust::AdminWebsocket;
+use holochain_conductor_client::AdminWebsocket;
 
 pub async fn setup_conductor() -> Result<(), String> {
   let mut ws = AdminWebsocket::connect(admin_url())

@@ -1,6 +1,6 @@
 use std::fs;
 
-use holochain_conductor_api_rust::AdminWebsocket;
+use holochain_conductor_client::AdminWebsocket;
 use tauri::api::process::Command;
 
 use crate::{

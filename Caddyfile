@@ -1,3 +1,0 @@
-tcp/localhost:8080 {
-    file_server browse
-}
