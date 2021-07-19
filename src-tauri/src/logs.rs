@@ -6,6 +6,7 @@ use log4rs::{
   encode::pattern::PatternEncoder,
   Config,
 };
+use tauri::async_runtime;
 
 use crate::config::logs_path;
 
@@ -23,4 +24,18 @@ pub fn setup_logs() -> Result<(), String> {
   log4rs::init_config(config).map_err(|err| format!("Could not init log config: {:?}", err))?;
 
   Ok(())
+}
+
+#[tauri::command]
+pub fn log(log: String) -> Result<(), String> {
+  log::info!("UI: {}", log);
+  Ok(())
+}
+
+pub fn open_logs() {
+  async_runtime::spawn(async move {
+    if let Err(err) = edit::edit_file(logs_path()) {
+      log::error!("Error opening logs: {}", err);
+    }
+  });
 }

@@ -30,11 +30,11 @@ fn main() {
 
   let quit = CustomMenuItem::new("quit".to_string(), "Quit");
   let show_admin = CustomMenuItem::new("show_admin".to_string(), "Show Admin");
-  let _show_logs = CustomMenuItem::new("show_logs".to_string(), "Show Logs");
+  let open_logs = CustomMenuItem::new("open_logs".to_string(), "Open Logs");
 
   let sys_tray_menu = SystemTrayMenu::new()
     // TODO: uncomment when async runtime works well
-    // .add_item(show_logs)
+    .add_item(open_logs)
     .add_item(show_admin)
     .add_native_item(SystemTrayMenuItem::Separator)
     .add_item(quit);
@@ -71,8 +71,8 @@ fn main() {
               log::info!("Creating admin window {:?}", _r);
             }
           }
-          "show_logs" => {
-            // logs::open_logs();
+          "open_logs" => {
+            logs::open_logs();
           }
           _ => {}
         },
@@ -95,7 +95,8 @@ fn main() {
       open_app_ui,
       install_ui,
       deactivate_app_ui,
-      activate_app_ui
+      activate_app_ui,
+      logs::log
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

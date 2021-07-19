@@ -82,8 +82,6 @@ export default defineComponent({
       const path = this.happBundlePath as string;
       let appId = this.pathToAppId(path);
 
-      this.$store.commit("log", { log: "Installing hApp..." });
-
       try {
         await this.$store.dispatch(
           `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.installApp}`,
@@ -92,17 +90,19 @@ export default defineComponent({
             appId,
           }
         );
-        this.$store.commit("log", { log: "Installed app" });
 
+        await invoke("log", { log: "Installed app" });
         await invoke("install_ui", {
           uiBundlePath: this.uiBundlePath,
           appId,
         });
-        this.$store.commit("log", {
-          log: `Installed UI`,
-        });
+        await invoke("log", { log: "Installed UI" });
       } catch (e) {
-        this.$store.commit("log", {
+        this.$snackbar.add({
+          type: "error",
+          text: `Error installing hApp ${appId}: ${JSON.stringify(e)}`,
+        });
+        await invoke("log", {
           log: `Error installing hApp ${appId}: ${JSON.stringify(e)}`,
         });
       }

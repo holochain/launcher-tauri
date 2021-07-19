@@ -33,8 +33,10 @@ pub async fn install_ui(app_id: String, ui_bundle_path: String) -> Result<(), St
   let port = port_mapping.set_available_ui_port_for_app(app_id.clone())?;
 
   log::info!("Allocated new port {} for app {}", port, app_id.clone());
+  
+  caddy::reload_caddy().await?;
 
-  caddy::reload_caddy().await
+  Ok(())
 }
 
 #[tauri::command]
@@ -61,7 +63,7 @@ pub fn open_app_ui(app_id: String) -> Result<(), String> {
 
   let app_url = format!("http://localhost:{}", port);
 
-  let result = open::with_in_background(app_url.as_str(), "firefox");
+  let result = open::that_in_background(app_url.as_str());
   log::info!(
     "Opening app {} at {}, result: {:?}",
     app_id.clone(),

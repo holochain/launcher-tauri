@@ -1,6 +1,6 @@
 use std::fs;
 
-use holochain_conductor_client::AdminWebsocket;
+use holochain_conductor_client::{AdminWebsocket, AppStatusFilter};
 use tauri::api::process::Command;
 
 use crate::{
@@ -55,12 +55,14 @@ async fn refresh_caddyfile() -> Result<(), String> {
     .await
     .or(Err(String::from("Could not connect to conductor")))?;
 
-  let active_app_ids = ws
-    .list_active_apps()
+  let active_apps = ws
+    .list_apps(Some(AppStatusFilter::Running))
     .await
     .or(Err("Could not get the currently active apps"))?;
 
   let port_mapping = PortMapping::read_port_mapping()?;
+
+  let active_app_ids = active_apps.into_iter().map(|a| a.installed_app_id).collect();
 
   let caddyfile_contents = build_caddyfile_contents(active_app_ids, port_mapping)?;
 

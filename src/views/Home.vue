@@ -3,17 +3,16 @@
     <InstallApp style="margin: 16px"></InstallApp>
     <InstalledApps
       @open-app="openApp($event)"
-      @app-deactivated="deactiveAppUI($event)"
-      @app-activated="activeAppUI($event)"
+      @app-disabled="disableAppUI($event)"
+      @app-enabled="enableAppUI($event)"
+      @app-started="startAppUI($event)"
       style="flex: 1; padding: 24px"
     ></InstalledApps>
-    <Logs style="height: 220px"></Logs>
   </div>
 </template>
 
 <script lang="ts">
 import InstallApp from "@/components/InstallApp.vue";
-import Logs from "@/components/Logs.vue";
 import { defineComponent } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
 
@@ -21,38 +20,79 @@ export default defineComponent({
   name: "Home",
   components: {
     InstallApp,
-    Logs,
   },
   methods: {
     async openApp(appId: string) {
       try {
-        this.$store.commit("log", { log: `Opening app ${appId}...` });
+        await invoke("log", { log: "Installed app" });
 
         await invoke("open_app_ui", { appId });
-        this.$store.commit("log", { log: `App ${appId} opened` });
+        this.$snackbar.add({
+          type: "success",
+          text: `App ${appId} opened`,
+        });
       } catch (e) {
-        this.$store.commit("log", {
-          log: `Error opening app ${appId}: ${JSON.stringify(e)}`,
+        const error = `Error opening app ${appId}: ${JSON.stringify(e)}`;
+        this.$snackbar.add({
+          type: "error",
+          text: error,
+        });
+        await invoke("log", {
+          log: error,
         });
       }
     },
-    async deactiveAppUI(appId: string) {
+    async disableAppUI(appId: string) {
       try {
         await invoke("deactivate_app_ui", { appId });
-        this.$store.commit("log", { log: `App ${appId} deactivated` });
+        this.$snackbar.add({
+          type: "success",
+          text: `App ${appId} disabled`,
+        });
       } catch (e) {
-        this.$store.commit("log", {
-          log: `Deactivated app ${appId} failed: ${JSON.stringify(e)}`,
+        const error = `Disable app ${appId} failed: ${JSON.stringify(e)}`;
+        this.$snackbar.add({
+          type: "error",
+          text: error,
+        });
+        await invoke("log", {
+          log: error,
         });
       }
     },
-    async activeAppUI(appId: string) {
+    async enableAppUI(appId: string) {
       try {
         await invoke("activate_app_ui", { appId });
-        this.$store.commit("log", { log: `App ${appId} activated` });
+        this.$snackbar.add({
+          type: "success",
+          text: `App ${appId} enabled`,
+        });
       } catch (e) {
-        this.$store.commit("log", {
-          log: `Activated app ${appId} failed: ${JSON.stringify(e)}`,
+        const error = `Enable app ${appId} failed: ${JSON.stringify(e)}`;
+        this.$snackbar.add({
+          type: "error",
+          text: error,
+        });
+        await invoke("log", {
+          log: error,
+        });
+      }
+    },
+    async startAppUI(appId: string) {
+      try {
+        await invoke("activate_app_ui", { appId });
+        this.$snackbar.add({
+          type: "success",
+          text: `App ${appId} started`,
+        });
+      } catch (e) {
+        const error = `Start app ${appId} failed: ${JSON.stringify(e)}`;
+        this.$snackbar.add({
+          type: "error",
+          text: error,
+        });
+        await invoke("log", {
+          log: error,
         });
       }
     },
