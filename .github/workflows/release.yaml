@@ -33,7 +33,7 @@ jobs:
         run: |
           mkdir src-tauri/bins
           cd src-tauri/bins
-          curl --output caddy.tar.gz https://github.com/caddyserver/caddy/releases/download/v2.4.3/caddy_2.4.3_mac_amd64.tar.gz
+          curl --output caddy.tar.gz "https://github-releases.githubusercontent.com/29207621/2490fd00-cfa4-11eb-810d-3baf663fb37f?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20210720%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210720T140548Z&X-Amz-Expires=300&X-Amz-Signature=e04c41550edc4e2e6c6f6981ac38c9fb9fb916355bc234c4d63d561df7386e19&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=29207621&response-content-disposition=attachment%3B%20filename%3Dcaddy_2.4.3_mac_amd64.tar.gz&response-content-type=application%2Foctet-stream"
           gunzip -c caddy.tar.gz | tar xopf -
           mv caddy caddy-x86_64-apple-darwin
       - name: install webkit2gtk (ubuntu only)
