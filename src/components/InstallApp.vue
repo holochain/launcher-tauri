@@ -97,6 +97,10 @@ export default defineComponent({
           appId,
         });
         await invoke("log", { log: "Installed UI" });
+        this.$snackbar.add({
+          type: "success",
+          text: `Installed hApp ${appId}`,
+        });
       } catch (e) {
         this.$snackbar.add({
           type: "error",
