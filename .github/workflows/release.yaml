@@ -50,12 +50,12 @@ jobs:
       run: |
         cargo install --git https://github.com/holochain/holochain --rev 1eb5b70f64b2188e6ef0c876367838b8a6a2015d holochain --force
         cargo install lair_keystore --version 0.0.1-alpha.12
-    - name: setup binaries (ubuntu & MacOS)
+    - name: setup binaries (ubuntu only)
       if: matrix.platform == 'ubuntu-latest'
       run: |
         sh scripts/setup-binaries.sh
-    - name: setup binaries (ubuntu & MacOS)
-      if: matrix.platform == 'ubuntu-latest'
+    - name: setup binaries (macos only)
+      if: matrix.platform == 'macos-latest'
       run: |
         HOLOCHAIN_PATH=$(which holochain)
         cp $HOLOCHAIN_PATH src-tauri/bins/holochain-x86_64-apple-darwin
