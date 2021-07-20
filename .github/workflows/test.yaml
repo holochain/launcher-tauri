@@ -12,7 +12,7 @@ on:
       - develop
 
 jobs:
-  publish-tauri:
+  test:
     strategy:
       fail-fast: false
       matrix:
