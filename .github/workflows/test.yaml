@@ -1,0 +1,55 @@
+name: "test"
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  publish-tauri:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest]
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: install Rust stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: download caddy (Windows only)
+      - name: install webkit2gtk (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget libssl-dev libgtk-3-dev squashfs-tools libgtksourceview-3.0-dev libappindicator3-dev
+      - name: install Caddy (ubuntu)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
+          curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo apt-key add -
+          curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+          sudo apt update
+          sudo apt install caddy
+      - name: install Holochain
+        run: |
+          cargo install --git https://github.com/holochain/holochain --rev 1eb5b70f64b2188e6ef0c876367838b8a6a2015d holochain --force
+          cargo install lair_keystore --version 0.0.1-alpha.12
+      - name: setup binaries (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sh scripts/setup-binaries.sh
+      - name: install app dependencies and build it
+        run: yarn install && npm run tauri:build
