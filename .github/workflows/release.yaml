@@ -62,7 +62,7 @@ jobs:
         LAIR_PATH=$(which lair-keystore)
         cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-apple-darwin
     - name: install app dependencies and build it
-      run: yarn i && npm run tauri:build
+      run: yarn install && npm run tauri:build
     - uses: tauri-apps/tauri-action@v0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
