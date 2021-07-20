@@ -12,7 +12,7 @@ on:
       - develop
 
 jobs:
-  test:
+  testbuild:
     strategy:
       fail-fast: false
       matrix:
