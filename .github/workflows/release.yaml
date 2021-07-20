@@ -26,10 +26,13 @@ jobs:
       if: matrix.platform == 'windows-latest'
       run: |
         mkdir src-tauri/bins
-        curl.exe --output src-tauri/bins/caddy-x86_64-pc-windows-msvc.exe https://github.com/caddyserver/caddy/releases/download/v2.4.3/caddy_2.4.3_windows_amd64.zip
+        curl.exe --output src-tauri/bins https://github.com/caddyserver/caddy/releases/download/v2.4.3/caddy_2.4.3_windows_amd64.zip
+        7z x src-tauri/bins/caddy_2.4.3_windows_amd64.zip
+        rename src-tauri/bins/caddy.exe src-tauri/bins/caddy-x86_64-pc-windows-msvc.exe
     - name: download caddy (MacOS only)
       if: matrix.platform == 'macos-latest'
       run: |
+        mkdir src-tauri/bins
         curl --output src-tauri/bins/caddy-x86_64-apple-darwin https://caddyserver.com/api/download?os=darwin&arch=amd64&idempotency=30565467962387
     - name: install webkit2gtk (ubuntu only)
       if: matrix.platform == 'ubuntu-latest'
