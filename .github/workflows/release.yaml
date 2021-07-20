@@ -27,7 +27,7 @@ jobs:
       run: |
         mkdir src-tauri/bins
         cd src-tauri/bins
-        curl.exe --output caddy_2.4.3_windows_amd64.zip https://github.com/caddyserver/caddy/releases/download/v2.4.3/caddy_2.4.3_windows_amd64.zip
+        curl.exe --output caddy_2.4.3_windows_amd64.zip https://github-releases.githubusercontent.com/29207621/21960c80-cfa4-11eb-92f4-f72e10556cd2?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20210720%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210720T101909Z&X-Amz-Expires=300&X-Amz-Signature=40e3db93c2f7d347cd063018cbc86baf604798b6270d71e9522a0e77f5842def&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=29207621&response-content-disposition=attachment%3B%20filename%3Dcaddy_2.4.3_windows_amd64.zip&response-content-type=application%2Foctet-stream
         dir .
         7z x caddy_2.4.3_windows_amd64.zip -o*
         ren caddy.exe caddy-x86_64-pc-windows-msvc.exe
