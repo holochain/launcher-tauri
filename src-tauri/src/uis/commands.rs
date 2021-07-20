@@ -3,7 +3,6 @@ use crate::{
   config::uis_data_path,
   uis::{caddy, utils::unzip_file},
 };
-use open;
 use std::fs::{self, File};
 
 #[tauri::command]
@@ -63,7 +62,7 @@ pub fn open_app_ui(app_id: String) -> Result<(), String> {
 
   let app_url = format!("http://localhost:{}", port);
 
-  let result = open::that_in_background(app_url.as_str());
+  let result = opener::open(app_url.as_str());
   log::info!(
     "Opening app {} at {}, result: {:?}",
     app_id.clone(),

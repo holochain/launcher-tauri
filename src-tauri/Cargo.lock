@@ -2180,8 +2180,6 @@ dependencies = [
  "holochain_conductor_client",
  "log",
  "log4rs",
- "open",
- "open-file",
  "opener",
  "serde",
  "serde_json",
@@ -3836,12 +3834,6 @@ dependencies = [
  "pathdiff",
  "winapi",
 ]
-
-[[package]]
-name = "open-file"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9723e5a9ffe49d9fa0184ab852bff555ec26fb77cbc02928b967947a9ade3c2"
 
 [[package]]
 name = "opener"
