@@ -14,7 +14,7 @@ fn caddyfile_config_for_an_app(port: u16, app_id: String) -> String {
   format!(
     r#"
 :{} {{
-    root * {}
+    root * "{}"
     file_server
 }}
         "#,

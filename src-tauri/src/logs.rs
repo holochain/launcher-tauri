@@ -6,7 +6,6 @@ use log4rs::{
   encode::pattern::PatternEncoder,
   Config,
 };
-use tauri::async_runtime;
 
 use crate::config::logs_path;
 
@@ -33,9 +32,7 @@ pub fn log(log: String) -> Result<(), String> {
 }
 
 pub fn open_logs() {
-  async_runtime::spawn(async move {
-    if let Err(err) = edit::edit_file(logs_path()) {
-      log::error!("Error opening logs: {}", err);
-    }
-  });
+  if let Err(err) = opener::open(logs_path()) {
+    log::error!("Error opening logs: {}", err);
+  }
 }
