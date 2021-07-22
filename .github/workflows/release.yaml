@@ -67,12 +67,10 @@ jobs:
       - name: setup binaries (Windows only)
         if: matrix.platform == 'windows-latest'
         run: |
-          where holochain > hcpath.txt
-          set /p hcpath= < hcpath.txt
-          copy "%hcpath%" src-tauri/bins/holochain-x86_64-pc-windows-msvc.exe
-          where lair-keystore > lkpath.txt
-          set /p lkpath= < lkpath.txt
-          copy "%lkpath%" src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
+          $hcpath = where holochain
+          copy $hcpath src-tauri/bins/holochain-x86_64-pc-windows-msvc.exe
+          $lkpath = where lair-keystore
+          copy $lkpath src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
       - name: install app dependencies and build it
         run: yarn install && npm run tauri:build
       - uses: tauri-apps/tauri-action@v0
