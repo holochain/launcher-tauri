@@ -38,7 +38,6 @@ fn main() {
   let open_logs = CustomMenuItem::new("open_logs".to_string(), "Open Logs");
 
   let sys_tray_menu = SystemTrayMenu::new()
-    // TODO: uncomment when async runtime works well
     .add_item(open_logs)
     .add_item(show_admin)
     .add_native_item(SystemTrayMenuItem::Separator)
