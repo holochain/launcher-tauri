@@ -51,7 +51,7 @@ jobs:
           sudo apt install caddy
       - name: install Holochain
         run: |
-          cargo install --git https://github.com/holochain/holochain --rev e977bad8dbe298bcdf72a3dff815785fc4e20e79 holochain --force
+          cargo install --git https://github.com/holochain/holochain --rev c5dbdf28825927106bc32d186dd54f20d35df468 holochain --force
           cargo install lair_keystore --version 0.0.1-alpha.13
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
@@ -68,9 +68,10 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: |
           $HcPath = where holochain
-          Copy-Item $HcPath -Destination src-tauri/bins/holochain-x86_64-pc-windows-msvc.exe
+          Write-Host "Holochain is installed in $HcPath"
+          Copy-Item -Path $HcPath -Destination src-tauri/bins/holochain-x86_64-pc-windows-msvc.exe
           $LkPath = where lair-keystore
-          Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
+          Copy-Item -Path $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
       - name: install app dependencies and build it
         run: yarn install && npm run tauri:build
       - uses: tauri-apps/tauri-action@v0
