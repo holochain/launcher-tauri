@@ -83,20 +83,15 @@ export default defineComponent({
       let appId = this.pathToAppId(path);
 
       try {
+        await invoke("install_app", {
+          uiBundlePath: this.uiBundlePath,
+          appBundlePath: this.happBundlePath,
+        });
+
         await this.$store.dispatch(
-          `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.installApp}`,
-          {
-            appBundlePath: this.happBundlePath,
-            appId,
-          }
+          `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.fetchInstalledApps}`
         );
 
-        await invoke("log", { log: "Installed app" });
-        await invoke("install_ui", {
-          uiBundlePath: this.uiBundlePath,
-          appId,
-        });
-        await invoke("log", { log: "Installed UI" });
         this.$snackbar.add({
           type: "success",
           text: `Installed hApp ${appId}`,
@@ -104,10 +99,7 @@ export default defineComponent({
       } catch (e) {
         this.$snackbar.add({
           type: "error",
-          text: `Error installing hApp ${appId}: ${JSON.stringify(e)}`,
-        });
-        await invoke("log", {
-          log: `Error installing hApp ${appId}: ${JSON.stringify(e)}`,
+          text: JSON.stringify(e),
         });
       }
 

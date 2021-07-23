@@ -13,15 +13,20 @@ use tauri::WindowBuilder;
 use tauri::WindowUrl;
 use tauri::{CustomMenuItem, SystemTrayMenuItem};
 
+mod commands;
 mod config;
 mod logs;
 mod setup;
 mod uis;
 
+use crate::commands::{
+  activate_app::{activate_app_ui, deactivate_app_ui},
+  install_app::install_app,
+  open_app::open_app_ui,
+};
 use crate::logs::setup_logs;
 use crate::setup::setup_conductor;
 use crate::uis::caddy;
-use crate::uis::commands::{activate_app_ui, deactivate_app_ui, install_ui, open_app_ui};
 
 fn main() {
   if let Err(err) = setup_logs() {
@@ -93,7 +98,7 @@ fn main() {
     })
     .invoke_handler(tauri::generate_handler![
       open_app_ui,
-      install_ui,
+      install_app,
       deactivate_app_ui,
       activate_app_ui,
       logs::log

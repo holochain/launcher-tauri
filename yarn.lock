@@ -953,7 +953,7 @@
 
 "@holochain/admin-ui@github:holochain/admin-ui#build":
   version "0.1.0"
-  resolved "https://codeload.github.com/holochain/admin-ui/tar.gz/a34b63f930eb1850d75aa37649375dada2afbc4c"
+  resolved "https://codeload.github.com/holochain/admin-ui/tar.gz/c46e3eee142966aeb10c54d7d4e5fa9c997aae69"
   dependencies:
     "@holochain-open-dev/core-types" "0.1.1"
     "@holochain/conductor-api" "github:holochain/holochain-conductor-api#enable-disable"
@@ -977,7 +977,7 @@
 
 "@holochain/conductor-api@github:holochain/holochain-conductor-api#enable-disable":
   version "0.1.1"
-  resolved "https://codeload.github.com/holochain/holochain-conductor-api/tar.gz/821f0703d21cc0db2d142d2f440d086ffbaf064f"
+  resolved "https://codeload.github.com/holochain/holochain-conductor-api/tar.gz/12604660f6a59772d6d6f5454372777169460939"
   dependencies:
     "@msgpack/msgpack" "2.4.0"
     "@types/ws" "^7.2.4"
@@ -987,7 +987,6 @@
 
 "@holochain/conductor-api@https://github.com/holochain/holochain-conductor-api#enable-disable":
   version "0.1.1"
-  uid "821f0703d21cc0db2d142d2f440d086ffbaf064f"
   resolved "https://github.com/holochain/holochain-conductor-api#821f0703d21cc0db2d142d2f440d086ffbaf064f"
   dependencies:
     "@msgpack/msgpack" "2.4.0"
@@ -1476,9 +1475,9 @@
   integrity sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==
 
 "@types/node@*":
-  version "16.3.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.3.3.tgz#0c30adff37bbbc7a50eb9b58fae2a504d0d88038"
-  integrity sha512-8h7k1YgQKxKXWckzFCMfsIwn0Y61UK6tlD6y2lOb3hTOIMlK3t9/QwHOhc81TwU+RMf0As5fj7NPjroERCnejQ==
+  version "16.4.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.4.1.tgz#9fad171a5b701613ee8a6f4ece3c88b1034b1b03"
+  integrity sha512-UW7cbLqf/Wu5XH2RKKY1cHwUNLicIDRLMraYKz+HHAerJ0ZffUEk+fMnd8qU2JaS6cAy0r8tsaf7yqHASf/Y0Q==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -1590,9 +1589,9 @@
     source-map "^0.6.0"
 
 "@types/ws@^7.2.4":
-  version "7.4.6"
-  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-7.4.6.tgz#c4320845e43d45a7129bb32905e28781c71c1fff"
-  integrity sha512-ijZ1vzRawI7QoWnTNL8KpHixd2b2XVb9I9HAqI3triPsh1EC0xH0Eg6w2O3TKbDCgiNNlJqfrof6j4T2I+l9vw==
+  version "7.4.7"
+  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-7.4.7.tgz#f7c390a36f7a0679aa69de2d501319f4f8d9b702"
+  integrity sha512-JQbbmxZTZehdc2iszGKs5oC3NFnjeay7mtAWrdt7qNtAVK0g19muApzAy4bm9byz79xa2ZnO/BOBC2R8RC5Lww==
   dependencies:
     "@types/node" "*"
 
