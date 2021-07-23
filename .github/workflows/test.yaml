@@ -3,22 +3,13 @@ on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
   push:
-    branches:
-      - main
-      - develop
+    branches: [ main, develop ]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [ main, develop ]
 
 jobs:
-  test:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [ubuntu-latest]
-
-    runs-on: ${{ matrix.platform }}
+  testbuild:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: setup node
@@ -29,7 +20,6 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - name: download caddy (Windows only)
       - name: install webkit2gtk (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
         run: |
