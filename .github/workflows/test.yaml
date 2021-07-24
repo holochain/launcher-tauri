@@ -42,4 +42,4 @@ jobs:
         run: |
           sh scripts/setup-binaries.sh
       - name: install app dependencies and build it
-        run: npm install && npm run tauri:build
+        run: yarn install && npm run tauri:build
