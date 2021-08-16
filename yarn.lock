@@ -951,9 +951,9 @@
     "@holochain/conductor-api" "0.0.4"
     js-base64 "^3.6.0"
 
-"@holochain/admin-ui@github:holochain/admin-ui#develop":
+"@holochain/admin-ui@github:holochain/admin-ui#build":
   version "0.1.0"
-  resolved "https://codeload.github.com/holochain/admin-ui/tar.gz/6ded35f1b649f8da4938b8b2cb33d089647aa36b"
+  resolved "https://codeload.github.com/holochain/admin-ui/tar.gz/d623ba8443124c03a9e8937a0bd2d369bc513bc1"
   dependencies:
     "@holochain-open-dev/core-types" "0.1.1"
     "@holochain/conductor-api" "0.2.0"

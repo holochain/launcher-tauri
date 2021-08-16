@@ -12,7 +12,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@holochain/admin-ui": "github:holochain/admin-ui#develop",
+    "@holochain/admin-ui": "github:holochain/admin-ui#build",
     "@holochain/conductor-api": "0.2.0",
     "@tauri-apps/api": "1.0.0-beta.5",
     "@tauri-apps/cli": "1.0.0-beta.6",
