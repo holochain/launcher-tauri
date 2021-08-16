@@ -951,12 +951,12 @@
     "@holochain/conductor-api" "0.0.4"
     js-base64 "^3.6.0"
 
-"@holochain/admin-ui@github:holochain/admin-ui#build":
+"@holochain/admin-ui@github:holochain/admin-ui#develop":
   version "0.1.0"
-  resolved "https://codeload.github.com/holochain/admin-ui/tar.gz/c46e3eee142966aeb10c54d7d4e5fa9c997aae69"
+  resolved "https://codeload.github.com/holochain/admin-ui/tar.gz/6ded35f1b649f8da4938b8b2cb33d089647aa36b"
   dependencies:
     "@holochain-open-dev/core-types" "0.1.1"
-    "@holochain/conductor-api" "github:holochain/holochain-conductor-api#enable-disable"
+    "@holochain/conductor-api" "0.2.0"
     "@msgpack/msgpack" "^2.7.0"
     core-js "^3.6.5"
     fflate "^0.7.0"
@@ -975,19 +975,10 @@
     nanoid "^3.1.9"
     ws "^7.3.0"
 
-"@holochain/conductor-api@github:holochain/holochain-conductor-api#enable-disable":
-  version "0.1.1"
-  resolved "https://codeload.github.com/holochain/holochain-conductor-api/tar.gz/12604660f6a59772d6d6f5454372777169460939"
-  dependencies:
-    "@msgpack/msgpack" "2.4.0"
-    "@types/ws" "^7.2.4"
-    isomorphic-ws "^4.0.1"
-    nanoid "^3.1.9"
-    ws "^7.3.0"
-
-"@holochain/conductor-api@https://github.com/holochain/holochain-conductor-api#enable-disable":
-  version "0.1.1"
-  resolved "https://github.com/holochain/holochain-conductor-api#821f0703d21cc0db2d142d2f440d086ffbaf064f"
+"@holochain/conductor-api@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@holochain/conductor-api/-/conductor-api-0.2.0.tgz#d2b9d27aa5cda359f63a646206c095a38364fe39"
+  integrity sha512-GUjItNXRAxrae9hwf3brVVAB55bkG+Z3u6tEkmazrMs2tk+egIOjN9Oin1GsORjQoNw+7xj7mwZ1+TLY2F8hiQ==
   dependencies:
     "@msgpack/msgpack" "2.4.0"
     "@types/ws" "^7.2.4"
