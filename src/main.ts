@@ -26,7 +26,7 @@ async function setup() {
     const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`);
 
     app
-      .use(HcAdminPlugin, { store, appWebsocket, adminWebsocket })
+      .use(HcAdminPlugin as any, { store, appWebsocket, adminWebsocket })
       .mount("#app");
 
     await invoke("log", {

@@ -1,5 +1,3 @@
-use std::env;
-
 use crate::uis::port_mapping::PortMapping;
 
 #[tauri::command]
@@ -11,8 +9,7 @@ pub fn open_app_ui(app_id: String) -> Result<(), String> {
     .ok_or("App not registered")?;
 
   let app_url = format!("http://localhost:{}", port);
-  env::set_var("BROWSER", "firefox");
-  let result = opener::open_browser(app_url.as_str());
+  let result = opener::open(app_url.as_str());
   log::info!(
     "Opening app {} at {}, result: {:?}",
     app_id.clone(),
