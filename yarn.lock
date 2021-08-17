@@ -951,22 +951,9 @@
     "@holochain/conductor-api" "0.0.4"
     js-base64 "^3.6.0"
 
-"@holochain/admin-ui@github:holochain/admin-ui#build":
-  version "0.1.0"
-  resolved "https://codeload.github.com/holochain/admin-ui/tar.gz/d623ba8443124c03a9e8937a0bd2d369bc513bc1"
-  dependencies:
-    "@holochain-open-dev/core-types" "0.1.1"
-    "@holochain/conductor-api" "0.2.0"
-    "@msgpack/msgpack" "^2.7.0"
-    core-js "^3.6.5"
-    fflate "^0.7.0"
-    vue "^3.0.0"
-    vue-router "^4.0.0-0"
-    vuex "^4.0.0-0"
-
 "@holochain/admin-ui@https://github.com/holochain/admin-ui#build":
   version "0.1.0"
-  resolved "https://github.com/holochain/admin-ui#d623ba8443124c03a9e8937a0bd2d369bc513bc1"
+  resolved "https://github.com/holochain/admin-ui#4869db7cfab95dd809ebaaf981222151a86584fd"
   dependencies:
     "@holochain-open-dev/core-types" "0.1.1"
     "@holochain/conductor-api" "0.2.0"
