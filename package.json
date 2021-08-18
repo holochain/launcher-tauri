@@ -12,12 +12,12 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@holochain/admin-ui": "github:holochain/admin-ui#build",
-    "@holochain/conductor-api": "https://github.com/holochain/holochain-conductor-api#enable-disable",
-    "@tauri-apps/api": "1.0.0-beta.5",
-    "@tauri-apps/cli": "1.0.0-beta.6",
+    "@holochain/admin-ui": "https://github.com/holochain/admin-ui#build",
+    "@holochain/conductor-api": "0.2.0",
+    "@tauri-apps/api": "1.0.0-beta.6",
+    "@tauri-apps/cli": "1.0.0-beta.8",
     "core-js": "^3.6.5",
-    "vue": "^3.0.0",
+    "vue": "^3.1.5",
     "vue-router": "^4.0.0-0",
     "vue3-snackbar": "^1.0.2",
     "vuex": "^4.0.0-0"
