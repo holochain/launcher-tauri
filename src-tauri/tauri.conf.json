@@ -1,7 +1,7 @@
 {
   "package": {
     "productName": "Holochain Launcher",
-    "version": "0.1.2"
+    "version": "0.2.0"
   },
   "build": {
     "distDir": "Set automatically by Vue CLI plugin",
@@ -47,13 +47,6 @@
       "all": true
     },
     "windows": [
-      {
-        "label": "background",
-        "title": "Holochain",
-        "width": 1,
-        "height": 1,
-        "visible": false
-      },
       {
         "label": "admin",
         "title": "Holochain Admin",

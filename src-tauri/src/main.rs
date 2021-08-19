@@ -11,7 +11,7 @@ use tauri::SystemTrayEvent;
 use tauri::SystemTrayMenu;
 use tauri::WindowBuilder;
 use tauri::WindowUrl;
-use tauri::{CustomMenuItem, SystemTrayMenuItem, Event};
+use tauri::{CustomMenuItem, Event, SystemTrayMenuItem};
 
 mod commands;
 mod config;
@@ -29,7 +29,6 @@ use crate::setup::setup_conductor;
 use crate::uis::caddy;
 
 fn main() {
-
   if let Err(err) = setup_logs() {
     println!("Error setting up the logs: {:?}", err);
   }
@@ -45,19 +44,15 @@ fn main() {
     .add_item(quit);
 
   let sys_tray = SystemTray::new().with_menu(sys_tray_menu);
-  
+
   let builder_result = tauri::Builder::default()
     .system_tray(sys_tray)
     .on_system_tray_event(|app, event| {
       match event {
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
           "quit" => {
-            // Closing all the windows exits the app and kills all the children processes
-            for window in app.windows().values() {
-              let _r = window.close();
-              log::info!("Closing window {} {:?}", window.label(), _r);
-            }
-          },
+            app.exit(0);
+          }
           "show_admin" => {
             let admin_window = app.get_window("admin");
 
@@ -84,12 +79,12 @@ fn main() {
         _ => {}
       }
     })
-    .setup(|_app| {      
+    .setup(|_app| {
       tauri::async_runtime::block_on(async move {
         match launch_children_processes().await {
           Ok(()) => {
             log::info!("Launch setup successful");
-          },
+          }
           Err(err) => {
             log::error!("There was an error launching holochain: {:?}", err);
           }
@@ -105,18 +100,17 @@ fn main() {
       logs::log
     ])
     .build(tauri::generate_context!());
-    
-    match builder_result {
-      Ok(builder) => {
-        builder.run(|_app_handle, event| {
-          if let Event::ExitRequested { api, .. } = event {
-            // Uncomment when tauri's bug is fixed
-            // api.prevent_exit();
-          }
-        });    
-      },
-      Err(err) => log::error!("Error building the app: {:?}", err)
+
+  match builder_result {
+    Ok(builder) => {
+      builder.run(|_app_handle, event| {
+        if let Event::ExitRequested { api, .. } = event {
+          api.prevent_exit();
+        }
+      });
     }
+    Err(err) => log::error!("Error building the app: {:?}", err),
+  }
 }
 
 async fn launch_children_processes() -> Result<(), String> {
