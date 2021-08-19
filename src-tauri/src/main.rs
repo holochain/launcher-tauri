@@ -11,7 +11,7 @@ use tauri::SystemTrayEvent;
 use tauri::SystemTrayMenu;
 use tauri::WindowBuilder;
 use tauri::WindowUrl;
-use tauri::{CustomMenuItem, SystemTrayMenuItem};
+use tauri::{CustomMenuItem, Event, SystemTrayMenuItem};
 
 mod commands;
 mod config;
@@ -45,17 +45,13 @@ fn main() {
 
   let sys_tray = SystemTray::new().with_menu(sys_tray_menu);
 
-  tauri::Builder::default()
+  let builder_result = tauri::Builder::default()
     .system_tray(sys_tray)
     .on_system_tray_event(|app, event| {
       match event {
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
           "quit" => {
-            // Closing all the windows exits the app and kills all the children processes
-            for window in app.windows().values() {
-              let _r = window.close();
-              log::info!("Closing window {} {:?}", window.label(), _r);
-            }
+            app.exit(0);
           }
           "show_admin" => {
             let admin_window = app.get_window("admin");
@@ -66,7 +62,7 @@ fn main() {
             } else {
               // Window was closed: we need to recreate it
               let _r = app.create_window(
-                "admin".into(),
+                "admin",
                 WindowUrl::App("index.html".into()),
                 move |window_builder, webview_attributes| {
                   (window_builder.title("Holochain Admin"), webview_attributes)
@@ -86,12 +82,13 @@ fn main() {
     .setup(|_app| {
       tauri::async_runtime::block_on(async move {
         match launch_children_processes().await {
-          Ok(()) => (),
+          Ok(()) => {
+            log::info!("Launch setup successful");
+          }
           Err(err) => {
             log::error!("There was an error launching holochain: {:?}", err);
           }
         }
-        log::info!("Launch setup successful")
       });
       Ok(())
     })
@@ -102,8 +99,18 @@ fn main() {
       activate_app_ui,
       logs::log
     ])
-    .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+    .build(tauri::generate_context!());
+
+  match builder_result {
+    Ok(builder) => {
+      builder.run(|_app_handle, event| {
+        if let Event::ExitRequested { api, .. } = event {
+          api.prevent_exit();
+        }
+      });
+    }
+    Err(err) => log::error!("Error building the app: {:?}", err),
+  }
 }
 
 async fn launch_children_processes() -> Result<(), String> {
