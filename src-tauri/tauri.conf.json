@@ -11,15 +11,19 @@
   },
   "tauri": {
     "systemTray": {
-      "iconPath": "icons/holochain.png"
+      "iconPath": "icons/icon.png"
     },
     "bundle": {
       "active": true,
       "targets": "all",
       "identifier": "org.holochain.developer",
       "icon": [
-        "icons/holochain.png",
-        "icons/icon.ico"
+        "icons/icon.png",
+        "icons/icon.ico",
+        "icons/16x16.png",
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png"
       ],
       "resources": [],
       "externalBin": ["bins/holochain", "bins/lair-keystore", "bins/caddy"],
