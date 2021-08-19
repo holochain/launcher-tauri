@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        platform: [macos-latest, ubuntu-18.04, windows-latest]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -37,12 +37,12 @@ jobs:
           gunzip -c caddy.tar.gz | tar xopf -
           mv caddy caddy-x86_64-apple-darwin
       - name: install webkit2gtk (ubuntu only)
-        if: matrix.platform == 'ubuntu-latest'
+        if: matrix.platform == 'ubuntu-18.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget libssl-dev libgtk-3-dev squashfs-tools libgtksourceview-3.0-dev libappindicator3-dev
       - name: install Caddy (ubuntu)
-        if: matrix.platform == 'ubuntu-latest'
+        if: matrix.platform == 'ubuntu-18.04'
         run: |
           sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
           curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo apt-key add -
@@ -54,7 +54,7 @@ jobs:
           cargo install --git https://github.com/holochain/holochain --rev c5dbdf28825927106bc32d186dd54f20d35df468 holochain --force
           cargo install lair_keystore --version 0.0.1-alpha.13
       - name: setup binaries (ubuntu only)
-        if: matrix.platform == 'ubuntu-latest'
+        if: matrix.platform == 'ubuntu-18.04'
         run: |
           sh scripts/setup-binaries.sh
       - name: setup binaries (macos only)
