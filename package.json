@@ -15,7 +15,6 @@
     "@holochain/admin-ui": "https://github.com/holochain/admin-ui#build",
     "@holochain/conductor-api": "0.2.0",
     "@tauri-apps/api": "1.0.0-beta.6",
-    "@tauri-apps/cli": "1.0.0-beta.8",
     "core-js": "^3.6.5",
     "vue": "^3.1.5",
     "vue-router": "^4.0.0-0",
@@ -23,6 +22,7 @@
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "1.0.0-beta.8",
     "@types/jest": "^24.0.19",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
@@ -54,5 +54,8 @@
       "vue-cli-service lint",
       "git add"
     ]
+  },
+  "resolutions": {
+    "@tauri-apps/cli": "1.0.0-beta.8"
   }
 }
