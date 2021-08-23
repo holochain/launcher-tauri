@@ -23,7 +23,7 @@ jobs:
       - name: install webkit2gtk (ubuntu only)
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget libssl-dev libgtk-3-dev squashfs-tools libgtksourceview-3.0-dev libappindicator3-dev patchelf librsvg2-dev
+          sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget libssl-dev libgtk-3-dev squashfs-tools libgtksourceview-3.0-dev libappindicator3-dev patchelf librsvg2-dev libsqlcipher-dev
       - name: install Caddy (ubuntu)
         run: |
           sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
