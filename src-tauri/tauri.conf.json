@@ -4,8 +4,8 @@
     "version": "0.2.0"
   },
   "build": {
-    "distDir": "Set automatically by Vue CLI plugin",
-    "devPath": "Set automatically by Vue CLI plugin",
+    "distDir": "../dist/",
+    "devPath": "../dist/",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
   },
