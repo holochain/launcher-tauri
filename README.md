@@ -6,17 +6,8 @@
 
 ## Installing the Launcher
 
-0. Install the necessary dependencies:
-
-```bash
-sudo apt-get install libgtksourceview-3.0-dev libwebkit2gtk-4.0-dev libappindicator3-dev
-```
-
-> This step should not be needed once [Tauri supports it](https://github.com/tauri-apps/tauri/issues/1986).
-
 1. Go to the [Releases page](https://github.com/holochain/launcher/releases).
-2. Download the appropriate executable for your platform.
-3. Execute the AppImage.
+2. Download the appropriate executable for your platform and execute it.
 
 > Warning! This will replace your `$CONFIG_DIR/holochain/conductor-config.yaml`, if you have one from running `holochain -i`.
 
@@ -33,7 +24,7 @@ You will also have the admin interface available at `ws://localhost:8889`, but i
 1. Package your happ into a `.happ` file.
 2. Package your UI into a `.zip` file.
 3. In the "Install hApp" section of the Holochain Admin, select your `.happ` file and your `.zip` file.
-4. Click install, it will take a while.
+4. Click install, it may take a while.
 5. When it's finished installation, the happ will appear in the list of active happs.
 
 ## Data storage
