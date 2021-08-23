@@ -34,7 +34,7 @@ jobs:
       - name: install Holochain
         run: |
           cargo install holochain --version 0.0.103
-          cargo install lair_keystore --version 0.0.3
+          cargo install lair_keystore --version 0.0.3 --locked
       - name: setup binaries (ubuntu only)
         run: |
           sh scripts/setup-binaries.sh
