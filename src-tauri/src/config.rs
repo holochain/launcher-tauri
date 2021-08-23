@@ -66,7 +66,9 @@ fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
     decryption_service_uri: ~
     dpki: ~
     keystore_path: {}
-    passphrase_service: ~
+    passphrase_service:
+        type: danger_insecure_from_config
+        passphrase: "test-passphrase"
     admin_interfaces: 
         - driver:
             type: websocket
