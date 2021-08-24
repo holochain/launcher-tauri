@@ -7,8 +7,6 @@
     "build": "vue-cli-service build --dest src-tauri/target/webpack_dist && npm run tauri build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "tauri:build": "vue-cli-service tauri:build",
-    "tauri:serve": "vue-cli-service tauri:serve",
     "tauri": "tauri"
   },
   "dependencies": {
