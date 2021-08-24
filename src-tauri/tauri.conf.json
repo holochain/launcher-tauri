@@ -4,8 +4,8 @@
     "version": "0.2.0"
   },
   "build": {
-    "distDir": "../dist/",
-    "devPath": "../dist/",
+    "distDir": "target/webpack_dist",
+    "devPath": "target/webpack_dist",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
   },
