@@ -72,7 +72,7 @@ jobs:
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-x86_64-pc-windows-msvc.exe
           Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
       - name: install app dependencies and build it
-        run: yarn install && yarn run tauri:build
+        run: yarn install && yarn run build
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
