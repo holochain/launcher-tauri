@@ -36,11 +36,16 @@ jobs:
           curl -L --output caddy.tar.gz "https://github.com/caddyserver/caddy/releases/download/v2.4.3/caddy_2.4.3_mac_amd64.tar.gz"
           gunzip -c caddy.tar.gz | tar xopf -
           mv caddy caddy-x86_64-apple-darwin
-      - name: install webkit2gtk (ubuntu only)
+      - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget libssl-dev libgtk-3-dev squashfs-tools libgtksourceview-3.0-dev libappindicator3-dev patchelf librsvg2-dev libsqlcipher-dev
+      - name: install dependencies (MacOS only)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" 2> /dev/null
+          brew install sqlcipher
       - name: install Caddy (ubuntu)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
@@ -52,7 +57,7 @@ jobs:
       - name: install Holochain
         run: |
           cargo install holochain --version 0.0.103
-          cargo install lair_keystore --version 0.0.4 --locked
+          cargo install lair_keystore --version 0.0.3 --locked
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
