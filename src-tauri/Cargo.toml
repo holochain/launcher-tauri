@@ -2,7 +2,7 @@
 authors = ["guillem.cordoba@gmail.com"]
 build = "src/build.rs"
 default-run = "holochain-launcher"
-description = "A Tauri App"
+description = "Holochain launcher to run Holochain locally in your desktop"
 edition = "2018"
 license = ""
 name = "holochain-launcher"
@@ -13,15 +13,15 @@ version = "0.2.0"
 
 [build-dependencies]
 # Branch `next`
-tauri-build = {git = "https://github.com/tauri-apps/tauri", rev = "1a28904b8ebea92e143d5dc21ebd209e9edec531"}
+tauri-build = {git = "https://github.com/tauri-apps/tauri", rev = "2026134f471a212aea9b227a873ecc937dda1acc"}
 
 [dependencies]
 base64 = "0.13.0"
 chrono = {version = "0.4", features = ["serde"] }
 flate2 = "1.0.20"
 futures = "0.3"
-holochain_conductor_client = {git = "https://github.com/holochain/conductor-client-rust", rev = "b271f8a1a716bab9693df63d91ae6a281a0a1aba"}
-holochain_types = {git = "https://github.com/holochain/holochain", rev = "c5dbdf28825927106bc32d186dd54f20d35df468"}
+holochain_conductor_client = {git = "https://github.com/holochain/conductor-client-rust", rev = "440e8a0b1016695fb1132a04e9cdb297f98801af"}
+holochain_types = "0.0.4"
 log = "0.4.14"
 log4rs = "1.0.0"
 opener = "0.5.0"
@@ -29,7 +29,7 @@ serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
 # Branch `next`
-tauri = {git = "https://github.com/tauri-apps/tauri", rev = "1a28904b8ebea92e143d5dc21ebd209e9edec531", features = ["api-all", "system-tray"] }
+tauri = {git = "https://github.com/tauri-apps/tauri", rev = "2026134f471a212aea9b227a873ecc937dda1acc", features = ["api-all", "system-tray"] }
 tokio = "1.9.0"
 zip = "0.5"
 
