@@ -5789,7 +5789,7 @@ dependencies = [
 [[package]]
 name = "tauri"
 version = "1.0.0-beta.8"
-source = "git+https://github.com/tauri-apps/tauri?rev=2026134f471a212aea9b227a873ecc937dda1acc#2026134f471a212aea9b227a873ecc937dda1acc"
+source = "git+https://github.com/tauri-apps/tauri?rev=7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0#7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0"
 dependencies = [
  "attohttpc",
  "base64",
@@ -5837,7 +5837,7 @@ dependencies = [
 [[package]]
 name = "tauri-build"
 version = "1.0.0-beta.4"
-source = "git+https://github.com/tauri-apps/tauri?rev=2026134f471a212aea9b227a873ecc937dda1acc#2026134f471a212aea9b227a873ecc937dda1acc"
+source = "git+https://github.com/tauri-apps/tauri?rev=7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0#7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0"
 dependencies = [
  "anyhow",
  "proc-macro2",
@@ -5850,7 +5850,7 @@ dependencies = [
 [[package]]
 name = "tauri-codegen"
 version = "1.0.0-beta.4"
-source = "git+https://github.com/tauri-apps/tauri?rev=2026134f471a212aea9b227a873ecc937dda1acc#2026134f471a212aea9b227a873ecc937dda1acc"
+source = "git+https://github.com/tauri-apps/tauri?rev=7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0#7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0"
 dependencies = [
  "blake3",
  "kuchiki",
@@ -5891,7 +5891,7 @@ dependencies = [
 [[package]]
 name = "tauri-macros"
 version = "1.0.0-beta.5"
-source = "git+https://github.com/tauri-apps/tauri?rev=2026134f471a212aea9b227a873ecc937dda1acc#2026134f471a212aea9b227a873ecc937dda1acc"
+source = "git+https://github.com/tauri-apps/tauri?rev=7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0#7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0"
 dependencies = [
  "proc-macro2",
  "quote 1.0.9",
@@ -5902,7 +5902,7 @@ dependencies = [
 [[package]]
 name = "tauri-runtime"
 version = "0.2.1"
-source = "git+https://github.com/tauri-apps/tauri?rev=2026134f471a212aea9b227a873ecc937dda1acc#2026134f471a212aea9b227a873ecc937dda1acc"
+source = "git+https://github.com/tauri-apps/tauri?rev=7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0#7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0"
 dependencies = [
  "gtk",
  "http",
@@ -5919,7 +5919,7 @@ dependencies = [
 [[package]]
 name = "tauri-runtime-wry"
 version = "0.2.1"
-source = "git+https://github.com/tauri-apps/tauri?rev=2026134f471a212aea9b227a873ecc937dda1acc#2026134f471a212aea9b227a873ecc937dda1acc"
+source = "git+https://github.com/tauri-apps/tauri?rev=7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0#7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0"
 dependencies = [
  "gtk",
  "ico",
@@ -5935,7 +5935,7 @@ dependencies = [
 [[package]]
 name = "tauri-utils"
 version = "1.0.0-beta.3"
-source = "git+https://github.com/tauri-apps/tauri?rev=2026134f471a212aea9b227a873ecc937dda1acc#2026134f471a212aea9b227a873ecc937dda1acc"
+source = "git+https://github.com/tauri-apps/tauri?rev=7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0#7917aa4722cfafcc9d211b8dfe3cfb4f01c890a0"
 dependencies = [
  "heck",
  "html5ever",
