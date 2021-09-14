@@ -19,7 +19,7 @@ jobs:
       - name: install Rust stable
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: 1.54
       - name: install webkit2gtk (ubuntu only)
         run: |
           sudo apt-get update
