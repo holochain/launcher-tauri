@@ -56,7 +56,7 @@ jobs:
           sudo apt install caddy
       - name: install Holochain
         run: |
-          cargo install holochain --version 0.0.104
+          cargo install holochain --version 0.0.104 --locked
           cargo install lair_keystore --version 0.0.4 --locked
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
