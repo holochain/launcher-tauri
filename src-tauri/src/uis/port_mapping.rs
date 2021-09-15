@@ -36,8 +36,16 @@ impl PortMapping {
     self.0.insert(app_id, port);
 
     self.write_port_mapping()?;
-
+    
     Ok(port)
+  }
+  
+  pub fn remove_app_from_mapping(&mut self, app_id: String) -> Result<(), String> {
+    self.0.remove(&app_id);
+    
+    self.write_port_mapping()?;
+
+    Ok(())
   }
 
   fn get_next_available_port(&self) -> u16 {

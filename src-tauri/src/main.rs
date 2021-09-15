@@ -22,6 +22,7 @@ mod uis;
 use crate::commands::{
   activate_app::{activate_app_ui, deactivate_app_ui},
   install_app::install_app,
+  uninstall_app::uninstall_app,
   open_app::open_app_ui,
 };
 use crate::logs::setup_logs;
@@ -97,6 +98,7 @@ fn main() {
       install_app,
       deactivate_app_ui,
       activate_app_ui,
+      uninstall_app,
       logs::log
     ])
     .build(tauri::generate_context!());

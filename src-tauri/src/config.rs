@@ -49,11 +49,13 @@ pub fn create_initial_config_if_necessary() -> () {
   create_dir_if_necessary(holochain_data_path());
   create_dir_if_necessary(keystore_data_path());
   create_dir_if_necessary(uis_data_path());
-  fs::write(
-    conductor_config_path(),
-    initial_config(DEFAULT_ADMIN_PORT, holochain_data_path()),
-  )
-  .expect("Could not write conductor config");
+  if let Err(_) = fs::read(holochain_data_path()) {
+    fs::write(
+      conductor_config_path(),
+      initial_config(DEFAULT_ADMIN_PORT, holochain_data_path()),
+    )
+    .expect("Could not write conductor config");
+  }
 }
 
 fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
@@ -84,18 +86,9 @@ fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
               type: remote_proxy_client
               proxy_url: "kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--"
         tuning_params:
-            gossip_peer_on_success_next_gossip_delay_ms: 500
-            gossip_peer_on_error_next_gossip_delay_ms: 2000
-            gossip_loop_iteration_delay_ms: 42
-            default_notify_remote_agent_count: 5
-            default_notify_timeout_ms: 1000
-            default_rpc_single_timeout_ms: 20000
-            default_rpc_multi_remote_agent_count: 2
-            default_rpc_multi_timeout_ms: 2000
-            agent_info_expires_after_ms: 180000
-            tls_in_mem_session_storage: 512
-            proxy_keepalive_ms: 120000
-            proxy_to_expire_ms: 300000
+            gossip_strategy: "sharded-gossip"
+            gossip_single_storage_arc_per_space: true
+            default_rpc_multi_remote_request_grace_ms: 10
     "#,
     environment_path.into_os_string().to_str().unwrap(),
     keystore_data_path().into_os_string().to_str().unwrap(),
