@@ -7,7 +7,7 @@ use crate::{
   },
 };
 use holochain_conductor_client::{AdminWebsocket, InstallAppBundlePayload};
-use holochain_types::prelude::{AppBundle, AppBundleSource};
+use holochain_types::prelude::{AppBundle, AppBundleSource, SerializedBytes};
 use holochain_types::web_app::WebAppBundle;
 use mr_bundle::ResourceBytes;
 use std::{
@@ -16,7 +16,12 @@ use std::{
 };
 
 #[tauri::command]
-pub async fn install_app(app_id: String, web_app_bundle_path: String) -> Result<(), String> {
+pub async fn install_app(
+  app_id: String,
+  web_app_bundle_path: String,
+  uid: Option<String>,
+  membrane_proofs: HashMap<String, SerializedBytes>,
+) -> Result<(), String> {
   log::info!("Installing: web_app_bundle = {}", web_app_bundle_path);
 
   let web_app_bundle = WebAppBundle::decode(
@@ -29,10 +34,12 @@ pub async fn install_app(app_id: String, web_app_bundle_path: String) -> Result<
     .await
     .or(Err("Failed to resolve hApp bundle"))?;
 
-  install_happ(app_id.clone(), app_bundle).await.map_err(|err| {
-    log::error!("Error installing hApp: {}", err);
-    err
-  })?;
+  install_happ(app_id.clone(), app_bundle, uid, membrane_proofs)
+    .await
+    .map_err(|err| {
+      log::error!("Error installing hApp: {}", err);
+      err
+    })?;
 
   log::info!("Installed hApp {} in the conductor", app_id);
 
@@ -53,7 +60,12 @@ pub async fn install_app(app_id: String, web_app_bundle_path: String) -> Result<
   Ok(())
 }
 
-async fn install_happ(app_id: String, app_bundle: AppBundle) -> Result<(), String> {
+async fn install_happ(
+  app_id: String,
+  app_bundle: AppBundle,
+  uid: Option<String>,
+  membrane_proofs: HashMap<String, SerializedBytes>,
+) -> Result<(), String> {
   let mut ws = AdminWebsocket::connect(admin_url())
     .await
     .or(Err(String::from("Could not connect to conductor")))?;
@@ -67,12 +79,13 @@ async fn install_happ(app_id: String, app_bundle: AppBundle) -> Result<(), Strin
     source: AppBundleSource::Bundle(app_bundle),
     agent_key: new_key,
     installed_app_id: Some(app_id.clone().into()),
-    membrane_proofs: HashMap::new(),
-    uid: None,
+    membrane_proofs,
+    uid,
   };
   ws.install_app_bundle(payload)
     .await
     .map_err(|err| format!("Error install hApp bundle: {:?}", err))?;
+
   ws.enable_app(app_id.into())
     .await
     .map_err(|err| format!("Error enabling app: {:?}", err))?;

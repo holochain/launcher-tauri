@@ -10,25 +10,25 @@ use crate::{
 };
 
 #[tauri::command]
-pub async fn uninstall_app(installed_app_id: String) -> Result<(), String> {
-  log::info!("Uninstalling: installed_app_id = {}", installed_app_id);
+pub async fn uninstall_app(app_id: String) -> Result<(), String> {
+  log::info!("Uninstalling: installed_app_id = {}", app_id);
 
   let mut ws = AdminWebsocket::connect(admin_url())
     .await
     .or(Err(String::from("Could not connect to conductor")))?;
 
-  ws.uninstall_app(installed_app_id.clone())
+  ws.uninstall_app(app_id.clone())
     .await
     .map_err(|err| format!("Error uninstalling app: {:?}", err))?;
 
-  log::info!("Uninstalled hApp {} from the conductor", installed_app_id);
+  log::info!("Uninstalled hApp {} from the conductor", app_id);
 
-  uninstall_ui(installed_app_id.clone()).await.map_err(|err| {
+  uninstall_ui(app_id.clone()).await.map_err(|err| {
     log::error!("Error removing the UI for hApp: {}", err);
     err
   })?;
 
-  log::info!("Removed UI for hApp {}", installed_app_id);
+  log::info!("Removed UI for hApp {}", app_id);
 
   Ok(())
 }

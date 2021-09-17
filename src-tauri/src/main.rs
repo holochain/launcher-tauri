@@ -20,10 +20,11 @@ mod setup;
 mod uis;
 
 use crate::commands::{
-  activate_app::{activate_app_ui, deactivate_app_ui},
+  enable_app::{disable_app, enable_app},
+  get_slots_to_configure::get_slots_to_configure,
   install_app::install_app,
-  uninstall_app::uninstall_app,
   open_app::open_app_ui,
+  uninstall_app::uninstall_app,
 };
 use crate::logs::setup_logs;
 use crate::setup::setup_conductor;
@@ -96,10 +97,11 @@ fn main() {
     .invoke_handler(tauri::generate_handler![
       open_app_ui,
       install_app,
-      deactivate_app_ui,
-      activate_app_ui,
+      enable_app,
+      disable_app,
       uninstall_app,
-      logs::log
+      get_slots_to_configure,
+      logs::log,
     ])
     .build(tauri::generate_context!());
 
