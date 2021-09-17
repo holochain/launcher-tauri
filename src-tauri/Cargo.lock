@@ -1450,7 +1450,7 @@ dependencies = [
 [[package]]
 name = "fixt"
 version = "0.0.5"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "holochain_serialized_bytes",
  "lazy_static",
@@ -2091,8 +2091,8 @@ dependencies = [
 
 [[package]]
 name = "holo_hash"
-version = "0.0.5"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.6"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "arbitrary",
  "base64",
@@ -2121,6 +2121,7 @@ dependencies = [
  "holochain_types",
  "log",
  "log4rs",
+ "mr_bundle 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "opener",
  "serde",
  "serde_json",
@@ -2133,8 +2134,8 @@ dependencies = [
 
 [[package]]
 name = "holochain_conductor_api"
-version = "0.0.6-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.6"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "derive_more",
  "directories 2.0.2",
@@ -2157,7 +2158,7 @@ dependencies = [
 [[package]]
 name = "holochain_conductor_client"
 version = "0.0.1"
-source = "git+https://github.com/holochain/conductor-client-rust?rev=5aff0eed1e69255ebc6b366fa69a27aacda8d668#5aff0eed1e69255ebc6b366fa69a27aacda8d668"
+source = "git+https://github.com/holochain/conductor-client-rust?rev=a5262a1a63c8af9e7ac8132b6e93b56ffc7e06d1#a5262a1a63c8af9e7ac8132b6e93b56ffc7e06d1"
 dependencies = [
  "again",
  "anyhow",
@@ -2170,8 +2171,8 @@ dependencies = [
 
 [[package]]
 name = "holochain_keystore"
-version = "0.0.6-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.6"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "ghost_actor 0.3.0-alpha.4",
  "holo_hash",
@@ -2190,8 +2191,8 @@ dependencies = [
 
 [[package]]
 name = "holochain_p2p"
-version = "0.0.6-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.6"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "async-trait",
  "fixt",
@@ -2201,7 +2202,7 @@ dependencies = [
  "holochain_keystore",
  "holochain_serialized_bytes",
  "holochain_types",
- "holochain_util",
+ "holochain_util 0.0.3 (git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66)",
  "holochain_zome_types",
  "kitsune_p2p",
  "kitsune_p2p_types",
@@ -2242,8 +2243,8 @@ dependencies = [
 
 [[package]]
 name = "holochain_sqlite"
-version = "0.0.6-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.6"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "anyhow",
  "byteorder",
@@ -2258,7 +2259,7 @@ dependencies = [
  "futures",
  "holo_hash",
  "holochain_serialized_bytes",
- "holochain_util",
+ "holochain_util 0.0.3 (git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66)",
  "holochain_zome_types",
  "kitsune_p2p",
  "lazy_static",
@@ -2288,8 +2289,8 @@ dependencies = [
 
 [[package]]
 name = "holochain_state"
-version = "0.0.6-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.6"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "base64",
  "byteorder",
@@ -2304,7 +2305,7 @@ dependencies = [
  "holochain_serialized_bytes",
  "holochain_sqlite",
  "holochain_types",
- "holochain_util",
+ "holochain_util 0.0.3 (git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66)",
  "holochain_wasm_test_utils",
  "holochain_zome_types",
  "kitsune_p2p",
@@ -2322,8 +2323,8 @@ dependencies = [
 
 [[package]]
 name = "holochain_types"
-version = "0.0.6-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.6"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "anyhow",
  "arbitrary",
@@ -2344,12 +2345,12 @@ dependencies = [
  "holochain_keystore",
  "holochain_serialized_bytes",
  "holochain_sqlite",
- "holochain_util",
+ "holochain_util 0.0.3 (git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66)",
  "holochain_zome_types",
  "itertools 0.10.1",
  "lazy_static",
  "mockall",
- "mr_bundle",
+ "mr_bundle 0.0.3 (git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66)",
  "must_future",
  "nanoid",
  "observability",
@@ -2372,7 +2373,22 @@ dependencies = [
 [[package]]
 name = "holochain_util"
 version = "0.0.3"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2cb9b17ef17ef43e6d68721151835bfd1debab5ab66e364c7a262f404eb818fe"
+dependencies = [
+ "cfg-if 0.1.10",
+ "derive_more",
+ "dunce",
+ "futures",
+ "num_cpus",
+ "once_cell",
+ "tokio",
+]
+
+[[package]]
+name = "holochain_util"
+version = "0.0.3"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "backtrace",
  "cfg-if 0.1.10",
@@ -2386,13 +2402,13 @@ dependencies = [
 
 [[package]]
 name = "holochain_wasm_test_utils"
-version = "0.0.6-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.6"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "fixt",
  "holo_hash",
  "holochain_types",
- "holochain_util",
+ "holochain_util 0.0.3 (git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66)",
  "holochain_zome_types",
  "rand 0.7.3",
  "strum 0.18.0",
@@ -2415,8 +2431,8 @@ dependencies = [
 
 [[package]]
 name = "holochain_websocket"
-version = "0.0.6-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.6"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "futures",
  "ghost_actor 0.4.0-alpha.5",
@@ -2439,8 +2455,8 @@ dependencies = [
 
 [[package]]
 name = "holochain_zome_types"
-version = "0.0.7"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.8"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "arbitrary",
  "chrono",
@@ -2450,6 +2466,7 @@ dependencies = [
  "holo_hash",
  "holochain_serialized_bytes",
  "holochain_wasmer_common",
+ "kitsune_p2p_timestamp",
  "nanoid",
  "num_enum",
  "once_cell",
@@ -2797,8 +2814,8 @@ dependencies = [
 
 [[package]]
 name = "kitsune_p2p"
-version = "0.0.6-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.6"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "arbitrary",
  "arrayref",
@@ -2812,6 +2829,7 @@ dependencies = [
  "itertools 0.10.1",
  "kitsune_p2p_mdns",
  "kitsune_p2p_proxy",
+ "kitsune_p2p_timestamp",
  "kitsune_p2p_transport_quic",
  "kitsune_p2p_types",
  "lair_keystore_api",
@@ -2832,7 +2850,7 @@ dependencies = [
 [[package]]
 name = "kitsune_p2p_dht_arc"
 version = "0.0.2"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "derive_more",
  "gcollections",
@@ -2843,7 +2861,7 @@ dependencies = [
 [[package]]
 name = "kitsune_p2p_mdns"
 version = "0.0.1"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "async-stream",
  "base64",
@@ -2858,8 +2876,8 @@ dependencies = [
 
 [[package]]
 name = "kitsune_p2p_proxy"
-version = "0.0.5-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.5"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "base64",
  "blake2b_simd",
@@ -2882,9 +2900,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "kitsune_p2p_timestamp"
+version = "0.0.2"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
+dependencies = [
+ "arbitrary",
+ "chrono",
+ "rusqlite",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "kitsune_p2p_transport_quic"
-version = "0.0.5-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.5"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "blake2b_simd",
  "futures",
@@ -2903,8 +2933,8 @@ dependencies = [
 
 [[package]]
 name = "kitsune_p2p_types"
-version = "0.0.5-dev.0"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+version = "0.0.5"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "base64",
  "derive_more",
@@ -3330,7 +3360,27 @@ dependencies = [
 [[package]]
 name = "mr_bundle"
 version = "0.0.3"
-source = "git+https://github.com/holochain/holochain?rev=885a87b8ac69e1e40db8a8f753419629459763ab#885a87b8ac69e1e40db8a8f753419629459763ab"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9108bf5cd6f7dff9b1357c3473c2726aadcc74f1af7a86965fae2ef1fd5c774f"
+dependencies = [
+ "bytes",
+ "derive_more",
+ "either",
+ "flate2",
+ "futures",
+ "holochain_util 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "reqwest",
+ "rmp-serde",
+ "serde",
+ "serde_bytes",
+ "serde_derive",
+ "thiserror",
+]
+
+[[package]]
+name = "mr_bundle"
+version = "0.0.3"
+source = "git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66#940a920ed44f09f47daf28d7cc997610bbc04d66"
 dependencies = [
  "arbitrary",
  "bytes",
@@ -3338,7 +3388,7 @@ dependencies = [
  "either",
  "flate2",
  "futures",
- "holochain_util",
+ "holochain_util 0.0.3 (git+https://github.com/holochain/holochain?rev=940a920ed44f09f47daf28d7cc997610bbc04d66)",
  "reqwest",
  "rmp-serde",
  "serde",

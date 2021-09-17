@@ -4,8 +4,8 @@ use std::{
   path::PathBuf,
 };
 
-pub fn unzip_file(file: File, outpath: PathBuf) -> Result<(), String> {
-  let mut archive = zip::ZipArchive::new(file).unwrap();
+pub fn unzip_file(reader: File, outpath: PathBuf) -> Result<(), String> {
+  let mut archive = zip::ZipArchive::new(reader).unwrap();
 
   for i in 0..archive.len() {
     let mut file = archive.by_index(i).unwrap();

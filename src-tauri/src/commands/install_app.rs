@@ -8,27 +8,40 @@ use crate::{
 };
 use holochain_conductor_client::{AdminWebsocket, InstallAppBundlePayload};
 use holochain_types::prelude::{AppBundle, AppBundleSource};
+use holochain_types::web_app::WebAppBundle;
+use mr_bundle::ResourceBytes;
 use std::{
   collections::HashMap,
   fs::{self, File},
 };
 
 #[tauri::command]
-pub async fn install_app(app_bundle_path: String, ui_bundle_path: String) -> Result<(), String> {
-  log::info!(
-    "Installing: app_id = {}, ui_bundle_path = {}",
-    app_bundle_path,
-    ui_bundle_path
-  );
+pub async fn install_app(app_id: String, web_app_bundle_path: String) -> Result<(), String> {
+  log::info!("Installing: web_app_bundle = {}", web_app_bundle_path);
 
-  let app_id = install_happ(app_bundle_path).await.map_err(|err| {
+  let web_app_bundle = WebAppBundle::decode(
+    &fs::read(&web_app_bundle_path).or(Err("Failed to read Web hApp bundle file"))?,
+  )
+  .or(Err("Malformed Web hApp bundle file"))?;
+
+  let app_bundle = web_app_bundle
+    .happ_bundle()
+    .await
+    .or(Err("Failed to resolve hApp bundle"))?;
+
+  install_happ(app_id.clone(), app_bundle).await.map_err(|err| {
     log::error!("Error installing hApp: {}", err);
     err
   })?;
 
   log::info!("Installed hApp {} in the conductor", app_id);
 
-  install_ui(app_id.clone(), ui_bundle_path)
+  let web_ui_zip_bytes = web_app_bundle
+    .web_ui_zip_bytes()
+    .await
+    .or(Err("Failed to resolve Web UI"))?;
+
+  install_ui(app_id.clone(), web_ui_zip_bytes.as_slice().to_vec())
     .await
     .map_err(|err| {
       log::error!("Error installing the UI for hApp: {}", err);
@@ -40,13 +53,7 @@ pub async fn install_app(app_bundle_path: String, ui_bundle_path: String) -> Res
   Ok(())
 }
 
-async fn install_happ(app_bundle_path: String) -> Result<String, String> {
-  let app_bundle =
-    AppBundle::decode(&fs::read(&app_bundle_path).or(Err("Failed to read hApp bundle file"))?)
-      .or(Err("Malformed hApp bundle file"))?;
-
-  let app_id = app_bundle.manifest().app_name();
-
+async fn install_happ(app_id: String, app_bundle: AppBundle) -> Result<(), String> {
   let mut ws = AdminWebsocket::connect(admin_url())
     .await
     .or(Err(String::from("Could not connect to conductor")))?;
@@ -57,9 +64,9 @@ async fn install_happ(app_bundle_path: String) -> Result<String, String> {
     .map_err(|err| format!("Error generating public key: {:?}", err))?;
 
   let payload = InstallAppBundlePayload {
-    source: AppBundleSource::Path(app_bundle_path.into()),
+    source: AppBundleSource::Bundle(app_bundle),
     agent_key: new_key,
-    installed_app_id: Some(app_id.into()),
+    installed_app_id: Some(app_id.clone().into()),
     membrane_proofs: HashMap::new(),
     uid: None,
   };
@@ -70,10 +77,10 @@ async fn install_happ(app_bundle_path: String) -> Result<String, String> {
     .await
     .map_err(|err| format!("Error enabling app: {:?}", err))?;
 
-  Ok(app_id.into())
+  Ok(())
 }
 
-async fn install_ui(app_id: String, ui_bundle_path: String) -> Result<(), String> {
+async fn install_ui(app_id: String, web_ui_zip_bytes: ResourceBytes) -> Result<(), String> {
   let mut port_mapping = PortMapping::read_port_mapping()?;
 
   if let Some(_) = port_mapping.get_ui_port_for_app(&app_id) {
@@ -83,12 +90,10 @@ async fn install_ui(app_id: String, ui_bundle_path: String) -> Result<(), String
   let ui_folder_path = app_ui_folder_path(app_id.clone());
   let ui_zip_path = uis_data_path().join(format!("{}.zip", app_id));
 
-  fs::copy(ui_bundle_path, ui_zip_path.clone()).or(Err("Failed to read UI ZIP file"))?;
+  fs::write(ui_zip_path.clone(), web_ui_zip_bytes).or(Err("Failed to write Web UI Zip file"))?;
 
-  unzip_file(
-    File::open(ui_zip_path).or(Err("Failed to read file"))?,
-    ui_folder_path,
-  )?;
+  let file = File::open(ui_zip_path).or(Err("Failed to read Web UI Zip file"))?;
+  unzip_file(file, ui_folder_path)?;
 
   let port = port_mapping.set_available_ui_port_for_app(app_id.clone())?;
 

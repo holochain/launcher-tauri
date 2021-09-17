@@ -20,10 +20,11 @@ base64 = "0.13.0"
 chrono = {version = "0.4", features = ["serde"] }
 flate2 = "1.0.20"
 futures = "0.3"
-holochain_conductor_client = {git = "https://github.com/holochain/conductor-client-rust", rev = "5aff0eed1e69255ebc6b366fa69a27aacda8d668"}
-holochain_types = {git = "https://github.com/holochain/holochain", rev = "885a87b8ac69e1e40db8a8f753419629459763ab"}
+holochain_conductor_client = {git = "https://github.com/holochain/conductor-client-rust", rev = "a5262a1a63c8af9e7ac8132b6e93b56ffc7e06d1"}
+holochain_types = {git = "https://github.com/holochain/holochain", rev = "940a920ed44f09f47daf28d7cc997610bbc04d66"}
 log = "0.4.14"
 log4rs = "1.0.0"
+mr_bundle = "0.0.3"
 opener = "0.5.0"
 serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
@@ -31,7 +32,7 @@ serde_yaml = "0.8"
 # Branch `next`
 tauri = {git = "https://github.com/tauri-apps/tauri", rev = "84f6e3e84a34b01b7fa04f5c4719acb921ef4263", features = ["api-all", "system-tray"] }
 tokio = "1.9.0"
-zip = "0.5"
+zip = "0.5.0"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

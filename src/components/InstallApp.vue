@@ -4,36 +4,23 @@
 
     <span style="margin-right: 8px">hApp file: </span>
     <button
-      v-if="!happBundlePath"
+      v-if="!webAppBundlePath"
       style="margin-right: 8px"
-      @click="selectHappFile()"
+      @click="selectWebHappFile()"
     >
-      Select hApp bundle
+      Select Web-hApp bundle
     </button>
     <div v-else class="row center">
-      <span style="margin-right: 8px">{{ pathToFilename(happBundlePath) }}</span
-      ><button @click="happBundlePath = undefined" style="margin-right: 8px">
-        Remove
-      </button>
-    </div>
-
-    <span style="margin-right: 8px; margin-left: 8px">UI file: </span>
-    <button
-      v-if="!uiBundlePath"
-      style="margin-right: 8px"
-      @click="selectUIFile()"
-    >
-      Select UI bundle
-    </button>
-    <div v-else class="row center">
-      <span style="margin-right: 8px">{{ pathToFilename(uiBundlePath) }}</span
-      ><button @click="uiBundlePath = undefined" style="margin-right: 8px">
+      <span style="margin-right: 8px">{{
+        pathToFilename(webAppBundlePath)
+      }}</span
+      ><button @click="webAppBundlePath = undefined" style="margin-right: 8px">
         Remove
       </button>
     </div>
 
     <button
-      :disabled="!happBundlePath || !uiBundlePath"
+      :disabled="!webAppBundlePath || !this.appId"
       @click="installApp()"
       style="margin-left: 24px"
     >
@@ -51,41 +38,29 @@ import { open } from "@tauri-apps/api/dialog";
 export default defineComponent({
   name: "InstallApp",
   data(): {
-    happBundlePath: string | undefined;
-    uiBundlePath: string | undefined;
+    webAppBundlePath: string | undefined;
+    appId: string | undefined;
   } {
     return {
-      happBundlePath: undefined,
-      uiBundlePath: undefined,
+      appId: Date.now().toString(),
+      webAppBundlePath: undefined,
     };
   },
   methods: {
-    async selectHappFile() {
-      this.happBundlePath = (await open({
-        filters: [{ name: "happ", extensions: ["happ"] }],
-      })) as string;
-    },
-    async selectUIFile() {
-      this.uiBundlePath = (await open({
-        filters: [{ name: "ui", extensions: ["zip"] }],
+    async selectWebHappFile() {
+      this.webAppBundlePath = (await open({
+        filters: [{ name: "webhapp", extensions: ["webhapp"] }],
       })) as string;
     },
     pathToFilename(path: string) {
       const components = path.split("/");
       return components[components.length - 1];
     },
-    pathToAppId(path: string) {
-      const filename = this.pathToFilename(path);
-      return filename.split(".")[0];
-    },
     async installApp() {
-      const path = this.happBundlePath as string;
-      let appId = this.pathToAppId(path);
-
       try {
         await invoke("install_app", {
-          uiBundlePath: this.uiBundlePath,
-          appBundlePath: this.happBundlePath,
+          appId: this.appId,
+          webAppBundlePath: this.webAppBundlePath,
         });
 
         await this.$store.dispatch(
@@ -94,7 +69,7 @@ export default defineComponent({
 
         this.$snackbar.add({
           type: "success",
-          text: `Installed hApp ${appId}`,
+          text: `Installed hApp ${this.appId}`,
         });
       } catch (e) {
         this.$snackbar.add({
@@ -103,8 +78,7 @@ export default defineComponent({
         });
       }
 
-      this.happBundlePath = undefined;
-      this.uiBundlePath = undefined;
+      this.webAppBundlePath = undefined;
     },
   },
 });
