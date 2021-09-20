@@ -21,7 +21,8 @@ jobs:
       - name: install Rust stable
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          override: true
+          toolchain: 1.54
       - name: download caddy (Windows only)
         if: matrix.platform == 'windows-latest'
         run: |
@@ -56,7 +57,7 @@ jobs:
           sudo apt install caddy
       - name: install Holochain
         run: |
-          cargo install holochain --git https://github.com/holochain/holochain --rev f37f94fd112de770af7c0352abb3ef4cf4082652 --locked
+          cargo install holochain --version 0.0.106 --locked
           cargo install lair_keystore --version 0.0.4 --locked
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
