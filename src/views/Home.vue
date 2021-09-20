@@ -1,17 +1,25 @@
 <template>
   <div class="column" style="flex: 1">
-    <InstalledApps
-      @open-app="openApp($event)"
-      @disable-app="disableApp($event)"
-      @enable-app="enableApp($event)"
-      @starte-app="startApp($event)"
-      @uninstall-app="uninstallApp($event)"
-      style="flex: 1; padding: 24px"
-    ></InstalledApps>
-    <InstallApp
-      style="margin: 16px; position: absolute; right: 0; bottom: 0"
-    ></InstallApp>
-    <mwc-snackbar :labelText="snackbarText" ref="snackbar"></mwc-snackbar>
+    <div class="flex-scrollable-parent">
+      <div class="flex-scrollable-container">
+        <div class="flex-scrollable-y">
+          <InstalledApps
+            @open-app="openApp($event)"
+            @disable-app="disableApp($event)"
+            @enable-app="enableApp($event)"
+            @starte-app="startApp($event)"
+            @uninstall-app="uninstallApp($event)"
+            style="padding: 24px; display: flex; margin-bottom: 80px"
+          ></InstalledApps>
+        </div>
+      </div>
+    </div>
+    <InstallApp></InstallApp>
+    <mwc-snackbar
+      leading
+      :labelText="snackbarText"
+      ref="snackbar"
+    ></mwc-snackbar>
   </div>
 </template>
 
@@ -20,8 +28,6 @@ import InstallApp from "@/components/InstallApp.vue";
 import { defineComponent } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import AdminUI from "@holochain/admin-ui";
-import "@material/mwc-snackbar";
-import "@material/mwc-button";
 
 export default defineComponent({
   name: "Home",
@@ -33,7 +39,6 @@ export default defineComponent({
   } {
     return { snackbarText: undefined };
   },
-
   methods: {
     async openApp(appId: string) {
       try {
@@ -51,7 +56,11 @@ export default defineComponent({
     },
     async disableApp(appId: string) {
       try {
-        await invoke("deactivate_app", { appId });
+        await invoke("disable_app", { appId });
+
+        await this.$store.dispatch(
+          `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.fetchInstalledApps}`
+        );
         this.showMessage(`App ${appId} disabled`);
       } catch (e) {
         const error = `Disable app ${appId} failed: ${JSON.stringify(e)}`;
@@ -64,6 +73,10 @@ export default defineComponent({
     async enableApp(appId: string) {
       try {
         await invoke("enable_app", { appId });
+
+        await this.$store.dispatch(
+          `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.fetchInstalledApps}`
+        );
         this.showMessage(`App ${appId} enabled`);
       } catch (e) {
         const error = `Enable app ${appId} failed: ${JSON.stringify(e)}`;
@@ -76,6 +89,11 @@ export default defineComponent({
     async startApp(appId: string) {
       try {
         await invoke("start_app", { appId });
+
+        await this.$store.dispatch(
+          `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.fetchInstalledApps}`
+        );
+
         this.showMessage(`App ${appId} started`);
       } catch (e) {
         const error = `Start app ${appId} failed: ${JSON.stringify(e)}`;

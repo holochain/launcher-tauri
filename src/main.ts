@@ -1,18 +1,22 @@
 import { createApp } from "vue";
-import App from "./App.vue";
-import router from "./router";
-import store from "./store";
-import { AdminWebsocket, AppWebsocket } from "@holochain/conductor-api";
-import HcAdminPlugin from "@holochain/admin-ui";
-import { invoke } from "@tauri-apps/api/tauri";
-import { ADMIN_PORT } from "./constants";
 import "@material/mwc-textfield";
+import "@material/mwc-textarea";
 import "@material/mwc-dialog";
 import "@material/mwc-fab";
 import "@material/mwc-snackbar";
+import "@material/mwc-linear-progress";
+//import "@material/mwc-button";
+
+import { AdminWebsocket, AppWebsocket } from "@holochain/conductor-api";
+import HcAdminPlugin from "@holochain/admin-ui";
+import { invoke } from "@tauri-apps/api/tauri";
+
+import App from "./App.vue";
+import store from "./store";
+import { ADMIN_PORT } from "./constants";
 
 async function setup() {
-  const app = createApp(App).use(store).use(router);
+  const app = createApp(App).use(store as any);
 
   try {
     const adminWebsocket = await AdminWebsocket.connect(

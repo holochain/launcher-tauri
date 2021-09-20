@@ -4,9 +4,19 @@
     <router-link to="/about">About</router-link>
   </div>
  -->
-  <router-view />
+  <Home style="display: flex; flex: 1"></Home>
 </template>
+<script lang="ts">
+import Home from "./views/Home.vue";
+import { defineComponent } from "vue";
 
+export default defineComponent({
+  name: "App",
+  components: {
+    Home,
+  },
+});
+</script>
 <style>
 html,
 body,
@@ -15,6 +25,13 @@ body,
   display: flex;
   flex: 1;
   height: 100%;
+  font-family: Mulish, sans-serif;
+  background-color: #ededed;
+}
+
+:root {
+  --mdc-theme-primary: #4720e3;
+  --mdc-theme-secondary: #0dddd3;
 }
 
 #app {

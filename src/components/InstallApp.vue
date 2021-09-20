@@ -3,65 +3,83 @@
     extended
     icon="add"
     label="Install new app"
-    @click="showDialog = true"
+    @click="selectWebHappFile()"
+    style="
+      margin: 16px;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      --mdc-theme-secondary: #4720e3;
+    "
   ></mwc-fab>
-  <mwc-dialog heading="Install App" :open="showDialog">
-    <div class="column">
-      <div class="row">
-        <mwc-button
-          v-if="!webAppBundlePath"
-          style="margin-right: 8px"
-          @click="selectWebHappFile()"
-          raised
-        >
-          Select Web-hApp bundle
-        </mwc-button>
-        <span v-else style="margin-right: 8px">{{
-          pathToFilename(webAppBundlePath)
-        }}</span>
-      </div>
+  <mwc-dialog heading="Install App" :open="!!webAppBundlePath">
+    <div
+      class="row center"
+      style="width: 512px"
+      v-if="webAppBundlePath === 'loading'"
+    >
+      <mwc-circular-progress
+        indeterminate
+        style="margin-top: 80px; margin-bottom: 60px"
+      ></mwc-circular-progress>
+    </div>
+    <div class="column" style="width: 512px" v-else-if="webAppBundlePath">
+      <span style="margin-right: 8px"
+        >Bundle: {{ pathToFilename(webAppBundlePath) }}</span
+      >
 
-      <div v-if="webAppBundlePath">
+      <div class="column" style="flex: 1">
         <mwc-textfield
           label="App Id"
           outlined
           @change="appId = $event.target.value"
           class="row-item"
+          style="flex: 1"
         ></mwc-textfield>
         <mwc-textfield
           label="UID"
           outlined
           @change="uid = $event.target.value"
           class="row-item"
+          style="flex: 1"
         ></mwc-textfield>
 
         <span class="row-item">Slots</span>
-        <div v-for="appSlot of slots" :key="appSlot.name" class="row-item">
+        <div
+          v-for="appSlot of slots"
+          :key="appSlot.name"
+          class="row-item row"
+          style="flex: 1"
+        >
           <span>{{ appSlot.name }}</span>
-          <mwc-textfield
+          <mwc-textarea
+            style="flex: 1"
             label="Membrane Proof"
             outlined
             @change="membraneProofs[appSlot.name] = $event.target.value"
-          ></mwc-textfield>
+          ></mwc-textarea>
         </div>
       </div>
     </div>
 
-    <mwc-button label="Cancel" slot="secondaryAction" @click="cancel()">
-    </mwc-button>
     <mwc-button
-      v-if="!installing"
-      :disabled="!isAppReadyToInstall()"
-      @click="installApp()"
-      style="margin-left: 24px"
-      label="INSTALL APP"
-      raised
-      slot="primaryAction"
+      v-if="webAppBundlePath !== 'loading'"
+      label="Cancel"
+      slot="secondaryAction"
+      :disabled="installing"
+      @click="cancel()"
     >
     </mwc-button>
-    <mwc-circular-progress v-else style="width: 80px"></mwc-circular-progress>
+    <mwc-button
+      v-if="webAppBundlePath !== 'loading'"
+      slot="primaryAction"
+      :disabled="!isAppReadyToInstall() || installing"
+      @click="installApp()"
+      :label="installing ? 'Installing...' : 'Install app'"
+    >
+    </mwc-button>
   </mwc-dialog>
-  <mwc-snackbar :labelText="snackbarText" ref="snackbar"></mwc-snackbar>
+  <mwc-snackbar leading :labelText="snackbarText" ref="snackbar"></mwc-snackbar>
 </template>
 
 <script lang="ts">
@@ -74,8 +92,7 @@ export default defineComponent({
   name: "InstallApp",
   data(): {
     installing: boolean;
-    showDialog: boolean;
-    webAppBundlePath: string | undefined;
+    webAppBundlePath: string | "loading" | undefined;
     appId: string | undefined;
     uid: string | undefined;
     membraneProofs: { [key: string]: string } | undefined;
@@ -84,7 +101,6 @@ export default defineComponent({
   } {
     return {
       installing: false,
-      showDialog: false,
       appId: undefined,
       webAppBundlePath: undefined,
       uid: undefined,
@@ -99,13 +115,16 @@ export default defineComponent({
         filters: [{ name: "webhapp", extensions: ["webhapp"] }],
       })) as string;
 
+      if (!webAppBundlePath) return;
+
+      this.webAppBundlePath = "loading";
+
       this.membraneProofs = {};
       this.slots = await invoke("get_slots_to_configure", { webAppBundlePath });
 
       this.webAppBundlePath = webAppBundlePath;
     },
     cancel() {
-      this.showDialog = false;
       this.webAppBundlePath = undefined;
       this.uid = undefined;
       this.membraneProofs = {};
@@ -136,9 +155,9 @@ export default defineComponent({
         );
 
         this.showMessage(`Installed hApp ${this.appId}`);
-        this.showDialog = false;
         this.webAppBundlePath = undefined;
       } catch (e) {
+        this.installing = false;
         this.showMessage(JSON.stringify(e));
       }
     },
