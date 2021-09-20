@@ -19,7 +19,7 @@ jobs:
       - name: install Rust stable
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.54
+          toolchain: stable
       - name: install webkit2gtk (ubuntu only)
         run: |
           sudo apt-get update
@@ -33,7 +33,7 @@ jobs:
           sudo apt install caddy
       - name: install Holochain
         run: |
-          cargo install holochain --git https://github.com/holochain/holochain --rev f37f94fd112de770af7c0352abb3ef4cf4082652 --locked
+          cargo install holochain --git https://github.com/holochain/holochain --rev 4bd6738d7cb2d89aa606901045669b573e8b5b99 --locked
           cargo install lair_keystore --version 0.0.4 --locked
       - name: setup binaries (ubuntu only)
         run: |
