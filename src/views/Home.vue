@@ -8,13 +8,31 @@
             @disable-app="disableApp($event)"
             @enable-app="enableApp($event)"
             @starte-app="startApp($event)"
-            @uninstall-app="uninstallApp($event)"
+            @uninstall-app="appToBeUninstalled = $event"
             style="padding: 24px; display: flex; margin-bottom: 50px"
           ></InstalledApps>
         </div>
       </div>
     </div>
     <InstallApp></InstallApp>
+    <mwc-dialog
+      heading="Uninstall App"
+      :open="appToBeUninstalled"
+      @closing="appToBeUninstalled = undefined"
+    >
+      <div>Are you sure you want to uninstall {{ appToBeUninstalled }}?</div>
+
+      <mwc-button
+        label="Cancel"
+        slot="secondaryAction"
+        dialogAction="close"
+      ></mwc-button>
+      <mwc-button
+        label="Uninstall"
+        slot="primaryAction"
+        @click="uninstallApp(appToBeUninstalled)"
+      ></mwc-button>
+    </mwc-dialog>
     <mwc-snackbar
       leading
       :labelText="snackbarText"
@@ -36,8 +54,9 @@ export default defineComponent({
   },
   data(): {
     snackbarText: string | undefined;
+    appToBeUninstalled: string | undefined;
   } {
-    return { snackbarText: undefined };
+    return { snackbarText: undefined, appToBeUninstalled: undefined };
   },
   methods: {
     async openApp(appId: string) {
@@ -111,6 +130,7 @@ export default defineComponent({
           `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.fetchInstalledApps}`
         );
 
+        this.appToBeUninstalled = undefined;
         this.showMessage(`Uninstalled ${appId}`);
       } catch (e) {
         const error = `Uninstall app ${appId} failed: ${JSON.stringify(e)}`;

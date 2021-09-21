@@ -1,10 +1,10 @@
 import { createApp } from "vue";
 import "@material/mwc-textfield";
 import "@material/mwc-textarea";
-import "@material/mwc-dialog";
 import "@material/mwc-fab";
 import "@material/mwc-snackbar";
 //import "@material/mwc-button";
+//import "@material/mwc-dialog";
 
 import { AdminWebsocket, AppWebsocket } from "@holochain/conductor-api";
 import HcAdminPlugin from "@holochain/admin-ui";

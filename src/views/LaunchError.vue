@@ -8,8 +8,10 @@
         computer has stored.
       </span>
       <span style="margin-top: 8px">
-        Unfortunately, at the moment there is no way of upgrade old Holochain
-        apps to be compatible with newer versions of Holochain.
+        In the future, Holochain will include a smooth mechanism to upgrade from
+        one version to the next. Unfortunately, at the moment there is no way of
+        upgrade old Holochain apps to be compatible with newer versions of
+        Holochain.
       </span>
       <span style="margin-top: 8px">
         <b>If you don't want to lose old data,</b> uninstall this version of the

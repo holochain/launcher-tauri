@@ -20,6 +20,7 @@ export default defineComponent({
   },
   methods: {
     isConnected() {
+      console.log(this.$store.state.isConnected);
       return this.$store.state.isConnected;
     },
   },
@@ -102,8 +103,6 @@ body,
   font-weight: 400;
   src: url(/font/MaterialIcons-Regular.eot); /* For IE6-8 */
   src: local("Material Icons"), local("MaterialIcons-Regular"),
-    url(/font/MaterialIcons-Regular.woff2) format("woff2"),
-    url(/font/MaterialIcons-Regular.woff) format("woff"),
     url(/font/MaterialIcons-Regular.ttf) format("truetype");
 }
 </style>

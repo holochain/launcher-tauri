@@ -33,6 +33,9 @@ module.exports = {
           "./node_modules/@material/mwc-button"
         ),
         "@material/mwc-icon": path.resolve("./node_modules/@material/mwc-icon"),
+        "@material/mwc-dialog": path.resolve(
+          "./node_modules/@material/mwc-dialog"
+        ),
       },
     },
   },

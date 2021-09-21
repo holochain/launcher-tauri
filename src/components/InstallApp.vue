@@ -12,7 +12,12 @@
       --mdc-theme-secondary: #4720e3;
     "
   ></mwc-fab>
-  <mwc-dialog heading="Install App" :open="!!webAppBundlePath">
+  <mwc-dialog
+    heading="Install App"
+    :open="!!webAppBundlePath"
+    scrimClickAction=""
+    escapeKeyAction=""
+  >
     <div
       class="row center"
       style="width: 512px"
@@ -32,19 +37,22 @@
         <mwc-textfield
           label="App Id"
           outlined
-          @change="appId = $event.target.value"
+          ref="appIdField"
+          @input="appId = $event.target.value"
           class="row-item"
+          autovalidate
+          required
           style="flex: 1"
         ></mwc-textfield>
         <mwc-textfield
           label="UID"
           outlined
-          @change="uid = $event.target.value"
+          @input="uid = $event.target.value"
           class="row-item"
           style="flex: 1"
         ></mwc-textfield>
 
-        <span class="row-item">Slots</span>
+        <span class="row-item">Dna Slots</span>
         <div
           v-for="appSlot of slots"
           :key="appSlot.name"
@@ -56,7 +64,7 @@
             style="flex: 1"
             label="Membrane Proof"
             outlined
-            @change="membraneProofs[appSlot.name] = $event.target.value"
+            @input="membraneProofs[appSlot.name] = $event.target.value"
           ></mwc-textarea>
         </div>
       </div>
@@ -87,6 +95,8 @@ import { defineComponent } from "vue";
 import AdminUI from "@holochain/admin-ui";
 import { invoke } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
+import type { TextField } from "@material/mwc-textfield";
+import { InstalledAppInfo } from "@holochain/conductor-api";
 
 export default defineComponent({
   name: "InstallApp",
@@ -98,6 +108,7 @@ export default defineComponent({
     membraneProofs: { [key: string]: string } | undefined;
     slots: Array<any> | undefined;
     snackbarText: string | undefined;
+    isAppIdValid: boolean;
   } {
     return {
       installing: false,
@@ -107,6 +118,7 @@ export default defineComponent({
       membraneProofs: undefined,
       slots: undefined,
       snackbarText: undefined,
+      isAppIdValid: true,
     };
   },
   methods: {
@@ -123,6 +135,27 @@ export default defineComponent({
       this.slots = await invoke("get_slots_to_configure", { webAppBundlePath });
 
       this.webAppBundlePath = webAppBundlePath;
+
+      this.$nextTick(() => {
+        const appIdField = this.$refs.appIdField as TextField;
+        appIdField.validityTransform = (newValue: string, nativeValidity) => {
+          if (!nativeValidity.valid) {
+            return {};
+          } else {
+            const alreadyInstalledAppIds =
+              this.$store.state.admin.installedApps.appsInfo.map(
+                (appInfo: InstalledAppInfo) => appInfo.installed_app_id
+              );
+            const isValid = !alreadyInstalledAppIds.includes(newValue);
+            // changes to make to the native validity
+            if (!isValid) appIdField.setCustomValidity("App Id already exists");
+            this.isAppIdValid = isValid;
+            return {
+              valid: isValid,
+            };
+          }
+        };
+      });
     },
     cancel() {
       this.webAppBundlePath = undefined;
@@ -137,6 +170,7 @@ export default defineComponent({
     isAppReadyToInstall() {
       if (!this.appId) return false;
       if (!this.webAppBundlePath) return false;
+      if (!this.isAppIdValid) return false;
       return true;
     },
     async installApp() {
