@@ -1,8 +1,8 @@
 use std::{fs, path::PathBuf};
 use tauri::api::path::{config_dir, data_dir};
 
-pub const DEFAULT_ADMIN_PORT: u16 = 8889;
-pub const DEFAULT_APP_PORT: u16 = 8888;
+pub const DEFAULT_ADMIN_PORT: u16 = 4038;
+pub const DEFAULT_APP_PORT: u16 = 4039;
 
 pub fn admin_url() -> String {
   format!("ws://localhost:{}", DEFAULT_ADMIN_PORT)
@@ -49,7 +49,7 @@ pub fn create_initial_config_if_necessary() -> () {
   create_dir_if_necessary(holochain_data_path());
   create_dir_if_necessary(keystore_data_path());
   create_dir_if_necessary(uis_data_path());
-  if let Err(_) = fs::read(holochain_data_path()) {
+  if let Err(_) = fs::read(conductor_config_path()) {
     fs::write(
       conductor_config_path(),
       initial_config(DEFAULT_ADMIN_PORT, holochain_data_path()),

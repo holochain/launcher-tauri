@@ -9,7 +9,7 @@
             @enable-app="enableApp($event)"
             @starte-app="startApp($event)"
             @uninstall-app="uninstallApp($event)"
-            style="padding: 24px; display: flex; margin-bottom: 80px"
+            style="padding: 24px; display: flex; margin-bottom: 50px"
           ></InstalledApps>
         </div>
       </div>
@@ -61,7 +61,7 @@ export default defineComponent({
         await this.$store.dispatch(
           `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.fetchInstalledApps}`
         );
-        this.showMessage(`App ${appId} disabled`);
+        this.showMessage(`Disabled ${appId}`);
       } catch (e) {
         const error = `Disable app ${appId} failed: ${JSON.stringify(e)}`;
         this.showMessage(error);
@@ -77,7 +77,7 @@ export default defineComponent({
         await this.$store.dispatch(
           `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.fetchInstalledApps}`
         );
-        this.showMessage(`App ${appId} enabled`);
+        this.showMessage(`Enabled ${appId}`);
       } catch (e) {
         const error = `Enable app ${appId} failed: ${JSON.stringify(e)}`;
         this.showMessage(error);
@@ -94,7 +94,7 @@ export default defineComponent({
           `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.fetchInstalledApps}`
         );
 
-        this.showMessage(`App ${appId} started`);
+        this.showMessage(`Started ${appId}`);
       } catch (e) {
         const error = `Start app ${appId} failed: ${JSON.stringify(e)}`;
         this.showMessage(error);
@@ -111,7 +111,7 @@ export default defineComponent({
           `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.fetchInstalledApps}`
         );
 
-        this.showMessage(`App ${appId} uninstalled`);
+        this.showMessage(`Uninstalled ${appId}`);
       } catch (e) {
         const error = `Uninstall app ${appId} failed: ${JSON.stringify(e)}`;
         this.showMessage(error);

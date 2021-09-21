@@ -4,16 +4,24 @@
     <router-link to="/about">About</router-link>
   </div>
  -->
-  <Home style="display: flex; flex: 1"></Home>
+  <Home v-if="isConnected()" style="display: flex; flex: 1"></Home>
+  <LaunchError v-else style="display: flex; flex: 1"></LaunchError>
 </template>
 <script lang="ts">
 import Home from "./views/Home.vue";
+import LaunchError from "./views/LaunchError.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "App",
   components: {
     Home,
+    LaunchError,
+  },
+  methods: {
+    isConnected() {
+      return this.$store.state.isConnected;
+    },
   },
 });
 </script>
@@ -86,5 +94,16 @@ body,
 .flex-scrollable-y {
   max-height: 100%;
   overflow-y: auto;
+}
+
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  src: url(/font/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: local("Material Icons"), local("MaterialIcons-Regular"),
+    url(/font/MaterialIcons-Regular.woff2) format("woff2"),
+    url(/font/MaterialIcons-Regular.woff) format("woff"),
+    url(/font/MaterialIcons-Regular.ttf) format("truetype");
 }
 </style>

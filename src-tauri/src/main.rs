@@ -2,9 +2,7 @@
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
-use std::{thread, time::Duration};
 use tauri;
-use tauri::api::process::Command;
 use tauri::Manager;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
@@ -15,6 +13,8 @@ use tauri::{CustomMenuItem, Event, SystemTrayMenuItem};
 
 mod commands;
 mod config;
+mod factory_reset;
+mod launch;
 mod logs;
 mod setup;
 mod uis;
@@ -27,8 +27,6 @@ use crate::commands::{
   uninstall_app::uninstall_app,
 };
 use crate::logs::setup_logs;
-use crate::setup::setup_conductor;
-use crate::uis::caddy;
 
 fn main() {
   if let Err(err) = setup_logs() {
@@ -83,7 +81,7 @@ fn main() {
     })
     .setup(|_app| {
       tauri::async_runtime::block_on(async move {
-        match launch_children_processes().await {
+        match launch::launch_children_processes().await {
           Ok(()) => {
             log::info!("Launch setup successful");
           }
@@ -101,6 +99,7 @@ fn main() {
       disable_app,
       uninstall_app,
       get_slots_to_configure,
+      crate::commands::factory_reset::factory_reset,
       logs::log,
     ])
     .build(tauri::generate_context!());
@@ -115,46 +114,4 @@ fn main() {
     }
     Err(err) => log::error!("Error building the app: {:?}", err),
   }
-}
-
-async fn launch_children_processes() -> Result<(), String> {
-  config::create_initial_config_if_necessary();
-
-  Command::new_sidecar("lair-keystore")
-    .or(Err(String::from("Can't find lair-keystore binary")))?
-    .args(&[
-      "-d",
-      config::keystore_data_path()
-        .into_os_string()
-        .to_str()
-        .unwrap(),
-    ])
-    .spawn()
-    .map_err(|err| format!("Failed to execute lair-keystore: {:?}", err))?;
-
-  log::info!("Launched lair-keystore");
-
-  thread::sleep(Duration::from_millis(1000));
-
-  Command::new_sidecar("holochain")
-    .or(Err(String::from("Can't find holochain binary")))?
-    .args(&[
-      "-c",
-      config::conductor_config_path()
-        .into_os_string()
-        .to_str()
-        .unwrap(),
-    ])
-    .spawn()
-    .map_err(|err| format!("Failed to execute holochain: {:?}", err))?;
-
-  log::info!("Launched holochain");
-
-  thread::sleep(Duration::from_millis(1000));
-
-  setup_conductor().await?;
-
-  caddy::launch_caddy().await?;
-
-  Ok(())
 }

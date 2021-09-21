@@ -154,7 +154,7 @@ export default defineComponent({
           `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.fetchInstalledApps}`
         );
 
-        this.showMessage(`Installed hApp ${this.appId}`);
+        this.showMessage(`Installed ${this.appId}`);
         this.webAppBundlePath = undefined;
       } catch (e) {
         this.installing = false;

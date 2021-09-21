@@ -1,12 +1,18 @@
 import { createStore } from "vuex";
 
-//export interface LauncherAdminState {}
+export interface LauncherAdminState {
+  isConnected: boolean;
+}
 
-export default createStore({
-  state() {
-    return {};
-  },
-  mutations: {},
-  actions: {},
-  modules: {},
-});
+export default function (connected: boolean) {
+  return createStore({
+    state(): LauncherAdminState {
+      return {
+        isConnected: connected,
+      };
+    },
+    mutations: {},
+    actions: {},
+    modules: {},
+  });
+}
