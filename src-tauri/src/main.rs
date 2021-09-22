@@ -9,6 +9,7 @@ use tauri::SystemTrayEvent;
 use tauri::SystemTrayMenu;
 use tauri::WindowBuilder;
 use tauri::WindowUrl;
+use tauri::api::process::kill_children;
 use tauri::{CustomMenuItem, Event, SystemTrayMenuItem};
 
 mod commands;
@@ -86,6 +87,7 @@ fn main() {
             log::info!("Launch setup successful");
           }
           Err(err) => {
+            kill_children();
             log::error!("There was an error launching holochain: {:?}", err);
           }
         }

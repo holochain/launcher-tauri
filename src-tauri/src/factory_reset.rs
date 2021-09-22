@@ -14,13 +14,20 @@ pub async fn factory_reset() -> Result<(), String> {
   kill_children();
   log::info!("Stopped children processes");
 
-  fs::remove_dir_all(holochain_data_path())
-    .or(Err(String::from("Could not remove holochain data path")))?;
-  fs::remove_dir_all(holochain_config_path())
-    .or(Err(String::from("Could not remove holochain config path")))?;
+  fs::remove_dir_all(holochain_data_path()).map_err(|err| {
+    log::error!("Could not remove holochain data path: {}", err);
+    String::from("Could not remove holochain data path")
+  })?;
+  fs::remove_dir_all(holochain_config_path()).map_err(|err| {
+    log::error!("Could not remove holochain config path: {}", err);
+    String::from("Could not remove holochain config path")
+  })?;
   log::info!("Cleaned up the file system");
 
-  launch_children_processes().await?;
+  launch_children_processes().await.map_err(|err| {
+    log::error!("Failed to restart Holochain: {}", err);
+    String::from("Failed to restart Holochain")
+  })?;
 
   log::info!("Started children processes again, factory reset completed");
 
