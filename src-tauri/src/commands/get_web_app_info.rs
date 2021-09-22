@@ -2,12 +2,14 @@ use holochain_types::prelude::{AppSlotManifest, CellProvisioning};
 use holochain_types::web_app::WebAppBundle;
 use std::fs;
 
-
+#[derive(serde::Serialize)]
+pub struct WebAppInfo {
+  app_name: String,
+  slots_to_create: Vec<AppSlotManifest>,
+}
 
 #[tauri::command]
-pub async fn get_slots_to_configure(
-  web_app_bundle_path: String,
-) -> Result<Vec<AppSlotManifest>, String> {
+pub async fn get_web_app_info(web_app_bundle_path: String) -> Result<WebAppInfo, String> {
   log::info!("Installing: web_app_bundle = {}", web_app_bundle_path);
 
   let web_app_bundle = WebAppBundle::decode(
@@ -34,5 +36,8 @@ pub async fn get_slots_to_configure(
     })
     .collect();
 
-  Ok(slots_to_create)
+  Ok(WebAppInfo {
+    app_name: app_bundle.manifest().app_name().to_string(),
+    slots_to_create,
+  })
 }

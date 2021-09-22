@@ -18,17 +18,17 @@
     scrimClickAction=""
     escapeKeyAction=""
   >
-    <div
-      class="row center"
-      style="width: 512px"
-      v-if="webAppBundlePath === 'loading'"
-    >
+    <div class="row center" style="width: 512px" v-if="isLoadingFile">
       <mwc-circular-progress
         indeterminate
         style="margin-top: 80px; margin-bottom: 60px"
       ></mwc-circular-progress>
     </div>
-    <div class="column" style="width: 512px" v-else-if="webAppBundlePath">
+    <div
+      class="column"
+      style="width: 512px"
+      v-else-if="webAppBundlePath && appInfo"
+    >
       <span style="margin-right: 8px"
         >Bundle: {{ pathToFilename(webAppBundlePath) }}</span
       >
@@ -40,7 +40,7 @@
           ref="appIdField"
           @input="appId = $event.target.value"
           class="row-item"
-          autovalidate
+          autoValidate
           required
           style="flex: 1"
         ></mwc-textfield>
@@ -52,36 +52,45 @@
           style="flex: 1"
         ></mwc-textfield>
 
-        <span class="row-item">Dna Slots</span>
-        <div
-          v-for="appSlot of slots"
-          :key="appSlot.name"
-          class="row-item row"
-          style="flex: 1"
+        <span
+          class="row-item"
+          style="
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 400;
+            color: black;
+          "
+          >Dna Slots</span
         >
-          <span>{{ appSlot.name }}</span>
+        <div
+          v-for="(appSlot, index) of appInfo.slots_to_create"
+          :key="appSlot.id"
+          class="column"
+          style="flex: 1; margin-top: 8px"
+        >
+          <span>#{{ index + 1 }} {{ appSlot.id }}</span>
           <mwc-textarea
-            style="flex: 1"
+            style="flex: 1; margin-top: 4px"
             label="Membrane Proof"
             outlined
-            @input="membraneProofs[appSlot.name] = $event.target.value"
+            @input="membraneProofs[appSlot.id] = $event.target.value"
           ></mwc-textarea>
         </div>
       </div>
     </div>
 
     <mwc-button
-      v-if="webAppBundlePath !== 'loading'"
+      v-if="isFileLoaded"
       label="Cancel"
       slot="secondaryAction"
       :disabled="installing"
-      @click="cancel()"
+      @click="cleanStateAndClose()"
     >
     </mwc-button>
     <mwc-button
-      v-if="webAppBundlePath !== 'loading'"
+      v-if="isFileLoaded"
       slot="primaryAction"
-      :disabled="!isAppReadyToInstall() || installing"
+      :disabled="!isAppReadyToInstall || installing"
       @click="installApp()"
       :label="installing ? 'Installing...' : 'Install app'"
     >
@@ -97,16 +106,17 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
 import type { TextField } from "@material/mwc-textfield";
 import { InstalledAppInfo } from "@holochain/conductor-api";
+import { WebAppInfo } from "../types";
 
 export default defineComponent({
   name: "InstallApp",
   data(): {
     installing: boolean;
-    webAppBundlePath: string | "loading" | undefined;
+    webAppBundlePath: string | undefined;
     appId: string | undefined;
     uid: string | undefined;
     membraneProofs: { [key: string]: string } | undefined;
-    slots: Array<any> | undefined;
+    appInfo: WebAppInfo | undefined;
     snackbarText: string | undefined;
     isAppIdValid: boolean;
   } {
@@ -116,62 +126,84 @@ export default defineComponent({
       webAppBundlePath: undefined,
       uid: undefined,
       membraneProofs: undefined,
-      slots: undefined,
+      appInfo: undefined,
       snackbarText: undefined,
       isAppIdValid: true,
     };
   },
+  computed: {
+    isAppReadyToInstall() {
+      if (!this.appId) return false;
+      if (!this.webAppBundlePath) return false;
+      if (
+        !this.$refs.appIdField ||
+        !(this.$refs.appIdField as TextField).validity
+      )
+        return false;
+      return true;
+    },
+    isFileLoaded() {
+      if (this.appInfo) return true;
+      return false;
+    },
+    isLoadingFile() {
+      if (this.webAppBundlePath && !this.appInfo) return true;
+      return false;
+    },
+  },
   methods: {
     async selectWebHappFile() {
-      const webAppBundlePath = (await open({
+      this.webAppBundlePath = (await open({
         filters: [{ name: "webhapp", extensions: ["webhapp"] }],
       })) as string;
 
-      if (!webAppBundlePath) return;
-
-      this.webAppBundlePath = "loading";
+      if (!this.webAppBundlePath) return;
 
       this.membraneProofs = {};
-      this.slots = await invoke("get_slots_to_configure", { webAppBundlePath });
-
-      this.webAppBundlePath = webAppBundlePath;
+      this.appInfo = (await invoke("get_web_app_info", {
+        webAppBundlePath: this.webAppBundlePath,
+      })) as WebAppInfo;
+      this.appId = this.appInfo.app_name;
 
       this.$nextTick(() => {
-        const appIdField = this.$refs.appIdField as TextField;
-        appIdField.validityTransform = (newValue: string, nativeValidity) => {
-          if (!nativeValidity.valid) {
-            return {};
-          } else {
-            const alreadyInstalledAppIds =
-              this.$store.state.admin.installedApps.appsInfo.map(
-                (appInfo: InstalledAppInfo) => appInfo.installed_app_id
-              );
-            const isValid = !alreadyInstalledAppIds.includes(newValue);
-            // changes to make to the native validity
-            if (!isValid) appIdField.setCustomValidity("App Id already exists");
-            this.isAppIdValid = isValid;
-            return {
-              valid: isValid,
-            };
-          }
-        };
+        setTimeout(() => {
+          const appIdField = this.$refs.appIdField as TextField;
+          appIdField.validityTransform = (newValue: string, nativeValidity) => {
+            console.log("hi", newValue);
+            if (!nativeValidity.valid) {
+              return {};
+            } else {
+              const alreadyInstalledAppIds =
+                this.$store.state.admin.installedApps.appsInfo.map(
+                  (appInfo: InstalledAppInfo) => appInfo.installed_app_id
+                );
+              const isValid = !alreadyInstalledAppIds.includes(newValue);
+
+              // changes to make to the native validity
+              if (isValid) {
+                appIdField.setCustomValidity("");
+              } else {
+                appIdField.setCustomValidity("App Id already exists");
+              }
+              return {
+                valid: isValid,
+              };
+            }
+          };
+          appIdField.value = this.appId as string;
+          appIdField.reportValidity();
+        });
       });
     },
-    cancel() {
+    cleanStateAndClose() {
       this.webAppBundlePath = undefined;
       this.uid = undefined;
-      this.membraneProofs = {};
-      this.slots = undefined;
+      this.membraneProofs = undefined;
+      this.appInfo = undefined;
     },
     pathToFilename(path: string) {
       const components = path.split("/");
       return components[components.length - 1];
-    },
-    isAppReadyToInstall() {
-      if (!this.appId) return false;
-      if (!this.webAppBundlePath) return false;
-      if (!this.isAppIdValid) return false;
-      return true;
     },
     async installApp() {
       try {
@@ -189,13 +221,13 @@ export default defineComponent({
         );
 
         this.showMessage(`Installed ${this.appId}`);
-        this.webAppBundlePath = undefined;
+
+        this.cleanStateAndClose();
       } catch (e) {
         this.installing = false;
         this.showMessage(JSON.stringify(e));
       }
     },
-
     showMessage(message: string) {
       this.snackbarText = message;
       (this.$refs as any).snackbar.show();

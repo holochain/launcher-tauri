@@ -22,7 +22,7 @@ mod uis;
 
 use crate::commands::{
   enable_app::{disable_app, enable_app},
-  get_slots_to_configure::get_slots_to_configure,
+  get_web_app_info::get_web_app_info,
   install_app::install_app,
   open_app::open_app_ui,
   uninstall_app::uninstall_app,
@@ -100,7 +100,7 @@ fn main() {
       enable_app,
       disable_app,
       uninstall_app,
-      get_slots_to_configure,
+      get_web_app_info,
       crate::commands::factory_reset::factory_reset,
       logs::log,
     ])

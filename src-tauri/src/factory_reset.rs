@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, io, path::PathBuf};
 
 use tauri::api::process::kill_children;
 
@@ -14,11 +14,11 @@ pub async fn factory_reset() -> Result<(), String> {
   kill_children();
   log::info!("Stopped children processes");
 
-  fs::remove_dir_all(holochain_data_path()).map_err(|err| {
+  remove_dir_if_exists(holochain_data_path()).map_err(|err| {
     log::error!("Could not remove holochain data path: {}", err);
     String::from("Could not remove holochain data path")
   })?;
-  fs::remove_dir_all(holochain_config_path()).map_err(|err| {
+  remove_dir_if_exists(holochain_config_path()).map_err(|err| {
     log::error!("Could not remove holochain config path: {}", err);
     String::from("Could not remove holochain config path")
   })?;
@@ -31,5 +31,12 @@ pub async fn factory_reset() -> Result<(), String> {
 
   log::info!("Started children processes again, factory reset completed");
 
+  Ok(())
+}
+
+fn remove_dir_if_exists(path: PathBuf) -> io::Result<()> {
+  if let Ok(_) = fs::read(path.clone()) {
+    fs::remove_dir_all(path)?;
+  }
   Ok(())
 }

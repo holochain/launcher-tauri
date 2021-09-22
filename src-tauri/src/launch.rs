@@ -1,15 +1,18 @@
-use std::{thread, time::Duration};
+use std::{collections::HashMap, thread, time::Duration};
 
 use crate::config::{admin_url, DEFAULT_APP_PORT};
 use holochain_conductor_client::AdminWebsocket;
-use tauri::api::process::Command;
+use tauri::api::process::{Command, CommandEvent};
 
 use crate::{config, uis::caddy};
 
 pub async fn launch_children_processes() -> Result<(), String> {
   config::create_initial_config_if_necessary();
 
-  Command::new_sidecar("lair-keystore")
+  let mut envs = HashMap::new();
+  envs.insert(String::from("RUST_LOG"), String::from("info"));
+
+  let (mut lair_rx, _) = Command::new_sidecar("lair-keystore")
     .or(Err(String::from("Can't find lair-keystore binary")))?
     .args(&[
       "-d",
@@ -18,14 +21,26 @@ pub async fn launch_children_processes() -> Result<(), String> {
         .to_str()
         .unwrap(),
     ])
+    .envs(envs.clone())
     .spawn()
     .map_err(|err| format!("Failed to execute lair-keystore: {:?}", err))?;
+
+  tauri::async_runtime::spawn(async move {
+    // read events such as stdout
+    while let Some(event) = lair_rx.recv().await {
+      match event.clone() {
+        CommandEvent::Stdout(line) => log::info!("[LAIR] {}", line),
+        CommandEvent::Stderr(line) => log::info!("[LAIR] {}", line),
+        _ => log::info!("[LAIR] {:?}", event),
+      }
+    }
+  });
 
   log::info!("Launched lair-keystore");
 
   thread::sleep(Duration::from_millis(1000));
 
-  Command::new_sidecar("holochain")
+  let (mut holochain_rx, _) = Command::new_sidecar("holochain")
     .or(Err(String::from("Can't find holochain binary")))?
     .args(&[
       "-c",
@@ -34,9 +49,20 @@ pub async fn launch_children_processes() -> Result<(), String> {
         .to_str()
         .unwrap(),
     ])
+    .envs(envs)
     .spawn()
     .map_err(|err| format!("Failed to execute holochain: {:?}", err))?;
 
+  tauri::async_runtime::spawn(async move {
+    // read events such as stdout
+    while let Some(event) = holochain_rx.recv().await {
+      match event.clone() {
+        CommandEvent::Stdout(line) => log::info!("[HOLOCHAIN] {}", line),
+        CommandEvent::Stderr(line) => log::info!("[HOLOCHAIN] {}", line),
+        _ => log::info!("[HOLOCHAIN] {:?}", event),
+      }
+    }
+  });
   log::info!("Launched holochain");
 
   thread::sleep(Duration::from_millis(1000));

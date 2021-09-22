@@ -27,7 +27,7 @@ pub fn setup_logs() -> Result<(), String> {
 
 #[tauri::command]
 pub fn log(log: String) -> Result<(), String> {
-  log::info!("UI: {}", log);
+  log::info!("[UI] {}", log);
   Ok(())
 }
 
