@@ -19,7 +19,11 @@ pub fn conductor_config_path() -> PathBuf {
 }
 
 pub fn logs_path() -> PathBuf {
-  holochain_data_path().join("launcher.log")
+  logs_folder_path().join("launcher.log")
+}
+
+pub fn logs_folder_path() -> PathBuf {
+  holochain_data_path().join("logs")
 }
 
 pub fn caddyfile_path() -> PathBuf {
@@ -45,6 +49,7 @@ pub fn create_initial_config_if_necessary() -> () {
   create_dir_if_necessary(holochain_data_path());
   create_dir_if_necessary(keystore_data_path());
   create_dir_if_necessary(uis_data_path());
+  create_dir_if_necessary(logs_folder_path());
   if let Err(_) = fs::read(conductor_config_path()) {
     fs::write(
       conductor_config_path(),

@@ -22,10 +22,9 @@ pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
   match event_id {
     "factory-reset" => window.emit("request-factory-reset", ()).unwrap(),
     "about" => window.emit("about", ()).unwrap(),
-    "report-issue" => opener::open("https://github.com/holochain/launcher/issues/new").unwrap(),
-
+    "report-issue" => opener::open("https://github.com/holochain/launcher/issues/new?assignees=&labels=bug&template=bug_report.md&title=").unwrap(),
     "open_logs" => {
-      logs::open_logs();
+      logs::open_logs_folder();
     }
     _ => {}
   }
