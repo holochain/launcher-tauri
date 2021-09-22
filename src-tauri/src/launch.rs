@@ -10,7 +10,7 @@ pub async fn launch_children_processes() -> Result<(), String> {
   config::create_initial_config_if_necessary();
 
   let mut envs = HashMap::new();
-  envs.insert(String::from("RUST_LOG"), String::from("info"));
+  envs.insert(String::from("RUST_LOG"), String::from("warn"));
 
   let (mut lair_rx, _) = Command::new_sidecar("lair-keystore")
     .or(Err(String::from("Can't find lair-keystore binary")))?
