@@ -1,6 +1,6 @@
 [package]
 authors = ["guillem.cordoba@gmail.com"]
-build = "src/build.rs"
+build = "build.rs"
 default-run = "holochain-launcher"
 description = "Holochain launcher to run Holochain locally in your desktop"
 edition = "2018"

@@ -16,7 +16,7 @@ import { ADMIN_PORT } from "./constants";
 
 async function setup() {
   const app = createApp(App);
-
+  debugger;
   try {
     const adminWebsocket = await AdminWebsocket.connect(
       `ws://localhost:${ADMIN_PORT}`

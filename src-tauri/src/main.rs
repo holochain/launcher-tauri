@@ -3,21 +3,15 @@
   windows_subsystem = "windows"
 )]
 use tauri;
-use tauri::Manager;
-use tauri::SystemTray;
-use tauri::SystemTrayEvent;
-use tauri::SystemTrayMenu;
-use tauri::WindowBuilder;
-use tauri::WindowUrl;
 use tauri::api::process::kill_children;
-use tauri::{CustomMenuItem, Event, SystemTrayMenuItem};
+use tauri::SystemTrayEvent;
+use tauri::{Event};
 
 mod commands;
-mod config;
-mod factory_reset;
 mod launch;
-mod logs;
 mod setup;
+mod menu;
+mod system_tray;
 mod uis;
 
 use crate::commands::{
@@ -26,59 +20,26 @@ use crate::commands::{
   install_app::install_app,
   open_app::open_app_ui,
   uninstall_app::uninstall_app,
+  factory_reset::execute_factory_reset
 };
-use crate::logs::setup_logs;
+use crate::setup::logs::setup_logs;
+use crate::menu::build_menu;
+use crate::menu::handle_menu_event;
+use crate::system_tray::build_system_tray;
+use crate::system_tray::handle_system_tray_event;
 
 fn main() {
   if let Err(err) = setup_logs() {
     println!("Error setting up the logs: {:?}", err);
   }
 
-  let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-  let show_admin = CustomMenuItem::new("show_admin".to_string(), "Show Admin");
-  let open_logs = CustomMenuItem::new("open_logs".to_string(), "Open Logs");
-
-  let sys_tray_menu = SystemTrayMenu::new()
-    .add_item(open_logs)
-    .add_item(show_admin)
-    .add_native_item(SystemTrayMenuItem::Separator)
-    .add_item(quit);
-
-  let sys_tray = SystemTray::new().with_menu(sys_tray_menu);
-
   let builder_result = tauri::Builder::default()
-    .system_tray(sys_tray)
-    .on_system_tray_event(|app, event| {
-      match event {
-        SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-          "quit" => {
-            app.exit(0);
-          }
-          "show_admin" => {
-            let admin_window = app.get_window("admin");
-
-            if let Some(window) = admin_window {
-              window.show().unwrap();
-              window.set_focus().unwrap();
-            } else {
-              // Window was closed: we need to recreate it
-              let _r = app.create_window(
-                "admin",
-                WindowUrl::App("index.html".into()),
-                move |window_builder, webview_attributes| {
-                  (window_builder.title("Holochain Admin"), webview_attributes)
-                },
-              );
-              log::info!("Creating admin window {:?}", _r);
-            }
-          }
-          "open_logs" => {
-            logs::open_logs();
-          }
-          _ => {}
-        },
-        _ => {}
-      }
+    .menu(build_menu())
+    .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
+    .system_tray(build_system_tray())
+    .on_system_tray_event(|app, event| match event {
+      SystemTrayEvent::MenuItemClick { id, .. } => handle_system_tray_event(app, id),
+      _ => {}
     })
     .setup(|_app| {
       tauri::async_runtime::block_on(async move {
@@ -101,8 +62,8 @@ fn main() {
       disable_app,
       uninstall_app,
       get_web_app_info,
-      crate::commands::factory_reset::factory_reset,
-      logs::log,
+      execute_factory_reset,
+      setup::logs::log,
     ])
     .build(tauri::generate_context!());
 

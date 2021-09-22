@@ -7,7 +7,7 @@ use log4rs::{
   Config,
 };
 
-use crate::config::logs_path;
+use crate::setup::config::logs_path;
 
 pub fn setup_logs() -> Result<(), String> {
   let logfile = FileAppender::builder()

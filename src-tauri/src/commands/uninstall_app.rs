@@ -1,13 +1,13 @@
 use std::fs;
 
-use holochain_conductor_client::AdminWebsocket;
 use crate::{
-  config::admin_url,
+  setup::config::admin_url,
   uis::{
     caddy,
     port_mapping::{app_ui_folder_path, PortMapping},
   },
 };
+use holochain_conductor_client::AdminWebsocket;
 
 #[tauri::command]
 pub async fn uninstall_app(app_id: String) -> Result<(), String> {

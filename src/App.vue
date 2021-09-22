@@ -4,24 +4,26 @@
     <router-link to="/about">About</router-link>
   </div>
  -->
-  <Home v-if="isConnected()" style="display: flex; flex: 1"></Home>
-  <LaunchError v-else style="display: flex; flex: 1"></LaunchError>
+  <Home v-if="!launchError()" style="display: flex; flex: 1"></Home>
+  <FactoryReset style="display: flex; flex: 1"></FactoryReset>
+  <About></About>
 </template>
 <script lang="ts">
 import Home from "./views/Home.vue";
-import LaunchError from "./views/LaunchError.vue";
+import FactoryReset from "./views/FactoryReset.vue";
+import About from "./components/About.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "App",
   components: {
     Home,
-    LaunchError,
+    FactoryReset,
+    About,
   },
   methods: {
-    isConnected() {
-      console.log(this.$store.state.isConnected);
-      return this.$store.state.isConnected;
+    launchError() {
+      return !this.$store.state.isConnected;
     },
   },
 });

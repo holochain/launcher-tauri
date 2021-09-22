@@ -1,5 +1,5 @@
 use crate::{
-  config::{admin_url, uis_data_path},
+  setup::config::{admin_url, uis_data_path},
   uis::{
     caddy,
     port_mapping::{app_ui_folder_path, PortMapping},

@@ -1,10 +1,10 @@
 use std::{collections::HashMap, thread, time::Duration};
 
-use crate::config::{admin_url, DEFAULT_APP_PORT};
+use crate::setup::config::{admin_url, DEFAULT_APP_PORT};
 use holochain_conductor_client::AdminWebsocket;
 use tauri::api::process::{Command, CommandEvent};
 
-use crate::{config, uis::caddy};
+use crate::{setup::config, uis::caddy};
 
 pub async fn launch_children_processes() -> Result<(), String> {
   config::create_initial_config_if_necessary();

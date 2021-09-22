@@ -4,7 +4,7 @@ use holochain_conductor_client::{AdminWebsocket, AppStatusFilter};
 use tauri::api::process::Command;
 
 use crate::{
-  config::{admin_url, caddyfile_path, DEFAULT_ADMIN_PORT, DEFAULT_APP_PORT},
+  setup::config::{admin_url, caddyfile_path, DEFAULT_ADMIN_PORT, DEFAULT_APP_PORT},
   uis::port_mapping::app_ui_folder_path,
 };
 

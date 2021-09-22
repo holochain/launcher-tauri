@@ -1,6 +1,6 @@
 use holochain_conductor_client::AdminWebsocket;
 
-use crate::{config::admin_url, uis::caddy};
+use crate::{setup::config::admin_url, uis::caddy};
 
 #[tauri::command]
 pub async fn enable_app(app_id: String) -> Result<(), String> {

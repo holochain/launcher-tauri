@@ -22,10 +22,6 @@ pub fn logs_path() -> PathBuf {
   holochain_data_path().join("launcher.log")
 }
 
-pub fn holochain_logs_path() -> PathBuf {
-  holochain_data_path().join("holochain.log")
-}
-
 pub fn caddyfile_path() -> PathBuf {
   uis_data_path().join("Caddyfile")
 }
@@ -87,7 +83,6 @@ fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
               proxy_url: "kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--"
         tuning_params:
             gossip_strategy: "sharded-gossip"
-            gossip_single_storage_arc_per_space: true
             default_rpc_multi_remote_request_grace_ms: 10
     "#,
     environment_path.into_os_string().to_str().unwrap(),

@@ -1,4 +1,4 @@
-use crate::config::uis_data_path;
+use crate::setup::config::uis_data_path;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, fs, io::ErrorKind, path::PathBuf};
 

@@ -38,28 +38,25 @@
           label="App Id"
           outlined
           ref="appIdField"
-          @input="appId = $event.target.value"
           class="row-item"
+          @input="appId = $event.target.value"
           autoValidate
           required
+          helper="Has to be unique"
           style="flex: 1"
         ></mwc-textfield>
         <mwc-textfield
           label="UID"
           outlined
           @input="uid = $event.target.value"
+          helper="Change it to create a new network"
           class="row-item"
           style="flex: 1"
         ></mwc-textfield>
 
         <span
           class="row-item"
-          style="
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: 400;
-            color: black;
-          "
+          style="font-size: 18px; font-weight: 400; color: black"
           >Dna Slots</span
         >
         <div
@@ -112,8 +109,8 @@ export default defineComponent({
   name: "InstallApp",
   data(): {
     installing: boolean;
-    webAppBundlePath: string | undefined;
     appId: string | undefined;
+    webAppBundlePath: string | undefined;
     uid: string | undefined;
     membraneProofs: { [key: string]: string } | undefined;
     appInfo: WebAppInfo | undefined;
@@ -135,11 +132,7 @@ export default defineComponent({
     isAppReadyToInstall() {
       if (!this.appId) return false;
       if (!this.webAppBundlePath) return false;
-      if (
-        !this.$refs.appIdField ||
-        !(this.$refs.appIdField as TextField).validity
-      )
-        return false;
+      if (!this.isAppIdValid) return false;
       return true;
     },
     isFileLoaded() {
@@ -169,26 +162,29 @@ export default defineComponent({
         setTimeout(() => {
           const appIdField = this.$refs.appIdField as TextField;
           appIdField.validityTransform = (newValue: string, nativeValidity) => {
-            console.log("hi", newValue);
-            if (!nativeValidity.valid) {
-              return {};
-            } else {
-              const alreadyInstalledAppIds =
-                this.$store.state.admin.installedApps.appsInfo.map(
-                  (appInfo: InstalledAppInfo) => appInfo.installed_app_id
-                );
-              const isValid = !alreadyInstalledAppIds.includes(newValue);
+            if (newValue === "") {
+              appIdField.setCustomValidity("App Id is required");
+              this.isAppIdValid = false;
 
-              // changes to make to the native validity
-              if (isValid) {
-                appIdField.setCustomValidity("");
-              } else {
-                appIdField.setCustomValidity("App Id already exists");
-              }
               return {
-                valid: isValid,
+                valid: false,
               };
             }
+
+            const alreadyInstalledAppIds =
+              this.$store.state.admin.installedApps.appsInfo.map(
+                (appInfo: InstalledAppInfo) => appInfo.installed_app_id
+              );
+            const isValid = !alreadyInstalledAppIds.includes(newValue);
+
+            // changes to make to the native validity
+            if (!isValid) {
+              appIdField.setCustomValidity("App Id already exists");
+            }
+            this.isAppIdValid = isValid;
+            return {
+              valid: isValid,
+            };
           };
           appIdField.value = this.appId as string;
           appIdField.reportValidity();
