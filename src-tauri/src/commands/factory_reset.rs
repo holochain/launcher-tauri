@@ -4,7 +4,7 @@ use tauri::api::process::kill_children;
 
 use crate::{
   launch::launch_children_processes,
-  setup::config::{holochain_config_path, holochain_data_path},
+  setup::config::{holochain_config_path, holochain_data_path, keystore_data_path},
 };
 
 #[tauri::command]
@@ -22,6 +22,10 @@ async fn factory_reset() -> Result<(), String> {
   remove_dir_if_exists(holochain_config_path()).map_err(|err| {
     log::error!("Could not remove holochain config path: {}", err);
     String::from("Could not remove holochain config path")
+  })?;
+  remove_dir_if_exists(keystore_data_path()).map_err(|err| {
+    log::error!("Could not remove lair path: {}", err);
+    String::from("Could not remove lair path")
   })?;
   remove_dir_if_exists(holochain_data_path())
     .or(Err(String::from("Could not remove holochain data path")))?;

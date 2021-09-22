@@ -1,6 +1,6 @@
 # Holochain Launcher
 
-> WARNING! This package is in its early development stages. Expect breaking changes, and a much better and polished UX coming soon.
+A cross-platform executable that launches a local Holochain conductor, and installs and opens apps.
 
 > Feedback is immensely welcome in the [issues section](https://github.com/holochain/launcher/issues).
 
@@ -9,23 +9,29 @@
 1. Go to the [Releases page](https://github.com/holochain/launcher/releases).
 2. Download the appropriate executable for your platform and execute it.
 
-> Warning! This will replace your `$CONFIG_DIR/holochain/conductor-config.yaml`, if you have one from running `holochain -i`.
-
 ## Usage
-
-### Preparing your UI
-
-When your UI is served from the launcher, you will have the Holochain app interface available at `ws://localhost:8888`. 
-
-You will also have the admin interface available at `ws://localhost:8889`, but its usage is discouraged as newer versions of the launcher will block any admin requests not coming from the Holochain Admin UI itself. There will be a call available in `AppWebsocket` that will prompt the user to do an action in the Holochain Admin UI, or similar (To Be Defined).
 
 ### Installing a hApp
 
-1. Package your happ into a `.happ` file.
-2. Package your UI into a `.zip` file.
-3. In the "Install hApp" section of the Holochain Admin, select your `.happ` file and your `.zip` file.
-4. Click install, it may take a while.
-5. When it's finished installation, the happ will appear in the list of active happs.
+If you already have a `.webhapp`
+
+1. Click "Install App" in the `Holochain Admin` window, and select your `.webhapp`.
+2. Set a unique `AppId` for the app, and click install, it may take a while.
+   > This AppId only needs to be unique inside your Holochain Launcher, it doesn't affect other users.
+3. When it's finished installation, the happ will appear in the list of active happs.
+4. Click `Open` in one of the installed apps to open the app.
+
+### Packaging a Web-hApp
+
+When your UI is served from the launcher and you call `AppWebsocket.connect()` or `AdminWebsocket.connect()`, you will be redirected to the actual port in which Holochain is running its interfaces. Also,
+
+For now, the UI still has access to the admin interface, but its usage is discouraged as newer versions of the launcher will block any admin requests not coming from the Holochain Admin UI itself. There will be a call available in `AppWebsocket` that will prompt the user to do an action in the Holochain Admin UI, or similar (To Be Defined).
+
+1. Package your happ into a `.happ` file, with `hc app pack`.
+2. Package your UI into a `.zip` file. IMPORTANT: this `.zip` is supposed to contain an `index.html` file in its root level.
+3. Create a Web-hApp manifest with `hc web-app init`.
+4. Set the corrrect locations for the UI `.zip` file and the `.happ` file.
+5. Package your Web-hApp with `hc web-app pack`, and publish it so that other users can download and install it.
 
 ## Data storage
 
@@ -36,17 +42,11 @@ The Holochain Launcher uses the same config and data locations as the main `holo
 - Data: `$DATA_DIR/holochain` and `$DATA_DIR/lair`.
   - In Ubuntu this is `$HOME/.local/share/holochain` and `$HOME/.local/share/lair`.
 
-To reset the launcher, it is enough to remove all the folders mentioned above and start the launcher again.
+To reset the launcher, you can execute a factory reset in the `Holochain Admin` window > `Settings` menu > `Factory Reset`.
 
-### Logs 
+### Logs
 
-Logs can be found at `$DATA_DIR/holochain/launcher.log`. When reporting issues, please attach the contents of this file.
-
-## Support
-
-Right now only Linux amd64 is supported. MacOS will be available soon. Windows support will be blocked until Holochain core supports it.
-
-There is a known issue that prevents the UIs from opening in Chromium based browsers. For now the launcher will only open UIs in Firefox.
+Logs can be found at `$DATA_DIR/holochain/logs/launcher.log`. When reporting issues, please attach the contents of this file.
 
 ## Developer Setup
 
