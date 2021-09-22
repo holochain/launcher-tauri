@@ -29,8 +29,8 @@ Please attach here the `launcher.log` file. To find it, go to `Holochain Admin` 
 If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Version [e.g. 22]
+ - OS: [e.g. MacOs v10.13]
+ - Holochain Launcher Version [e.g. 0.], you can find out in `Help` > 'About'
 
 **Additional context**
 Add any other context about the problem here.
