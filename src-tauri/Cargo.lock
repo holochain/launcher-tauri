@@ -2122,6 +2122,7 @@ dependencies = [
  "log",
  "log4rs",
  "mr_bundle 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "open",
  "opener",
  "serde",
  "serde_json",
