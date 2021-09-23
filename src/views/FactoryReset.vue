@@ -34,6 +34,7 @@
     <mwc-button
       slot="secondaryAction"
       v-if="!launchError()"
+      :disabled="executing"
       dialogAction="close"
       label="Cancel"
     ></mwc-button>

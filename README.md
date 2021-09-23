@@ -33,6 +33,10 @@ For now, the UI still has access to the admin interface, but its usage is discou
 4. Set the corrrect locations for the UI `.zip` file and the `.happ` file.
 5. Package your Web-hApp with `hc web-app pack`, and publish it so that other users can download and install it.
 
+## Known issues
+
+- Encryption at rest is only enabled in linux environments. Encryption in MacOs and Windows environments will be enabled when the upstream `rusqlite` crate creates the next release, introducing the option of statically bundling `sqlcipher` in MacOs and in Windows.
+
 ## Data storage
 
 The Holochain Launcher uses the same config and data locations as the main `holochain` and `lair-keystore` processes. These locations are:
