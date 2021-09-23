@@ -990,7 +990,7 @@
 
 "@holochain/admin-ui@https://github.com/holochain/admin-ui#build":
   version "0.1.0"
-  resolved "https://github.com/holochain/admin-ui#d7c793b64f40f36350f1840cf1b6d32e279e6d25"
+  resolved "https://github.com/holochain/admin-ui#e094d9d41f94c3f643b876b72fdcdb04737164fc"
   dependencies:
     "@authentic/mwc-card" "^0.9.0"
     "@holochain-open-dev/core-types" "0.1.1"

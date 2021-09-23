@@ -35,7 +35,7 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
             (
               window_builder
                 .title("Holochain Admin")
-                .inner_size(1000, 700),
+                .inner_size(1000.0, 700.0),
               webview_attributes,
             )
           },
