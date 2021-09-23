@@ -20,8 +20,8 @@ base64 = "0.13.0"
 chrono = {version = "0.4", features = ["serde"] }
 flate2 = "1.0.20"
 futures = "0.3"
-holochain_conductor_client = {git = "https://github.com/holochain/conductor-client-rust", rev = "ada5c7444e725ef113a73834ae79950ad66630c2"}
-holochain_types = {git = "https://github.com/holochain/holochain", rev = "fa6f19ef2f7586cd0afa6a0103d9a937729eeb9e"}
+holochain_conductor_client = {git = "https://github.com/holochain/conductor-client-rust", rev = "53bb9925e29443fe727926ab27c07e1b1ea51e3f"}
+holochain_types = "0.0.7"
 log = "0.4.14"
 log4rs = "1.0.0"
 mr_bundle = "0.0.3"

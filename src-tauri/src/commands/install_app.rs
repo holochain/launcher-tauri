@@ -7,7 +7,7 @@ use crate::{
   },
 };
 use holochain_conductor_client::{AdminWebsocket, InstallAppBundlePayload};
-use holochain_types::prelude::{AppBundle, AppBundleSource, SerializedBytes};
+use holochain_types::prelude::{AppBundle, AppBundleSource, SerializedBytes, UnsafeBytes};
 use holochain_types::web_app::WebAppBundle;
 use mr_bundle::ResourceBytes;
 use std::{
@@ -20,7 +20,7 @@ pub async fn install_app(
   app_id: String,
   web_app_bundle_path: String,
   uid: Option<String>,
-  membrane_proofs: HashMap<String, SerializedBytes>,
+  membrane_proofs: HashMap<String, Vec<u8>>,
 ) -> Result<(), String> {
   log::info!("Installing: web_app_bundle = {}", web_app_bundle_path);
 
@@ -34,7 +34,15 @@ pub async fn install_app(
     .await
     .or(Err("Failed to resolve hApp bundle"))?;
 
-  install_happ(app_id.clone(), app_bundle, uid, membrane_proofs)
+  let mut converted_membrane_proofs: HashMap<String, SerializedBytes> = HashMap::new();
+  for (dna_slot, proof) in membrane_proofs.iter() {
+    converted_membrane_proofs.insert(
+      dna_slot.clone(),
+      SerializedBytes::from(UnsafeBytes::from(proof.clone())),
+    );
+  }
+
+  install_happ(app_id.clone(), app_bundle, uid, converted_membrane_proofs)
     .await
     .map_err(|err| {
       log::error!("Error installing hApp: {}", err);

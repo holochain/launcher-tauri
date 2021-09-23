@@ -104,6 +104,9 @@ import { open } from "@tauri-apps/api/dialog";
 import type { TextField } from "@material/mwc-textfield";
 import { InstalledAppInfo } from "@holochain/conductor-api";
 import { WebAppInfo } from "../types";
+import { toUint8Array } from "js-base64";
+
+type Dictionary<T> = { [key: string]: T };
 
 export default defineComponent({
   name: "InstallApp",
@@ -201,13 +204,25 @@ export default defineComponent({
       const components = path.split("/");
       return components[components.length - 1];
     },
+    getEncodedMembraneProofs() {
+      if (!this.membraneProofs) return {};
+
+      const encodedMembraneProofs: Dictionary<Array<number>> = {};
+      for (const dnaSlot of Object.keys(this.membraneProofs)) {
+        encodedMembraneProofs[dnaSlot] = Array.from(
+          toUint8Array(this.membraneProofs[dnaSlot])
+        );
+      }
+      console.log(encodedMembraneProofs);
+      return encodedMembraneProofs;
+    },
     async installApp() {
       try {
         this.installing = true;
         await invoke("install_app", {
           appId: this.appId,
           webAppBundlePath: this.webAppBundlePath,
-          membraneProofs: this.membraneProofs,
+          membraneProofs: this.getEncodedMembraneProofs(),
           uid: this.uid,
         });
 

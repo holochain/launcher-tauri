@@ -1936,6 +1936,11 @@
   resolved "https://registry.yarnpkg.com/@msgpack/msgpack/-/msgpack-2.4.0.tgz#789c69301388a6a44a47ce654014ecd1703c8fcc"
   integrity sha512-5qzv53J43V8GaYsaETs29Q0Ehw9Dog6SG18MASZRQDuZYXtA5T7pymGE2S40NL0X8sjl8+TybmRa5O8d45V7MQ==
 
+"@msgpack/msgpack@^2.7.1":
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/@msgpack/msgpack/-/msgpack-2.7.1.tgz#f01954baadc502f3c82e9c3f72c740ce65eae1cc"
+  integrity sha512-ApwiSL2c9ObewdOE/sqt788P1C5lomBOHyO8nUBCr4ofErBCnYQ003NtJ8lS9OQZc11ximkbmgAZJjB8y6cCdA==
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -8643,6 +8648,11 @@ js-base64@^3.6.0:
   version "3.7.1"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.1.tgz#d5fa3ee5fe56a49db871516e70b0474238efcc68"
   integrity sha512-XyYXEUTP3ykPPnGPoesMr4yBygopit99iXW52yT1EWrkzwzvtAor/pbf+EBuDkwqSty7K10LeTjCkUn8c166aQ==
+
+js-base64@^3.7.2:
+  version "3.7.2"
+  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.2.tgz#816d11d81a8aff241603d19ce5761e13e41d7745"
+  integrity sha512-NnRs6dsyqUXejqk/yv2aiXlAvOs56sLkX6nUdeaNezI5LFFLlsZjOThmwnrcwh5ZZRwZlCMnVAY3CvhIhoVEKQ==
 
 js-beautify@^1.6.12, js-beautify@^1.6.14:
   version "1.14.0"
