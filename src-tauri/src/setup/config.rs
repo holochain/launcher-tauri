@@ -89,6 +89,7 @@ fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
         tuning_params:
             gossip_strategy: "sharded-gossip"
             default_rpc_multi_remote_request_grace_ms: 10
+    db_sync_level: Off
     "#,
     environment_path.into_os_string().to_str().unwrap(),
     keystore_data_path().into_os_string().to_str().unwrap(),
