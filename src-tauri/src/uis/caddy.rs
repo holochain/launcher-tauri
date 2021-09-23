@@ -25,7 +25,7 @@ fn caddyfile_config_for_an_app(port: u16, app_id: String) -> String {
 		    close
 	  }}
     
-    header Cache-Control no-store
+    header Cache-Control no-cache, no-store
     
     root * "{}"
     file_server
