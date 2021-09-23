@@ -1,5 +1,7 @@
-use tauri::{AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem, WindowBuilder, WindowUrl, Wry};
-
+use tauri::{
+  AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem,
+  WindowBuilder, WindowUrl, Wry,
+};
 
 pub fn build_system_tray() -> SystemTray {
   let quit = CustomMenuItem::new("quit".to_string(), "Quit");
@@ -30,7 +32,12 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
           "admin",
           WindowUrl::App("index.html".into()),
           move |window_builder, webview_attributes| {
-            (window_builder.title("Holochain Admin"), webview_attributes)
+            (
+              window_builder
+                .title("Holochain Admin")
+                .inner_size(1000, 700),
+              webview_attributes,
+            )
           },
         );
         log::info!("Creating admin window {:?}", _r);
