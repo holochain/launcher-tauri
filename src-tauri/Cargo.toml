@@ -32,7 +32,6 @@ serde_json = "1.0"
 serde_yaml = "0.8"
 # Branch `next`
 tauri = {git = "https://github.com/tauri-apps/tauri", rev = "bb00d5bd6c9dfcb6bdd0d308dadb70e6c6aafe5c", features = ["api-all", "system-tray"] }
-tokio = "1.9.0"
 zip = "0.5.0"
 
 [features]
