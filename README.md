@@ -36,6 +36,7 @@ For now, the UI still has access to the admin interface, but its usage is discou
 ## Known issues
 
 - Encryption at rest is only enabled in linux environments. Encryption in MacOs and Windows environments will be enabled when the upstream `rusqlite` crate creates the next release, introducing the option of statically bundling `sqlcipher` in MacOs and in Windows.
+- Only MacOs v10.13 and after are supported at this moment.
 
 ## Data storage
 
