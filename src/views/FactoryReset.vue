@@ -2,6 +2,8 @@
   <mwc-dialog
     :heading="!launchError() ? 'Factory Reset' : 'Launch Error'"
     ref="dialog"
+    scrimClickAction=""
+    escapeKeyAction=""
   >
     <div class="column">
       <span v-if="launchError()">There was an error launching Holochain.</span>
@@ -17,13 +19,13 @@
         Holochain.
       </span>
       <span v-if="launchError()" style="margin-top: 8px">
-        <b>If you don't want to lose old data,</b> uninstall this version of the
-        Holochain Launcher and downgrade with the version that you were already
-        using.
+        <b>If you don't want to lose old Holochain data,</b> uninstall this
+        version of the Holochain Launcher and downgrade with the version that
+        you were already using.
       </span>
       <span style="margin-top: 8px">
-        <b>If you don't mind losing old data</b>, you can execute a factory
-        reset.
+        <b>If you don't mind losing old Holochain data</b>, you can execute a
+        factory reset.
         <b>
           This will uninstall all the Holochain apps that were installed in this
           computer, and also remove all previous stored data.

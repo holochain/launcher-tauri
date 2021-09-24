@@ -5,7 +5,7 @@ use std::{collections::BTreeMap, fs, io::ErrorKind, path::PathBuf};
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct PortMapping(BTreeMap<String, u16>);
 
-const FIRST_PORT: u16 = 4040;
+const FIRST_PORT: u16 = 20202;
 
 impl PortMapping {
   fn path() -> PathBuf {

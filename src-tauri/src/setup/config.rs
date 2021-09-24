@@ -1,8 +1,8 @@
 use std::{fs, path::PathBuf};
 use tauri::api::path::{config_dir, data_dir};
 
-pub const DEFAULT_ADMIN_PORT: u16 = 4038;
-pub const DEFAULT_APP_PORT: u16 = 4039;
+pub const DEFAULT_ADMIN_PORT: u16 = 20200;
+pub const DEFAULT_APP_PORT: u16 = 20201;
 
 pub fn admin_url() -> String {
   format!("ws://localhost:{}", DEFAULT_ADMIN_PORT)
