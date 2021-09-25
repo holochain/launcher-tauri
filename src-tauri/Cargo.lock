@@ -2122,6 +2122,7 @@ dependencies = [
  "mr_bundle 0.0.3",
  "open",
  "opener",
+ "portpicker",
  "serde",
  "serde_json",
  "serde_yaml",
@@ -4314,6 +4315,15 @@ checksum = "4b7456bc1ad2d4cf82b3a016be4c2ac48daf11bf990c1603ebd447fe6f30fca8"
 dependencies = [
  "cpuid-bool",
  "universal-hash",
+]
+
+[[package]]
+name = "portpicker"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "be97d76faf1bfab666e1375477b23fde79eccf0276e9b63b92a39d676a889ba9"
+dependencies = [
+ "rand 0.8.4",
 ]
 
 [[package]]

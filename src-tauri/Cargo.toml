@@ -31,6 +31,7 @@ serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
 # Branch `next`
+portpicker = "0.1.1"
 tauri = {git = "https://github.com/tauri-apps/tauri", rev = "bb00d5bd6c9dfcb6bdd0d308dadb70e6c6aafe5c", features = ["api-all", "system-tray"] }
 zip = "0.5.0"
 

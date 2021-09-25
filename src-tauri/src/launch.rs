@@ -1,13 +1,12 @@
 use std::{collections::HashMap, thread, time::Duration};
 
-use crate::setup::config::{admin_url, DEFAULT_APP_PORT};
 use holochain_conductor_client::AdminWebsocket;
 use tauri::api::process::{Command, CommandEvent};
 
 use crate::{setup::config, uis::caddy};
 
-pub async fn launch_children_processes() -> Result<(), String> {
-  config::create_initial_config_if_necessary();
+pub async fn launch_children_processes(admin_port: u16) -> Result<(), String> {
+  config::create_initial_config_if_necessary(admin_port);
 
   let mut envs = HashMap::new();
   envs.insert(String::from("RUST_LOG"), String::from("warn"));
@@ -67,15 +66,15 @@ pub async fn launch_children_processes() -> Result<(), String> {
 
   thread::sleep(Duration::from_millis(1000));
 
-  setup_conductor().await?;
+  setup_conductor(admin_port).await?;
 
-  caddy::launch_caddy().await?;
+  caddy::launch_caddy(admin_port).await?;
 
   Ok(())
 }
 
-async fn setup_conductor() -> Result<(), String> {
-  let mut ws = AdminWebsocket::connect(admin_url())
+async fn setup_conductor(admin_port: u16) -> Result<(), String> {
+  let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", admin_port))
     .await
     .or(Err(String::from("Could not connect to conductor")))?;
 
@@ -86,11 +85,13 @@ async fn setup_conductor() -> Result<(), String> {
     .await
     .or(Err(String::from("Could not list app interfaces")))?;
 
-  if !app_interfaces.contains(&DEFAULT_APP_PORT) {
-    ws.attach_app_interface(DEFAULT_APP_PORT)
+  if app_interfaces.len() == 0 {
+    let free_port = portpicker::pick_unused_port().expect("No ports free");
+
+    ws.attach_app_interface(free_port)
       .await
       .or(Err(String::from("Could not attach app interface")))?;
-    log::info!("Attached app interface to {}", DEFAULT_APP_PORT);
+    log::info!("Attached app interface to {}", free_port);
   }
 
   Ok(())

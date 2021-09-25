@@ -12,14 +12,15 @@ import { invoke } from "@tauri-apps/api/tauri";
 
 import App from "./App.vue";
 import createStore from "./store";
-import { ADMIN_PORT } from "./constants";
 
 async function setup() {
   const app = createApp(App);
-  debugger;
+
   try {
+    const adminPort = await invoke("get_admin_port", {});
+
     const adminWebsocket = await AdminWebsocket.connect(
-      `ws://localhost:${ADMIN_PORT}`
+      `ws://localhost:${adminPort}`
     );
 
     const appInterfaces = await adminWebsocket.listAppInterfaces();
@@ -35,7 +36,7 @@ async function setup() {
       .mount("#app");
 
     await invoke("log", {
-      log: `Connected to Holochain, Admin port = ${ADMIN_PORT}, App port = ${port}`,
+      log: `Connected to Holochain, Admin port = ${adminPort}, App port = ${port}`,
     });
   } catch (e) {
     const error = `Error connecting to Holochain: ${e}`;

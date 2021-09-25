@@ -6,6 +6,7 @@ use tauri;
 use tauri::api::process::kill_children;
 use tauri::SystemTrayEvent;
 use tauri::{Event};
+use portpicker;
 
 mod commands;
 mod launch;
@@ -13,6 +14,7 @@ mod setup;
 mod menu;
 mod system_tray;
 mod uis;
+mod state;
 
 use crate::commands::{
   enable_app::{disable_app, enable_app},
@@ -21,19 +23,26 @@ use crate::commands::{
   open_app::open_app_ui,
   uninstall_app::uninstall_app,
   factory_reset::execute_factory_reset
+  get_admin_port::get_admin_port
 };
 use crate::setup::logs::setup_logs;
 use crate::menu::build_menu;
 use crate::menu::handle_menu_event;
 use crate::system_tray::build_system_tray;
 use crate::system_tray::handle_system_tray_event;
+use crate::state::LauncherState;
 
 fn main() {
   if let Err(err) = setup_logs() {
     println!("Error setting up the logs: {:?}", err);
   }
 
+  let free_port = portpicker::pick_unused_port().expect("No ports free");
+
   let builder_result = tauri::Builder::default()
+  .manage(LauncherState {
+    admin_interface_port: free_port
+  })
     .menu(build_menu())
     .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
     .system_tray(build_system_tray())
@@ -43,7 +52,7 @@ fn main() {
     })
     .setup(|_app| {
       tauri::async_runtime::block_on(async move {
-        match launch::launch_children_processes().await {
+        match launch::launch_children_processes(free_port).await {
           Ok(()) => {
             log::info!("Launch setup successful");
           }
@@ -62,6 +71,7 @@ fn main() {
       disable_app,
       uninstall_app,
       get_web_app_info,
+      get_admin_port,
       execute_factory_reset,
       setup::logs::log,
     ])
