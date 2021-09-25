@@ -50,7 +50,7 @@ fn main() {
       SystemTrayEvent::MenuItemClick { id, .. } => handle_system_tray_event(app, id),
       _ => {}
     })
-    .setup(|_app| {
+    .setup(move |_app| {
       tauri::async_runtime::block_on(async move {
         match launch::launch_children_processes(free_port).await {
           Ok(()) => {
