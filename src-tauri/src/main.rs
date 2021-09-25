@@ -22,7 +22,7 @@ use crate::commands::{
   install_app::install_app,
   open_app::open_app_ui,
   uninstall_app::uninstall_app,
-  factory_reset::execute_factory_reset
+  factory_reset::execute_factory_reset,
   get_admin_port::get_admin_port
 };
 use crate::setup::logs::setup_logs;
