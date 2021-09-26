@@ -22,7 +22,7 @@ use crate::commands::{
   install_app::install_app,
   open_app::open_app_ui,
   uninstall_app::uninstall_app,
-  factory_reset::execute_factory_reset
+  factory_reset::execute_factory_reset,
   get_admin_port::get_admin_port
 };
 use crate::setup::logs::setup_logs;
@@ -50,7 +50,7 @@ fn main() {
       SystemTrayEvent::MenuItemClick { id, .. } => handle_system_tray_event(app, id),
       _ => {}
     })
-    .setup(|_app| {
+    .setup(move |_app| {
       tauri::async_runtime::block_on(async move {
         match launch::launch_children_processes(free_port).await {
           Ok(()) => {
