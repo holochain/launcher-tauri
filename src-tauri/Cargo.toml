@@ -30,11 +30,14 @@ opener = "0.5.0"
 serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
-# Branch `next`
 portpicker = "0.1.1"
+# Branch `next`
 tauri = {git = "https://github.com/tauri-apps/tauri", rev = "84f6e3e84a34b01b7fa04f5c4719acb921ef4263", features = ["api-all", "system-tray"] }
 tokio = "1.9.0"
 zip = "0.5.0"
+
+[patch."https://github.com/tauri-apps/wry"]
+wry = { git = "https://github.com/tauri-apps//wry.git", rev = "01de53ff65bd989833bf17659282127d6ededa85", default-features = false, features = [ "file-drop", "protocol" ] }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
