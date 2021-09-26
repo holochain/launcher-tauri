@@ -2128,6 +2128,7 @@ dependencies = [
  "serde_yaml",
  "tauri",
  "tauri-build",
+ "tokio",
  "zip",
 ]
 
@@ -4880,9 +4881,9 @@ dependencies = [
 
 [[package]]
 name = "rfd"
-version = "0.5.0"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "84b4745feef3bc92e709042c78d205e9a566ec46e18c58d4fac458e6fc12627e"
+checksum = "609ed912e110af7d7084b6b17d2a68b25e766208e015a37beba1be3c2d7cbb3b"
 dependencies = [
  "block",
  "dispatch",
@@ -5750,7 +5751,7 @@ dependencies = [
 [[package]]
 name = "tauri"
 version = "1.0.0-beta.8"
-source = "git+https://github.com/tauri-apps/tauri?rev=4866404f043ae97c77583fb6061e3fafed823268#4866404f043ae97c77583fb6061e3fafed823268"
+source = "git+https://github.com/tauri-apps/tauri?rev=84f6e3e84a34b01b7fa04f5c4719acb921ef4263#84f6e3e84a34b01b7fa04f5c4719acb921ef4263"
 dependencies = [
  "attohttpc",
  "base64",
@@ -5798,9 +5799,11 @@ dependencies = [
 [[package]]
 name = "tauri-build"
 version = "1.0.0-beta.4"
-source = "git+https://github.com/tauri-apps/tauri?rev=4866404f043ae97c77583fb6061e3fafed823268#4866404f043ae97c77583fb6061e3fafed823268"
+source = "git+https://github.com/tauri-apps/tauri?rev=84f6e3e84a34b01b7fa04f5c4719acb921ef4263#84f6e3e84a34b01b7fa04f5c4719acb921ef4263"
 dependencies = [
  "anyhow",
+ "proc-macro2",
+ "quote 1.0.9",
  "serde_json",
  "tauri-utils",
  "winres",
@@ -5809,7 +5812,7 @@ dependencies = [
 [[package]]
 name = "tauri-codegen"
 version = "1.0.0-beta.4"
-source = "git+https://github.com/tauri-apps/tauri?rev=4866404f043ae97c77583fb6061e3fafed823268#4866404f043ae97c77583fb6061e3fafed823268"
+source = "git+https://github.com/tauri-apps/tauri?rev=84f6e3e84a34b01b7fa04f5c4719acb921ef4263#84f6e3e84a34b01b7fa04f5c4719acb921ef4263"
 dependencies = [
  "blake3",
  "kuchiki",
@@ -5850,7 +5853,7 @@ dependencies = [
 [[package]]
 name = "tauri-macros"
 version = "1.0.0-beta.5"
-source = "git+https://github.com/tauri-apps/tauri?rev=4866404f043ae97c77583fb6061e3fafed823268#4866404f043ae97c77583fb6061e3fafed823268"
+source = "git+https://github.com/tauri-apps/tauri?rev=84f6e3e84a34b01b7fa04f5c4719acb921ef4263#84f6e3e84a34b01b7fa04f5c4719acb921ef4263"
 dependencies = [
  "proc-macro2",
  "quote 1.0.9",
@@ -5861,7 +5864,7 @@ dependencies = [
 [[package]]
 name = "tauri-runtime"
 version = "0.2.1"
-source = "git+https://github.com/tauri-apps/tauri?rev=4866404f043ae97c77583fb6061e3fafed823268#4866404f043ae97c77583fb6061e3fafed823268"
+source = "git+https://github.com/tauri-apps/tauri?rev=84f6e3e84a34b01b7fa04f5c4719acb921ef4263#84f6e3e84a34b01b7fa04f5c4719acb921ef4263"
 dependencies = [
  "gtk",
  "http",
@@ -5872,13 +5875,13 @@ dependencies = [
  "tauri-utils",
  "thiserror",
  "uuid",
- "webview2-com-sys",
+ "winapi",
 ]
 
 [[package]]
 name = "tauri-runtime-wry"
 version = "0.2.1"
-source = "git+https://github.com/tauri-apps/tauri?rev=4866404f043ae97c77583fb6061e3fafed823268#4866404f043ae97c77583fb6061e3fafed823268"
+source = "git+https://github.com/tauri-apps/tauri?rev=84f6e3e84a34b01b7fa04f5c4719acb921ef4263#84f6e3e84a34b01b7fa04f5c4719acb921ef4263"
 dependencies = [
  "gtk",
  "ico",
@@ -5887,14 +5890,14 @@ dependencies = [
  "tauri-runtime",
  "tauri-utils",
  "uuid",
- "webview2-com",
+ "winapi",
  "wry",
 ]
 
 [[package]]
 name = "tauri-utils"
 version = "1.0.0-beta.3"
-source = "git+https://github.com/tauri-apps/tauri?rev=4866404f043ae97c77583fb6061e3fafed823268#4866404f043ae97c77583fb6061e3fafed823268"
+source = "git+https://github.com/tauri-apps/tauri?rev=84f6e3e84a34b01b7fa04f5c4719acb921ef4263#84f6e3e84a34b01b7fa04f5c4719acb921ef4263"
 dependencies = [
  "heck",
  "html5ever",
@@ -6796,7 +6799,7 @@ dependencies = [
 [[package]]
 name = "wry"
 version = "0.12.2"
-source = "git+https://github.com/tauri-apps/wry?rev=e056fb2a15e29de1b8ed85a548cfeb1f85031357#e056fb2a15e29de1b8ed85a548cfeb1f85031357"
+source = "git+https://github.com/tauri-apps/wry?branch=next#e056fb2a15e29de1b8ed85a548cfeb1f85031357"
 dependencies = [
  "cocoa",
  "core-graphics 0.22.2",

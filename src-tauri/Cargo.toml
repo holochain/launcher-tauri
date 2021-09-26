@@ -13,7 +13,7 @@ version = "0.3.0"
 
 [build-dependencies]
 # Branch `next`
-tauri-build = {git = "https://github.com/tauri-apps/tauri", rev = "4866404f043ae97c77583fb6061e3fafed823268"}
+tauri-build = {git = "https://github.com/tauri-apps/tauri", rev = "84f6e3e84a34b01b7fa04f5c4719acb921ef4263"}
 
 [dependencies]
 base64 = "0.13.0"
@@ -32,7 +32,8 @@ serde_json = "1.0"
 serde_yaml = "0.8"
 # Branch `next`
 portpicker = "0.1.1"
-tauri = {git = "https://github.com/tauri-apps/tauri", rev = "4866404f043ae97c77583fb6061e3fafed823268", features = ["api-all", "system-tray"] }
+tauri = {git = "https://github.com/tauri-apps/tauri", rev = "84f6e3e84a34b01b7fa04f5c4719acb921ef4263", features = ["api-all", "system-tray"] }
+tokio = "1.9.0"
 zip = "0.5.0"
 
 [features]
