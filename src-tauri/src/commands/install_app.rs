@@ -1,5 +1,6 @@
 use crate::{
-  setup::config::{admin_url, uis_data_path},
+  setup::config::uis_data_path,
+  state::LauncherState,
   uis::{
     caddy,
     port_mapping::{app_ui_folder_path, PortMapping},
@@ -17,6 +18,7 @@ use std::{
 
 #[tauri::command]
 pub async fn install_app(
+  state: tauri::State<'_, LauncherState>,
   app_id: String,
   web_app_bundle_path: String,
   uid: Option<String>,
@@ -42,12 +44,18 @@ pub async fn install_app(
     );
   }
 
-  install_happ(app_id.clone(), app_bundle, uid, converted_membrane_proofs)
-    .await
-    .map_err(|err| {
-      log::error!("Error installing hApp: {}", err);
-      err
-    })?;
+  install_happ(
+    state.admin_interface_port,
+    app_id.clone(),
+    app_bundle,
+    uid,
+    converted_membrane_proofs,
+  )
+  .await
+  .map_err(|err| {
+    log::error!("Error installing hApp: {}", err);
+    err
+  })?;
 
   log::info!("Installed hApp {} in the conductor", app_id);
 
@@ -56,12 +64,16 @@ pub async fn install_app(
     .await
     .or(Err("Failed to resolve Web UI"))?;
 
-  install_ui(app_id.clone(), web_ui_zip_bytes.as_slice().to_vec())
-    .await
-    .map_err(|err| {
-      log::error!("Error installing the UI for hApp: {}", err);
-      err
-    })?;
+  install_ui(
+    state.admin_interface_port,
+    app_id.clone(),
+    web_ui_zip_bytes.as_slice().to_vec(),
+  )
+  .await
+  .map_err(|err| {
+    log::error!("Error installing the UI for hApp: {}", err);
+    err
+  })?;
 
   log::info!("Installed UI for hApp {}", app_id);
 
@@ -69,12 +81,13 @@ pub async fn install_app(
 }
 
 async fn install_happ(
+  admin_port: u16,
   app_id: String,
   app_bundle: AppBundle,
   uid: Option<String>,
   membrane_proofs: HashMap<String, SerializedBytes>,
 ) -> Result<(), String> {
-  let mut ws = AdminWebsocket::connect(admin_url())
+  let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", admin_port))
     .await
     .or(Err(String::from("Could not connect to conductor")))?;
 
@@ -101,7 +114,11 @@ async fn install_happ(
   Ok(())
 }
 
-async fn install_ui(app_id: String, web_ui_zip_bytes: ResourceBytes) -> Result<(), String> {
+async fn install_ui(
+  admin_port: u16,
+  app_id: String,
+  web_ui_zip_bytes: ResourceBytes,
+) -> Result<(), String> {
   let mut port_mapping = PortMapping::read_port_mapping()?;
 
   if let Some(_) = port_mapping.get_ui_port_for_app(&app_id) {
@@ -120,7 +137,7 @@ async fn install_ui(app_id: String, web_ui_zip_bytes: ResourceBytes) -> Result<(
 
   log::info!("Allocated new port {} for app {}", port, app_id.clone());
 
-  caddy::reload_caddy().await?;
+  caddy::reload_caddy(admin_port).await?;
 
   Ok(())
 }

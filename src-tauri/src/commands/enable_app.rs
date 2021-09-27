@@ -1,10 +1,13 @@
 use holochain_conductor_client::AdminWebsocket;
 
-use crate::{setup::config::admin_url, uis::caddy};
+use crate::{state::LauncherState, uis::caddy};
 
 #[tauri::command]
-pub async fn enable_app(app_id: String) -> Result<(), String> {
-  let mut ws = AdminWebsocket::connect(admin_url())
+pub async fn enable_app(
+  state: tauri::State<'_, LauncherState>,
+  app_id: String,
+) -> Result<(), String> {
+  let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", state.admin_interface_port))
     .await
     .or(Err(String::from("Could not connect to conductor")))?;
 
@@ -14,12 +17,14 @@ pub async fn enable_app(app_id: String) -> Result<(), String> {
 
   log::info!("Activating UI: app_id = {}", app_id);
 
-  caddy::reload_caddy().await
+  caddy::reload_caddy(state.admin_interface_port).await
 }
 
 #[tauri::command]
-pub async fn disable_app(app_id: String) -> Result<(), String> {
-  let mut ws = AdminWebsocket::connect(admin_url())
+pub async fn disable_app(
+  state: tauri::State<'_, LauncherState>,
+  app_id: String) -> Result<(), String> {
+    let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", state.admin_interface_port))
     .await
     .or(Err(String::from("Could not connect to conductor")))?;
 
@@ -29,5 +34,5 @@ pub async fn disable_app(app_id: String) -> Result<(), String> {
 
   log::info!("Deactivating UI: app_id = {}", app_id);
 
-  caddy::reload_caddy().await
+  caddy::reload_caddy(state.admin_interface_port).await
 }

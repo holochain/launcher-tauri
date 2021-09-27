@@ -1,13 +1,6 @@
 use std::{fs, path::PathBuf};
 use tauri::api::path::{config_dir, data_dir};
 
-pub const DEFAULT_ADMIN_PORT: u16 = 4038;
-pub const DEFAULT_APP_PORT: u16 = 4039;
-
-pub fn admin_url() -> String {
-  format!("ws://localhost:{}", DEFAULT_ADMIN_PORT)
-}
-
 pub fn holochain_config_path() -> PathBuf {
   config_dir()
     .expect("Could not get config dir")
@@ -44,19 +37,17 @@ pub fn keystore_data_path() -> PathBuf {
   data_dir().expect("Could not get config dir").join("lair")
 }
 
-pub fn create_initial_config_if_necessary() -> () {
+pub fn create_initial_config_if_necessary(admin_port: u16) -> () {
   create_dir_if_necessary(holochain_config_path());
   create_dir_if_necessary(holochain_data_path());
   create_dir_if_necessary(keystore_data_path());
   create_dir_if_necessary(uis_data_path());
   create_dir_if_necessary(logs_folder_path());
-  if let Err(_) = fs::read(conductor_config_path()) {
-    fs::write(
-      conductor_config_path(),
-      initial_config(DEFAULT_ADMIN_PORT, holochain_data_path()),
-    )
-    .expect("Could not write conductor config");
-  }
+  fs::write(
+    conductor_config_path(),
+    initial_config(admin_port, holochain_data_path()),
+  )
+  .expect("Could not write conductor config");
 }
 
 fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {

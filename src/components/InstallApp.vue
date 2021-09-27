@@ -70,6 +70,7 @@
             style="flex: 1; margin-top: 4px"
             label="Membrane Proof"
             outlined
+            helper="Check with the author if this is required"
             @input="membraneProofs[appSlot.id] = $event.target.value"
           ></mwc-textarea>
         </div>

@@ -7,13 +7,13 @@ edition = "2018"
 license = ""
 name = "holochain-launcher"
 repository = ""
-version = "0.2.3"
+version = "0.3.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
 # Branch `next`
-tauri-build = {git = "https://github.com/tauri-apps/tauri", rev = "84f6e3e84a34b01b7fa04f5c4719acb921ef4263"}
+tauri-build = {git = "https://github.com/tauri-apps/tauri", rev = "4866404f043ae97c77583fb6061e3fafed823268"}
 
 [dependencies]
 base64 = "0.13.0"
@@ -24,16 +24,20 @@ holochain_conductor_client = {git = "https://github.com/holochain/conductor-clie
 holochain_types = "0.0.7"
 log = "0.4.14"
 log4rs = "1.0.0"
-mr_bundle = "0.0.3"
+mr_bundle = "0.0.4"
 open = "2.0.1"
 opener = "0.5.0"
 serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
+portpicker = "0.1.1"
 # Branch `next`
-tauri = {git = "https://github.com/tauri-apps/tauri", rev = "84f6e3e84a34b01b7fa04f5c4719acb921ef4263", features = ["api-all", "system-tray"] }
+tauri = {git = "https://github.com/tauri-apps/tauri", rev = "4866404f043ae97c77583fb6061e3fafed823268", features = ["api-all", "system-tray"] }
 tokio = "1.9.0"
 zip = "0.5.0"
+
+[patch."https://github.com/tauri-apps/wry"]
+wry = { git = "https://github.com/guillemcordoba/wry.git", rev = "9f048b0ca63ccfe26c09a04dddb8b431f9c9f5d9", default-features = false, features = [ "file-drop" ] }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

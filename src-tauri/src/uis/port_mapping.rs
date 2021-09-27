@@ -5,8 +5,6 @@ use std::{collections::BTreeMap, fs, io::ErrorKind, path::PathBuf};
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct PortMapping(BTreeMap<String, u16>);
 
-const FIRST_PORT: u16 = 4040;
-
 impl PortMapping {
   fn path() -> PathBuf {
     uis_data_path().join(String::from("port_mapping.yml"))
@@ -36,23 +34,20 @@ impl PortMapping {
     self.0.insert(app_id, port);
 
     self.write_port_mapping()?;
-    
+
     Ok(port)
   }
-  
+
   pub fn remove_app_from_mapping(&mut self, app_id: String) -> Result<(), String> {
     self.0.remove(&app_id);
-    
+
     self.write_port_mapping()?;
 
     Ok(())
   }
 
   fn get_next_available_port(&self) -> u16 {
-    match self.0.values().max() {
-      Some(max) => max + 1,
-      None => FIRST_PORT,
-    }
+    portpicker::pick_unused_port().expect("No ports free")
   }
 
   fn write_port_mapping(&self) -> Result<(), String> {
