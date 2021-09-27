@@ -37,7 +37,7 @@ tokio = "1.9.0"
 zip = "0.5.0"
 
 [patch."https://github.com/tauri-apps/wry"]
-wry = { git = "https://github.com/guillemcordoba/wry.git", rev = "ea477e2960b3c461c54633f0c839945607fb5f05", default-features = false, features = [ "file-drop" ] }
+wry = { git = "https://github.com/guillemcordoba/wry.git", rev = "9f048b0ca63ccfe26c09a04dddb8b431f9c9f5d9", default-features = false, features = [ "file-drop" ] }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

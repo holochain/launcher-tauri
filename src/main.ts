@@ -9,6 +9,7 @@ import "@material/mwc-snackbar";
 import { AdminWebsocket, AppWebsocket } from "@holochain/conductor-api";
 import HcAdminPlugin from "@holochain/admin-ui";
 import { invoke } from "@tauri-apps/api/tauri";
+import "blob-polyfill";
 
 import App from "./App.vue";
 import createStore from "./store";
