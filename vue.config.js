@@ -15,6 +15,7 @@ module.exports = {
           isCustomElement: (tag) =>
             tag.startsWith("copyable-") ||
             tag.startsWith("mwc-") ||
+            tag.startsWith("ui5-") ||
             tag.startsWith("sl-"),
         },
       }));
