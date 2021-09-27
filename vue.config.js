@@ -30,6 +30,9 @@ module.exports = {
         "@material/mwc-ripple": path.resolve(
           "./node_modules/@material/mwc-ripple"
         ),
+        lit: path.resolve("./node_modules/lit"),
+        "lit-html": path.resolve("./node_modules/lit-html"),
+        "lit-element": path.resolve("./node_modules/lit-element"),
         "@material/mwc-button": path.resolve(
           "./node_modules/@material/mwc-button"
         ),
