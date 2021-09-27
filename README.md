@@ -23,7 +23,12 @@ If you already have a `.webhapp`
 
 ### Packaging a Web-hApp
 
-When your UI is served from the launcher and you call `AppWebsocket.connect()` or `AdminWebsocket.connect()`, you will be redirected to the actual port in which Holochain is running its interfaces. Also,
+Requirements:
+
+- On the zome side, target `hdk v0.0.107`.
+- On the UI side, target `@holochain/conductor-api v0.2.1` (v0.2.0 is not going to work).
+
+When your UI is served from the launcher and `AppWebsocket.connect()` or `AdminWebsocket.connect()` are called, the call will be redirected to the actual port in which Holochain is running its interfaces. Also, when the `appWebsocket.appInfo({ installed_app_info: <APP_ID> })` is called, the `APP_ID` parameter is going to be replaced with the actual application ID that is installed in the Launcher.
 
 For now, the UI still has access to the admin interface, but its usage is discouraged as newer versions of the launcher will block any admin requests not coming from the Holochain Admin UI itself. There will be a call available in `AppWebsocket` that will prompt the user to do an action in the Holochain Admin UI, or similar (To Be Defined).
 
@@ -32,6 +37,8 @@ For now, the UI still has access to the admin interface, but its usage is discou
 3. Create a Web-hApp manifest with `hc web-app init`.
 4. Set the corrrect locations for the UI `.zip` file and the `.happ` file.
 5. Package your Web-hApp with `hc web-app pack`, and publish it so that other users can download and install it.
+
+See [where](https://github.com/lightningrodlabs/where) for a complete working setup.
 
 ## Known issues
 
