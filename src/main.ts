@@ -14,6 +14,14 @@ import "blob-polyfill";
 import App from "./App.vue";
 import createStore from "./store";
 
+window.onerror = function (message, source, lineno, colno, error) {
+  invoke("log", {
+    log: `UI error: message: ${message}. source: ${source}. lineno: ${lineno}. colno: ${colno}. error: ${JSON.stringify(
+      error
+    )}`,
+  });
+};
+
 async function setup() {
   const app = createApp(App);
 
