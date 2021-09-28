@@ -1,7 +1,7 @@
 use std::fs;
 
 use holochain_conductor_client::{AdminWebsocket, AppStatusFilter};
-use tauri::api::process::Command;
+use tauri::api::process::{Command, CommandEvent};
 
 use crate::{setup::config::caddyfile_path, uis::port_mapping::app_ui_folder_path};
 
@@ -132,7 +132,7 @@ pub async fn reload_caddy(admin_port: u16) -> Result<(), String> {
 pub async fn launch_caddy(admin_port: u16) -> Result<(), String> {
   refresh_caddyfile(admin_port).await?;
 
-  Command::new_sidecar("caddy")
+  let (mut caddy_rx, _) = Command::new_sidecar("caddy")
     .or(Err(String::from("Can't find caddy binary")))?
     .args(&[
       "run",
@@ -141,6 +141,18 @@ pub async fn launch_caddy(admin_port: u16) -> Result<(), String> {
     ])
     .spawn()
     .map_err(|err| format!("Error running caddy {:?}", err))?;
+
+  tauri::async_runtime::spawn(async move {
+    // read events such as stdout
+    while let Some(event) = caddy_rx.recv().await {
+      match event.clone() {
+        CommandEvent::Stdout(line) => log::info!("[CADDY] {}", line),
+        CommandEvent::Stderr(line) => log::info!("[CADDY] {}", line),
+        _ => log::info!("[CADDY] {:?}", event),
+      }
+    }
+  });
+  log::info!("Launched caddy");
 
   Ok(())
 }
