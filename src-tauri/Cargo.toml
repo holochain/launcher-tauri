@@ -13,11 +13,11 @@ version = "0.3.0"
 
 [build-dependencies]
 # Branch `next`
-tauri-build = {git = "https://github.com/tauri-apps/tauri", rev = "1a28904b8ebea92e143d5dc21ebd209e9edec531"}
+tauri-build = "1.0.0-beta.4"
 
 [dependencies]
 base64 = "0.13.0"
-chrono = {version = "0.4", features = ["serde"]}
+chrono = {version = "0.4", features = ["serde"] }
 flate2 = "1.0.20"
 futures = "0.3"
 holochain_conductor_client = {git = "https://github.com/holochain/conductor-client-rust", rev = "53bb9925e29443fe727926ab27c07e1b1ea51e3f"}
@@ -28,12 +28,11 @@ mr_bundle = "0.0.4"
 open = "2.0.1"
 opener = "0.5.0"
 portpicker = "0.1.1"
-serde = {version = "1", features = ["derive"]}
+serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
 # Branch `next`
-tauri = {git = "https://github.com/tauri-apps/tauri", rev = "1a28904b8ebea92e143d5dc21ebd209e9edec531", features = ["api-all", "system-tray"]}
-
+tauri = {version = "1.0.0-beta.8", features = ["api-all", "system-tray"] }
 tokio = "1.9.0"
 zip = "0.5.0"
 
