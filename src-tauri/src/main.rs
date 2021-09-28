@@ -2,37 +2,42 @@
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
+use portpicker;
 use tauri;
 use tauri::api::process::kill_children;
+use tauri::Event;
 use tauri::SystemTrayEvent;
-use tauri::{Event};
-use portpicker;
 
 mod commands;
 mod launch;
-mod setup;
 mod menu;
+mod setup;
+mod state;
 mod system_tray;
 mod uis;
-mod state;
 
 use crate::commands::{
   enable_app::{disable_app, enable_app},
+  factory_reset::execute_factory_reset,
+  get_admin_port::get_admin_port,
   get_web_app_info::get_web_app_info,
   install_app::install_app,
   open_app::open_app_ui,
   uninstall_app::uninstall_app,
-  factory_reset::execute_factory_reset,
-  get_admin_port::get_admin_port
 };
-use crate::setup::logs::setup_logs;
 use crate::menu::build_menu;
 use crate::menu::handle_menu_event;
+use crate::setup::is_holochain_already_running;
+use crate::setup::logs::setup_logs;
+use crate::state::LauncherState;
 use crate::system_tray::build_system_tray;
 use crate::system_tray::handle_system_tray_event;
-use crate::state::LauncherState;
 
 fn main() {
+  if is_holochain_already_running() {
+    return ();
+  }
+
   if let Err(err) = setup_logs() {
     println!("Error setting up the logs: {:?}", err);
   }
@@ -40,9 +45,9 @@ fn main() {
   let free_port = portpicker::pick_unused_port().expect("No ports free");
 
   let builder_result = tauri::Builder::default()
-  .manage(LauncherState {
-    admin_interface_port: free_port
-  })
+    .manage(LauncherState {
+      admin_interface_port: free_port,
+    })
     .menu(build_menu())
     .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
     .system_tray(build_system_tray())

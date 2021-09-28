@@ -2140,6 +2140,7 @@ dependencies = [
  "chrono",
  "flate2",
  "futures",
+ "holochain_conductor_api",
  "holochain_conductor_client",
  "holochain_types",
  "log",
