@@ -5813,7 +5813,7 @@ dependencies = [
  "tauri-macros",
  "tauri-runtime",
  "tauri-runtime-wry",
- "tauri-utils",
+ "tauri-utils 1.0.0-beta.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "tempfile",
  "thiserror",
  "tokio",
@@ -5825,14 +5825,11 @@ dependencies = [
 [[package]]
 name = "tauri-build"
 version = "1.0.0-beta.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c9c9a9bea25b9d6f5845b8662e18447e17218f99860cab37e39e2b57a9fcd49"
+source = "git+https://github.com/tauri-apps/tauri?rev=4866404f043ae97c77583fb6061e3fafed823268#4866404f043ae97c77583fb6061e3fafed823268"
 dependencies = [
  "anyhow",
- "proc-macro2",
- "quote 1.0.9",
  "serde_json",
- "tauri-utils",
+ "tauri-utils 1.0.0-beta.3 (git+https://github.com/tauri-apps/tauri?rev=4866404f043ae97c77583fb6061e3fafed823268)",
  "winres",
 ]
 
@@ -5849,7 +5846,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "tauri-utils",
+ "tauri-utils 1.0.0-beta.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror",
  "walkdir",
  "zstd",
@@ -5902,7 +5899,7 @@ dependencies = [
  "infer",
  "serde",
  "serde_json",
- "tauri-utils",
+ "tauri-utils 1.0.0-beta.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror",
  "uuid",
  "winapi",
@@ -5919,7 +5916,7 @@ dependencies = [
  "infer",
  "png 0.16.8",
  "tauri-runtime",
- "tauri-utils",
+ "tauri-utils 1.0.0-beta.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "uuid",
  "winapi",
  "wry",
@@ -5931,6 +5928,24 @@ version = "1.0.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fcb9b79594f22b6ed0cc8362e0dfde5b7969962de3cd8ca683de702e59e8221b"
 dependencies = [
+ "html5ever",
+ "kuchiki",
+ "phf 0.10.0",
+ "proc-macro2",
+ "quote 1.0.9",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "url",
+ "zstd",
+]
+
+[[package]]
+name = "tauri-utils"
+version = "1.0.0-beta.3"
+source = "git+https://github.com/tauri-apps/tauri?rev=4866404f043ae97c77583fb6061e3fafed823268#4866404f043ae97c77583fb6061e3fafed823268"
+dependencies = [
+ "heck",
  "html5ever",
  "kuchiki",
  "phf 0.10.0",

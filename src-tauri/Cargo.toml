@@ -13,7 +13,7 @@ version = "0.3.0"
 
 [build-dependencies]
 # Branch `next`
-tauri-build = "1.0.0-beta.4"
+tauri-build = {git = "https://github.com/tauri-apps/tauri", rev = "4866404f043ae97c77583fb6061e3fafed823268"}
 
 [dependencies]
 base64 = "0.13.0"
