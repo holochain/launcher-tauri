@@ -42,7 +42,7 @@ See [where](https://github.com/lightningrodlabs/where) for a complete working se
 
 ## Known issues
 
-- Encryption at rest is only enabled in linux environments. Encryption in MacOs and Windows environments will be enabled when the upstream `rusqlite` crate creates the next release, introducing the option of statically bundling `sqlcipher` in MacOs and in Windows.
+- Encryption at rest is not supported yet. It will be enabled when the upstream `rusqlite` crate creates the next release, introducing the option of statically bundling `sqlcipher` in MacOs and in Windows.
 - Only MacOs v10.13 and after are supported at this moment.
 
 ## Data storage

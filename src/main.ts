@@ -13,6 +13,7 @@ import "blob-polyfill";
 
 import App from "./App.vue";
 import createStore from "./store";
+import { ConnectionStatus } from "./types";
 
 window.onerror = function (message, source, lineno, colno, error) {
   invoke("log", {
@@ -25,35 +26,64 @@ window.onerror = function (message, source, lineno, colno, error) {
 async function setup() {
   const app = createApp(App);
 
-  try {
-    const adminPort = await invoke("get_admin_port", {});
+  let status = await getConnectionStatus();
+  let store = createStore(status) as any;
 
-    const adminWebsocket = await AdminWebsocket.connect(
-      `ws://localhost:${adminPort}`
-    );
+  if (status.type === "Connected") {
+    try {
+      const { appWebsocket, adminWebsocket } = await connect(
+        status.admin_interface_port
+      );
 
-    const appInterfaces = await adminWebsocket.listAppInterfaces();
+      app.use(HcAdminPlugin as any, { store, appWebsocket, adminWebsocket });
 
-    const port = appInterfaces[0];
-
-    const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`);
-
-    const store = createStore(true);
-    app.use(store as any);
-    app
-      .use(HcAdminPlugin as any, { store, appWebsocket, adminWebsocket })
-      .mount("#app");
-
-    await invoke("log", {
-      log: `Connected to Holochain, Admin port = ${adminPort}, App port = ${port}`,
-    });
-  } catch (e) {
-    const error = `Error connecting to Holochain: ${e}`;
-
-    await invoke("log", { log: error });
-    app.use(createStore(false) as any);
-    app.mount("#app");
+      await invoke("log", {
+        log: `Connected to Holochain, Admin port = ${status.admin_interface_port}, App URL = ${appWebsocket.client.socket.url}`,
+      });
+    } catch (e) {
+      const error = `Error connecting to Holochain: ${e}`;
+      status = {
+        type: "Error",
+        error,
+      };
+      store = createStore(status);
+      await invoke("log", { log: error });
+    }
   }
+
+  app.use(store);
+  app.mount("#app");
+}
+
+async function getConnectionStatus(): Promise<ConnectionStatus> {
+  try {
+    const state: ConnectionStatus = await invoke("get_connection_status", {});
+    return state;
+  } catch (e) {
+    return {
+      type: "Error",
+      error: `Error getting the connection status: ${e}`,
+    };
+  }
+}
+
+async function connect(adminPort: number): Promise<{
+  appWebsocket: AppWebsocket;
+  adminWebsocket: AdminWebsocket;
+}> {
+  const adminWebsocket = await AdminWebsocket.connect(
+    `ws://localhost:${adminPort}`
+  );
+
+  const appInterfaces = await adminWebsocket.listAppInterfaces();
+
+  const port = appInterfaces[0];
+
+  const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`);
+  return {
+    appWebsocket,
+    adminWebsocket,
+  };
 }
 
 setup();

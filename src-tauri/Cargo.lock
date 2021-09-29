@@ -2115,8 +2115,10 @@ dependencies = [
  "chrono",
  "flate2",
  "futures",
+ "holochain_conductor_api",
  "holochain_conductor_client",
  "holochain_types",
+ "holochain_websocket",
  "log",
  "log4rs",
  "mr_bundle",
@@ -2128,7 +2130,7 @@ dependencies = [
  "serde_yaml",
  "tauri",
  "tauri-build",
- "tokio",
+ "url",
  "zip",
 ]
 

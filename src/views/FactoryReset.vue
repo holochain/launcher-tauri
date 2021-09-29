@@ -6,7 +6,10 @@
     escapeKeyAction=""
   >
     <div class="column">
-      <span v-if="launchError()">There was an error launching Holochain.</span>
+      <span v-if="launchError()">There was an error launching Holochain:</span>
+      <pre v-if="launchError()" style="word-wrap: break-word">{{
+        $store.state.connectionStatus.error
+      }}</pre>
       <span v-if="launchError()" style="margin-top: 8px">
         If you are upgrading from a previous version of Holochain, it is most
         likely that the new version is not compatible with the data that this
@@ -83,7 +86,7 @@ export default defineComponent({
       (this.$refs.dialog as Dialog).show();
     },
     launchError() {
-      return !this.$store.state.isConnected;
+      return this.$store.state.connectionStatus.type === "Error";
     },
     async executeFactoryReset() {
       try {

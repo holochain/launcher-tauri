@@ -16,23 +16,22 @@ fn caddyfile_config_for_an_app(
   app_id: String,
 ) -> String {
   format!(
-    r#"
-:{} {{
-    respond /{} 200 {{
-		    body `{{
-  "APP_INTERFACE_PORT": {},
-  "ADMIN_INTERFACE_PORT": {},
-  "INSTALLED_APP_ID": "{}"
-}}`
-		    close
-	  }}
-    
-    header Cache-Control no-cache, no-store
-    
-    root * "{}"
-    file_server
+r#":{} {{
+        respond /{} 200 {{
+                body `{{
+                        "APP_INTERFACE_PORT": {},
+                        "ADMIN_INTERFACE_PORT": {},
+                        "INSTALLED_APP_ID": "{}"
+                }}`
+                close
+        }}
+        
+        header Cache-Control no-cache, no-store
+        
+        root * "{}"
+        file_server
 }}
-        "#,
+"#,
     ui_port,
     LAUNCHER_ENV_URL,
     app_interface_port,
@@ -51,7 +50,7 @@ fn build_caddyfile_contents(
   active_apps_ids: Vec<String>,
   port_mapping: PortMapping,
 ) -> Result<String, String> {
-  let mut config_vec = active_apps_ids
+  let config_vec = active_apps_ids
     .into_iter()
     .map(|app_id| {
       let ui_port = port_mapping
@@ -68,9 +67,7 @@ fn build_caddyfile_contents(
     .collect::<Result<Vec<String>, String>>()?;
 
   let empty_line = r#"
-    "#;
-
-  config_vec.push(empty_line.into());
+"#;
 
   Ok(config_vec.join(empty_line))
 }

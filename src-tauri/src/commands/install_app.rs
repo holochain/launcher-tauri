@@ -24,6 +24,8 @@ pub async fn install_app(
   uid: Option<String>,
   membrane_proofs: HashMap<String, Vec<u8>>,
 ) -> Result<(), String> {
+  let admin_port = state.connection_status.get_admin_port()?;
+
   log::info!("Installing: web_app_bundle = {}", web_app_bundle_path);
 
   let web_app_bundle = WebAppBundle::decode(
@@ -45,7 +47,7 @@ pub async fn install_app(
   }
 
   install_happ(
-    state.admin_interface_port,
+    admin_port,
     app_id.clone(),
     app_bundle,
     uid,
@@ -65,7 +67,7 @@ pub async fn install_app(
     .or(Err("Failed to resolve Web UI"))?;
 
   install_ui(
-    state.admin_interface_port,
+    admin_port,
     app_id.clone(),
     web_ui_zip_bytes.as_slice().to_vec(),
   )

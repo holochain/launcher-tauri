@@ -1,3 +1,4 @@
+use holochain_conductor_api::{config::conductor::ConductorConfig, InterfaceDriver};
 use std::{fs, path::PathBuf};
 use tauri::api::path::{config_dir, data_dir};
 
@@ -50,6 +51,20 @@ pub fn create_initial_config_if_necessary(admin_port: u16) -> () {
   .expect("Could not write conductor config");
 }
 
+pub fn config_admin_port() -> Result<Option<u16>, String> {
+  let config = ConductorConfig::load_yaml(&conductor_config_path())
+    .map_err(|err| format!("Unable to open the conductor config file {}", err))?;
+
+  if let Some(admin_interfaces) = config.admin_interfaces {
+    if let Some(interface) = admin_interfaces.get(0) {
+      let InterfaceDriver::Websocket { port } = interface.driver;
+      return Ok(Some(port));
+    }
+  }
+
+  Ok(None)
+}
+
 fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
   format!(
     r#"---
@@ -67,6 +82,7 @@ fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
         - driver:
             type: websocket
             port: {}
+    db_sync_level: Normal
     network:
         network_type: quic_bootstrap
         bootstrap_service: https://bootstrap-staging.holo.host
@@ -77,7 +93,6 @@ fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
             proxy_config:
               type: remote_proxy_client
               proxy_url: "kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--"
-        db_sync_level: Normal
         tuning_params:
             gossip_strategy: sharded-gossip
             gossip_loop_iteration_delay_ms: "1000"
