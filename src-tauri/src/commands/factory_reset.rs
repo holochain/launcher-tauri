@@ -10,7 +10,9 @@ use crate::{
 
 #[tauri::command]
 pub async fn execute_factory_reset(state: tauri::State<'_, LauncherState>) -> Result<(), String> {
-  factory_reset(state.admin_interface_port).await
+  let admin_port = state.connection_status.get_admin_port()?;
+
+  factory_reset(admin_port).await
 }
 
 async fn factory_reset(admin_port: u16) -> Result<(), String> {

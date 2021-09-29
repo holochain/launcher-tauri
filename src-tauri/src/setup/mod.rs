@@ -1,16 +1,25 @@
-use holochain_conductor_client::AdminWebsocket;
+use std::sync::Arc;
+
+use holochain_websocket::{connect, WebsocketConfig};
+use url::Url;
 
 pub mod config;
 pub mod logs;
 
-pub async fn is_holochain_already_running() -> Result<bool, String> {
-  let maybe_port = config::config_admin_port()?;
+pub async fn is_holochain_already_running() -> bool {
+  match config::config_admin_port() {
+    Err(_) => false,
+    Ok(maybe_port) => match maybe_port {
+      None => false,
+      Some(port) => {
+        let url = Url::parse(&format!("ws://localhost:{}", port)).unwrap();
+        let websocket_config = WebsocketConfig::default().default_request_timeout_s(20);
 
-  match maybe_port {
-    None => Ok(false),
-    Some(port) => match AdminWebsocket::connect(format!("ws://localhost:{}", port)).await {
-      Ok(_) => Ok(true),
-      Err(_) => Ok(false),
+        match connect(url.clone().into(), Arc::new(websocket_config)).await {
+          Ok(_) => true,
+          Err(_) => false,
+        }
+      }
     },
   }
 }

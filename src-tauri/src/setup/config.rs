@@ -1,9 +1,5 @@
 use holochain_conductor_api::{config::conductor::ConductorConfig, InterfaceDriver};
-use std::{
-  fs::{self, File},
-  io::Read,
-  path::PathBuf,
-};
+use std::{fs, path::PathBuf};
 use tauri::api::path::{config_dir, data_dir};
 
 pub fn holochain_config_path() -> PathBuf {

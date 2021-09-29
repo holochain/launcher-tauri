@@ -4,13 +4,15 @@
     <router-link to="/about">About</router-link>
   </div>
  -->
-  <Home v-if="!launchError()" style="display: flex; flex: 1"></Home>
+  <Home v-if="isConnected()" style="display: flex; flex: 1"></Home>
+  <AlreadyRunning v-else-if="isAlreadyRunning()"></AlreadyRunning>
   <FactoryReset style="display: flex; flex: 1"></FactoryReset>
   <About></About>
 </template>
 <script lang="ts">
 import Home from "./views/Home.vue";
 import FactoryReset from "./views/FactoryReset.vue";
+import AlreadyRunning from "./components/AlreadyRunning.vue";
 import About from "./components/About.vue";
 import { defineComponent } from "vue";
 
@@ -20,10 +22,14 @@ export default defineComponent({
     Home,
     FactoryReset,
     About,
+    AlreadyRunning,
   },
   methods: {
-    launchError() {
-      return !this.$store.state.isConnected;
+    isConnected() {
+      return this.$store.state.connectionStatus.type === "Connected";
+    },
+    isAlreadyRunning() {
+      return this.$store.state.connectionStatus.type === "AlreadyRunning";
     },
   },
 });

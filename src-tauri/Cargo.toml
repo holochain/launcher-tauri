@@ -20,9 +20,10 @@ base64 = "0.13.0"
 chrono = {version = "0.4", features = ["serde"] }
 flate2 = "1.0.20"
 futures = "0.3"
+holochain_conductor_api = "0.0.7"
 holochain_conductor_client = {git = "https://github.com/holochain/conductor-client-rust", rev = "53bb9925e29443fe727926ab27c07e1b1ea51e3f"}
 holochain_types = "0.0.7"
-holochain_conductor_api = "0.0.7"
+holochain_websocket = "0.0.7"
 log = "0.4.14"
 log4rs = "1.0.0"
 mr_bundle = "0.0.4"
@@ -34,7 +35,7 @@ serde_json = "1.0"
 serde_yaml = "0.8"
 # Branch `next`
 tauri = {version = "1.0.0-beta.8", features = ["api-all", "system-tray"] }
-tokio = "1.9.0"
+url = "2.2.2"
 zip = "0.5.0"
 
 [features]

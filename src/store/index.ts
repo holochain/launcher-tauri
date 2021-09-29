@@ -1,14 +1,15 @@
+import { ConnectionStatus } from "../types";
 import { createStore } from "vuex";
 
 export interface LauncherAdminState {
-  isConnected: boolean;
+  connectionStatus: ConnectionStatus;
 }
 
-export default function (connected: boolean) {
+export default function (status: ConnectionStatus) {
   return createStore({
     state(): LauncherAdminState {
       return {
-        isConnected: connected,
+        connectionStatus: status,
       };
     },
     mutations: {},

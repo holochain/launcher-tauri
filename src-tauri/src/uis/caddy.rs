@@ -17,20 +17,20 @@ fn caddyfile_config_for_an_app(
 ) -> String {
   format!(
     r#"
-:{} {{
-    respond /{} 200 {{
-		    body `{{
-  "APP_INTERFACE_PORT": {},
-  "ADMIN_INTERFACE_PORT": {},
-  "INSTALLED_APP_ID": "{}"
-}}`
-		    close
-	  }}
-    
-    header Cache-Control no-cache, no-store
-    
-    root * "{}"
-    file_server
+    :{} {{
+        respond /{} 200 {{
+                body `{{
+                        "APP_INTERFACE_PORT": {},
+                        "ADMIN_INTERFACE_PORT": {},
+                        "INSTALLED_APP_ID": "{}"
+                }}`
+                close
+        }}
+        
+        header Cache-Control no-cache, no-store
+        
+        root * "{}"
+        file_server
 }}
         "#,
     ui_port,

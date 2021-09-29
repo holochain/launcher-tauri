@@ -19,7 +19,7 @@ mod uis;
 use crate::commands::{
   enable_app::{disable_app, enable_app},
   factory_reset::execute_factory_reset,
-  get_admin_port::get_admin_port,
+  get_connection_status::get_connection_status,
   get_web_app_info::get_web_app_info,
   install_app::install_app,
   open_app::open_app_ui,
@@ -29,25 +29,59 @@ use crate::menu::build_menu;
 use crate::menu::handle_menu_event;
 use crate::setup::is_holochain_already_running;
 use crate::setup::logs::setup_logs;
+use crate::state::ConnectionStatus;
 use crate::state::LauncherState;
 use crate::system_tray::build_system_tray;
 use crate::system_tray::handle_system_tray_event;
 
 fn main() {
-  if is_holochain_already_running() {
-    return ();
-  }
-
   if let Err(err) = setup_logs() {
     println!("Error setting up the logs: {:?}", err);
   }
 
+  let already_running =
+    tauri::async_runtime::block_on(async move { is_holochain_already_running().await });
+
+  // If holochain is already running, only display a small notice window
+  if already_running {
+    let build_result = tauri::Builder::default()
+      .manage(LauncherState {
+        connection_status: ConnectionStatus::AlreadyRunning,
+      })
+      .invoke_handler(tauri::generate_handler![get_connection_status])
+      .run(tauri::generate_context!());
+    if let Err(err) = build_result {
+      log::error!("Error building the window: {}", err);
+    }
+    return ();
+  }
+
   let free_port = portpicker::pick_unused_port().expect("No ports free");
+  let launch_result =
+    tauri::async_runtime::block_on(
+      async move { launch::launch_children_processes(free_port).await },
+    );
+
+  let state = match launch_result {
+    Ok(()) => {
+      log::info!("Launch setup successful");
+      LauncherState {
+        connection_status: ConnectionStatus::Connected {
+          admin_interface_port: free_port
+        }
+      }
+    }
+    Err(err) => {
+      kill_children();
+      log::error!("There was an error launching holochain: {:?}", err);
+      LauncherState {
+        connection_status: ConnectionStatus::Error { error: err },
+      }
+    }
+  };
 
   let builder_result = tauri::Builder::default()
-    .manage(LauncherState {
-      admin_interface_port: free_port,
-    })
+    .manage(state)
     .menu(build_menu())
     .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
     .system_tray(build_system_tray())
@@ -55,28 +89,14 @@ fn main() {
       SystemTrayEvent::MenuItemClick { id, .. } => handle_system_tray_event(app, id),
       _ => {}
     })
-    .setup(move |_app| {
-      tauri::async_runtime::block_on(async move {
-        match launch::launch_children_processes(free_port).await {
-          Ok(()) => {
-            log::info!("Launch setup successful");
-          }
-          Err(err) => {
-            kill_children();
-            log::error!("There was an error launching holochain: {:?}", err);
-          }
-        }
-      });
-      Ok(())
-    })
     .invoke_handler(tauri::generate_handler![
+      get_connection_status,
       open_app_ui,
       install_app,
       enable_app,
       disable_app,
       uninstall_app,
       get_web_app_info,
-      get_admin_port,
       execute_factory_reset,
       setup::logs::log,
     ])

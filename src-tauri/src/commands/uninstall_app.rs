@@ -14,9 +14,11 @@ pub async fn uninstall_app(
   state: tauri::State<'_, LauncherState>,
   app_id: String,
 ) -> Result<(), String> {
+  let admin_port = state.connection_status.get_admin_port()?;
+
   log::info!("Uninstalling: installed_app_id = {}", app_id);
 
-  let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", state.admin_interface_port))
+  let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", admin_port))
     .await
     .or(Err(String::from("Could not connect to conductor")))?;
 
@@ -26,7 +28,7 @@ pub async fn uninstall_app(
 
   log::info!("Uninstalled hApp {} from the conductor", app_id);
 
-  uninstall_ui(state.admin_interface_port, app_id.clone())
+  uninstall_ui(admin_port, app_id.clone())
     .await
     .map_err(|err| {
       log::error!("Error removing the UI for hApp: {}", err);
