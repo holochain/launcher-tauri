@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-18.04, windows-latest]
+        platform: [macos-latest, windows-latest]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.9
 
