@@ -37,7 +37,7 @@ pub async fn launch_children_processes(admin_port: u16) -> Result<(), String> {
 
   log::info!("Launched lair-keystore");
 
-  thread::sleep(Duration::from_millis(300));
+  thread::sleep(Duration::from_millis(1000));
 
   let (mut holochain_rx, _) = Command::new_sidecar("holochain")
     .or(Err(String::from("Can't find holochain binary")))?
