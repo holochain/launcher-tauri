@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "private": true,
   "scripts": {
     "dev": "npm run build:ui && npm run tauri dev",
