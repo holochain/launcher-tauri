@@ -50,7 +50,7 @@ fn build_caddyfile_contents(
   active_apps_ids: Vec<String>,
   port_mapping: PortMapping,
 ) -> Result<String, String> {
-  let mut config_vec = active_apps_ids
+  let config_vec = active_apps_ids
     .into_iter()
     .map(|app_id| {
       let ui_port = port_mapping
