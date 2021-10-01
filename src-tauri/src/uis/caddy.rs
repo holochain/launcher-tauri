@@ -16,7 +16,7 @@ fn caddyfile_config_for_an_app(
   app_id: String,
 ) -> String {
   format!(
-r#":{} {{
+    r#":{} {{
         respond /{} 200 {{
                 body `{{
                         "APP_INTERFACE_PORT": {},
@@ -50,7 +50,7 @@ fn build_caddyfile_contents(
   active_apps_ids: Vec<String>,
   port_mapping: PortMapping,
 ) -> Result<String, String> {
-  let config_vec = active_apps_ids
+  let mut config_vec = active_apps_ids
     .into_iter()
     .map(|app_id| {
       let ui_port = port_mapping
@@ -68,6 +68,10 @@ fn build_caddyfile_contents(
 
   let empty_line = r#"
 "#;
+
+  if config_vec.len() == 0 {
+    return Ok(String::from(empty_line));
+  }
 
   Ok(config_vec.join(empty_line))
 }
