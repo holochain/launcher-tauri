@@ -10,7 +10,11 @@ use crate::{
 
 #[tauri::command]
 pub async fn execute_factory_reset(state: tauri::State<'_, LauncherState>) -> Result<(), String> {
-  let admin_port = state.connection_status.get_admin_port()?;
+  // Holochain may be down; if it is, pick a new port for the relaunch
+  let admin_port = match state.connection_status.get_admin_port() {
+    Ok(port) => port,
+    Err(_) => portpicker::pick_unused_port().expect("No ports free"),
+  };
 
   factory_reset(admin_port).await
 }
