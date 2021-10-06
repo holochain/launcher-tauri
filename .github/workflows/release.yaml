@@ -54,15 +54,9 @@ jobs:
           curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
           sudo apt update
           sudo apt install caddy
-      - name: install Holochain (Windows)
-        if: matrix.platform == 'windows-latest'
+      - name: install Holochain 
         run: |
           cargo install holochain --version 0.0.109
-          cargo install lair_keystore --version 0.0.7
-      - name: install Holochain (Ubuntu and MacOs)
-        if: matrix.platform != 'windows-latest'
-        run: |
-          cargo install holochain --version 0.0.109 --features db-encryption
           cargo install lair_keystore --version 0.0.7
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
