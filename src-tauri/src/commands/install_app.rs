@@ -1,6 +1,6 @@
 use crate::{
   setup::config::uis_data_path,
-  state::LauncherState,
+  state::{LauncherState, RunningPorts},
   uis::{
     caddy,
     port_mapping::{app_ui_folder_path, PortMapping},
@@ -24,7 +24,7 @@ pub async fn install_app(
   uid: Option<String>,
   membrane_proofs: HashMap<String, Vec<u8>>,
 ) -> Result<(), String> {
-  let admin_port = state.connection_status.get_admin_port()?;
+  let ports = state.get_running_ports()?;
 
   log::info!("Installing: web_app_bundle = {}", web_app_bundle_path);
 
@@ -47,7 +47,7 @@ pub async fn install_app(
   }
 
   install_happ(
-    admin_port,
+    ports.admin_interface_port,
     app_id.clone(),
     app_bundle,
     uid,
@@ -66,16 +66,12 @@ pub async fn install_app(
     .await
     .or(Err("Failed to resolve Web UI"))?;
 
-  install_ui(
-    admin_port,
-    app_id.clone(),
-    web_ui_zip_bytes.as_slice().to_vec(),
-  )
-  .await
-  .map_err(|err| {
-    log::error!("Error installing the UI for hApp: {}", err);
-    err
-  })?;
+  install_ui(ports, app_id.clone(), web_ui_zip_bytes.as_slice().to_vec())
+    .await
+    .map_err(|err| {
+      log::error!("Error installing the UI for hApp: {}", err);
+      err
+    })?;
 
   log::info!("Installed UI for hApp {}", app_id);
 
@@ -117,7 +113,7 @@ async fn install_happ(
 }
 
 async fn install_ui(
-  admin_port: u16,
+  ports: RunningPorts,
   app_id: String,
   web_ui_zip_bytes: ResourceBytes,
 ) -> Result<(), String> {
@@ -139,7 +135,7 @@ async fn install_ui(
 
   log::info!("Allocated new port {} for app {}", port, app_id.clone());
 
-  caddy::reload_caddy(admin_port).await?;
+  caddy::reload_caddy(ports).await?;
 
   Ok(())
 }

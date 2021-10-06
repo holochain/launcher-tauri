@@ -31,6 +31,7 @@ use crate::setup::is_holochain_already_running;
 use crate::setup::logs::setup_logs;
 use crate::state::ConnectionStatus;
 use crate::state::LauncherState;
+use crate::state::RunningPorts;
 use crate::system_tray::build_system_tray;
 use crate::system_tray::handle_system_tray_event;
 
@@ -57,18 +58,22 @@ fn main() {
   }
 
   let free_port = portpicker::pick_unused_port().expect("No ports free");
+  let caddy_free_port = portpicker::pick_unused_port().expect("No ports free");
+  let ports = RunningPorts {
+    admin_interface_port: free_port,
+    caddy_admin_port: caddy_free_port,
+  };
+  let cloned_ports = ports.clone();
   let launch_result =
     tauri::async_runtime::block_on(
-      async move { launch::launch_children_processes(free_port).await },
+      async move { launch::launch_children_processes(cloned_ports).await },
     );
 
   let state = match launch_result {
     Ok(()) => {
       log::info!("Launch setup successful");
       LauncherState {
-        connection_status: ConnectionStatus::Connected {
-          admin_interface_port: free_port
-        }
+        connection_status: ConnectionStatus::Connected(ports),
       }
     }
     Err(err) => {

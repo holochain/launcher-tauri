@@ -9,6 +9,7 @@ export type ConnectionStatus =
   | {
       type: "Connected";
       admin_interface_port: number;
+      caddy_admin_port: number;
     }
   | { type: "Error"; error: string }
   | {

@@ -3,10 +3,10 @@ use std::{collections::HashMap, thread, time::Duration};
 use holochain_conductor_client::AdminWebsocket;
 use tauri::api::process::{Command, CommandEvent};
 
-use crate::{setup::config, uis::caddy};
+use crate::{setup::config, state::RunningPorts, uis::caddy};
 
-pub async fn launch_children_processes(admin_port: u16) -> Result<(), String> {
-  config::create_initial_config_if_necessary(admin_port);
+pub async fn launch_children_processes(running_ports: RunningPorts) -> Result<(), String> {
+  config::create_initial_config_if_necessary(running_ports.admin_interface_port);
 
   let mut envs = HashMap::new();
   envs.insert(String::from("RUST_LOG"), String::from("warn"));
@@ -64,9 +64,9 @@ pub async fn launch_children_processes(admin_port: u16) -> Result<(), String> {
   });
   log::info!("Launched holochain");
 
-  setup_conductor(admin_port).await?;
+  setup_conductor(running_ports.admin_interface_port).await?;
 
-  caddy::launch_caddy(admin_port).await?;
+  caddy::launch_caddy(running_ports).await?;
 
   Ok(())
 }

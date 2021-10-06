@@ -3,19 +3,22 @@ use std::fs;
 use holochain_conductor_client::{AdminWebsocket, AppStatusFilter};
 use tauri::api::process::{Command, CommandEvent};
 
-use crate::{setup::config::caddyfile_path, uis::port_mapping::app_ui_folder_path};
+use crate::{
+  setup::config::caddyfile_path, state::RunningPorts, uis::port_mapping::app_ui_folder_path,
+};
 
 use super::port_mapping::PortMapping;
 
 const LAUNCHER_ENV_URL: &str = ".launcher-env.json";
 
-fn initial_caddyfile() -> String {
-  r#"
-{
-    admin off
-}
-"#
-  .into()
+fn initial_caddyfile(caddy_admin_port: u16) -> String {
+  format!(
+    r#"{{
+    admin localhost:{}
+}}
+"#,
+    caddy_admin_port
+  )
 }
 
 fn caddyfile_config_for_an_app(
@@ -54,12 +57,12 @@ fn caddyfile_config_for_an_app(
 }
 
 fn build_caddyfile_contents(
-  admin_port: u16,
+  running_ports: RunningPorts,
   app_interface_port: u16,
   active_apps_ids: Vec<String>,
   port_mapping: PortMapping,
 ) -> Result<String, String> {
-  let caddyfile = initial_caddyfile();
+  let caddyfile = initial_caddyfile(running_ports.caddy_admin_port);
 
   let mut config_vec = active_apps_ids
     .into_iter()
@@ -69,7 +72,7 @@ fn build_caddyfile_contents(
         .ok_or(String::from("This app has no assigned port"))?;
 
       Ok(caddyfile_config_for_an_app(
-        admin_port,
+        running_ports.admin_interface_port,
         app_interface_port,
         ui_port,
         app_id,
@@ -86,11 +89,14 @@ fn build_caddyfile_contents(
 }
 
 /// Connects to the conductor, requests the list of running apps, and writes the Caddyfile with the appropriate port mapping
-async fn refresh_caddyfile(admin_port: u16) -> Result<(), String> {
+async fn refresh_caddyfile(running_ports: RunningPorts) -> Result<(), String> {
   log::info!("Refreshing caddyfile");
-  let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", admin_port))
-    .await
-    .or(Err(String::from("Could not connect to conductor")))?;
+  let mut ws = AdminWebsocket::connect(format!(
+    "ws://localhost:{}",
+    running_ports.admin_interface_port
+  ))
+  .await
+  .or(Err(String::from("Could not connect to conductor")))?;
 
   let active_apps = ws
     .list_apps(Some(AppStatusFilter::Running))
@@ -108,8 +114,12 @@ async fn refresh_caddyfile(admin_port: u16) -> Result<(), String> {
     .map(|a| a.installed_app_id)
     .collect();
 
-  let caddyfile_contents =
-    build_caddyfile_contents(admin_port, app_interfaces[0], active_app_ids, port_mapping)?;
+  let caddyfile_contents = build_caddyfile_contents(
+    running_ports,
+    app_interfaces[0],
+    active_app_ids,
+    port_mapping,
+  )?;
 
   fs::write(caddyfile_path(), caddyfile_contents)
     .map_err(|err| format!("Error writing Caddyfile: {:?}", err))?;
@@ -119,8 +129,8 @@ async fn refresh_caddyfile(admin_port: u16) -> Result<(), String> {
 
 /// Refreshes the running apps and reloads caddy to be consistent with them
 /// Execute this when there has been some change in the status of an app (enabled, disabled, uninstalled...)
-pub async fn reload_caddy(admin_port: u16) -> Result<(), String> {
-  refresh_caddyfile(admin_port).await?;
+pub async fn reload_caddy(running_ports: RunningPorts) -> Result<(), String> {
+  refresh_caddyfile(running_ports).await?;
 
   log::info!("Reloading Caddy");
 
@@ -139,8 +149,8 @@ pub async fn reload_caddy(admin_port: u16) -> Result<(), String> {
 
 /// Builds the Caddyfile from the list of running apps and launches caddy
 /// Execute only on launcher start
-pub async fn launch_caddy(admin_port: u16) -> Result<(), String> {
-  refresh_caddyfile(admin_port).await?;
+pub async fn launch_caddy(running_ports: RunningPorts) -> Result<(), String> {
+  refresh_caddyfile(running_ports).await?;
 
   let (mut caddy_rx, _) = Command::new_sidecar("caddy")
     .or(Err(String::from("Can't find caddy binary")))?

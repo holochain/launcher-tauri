@@ -1,12 +1,9 @@
 use std::fs;
 
-use crate::{
-  state::LauncherState,
-  uis::{
+use crate::{state::{LauncherState, RunningPorts}, uis::{
     caddy,
     port_mapping::{app_ui_folder_path, PortMapping},
-  },
-};
+  }};
 use holochain_conductor_client::AdminWebsocket;
 
 #[tauri::command]
@@ -14,11 +11,11 @@ pub async fn uninstall_app(
   state: tauri::State<'_, LauncherState>,
   app_id: String,
 ) -> Result<(), String> {
-  let admin_port = state.connection_status.get_admin_port()?;
+  let ports = state.get_running_ports()?;
 
   log::info!("Uninstalling: installed_app_id = {}", app_id);
 
-  let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", admin_port))
+  let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", ports.admin_interface_port))
     .await
     .or(Err(String::from("Could not connect to conductor")))?;
 
@@ -28,12 +25,10 @@ pub async fn uninstall_app(
 
   log::info!("Uninstalled hApp {} from the conductor", app_id);
 
-  uninstall_ui(admin_port, app_id.clone())
-    .await
-    .map_err(|err| {
-      log::error!("Error removing the UI for hApp: {}", err);
-      err
-    })?;
+  uninstall_ui(ports, app_id.clone()).await.map_err(|err| {
+    log::error!("Error removing the UI for hApp: {}", err);
+    err
+  })?;
 
   log::info!("Removed UI for hApp {}", app_id);
 
@@ -41,7 +36,7 @@ pub async fn uninstall_app(
 }
 
 // We are assuming that the app id is in the PortMapping
-async fn uninstall_ui(admin_port: u16, app_id: String) -> Result<(), String> {
+async fn uninstall_ui(ports: RunningPorts, app_id: String) -> Result<(), String> {
   let mut port_mapping = PortMapping::read_port_mapping()?;
 
   let ui_folder_path = app_ui_folder_path(app_id.clone());
@@ -50,7 +45,7 @@ async fn uninstall_ui(admin_port: u16, app_id: String) -> Result<(), String> {
 
   port_mapping.remove_app_from_mapping(app_id.clone())?;
 
-  caddy::reload_caddy(admin_port).await?;
+  caddy::reload_caddy(ports).await?;
 
   Ok(())
 }

@@ -1,25 +1,25 @@
 use std::{fs, io, path::PathBuf};
 
 use tauri::api::process::kill_children;
+use portpicker::pick_unused_port;
 
-use crate::{
-  launch::launch_children_processes,
-  setup::config::{holochain_config_path, holochain_data_path, keystore_data_path},
-  state::LauncherState,
-};
+use crate::{launch::launch_children_processes, setup::config::{holochain_config_path, holochain_data_path, keystore_data_path}, state::{LauncherState, RunningPorts}};
 
 #[tauri::command]
 pub async fn execute_factory_reset(state: tauri::State<'_, LauncherState>) -> Result<(), String> {
   // Holochain may be down; if it is, pick a new port for the relaunch
-  let admin_port = match state.connection_status.get_admin_port() {
-    Ok(port) => port,
-    Err(_) => portpicker::pick_unused_port().expect("No ports free"),
+  let ports = match state.get_running_ports() {
+    Ok(ports) => ports,
+    Err(_) => RunningPorts {
+      admin_interface_port: pick_unused_port().expect("No ports free"),
+      caddy_admin_port: pick_unused_port().expect("No ports free"),
+    },
   };
 
-  factory_reset(admin_port).await
+  factory_reset(ports).await
 }
 
-async fn factory_reset(admin_port: u16) -> Result<(), String> {
+async fn factory_reset(ports: RunningPorts) -> Result<(), String> {
   log::warn!("A factory reset has been requested, initiating...");
 
   // Kill all the children processes to avoid messing up with the filesystem
@@ -37,7 +37,7 @@ async fn factory_reset(admin_port: u16) -> Result<(), String> {
   remove_dir_if_exists(holochain_data_path())
     .or(Err(String::from("Could not remove holochain data path")))?;
 
-  launch_children_processes(admin_port).await.map_err(|err| {
+  launch_children_processes(ports).await.map_err(|err| {
     log::error!("Failed to restart Holochain: {}", err);
     String::from("Failed to restart Holochain")
   })?;

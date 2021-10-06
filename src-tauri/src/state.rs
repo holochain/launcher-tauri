@@ -1,28 +1,32 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct RunningPorts {
+  pub admin_interface_port: u16,
+  pub caddy_admin_port: u16,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type")]
 pub enum ConnectionStatus {
   // Normal state
-  Connected { admin_interface_port: u16 },
+  Connected(RunningPorts),
   // There was an error running the launcher
   Error { error: String },
   // There was already an older instance of the launcher running
   AlreadyRunning,
 }
 
-impl ConnectionStatus {
-  pub fn get_admin_port(&self) -> Result<u16, String> {
-    match self {
-      ConnectionStatus::Connected {
-        admin_interface_port,
-      } => Ok(admin_interface_port.clone()),
-      _ => Err(String::from("Launcher is not connected")),
-    }
-  }
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LauncherState {
   pub connection_status: ConnectionStatus,
+}
+
+impl LauncherState {
+  pub fn get_running_ports(&self) -> Result<RunningPorts, String> {
+    match self.connection_status.clone() {
+      ConnectionStatus::Connected(ports) => Ok(ports),
+      _ => Err(String::from("The conductor is not running")),
+    }
+  }
 }
