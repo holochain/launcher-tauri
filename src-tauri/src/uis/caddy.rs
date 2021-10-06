@@ -9,6 +9,15 @@ use super::port_mapping::PortMapping;
 
 const LAUNCHER_ENV_URL: &str = ".launcher-env.json";
 
+fn initial_caddyfile() -> String {
+  r#"
+{
+    admin off
+}
+"#
+  .into()
+}
+
 fn caddyfile_config_for_an_app(
   admin_interface_port: u16,
   app_interface_port: u16,
@@ -16,7 +25,7 @@ fn caddyfile_config_for_an_app(
   app_id: String,
 ) -> String {
   format!(
-r#":{} {{
+    r#":{} {{
         respond /{} 200 {{
                 body `{{
                         "APP_INTERFACE_PORT": {},
@@ -50,7 +59,9 @@ fn build_caddyfile_contents(
   active_apps_ids: Vec<String>,
   port_mapping: PortMapping,
 ) -> Result<String, String> {
-  let config_vec = active_apps_ids
+  let caddyfile = initial_caddyfile();
+
+  let mut config_vec = active_apps_ids
     .into_iter()
     .map(|app_id| {
       let ui_port = port_mapping
@@ -68,6 +79,8 @@ fn build_caddyfile_contents(
 
   let empty_line = r#"
 "#;
+
+  config_vec.insert(0, caddyfile);
 
   Ok(config_vec.join(empty_line))
 }
