@@ -45,12 +45,7 @@ jobs:
         if: matrix.platform == 'ubuntu-18.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libcanberra-gtk-module libcanberra-gtk3-module build-essential curl wget libssl-dev libgtk-3-dev squashfs-tools libgtksourceview-3.0-dev libappindicator3-dev patchelf librsvg2-dev libsqlcipher-dev
-      - name: install dependencies (MacOS only)
-        if: matrix.platform == 'macos-latest'
-        run: |
-          ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" 2> /dev/null
-          brew install sqlcipher
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libcanberra-gtk-module libcanberra-gtk3-module build-essential curl wget libssl-dev libgtk-3-dev squashfs-tools libgtksourceview-3.0-dev libappindicator3-dev patchelf librsvg2-dev
       - name: install Caddy (ubuntu)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
@@ -61,8 +56,8 @@ jobs:
           sudo apt install caddy
       - name: install Holochain
         run: |
-          cargo install holochain --version 0.0.108
-          cargo install lair_keystore --git https://github.com/guillemcordoba/lair --rev 53fea43d53352609978d550f72f987f0ce458896
+          cargo install holochain --version 0.0.109
+          cargo install lair_keystore --version 0.0.7
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
