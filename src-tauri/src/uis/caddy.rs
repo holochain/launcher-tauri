@@ -40,11 +40,14 @@ fn caddyfile_config_for_an_app(
         
         header Cache-Control no-cache, no-store
 
-        handle {{
-                root * "{}"
-                try_files {{path}} {{path}}/ /index.html
-                file_server
+        @launcherenv {{
+          path not ^\/{}
         }}
+
+        rewrite @launcherenv {{path}}/index.html
+
+        root * "{}"
+        file_server
 }}
 "#,
     ui_port,
@@ -52,6 +55,7 @@ fn caddyfile_config_for_an_app(
     app_interface_port,
     admin_interface_port,
     app_id.clone(),
+    LAUNCHER_ENV_URL,
     app_ui_folder_path(app_id)
       .into_os_string()
       .to_str()
