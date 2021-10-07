@@ -2,15 +2,9 @@
   <mwc-dialog heading="About" ref="dialog">
     <div class="column">
       <span> Holochain Launcher v0.3.3 </span>
-      <span style="margin-top: 8px"> Holochain v0.0.108 </span>
-      <span style="margin-top: 8px"> Lair Keystore v0.0.4 </span>
+      <span style="margin-top: 8px"> Holochain v0.0.109 </span>
+      <span style="margin-top: 8px"> Lair Keystore v0.0.7 </span>
     </div>
-
-    <mwc-button
-      slot="primaryAction"
-      dialogAction="close"
-      label="Ok"
-    ></mwc-button>
   </mwc-dialog>
 </template>
 

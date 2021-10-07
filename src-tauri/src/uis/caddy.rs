@@ -41,6 +41,7 @@ fn caddyfile_config_for_an_app(
         header Cache-Control no-cache, no-store
         
         root * "{}"
+        try_files {{path}} {{path}}/ /index.html
         file_server
 }}
 "#,

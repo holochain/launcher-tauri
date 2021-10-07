@@ -17,7 +17,9 @@ pub fn logs_path() -> PathBuf {
 }
 
 pub fn logs_folder_path() -> PathBuf {
-  holochain_data_path().join("logs")
+  data_dir()
+    .expect("Could not get config dir")
+    .join("holochain-launcher")
 }
 
 pub fn caddyfile_path() -> PathBuf {

@@ -39,7 +39,7 @@ pub async fn launch_children_processes(running_ports: RunningPorts) -> Result<()
 
   thread::sleep(Duration::from_millis(1000));
 
-  let (mut holochain_rx, _) = Command::new_sidecar("holochain")
+  let (mut holochain_rx, holochain_child) = Command::new_sidecar("holochain")
     .or(Err(String::from("Can't find holochain binary")))?
     .args(&[
       "-c",
@@ -59,6 +59,13 @@ pub async fn launch_children_processes(running_ports: RunningPorts) -> Result<()
         CommandEvent::Stdout(line) => log::info!("[HOLOCHAIN] {}", line),
         CommandEvent::Stderr(line) => log::info!("[HOLOCHAIN] {}", line),
         _ => log::info!("[HOLOCHAIN] {:?}", event),
+      };
+      if format!("{:?}", event).contains("Installing lair_keystore") {
+        // Lair keystore can't be executed, Holochain is trying to download and install Lair, kill it
+        log::error!("Holochain is trying to download and install lair_keystore directly! Killing Holochain...");
+        let result = holochain_child.kill();
+        log::error!("Holochain terminated: {:?}", result);
+        break;
       }
     }
   });

@@ -1,9 +1,13 @@
 use std::{fs, io, path::PathBuf};
 
-use tauri::api::process::kill_children;
 use portpicker::pick_unused_port;
+use tauri::api::process::kill_children;
 
-use crate::{launch::launch_children_processes, setup::config::{holochain_config_path, holochain_data_path, keystore_data_path}, state::{LauncherState, RunningPorts}};
+use crate::{
+  launch::launch_children_processes,
+  setup::config::{holochain_config_path, holochain_data_path, keystore_data_path},
+  state::{LauncherState, RunningPorts},
+};
 
 #[tauri::command]
 pub async fn execute_factory_reset(state: tauri::State<'_, LauncherState>) -> Result<(), String> {
