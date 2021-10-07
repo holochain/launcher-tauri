@@ -1,3 +1,5 @@
+use std::sync::{Arc, Mutex};
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -19,12 +21,12 @@ pub enum ConnectionStatus {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LauncherState {
-  pub connection_status: ConnectionStatus,
+  pub connection_status: Arc<Mutex<ConnectionStatus>>,
 }
 
 impl LauncherState {
   pub fn get_running_ports(&self) -> Result<RunningPorts, String> {
-    match self.connection_status.clone() {
+    match self.connection_status.lock().unwrap().clone() {
       ConnectionStatus::Connected(ports) => Ok(ports),
       _ => Err(String::from("The conductor is not running")),
     }

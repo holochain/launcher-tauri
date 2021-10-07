@@ -2,6 +2,9 @@
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
+use std::sync::Arc;
+use std::sync::Mutex;
+
 use portpicker;
 use tauri;
 use tauri::api::process::kill_children;
@@ -47,7 +50,7 @@ fn main() {
   if already_running {
     let build_result = tauri::Builder::default()
       .manage(LauncherState {
-        connection_status: ConnectionStatus::AlreadyRunning,
+        connection_status: Arc::new(Mutex::new(ConnectionStatus::AlreadyRunning)),
       })
       .invoke_handler(tauri::generate_handler![get_connection_status])
       .run(tauri::generate_context!());
@@ -73,14 +76,14 @@ fn main() {
     Ok(()) => {
       log::info!("Launch setup successful");
       LauncherState {
-        connection_status: ConnectionStatus::Connected(ports),
+        connection_status: Arc::new(Mutex::new(ConnectionStatus::Connected(ports))),
       }
     }
     Err(err) => {
       kill_children();
       log::error!("There was an error launching holochain: {:?}", err);
       LauncherState {
-        connection_status: ConnectionStatus::Error { error: err },
+        connection_status: Arc::new(Mutex::new(ConnectionStatus::Error { error: err })),
       }
     }
   };
