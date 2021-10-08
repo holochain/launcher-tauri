@@ -29,25 +29,24 @@ fn caddyfile_config_for_an_app(
 ) -> String {
   format!(
     r#":{} {{
-        respond /{} 200 {{
-                body `{{
-                        "APP_INTERFACE_PORT": {},
-                        "ADMIN_INTERFACE_PORT": {},
-                        "INSTALLED_APP_ID": "{}"
-                }}`
-                close
+        handle_path /{} {{
+                respond 200 {{
+                        body `{{
+                                "APP_INTERFACE_PORT": {},
+                                "ADMIN_INTERFACE_PORT": {},
+                                "INSTALLED_APP_ID": "{}"
+                        }}`
+                        close
+                }}
         }}
-        
+
         header Cache-Control no-cache, no-store
 
-        @launcherenv {{
-          path not ^\/{}
+        handle {{
+                root * "{}"
+                try_files {{path}} {{file}} /index.html
+                file_server
         }}
-
-        rewrite @launcherenv {{path}}/index.html
-
-        root * "{}"
-        file_server
 }}
 "#,
     ui_port,
@@ -55,7 +54,6 @@ fn caddyfile_config_for_an_app(
     app_interface_port,
     admin_interface_port,
     app_id.clone(),
-    LAUNCHER_ENV_URL,
     app_ui_folder_path(app_id)
       .into_os_string()
       .to_str()
