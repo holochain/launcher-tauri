@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 
 module.exports = {
   lintOnSave: false,
@@ -21,6 +22,11 @@ module.exports = {
       }));
   },
   configureWebpack: {
+    plugins: [
+      new webpack.DefinePlugin({
+        globalThis: "window",
+      }),
+    ],
     resolve: {
       alias: {
         vue$: path.resolve(
