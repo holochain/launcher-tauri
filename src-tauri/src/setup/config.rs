@@ -71,15 +71,14 @@ fn initial_config(admin_port: u16, environment_path: PathBuf) -> String {
   format!(
     r#"---
     environment_path: {}
-    use_dangerous_test_keystore: false
     signing_service_uri: ~
     encryption_service_uri: ~
     decryption_service_uri: ~
     dpki: ~
-    keystore_path: {}
-    passphrase_service:
-        type: danger_insecure_from_config
-        passphrase: "test-passphrase"
+    keystore:
+        type: lair_server_legacy_deprecated
+        keystore_path: {}
+        danger_passphrase_insecure_from_config: "test-passphrase"
     admin_interfaces: 
         - driver:
             type: websocket

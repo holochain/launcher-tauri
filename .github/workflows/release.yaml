@@ -11,7 +11,7 @@ jobs:
       matrix:
         platform: [macos-latest, ubuntu-18.04, windows-latest]
     env:
-      MACOSX_DEPLOYMENT_TARGET: 10.9
+      MACOSX_DEPLOYMENT_TARGET: 10.13
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -24,7 +24,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           override: true
-          toolchain: 1.54
+          toolchain: 1.55
       - name: install app dependencies and info
         run: yarn install && yarn run tauri info
       - name: download caddy (Windows only)
