@@ -57,7 +57,7 @@ jobs:
       - name: install Holochain 
         run: |
           cargo install holochain --git https://github.com/holochain/holochain --rev 72c491e2205a33f90f635ab8bc850205da472dc0
-          cargo install lair_keystore --git https://github.com/guillemcordoba/lair --rev 9bc68fcd524b8450fb394c315743fe343d262738
+          cargo install lair_keystore --git https://github.com/guillemcordoba/lair --rev 155741566d5d05d111f6242c64b7181b66e7730d
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
