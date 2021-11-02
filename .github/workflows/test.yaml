@@ -34,10 +34,10 @@ jobs:
           sudo apt install caddy
       - name: install Holochain
         run: |
-          cargo install holochain --version 0.0.109
-          cargo install lair_keystore --git https://github.com/guillemcordoba/lair --rev 9bc68fcd524b8450fb394c315743fe343d262738
+          cargo install holochain --version 0.0.113
+          cargo install lair_keystore --git https://github.com/guillemcordoba/lair --rev 155741566d5d05d111f6242c64b7181b66e7730d
       - name: setup binaries (ubuntu only)
         run: |
           sh scripts/setup-binaries.sh
       - name: install app dependencies and build it
-        run: yarn install && npm run build
+        run: npm install && npm run build

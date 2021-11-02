@@ -350,9 +350,9 @@ checksum = "065374052e7df7ee4047b1160cca5e1467a12351a40b3da123c870ba0b8eda2a"
 
 [[package]]
 name = "attohttpc"
-version = "0.18.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e69e13a99a7e6e070bb114f7ff381e58c7ccc188630121fc4c2fe4bcf24cd072"
+checksum = "9a8bda305457262b339322106c776e3fd21df860018e566eb6a5b1aa4b6ae02d"
 dependencies = [
  "flate2",
  "http",
@@ -361,7 +361,7 @@ dependencies = [
  "openssl",
  "serde",
  "serde_json",
- "serde_urlencoded",
+ "serde_urlencoded 0.6.1",
  "url",
  "wildmatch",
 ]
@@ -643,15 +643,6 @@ name = "cfg-expr"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b412e83326147c2bb881f8b40edfbf9905b9b8abaebd0e47ca190ba62fda8f0e"
-dependencies = [
- "smallvec 1.6.1",
-]
-
-[[package]]
-name = "cfg-expr"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "edae0b9625d1fce32f7d64b71784d9b1bf8469ec1a9c417e44aaf16a9cbd7571"
 dependencies = [
  "smallvec 1.6.1",
 ]
@@ -2114,9 +2105,9 @@ dependencies = [
 
 [[package]]
 name = "holo_hash"
-version = "0.0.10"
+version = "0.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee83d18d883878dc9e6da3e162a42b882db62f3fd7e957e0b5b85f04a5dbe117"
+checksum = "12dd2004f3732b61a4a508b97cae2d12a0809cc2b441da023274a760405871e6"
 dependencies = [
  "arbitrary",
  "base64",
@@ -2163,9 +2154,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_conductor_api"
-version = "0.0.12"
+version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "baec22e368bebeb1a11f7da2f502701841cbe34f62db0d753644123717ff0c7f"
+checksum = "c7c9e2ac72952058c17ff25f36fd324622e7edd2d75aa3b3f7da7c59e03012b4"
 dependencies = [
  "derive_more",
  "directories 2.0.2",
@@ -2188,7 +2179,7 @@ dependencies = [
 [[package]]
 name = "holochain_conductor_client"
 version = "0.0.1"
-source = "git+https://github.com/holochain/conductor-client-rust?rev=ed8bc0efbb7bdc5fd5aa2e922d316f1d03d96410#ed8bc0efbb7bdc5fd5aa2e922d316f1d03d96410"
+source = "git+https://github.com/holochain/conductor-client-rust?rev=2832a2ce3a11070c9464ee97874b17be5243cdb5#2832a2ce3a11070c9464ee97874b17be5243cdb5"
 dependencies = [
  "again",
  "anyhow",
@@ -2201,9 +2192,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_keystore"
-version = "0.0.12"
+version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e569a2fc03a738de616da1aac631e0ba8e99a138851b111e08600c7641f61036"
+checksum = "adbac4ddebffe1e40d9473aa05c5c0336e6d6cfdb6abfa9ab758c23b623ca462"
 dependencies = [
  "base64",
  "ghost_actor 0.3.0-alpha.4",
@@ -2225,9 +2216,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_p2p"
-version = "0.0.12"
+version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf8d28ad95aaa15c3527414e970fcb635f78b572ad15da58f5f42323dc4fb1af"
+checksum = "443b79b51d2f1c958e9a0d5fac6d66ea68ff63e8ad08eacedf8fe7c28a4aef22"
 dependencies = [
  "async-trait",
  "fixt",
@@ -2279,9 +2270,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_sqlite"
-version = "0.0.12"
+version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d33c2212bd6c9b236bebb2f113781f25a7d0039b22d3f233ddeca5a94baaa9d"
+checksum = "5fa847f2a7d2504884b37d9defbfceec09792b5993cc67b47c67d0721b14d89b"
 dependencies = [
  "anyhow",
  "byteorder",
@@ -2326,9 +2317,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_state"
-version = "0.0.12"
+version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e7b658de3337d6f9c50e1c9b5ba40aef4045a0d1a51c97374f6638fa55819c8f"
+checksum = "2739df6a2379211da1994f1df26523083f60db6e8ec4617883e59c3e8c9f6d14"
 dependencies = [
  "async-recursion",
  "base64",
@@ -2364,9 +2355,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_types"
-version = "0.0.12"
+version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac233489d137e848cd1c294ee39eb684dacf7bb4cec9ad30d947bffb0be06de9"
+checksum = "9849e2ce82d98e1c2186e3c7f050c8f6a0de6d709bc2ddef5c3364d2574bb7ab"
 dependencies = [
  "anyhow",
  "arbitrary",
@@ -2430,9 +2421,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_wasm_test_utils"
-version = "0.0.12"
+version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74ea28ca2b36f3b1e85d17013dfb986fd07dde9813fd621e6899f80c4ddd75b4"
+checksum = "34f5387cef01521a69b3f802e656dd2db0e3084274df0e91003111af38fd9c6e"
 dependencies = [
  "fixt",
  "holo_hash",
@@ -2460,9 +2451,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_websocket"
-version = "0.0.12"
+version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "288521589fab55a6e665c805aad2484526c6137ce8ef1db26c62b16ad8cb3d49"
+checksum = "5420e701c34dc947bf1c57379c85db7999f77349c39ece2fe633a2c0bc6641d0"
 dependencies = [
  "futures",
  "ghost_actor 0.4.0-alpha.5",
@@ -2485,9 +2476,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_zome_types"
-version = "0.0.14"
+version = "0.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d287e13e403ea66f9615e3a301acd49f9649a0bb97c5a74fa14b23e13b126077"
+checksum = "3f5bde7670f7de4856cb56778a3d7600d5f26e6bd54382e034f7d307b0e2c1fd"
 dependencies = [
  "arbitrary",
  "chrono",
@@ -2803,25 +2794,21 @@ checksum = "b71991ff56294aa922b450139ee08b3bfc70982c6b2c7562771375cf73542dd4"
 
 [[package]]
 name = "javascriptcore-rs"
-version = "0.15.1"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9644bfae308588f4e57616bd8402b982dbcd68d1934c0848e2869ffcc03b562"
+checksum = "5ca9c7d1445bba2889672fbadc16c3d5007bfdcf0a15a18a3a50fe9fab2c7427"
 dependencies = [
- "bitflags 1.3.2",
  "glib",
  "javascriptcore-rs-sys",
 ]
 
 [[package]]
 name = "javascriptcore-rs-sys"
-version = "0.3.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c75261f65a87f3903856651c1c0a847e06e1fc55a2d78879f3fb570c4bacaf2"
+checksum = "3f46ada8a08dcd75a10afae872fbfb51275df4a8ae0d46b8cc7c708f08dd2998"
 dependencies = [
- "glib-sys 0.14.0",
- "gobject-sys 0.14.0",
  "libc",
- "system-deps 5.0.0",
 ]
 
 [[package]]
@@ -3353,9 +3340,9 @@ checksum = "0c835948974f68e0bd58636fc6c5b1fbff7b297e3046f11b3b3c18bbac012c6d"
 
 [[package]]
 name = "minisign-verify"
-version = "0.2.0"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "95ccf091884470c4b3a80ad6daadbb2e7736611d631cbf0c9e603bb7dbcfdfd9"
+checksum = "db0507fe8e3c68cd62961cf9f87f6c2b21d884d3515a7150a4a3fa9d014e5c12"
 
 [[package]]
 name = "miniz_oxide"
@@ -4914,7 +4901,7 @@ dependencies = [
  "percent-encoding",
  "pin-project-lite",
  "serde",
- "serde_urlencoded",
+ "serde_urlencoded 0.7.0",
  "tokio",
  "tokio-native-tls",
  "url",
@@ -5279,6 +5266,18 @@ dependencies = [
  "proc-macro2",
  "quote 1.0.9",
  "syn 1.0.77",
+]
+
+[[package]]
+name = "serde_urlencoded"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ec5d77e2d4c73717816afac02670d5c4f534ea95ed430442cad02e7a6e32c97"
+dependencies = [
+ "dtoa",
+ "itoa",
+ "serde",
+ "url",
 ]
 
 [[package]]
@@ -5725,26 +5724,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "480c269f870722b3b08d2f13053ce0c2ab722839f472863c3e2d61ff3a1c2fa6"
 dependencies = [
  "anyhow",
- "cfg-expr 0.8.1",
+ "cfg-expr",
  "heck",
  "itertools 0.10.1",
  "pkg-config",
  "strum 0.21.0",
  "strum_macros 0.21.1",
  "thiserror",
- "toml",
- "version-compare 0.0.11",
-]
-
-[[package]]
-name = "system-deps"
-version = "5.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "18db855554db7bd0e73e06cf7ba3df39f97812cb11d3f75e71c39bf45171797e"
-dependencies = [
- "cfg-expr 0.9.0",
- "heck",
- "pkg-config",
  "toml",
  "version-compare 0.0.11",
 ]
@@ -5803,7 +5789,7 @@ dependencies = [
 [[package]]
 name = "tauri"
 version = "1.0.0-beta.8"
-source = "git+https://github.com/tauri-apps/tauri?rev=80ffa87edbce52983f01542e266a99fef744f510#80ffa87edbce52983f01542e266a99fef744f510"
+source = "git+https://github.com/tauri-apps/tauri?rev=4c0c780e00d8851be38cb1c22f636d9e4ed34a23#4c0c780e00d8851be38cb1c22f636d9e4ed34a23"
 dependencies = [
  "attohttpc",
  "base64",
@@ -5851,7 +5837,7 @@ dependencies = [
 [[package]]
 name = "tauri-build"
 version = "1.0.0-beta.4"
-source = "git+https://github.com/tauri-apps/tauri?rev=80ffa87edbce52983f01542e266a99fef744f510#80ffa87edbce52983f01542e266a99fef744f510"
+source = "git+https://github.com/tauri-apps/tauri?rev=4c0c780e00d8851be38cb1c22f636d9e4ed34a23#4c0c780e00d8851be38cb1c22f636d9e4ed34a23"
 dependencies = [
  "anyhow",
  "serde_json",
@@ -5862,7 +5848,7 @@ dependencies = [
 [[package]]
 name = "tauri-codegen"
 version = "1.0.0-beta.4"
-source = "git+https://github.com/tauri-apps/tauri?rev=80ffa87edbce52983f01542e266a99fef744f510#80ffa87edbce52983f01542e266a99fef744f510"
+source = "git+https://github.com/tauri-apps/tauri?rev=4c0c780e00d8851be38cb1c22f636d9e4ed34a23#4c0c780e00d8851be38cb1c22f636d9e4ed34a23"
 dependencies = [
  "blake3",
  "kuchiki",
@@ -5903,7 +5889,7 @@ dependencies = [
 [[package]]
 name = "tauri-macros"
 version = "1.0.0-beta.5"
-source = "git+https://github.com/tauri-apps/tauri?rev=80ffa87edbce52983f01542e266a99fef744f510#80ffa87edbce52983f01542e266a99fef744f510"
+source = "git+https://github.com/tauri-apps/tauri?rev=4c0c780e00d8851be38cb1c22f636d9e4ed34a23#4c0c780e00d8851be38cb1c22f636d9e4ed34a23"
 dependencies = [
  "proc-macro2",
  "quote 1.0.9",
@@ -5914,7 +5900,7 @@ dependencies = [
 [[package]]
 name = "tauri-runtime"
 version = "0.2.1"
-source = "git+https://github.com/tauri-apps/tauri?rev=80ffa87edbce52983f01542e266a99fef744f510#80ffa87edbce52983f01542e266a99fef744f510"
+source = "git+https://github.com/tauri-apps/tauri?rev=4c0c780e00d8851be38cb1c22f636d9e4ed34a23#4c0c780e00d8851be38cb1c22f636d9e4ed34a23"
 dependencies = [
  "gtk",
  "http",
@@ -5931,7 +5917,7 @@ dependencies = [
 [[package]]
 name = "tauri-runtime-wry"
 version = "0.2.1"
-source = "git+https://github.com/tauri-apps/tauri?rev=80ffa87edbce52983f01542e266a99fef744f510#80ffa87edbce52983f01542e266a99fef744f510"
+source = "git+https://github.com/tauri-apps/tauri?rev=4c0c780e00d8851be38cb1c22f636d9e4ed34a23#4c0c780e00d8851be38cb1c22f636d9e4ed34a23"
 dependencies = [
  "gtk",
  "ico",
@@ -5947,7 +5933,7 @@ dependencies = [
 [[package]]
 name = "tauri-utils"
 version = "1.0.0-beta.3"
-source = "git+https://github.com/tauri-apps/tauri?rev=80ffa87edbce52983f01542e266a99fef744f510#80ffa87edbce52983f01542e266a99fef744f510"
+source = "git+https://github.com/tauri-apps/tauri?rev=4c0c780e00d8851be38cb1c22f636d9e4ed34a23#4c0c780e00d8851be38cb1c22f636d9e4ed34a23"
 dependencies = [
  "heck",
  "html5ever",
@@ -6626,9 +6612,9 @@ dependencies = [
 
 [[package]]
 name = "webkit2gtk"
-version = "0.15.1"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "525fc0e0f81e567293e9d2469a0cf1124c7a757437b934c2f9514cfd0264f676"
+checksum = "e3e47b7f870883fc21612d2a51b74262f7f2cc5371f1621370817292a35300a9"
 dependencies = [
  "bitflags 1.3.2",
  "cairo-rs",
@@ -6649,9 +6635,9 @@ dependencies = [
 
 [[package]]
 name = "webkit2gtk-sys"
-version = "0.15.0"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfd518519f30f8596be1c3c26cd2032111641fd6f7c1f5ac5af0a0730a4d3f60"
+checksum = "b66ccc9f0cb4de7c3b92376a5bf64e7ddffb33852f092721731a039ec38dda98"
 dependencies = [
  "atk-sys",
  "bitflags 1.3.2",
@@ -6667,7 +6653,7 @@ dependencies = [
  "pango-sys",
  "pkg-config",
  "soup-sys",
- "system-deps 5.0.0",
+ "system-deps 3.2.0",
 ]
 
 [[package]]
@@ -6726,9 +6712,9 @@ dependencies = [
 
 [[package]]
 name = "wildmatch"
-version = "2.1.0"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6c48bd20df7e4ced539c12f570f937c6b4884928a87fee70a479d72f031d4e0"
+checksum = "7f44b95f62d34113cf558c93511ac93027e03e9c29a60dd0fd70e6e025c7270a"
 
 [[package]]
 name = "winapi"
@@ -6849,7 +6835,7 @@ dependencies = [
 [[package]]
 name = "wry"
 version = "0.12.2"
-source = "git+https://github.com/tauri-apps/wry?rev=910cc1eb8ed08c66e9fb75df90e28635538d68ab#910cc1eb8ed08c66e9fb75df90e28635538d68ab"
+source = "git+https://github.com/tauri-apps/wry?rev=e056fb2a15e29de1b8ed85a548cfeb1f85031357#e056fb2a15e29de1b8ed85a548cfeb1f85031357"
 dependencies = [
  "cocoa",
  "core-graphics 0.22.2",

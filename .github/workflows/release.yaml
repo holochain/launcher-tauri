@@ -26,7 +26,7 @@ jobs:
           override: true
           toolchain: 1.55
       - name: install app dependencies and info
-        run: yarn install && yarn run tauri info
+        run: npm install && npm run tauri info
       - name: download caddy (Windows only)
         if: matrix.platform == 'windows-latest'
         run: |
@@ -77,7 +77,7 @@ jobs:
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-x86_64-pc-windows-msvc.exe
           Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
       - name: build the app
-        run: yarn run build
+        run: npm run build
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
