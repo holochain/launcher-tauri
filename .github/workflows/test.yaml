@@ -34,7 +34,7 @@ jobs:
           sudo apt install caddy
       - name: install Holochain
         run: |
-          cargo install holochain --version 0.0.113
+          cargo install holochain --version 0.0.114
           cargo install lair_keystore --git https://github.com/guillemcordoba/lair --rev 155741566d5d05d111f6242c64b7181b66e7730d
       - name: setup binaries (ubuntu only)
         run: |
