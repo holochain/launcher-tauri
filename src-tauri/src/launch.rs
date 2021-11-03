@@ -6,7 +6,7 @@ use tauri::api::process::{Command, CommandEvent};
 use crate::{setup::config, state::RunningPorts, uis::caddy};
 
 pub async fn launch_children_processes(running_ports: RunningPorts) -> Result<(), String> {
-  config::create_initial_config_if_necessary(running_ports.admin_interface_port);
+  config::setup_config(running_ports.admin_interface_port);
 
   let mut envs = HashMap::new();
   envs.insert(String::from("RUST_LOG"), String::from("warn"));

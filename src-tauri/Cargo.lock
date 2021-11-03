@@ -2135,6 +2135,7 @@ dependencies = [
  "futures",
  "holochain_conductor_api",
  "holochain_conductor_client",
+ "holochain_p2p",
  "holochain_types",
  "holochain_websocket",
  "log",
@@ -2148,7 +2149,7 @@ dependencies = [
  "serde_yaml",
  "tauri",
  "tauri-build",
- "url",
+ "url2",
  "zip",
 ]
 
