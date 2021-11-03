@@ -57,21 +57,21 @@
         <span
           class="row-item"
           style="font-size: 18px; font-weight: 400; color: black"
-          >Dna Slots</span
+          >Dna Roles</span
         >
         <div
-          v-for="(appSlot, index) of appInfo.slots_to_create"
-          :key="appSlot.id"
+          v-for="(appRole, index) of appInfo.roles_to_create"
+          :key="appRole.id"
           class="column"
           style="flex: 1; margin-top: 8px"
         >
-          <span>#{{ index + 1 }} {{ appSlot.id }}</span>
+          <span>#{{ index + 1 }} {{ appRole.id }}</span>
           <mwc-textarea
             style="flex: 1; margin-top: 4px"
             label="Membrane Proof"
             outlined
             helper="Check with the author if this is required"
-            @input="membraneProofs[appSlot.id] = $event.target.value"
+            @input="membraneProofs[appRole.id] = $event.target.value"
           ></mwc-textarea>
         </div>
       </div>

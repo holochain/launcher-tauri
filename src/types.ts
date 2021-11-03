@@ -1,8 +1,8 @@
-import { AppSlotManifest } from "@holochain/conductor-api";
+import { AppRoleManifest } from "@holochain/conductor-api";
 
 export interface WebAppInfo {
   app_name: string;
-  slots_to_create: Array<AppSlotManifest>;
+  roles_to_create: Array<AppRoleManifest>;
 }
 
 export type ConnectionStatus =
