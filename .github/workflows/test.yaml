@@ -15,12 +15,12 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 16
       - name: install Rust stable
         uses: actions-rs/toolchain@v1
         with:
           override: true
-          toolchain: 1.54
+          toolchain: 1.55
       - name: install webkit2gtk (ubuntu only)
         run: |
           sudo apt-get update
