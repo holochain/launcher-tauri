@@ -12,7 +12,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@holochain/admin-ui": "https://github.com/holochain/admin-ui#build",
+    "@holochain/admin-ui": "github:holochain/admin-ui#build",
     "@holochain/conductor-api": "github:holochain/holochain-conductor-api#update-to-113",
     "@material/mwc-button": "^0.25.1",
     "@material/mwc-dialog": "^0.25.1",
