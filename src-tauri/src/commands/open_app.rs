@@ -8,7 +8,7 @@ pub fn open_app_ui(app_id: String) -> Result<(), String> {
 
   let port = port_mapping
     .get_ui_port_for_app(&app_id)
-    .ok_or("App not registered")?;
+    .ok_or("This application has no UI installed")?;
 
   let app_url = format!("http://localhost:{}", port);
   let result = open_url(app_url.clone());
