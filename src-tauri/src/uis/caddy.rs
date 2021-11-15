@@ -66,31 +66,29 @@ fn build_caddyfile_contents(
   app_interface_port: u16,
   active_apps_ids: Vec<String>,
   port_mapping: PortMapping,
-) -> Result<String, String> {
+) -> String {
   let caddyfile = initial_caddyfile(running_ports.caddy_admin_port);
 
-  let mut config_vec = active_apps_ids
+  let mut config_vec: Vec<String> = active_apps_ids
     .into_iter()
-    .map(|app_id| {
-      let ui_port = port_mapping
-        .get_ui_port_for_app(&app_id)
-        .ok_or(String::from("This app has no assigned port"))?;
-
-      Ok(caddyfile_config_for_an_app(
-        running_ports.admin_interface_port,
-        app_interface_port,
-        ui_port,
-        app_id,
-      ))
+    .filter_map(|app_id| {
+      port_mapping.get_ui_port_for_app(&app_id).map(|ui_port| {
+        caddyfile_config_for_an_app(
+          running_ports.admin_interface_port,
+          app_interface_port,
+          ui_port,
+          app_id,
+        )
+      })
     })
-    .collect::<Result<Vec<String>, String>>()?;
+    .collect();
 
   let empty_line = r#"
 "#;
 
   config_vec.insert(0, caddyfile);
 
-  Ok(config_vec.join(empty_line))
+  config_vec.join(empty_line)
 }
 
 /// Connects to the conductor, requests the list of running apps, and writes the Caddyfile with the appropriate port mapping
@@ -124,7 +122,7 @@ async fn refresh_caddyfile(running_ports: RunningPorts) -> Result<(), String> {
     app_interfaces[0],
     active_app_ids,
     port_mapping,
-  )?;
+  );
 
   fs::write(caddyfile_path(), caddyfile_contents)
     .map_err(|err| format!("Error writing Caddyfile: {:?}", err))?;
