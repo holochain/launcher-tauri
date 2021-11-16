@@ -1,9 +1,12 @@
 use std::fs;
 
-use crate::{state::{LauncherState, RunningPorts}, uis::{
+use crate::{
+  state::{LauncherState, RunningPorts},
+  uis::{
     caddy,
     port_mapping::{app_ui_folder_path, PortMapping},
-  }};
+  },
+};
 use holochain_conductor_client::AdminWebsocket;
 
 #[tauri::command]
@@ -25,12 +28,16 @@ pub async fn uninstall_app(
 
   log::info!("Uninstalled hApp {} from the conductor", app_id);
 
-  uninstall_ui(ports, app_id.clone()).await.map_err(|err| {
-    log::error!("Error removing the UI for hApp: {}", err);
-    err
-  })?;
+  let port_mapping = PortMapping::read_port_mapping()?;
 
-  log::info!("Removed UI for hApp {}", app_id);
+  if let Some(_) = port_mapping.get_ui_port_for_app(&app_id) {
+    uninstall_ui(ports, app_id.clone()).await.map_err(|err| {
+      log::error!("Error removing the UI for hApp: {}", err);
+      err
+    })?;
+
+    log::info!("Removed UI for hApp {}", app_id);
+  }
 
   Ok(())
 }
