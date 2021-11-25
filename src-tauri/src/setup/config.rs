@@ -126,7 +126,7 @@ fn initial_config(admin_port: u16) -> ConductorConfig {
       driver: InterfaceDriver::Websocket { port: admin_port },
     }]),
     network: Some(network_config),
-    db_sync_level: Default::default(),
+    db_sync_strategy: Default::default(),
   }
 }
 
