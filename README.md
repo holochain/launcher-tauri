@@ -25,8 +25,8 @@ If you already have a `.webhapp`
 
 Requirements:
 
-- On the zome side, target `hdk v0.0.109`.
-- On the UI side, target `@holochain/conductor-api v0.2.1` (v0.2.0 is not going to work).
+- On the zome side, target `hdk v0.0.115`.
+- On the UI side, target `@holochain/conductor-api v0.2.4` (v0.2.0 is not going to work).
 
 When your UI is served from the launcher and `AppWebsocket.connect()` or `AdminWebsocket.connect()` are called, the call will be redirected to the actual port in which Holochain is running its interfaces. Also, when the `appWebsocket.appInfo({ installed_app_info: <APP_ID> })` is called, the `APP_ID` parameter is going to be replaced with the actual application ID that is installed in the Launcher.
 
