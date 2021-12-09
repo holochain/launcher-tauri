@@ -58,7 +58,7 @@ To reset the launcher, you can execute a factory reset in the `Holochain Admin` 
 
 ### Logs
 
-Logs can be found at `$DATA_DIR/holochain/logs/launcher.log`. When reporting issues, please attach the contents of this file.
+Logs can be found at `$DATA_DIR/holochain-launcher/launcher.log`. When reporting issues, please attach the contents of this file.
 
 ## Developer Setup
 
