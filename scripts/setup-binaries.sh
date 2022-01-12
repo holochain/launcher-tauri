@@ -3,11 +3,13 @@
 rm -rf src-tauri/bins/
 mkdir src-tauri/bins
 
+TARGET_TRIPLE=$(rustc -vV | sed -n 's/^.*host: \(.*\)*$/\1/p')
+
 HOLOCHAIN_PATH=$(which holochain)
-cp $HOLOCHAIN_PATH src-tauri/bins/holochain-x86_64-unknown-linux-gnu
+cp $HOLOCHAIN_PATH src-tauri/bins/holochain-$TARGET_TRIPLE
 
 LAIR_PATH=$(which lair-keystore)
-cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-unknown-linux-gnu
+cp $LAIR_PATH src-tauri/bins/lair-keystore-$TARGET_TRIPLE
 
 CADDY_PATH=$(which caddy)
-cp $CADDY_PATH src-tauri/bins/caddy-x86_64-unknown-linux-gnu
+cp $CADDY_PATH src-tauri/bins/caddy-$TARGET_TRIPLE
