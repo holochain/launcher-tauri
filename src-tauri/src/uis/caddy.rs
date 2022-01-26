@@ -1,6 +1,6 @@
 use std::fs;
 
-use holochain_conductor_client::{AdminWebsocket, AppStatusFilter};
+use holochain_client::{AdminWebsocket, AppStatusFilter};
 use tauri::api::process::{Command, CommandEvent};
 
 use crate::{

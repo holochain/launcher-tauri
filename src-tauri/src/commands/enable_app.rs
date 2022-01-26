@@ -1,4 +1,4 @@
-use holochain_conductor_client::AdminWebsocket;
+use holochain_client::AdminWebsocket;
 
 use crate::{state::LauncherState, uis::caddy};
 

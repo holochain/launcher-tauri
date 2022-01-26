@@ -1,6 +1,6 @@
 use std::{collections::HashMap, thread, time::Duration};
 
-use holochain_conductor_client::AdminWebsocket;
+use holochain_client::AdminWebsocket;
 use tauri::api::process::{Command, CommandEvent};
 
 use crate::{setup::config, state::RunningPorts, uis::caddy};

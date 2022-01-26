@@ -7,7 +7,7 @@ use crate::{
     port_mapping::{app_ui_folder_path, PortMapping},
   },
 };
-use holochain_conductor_client::AdminWebsocket;
+use holochain_client::AdminWebsocket;
 
 #[tauri::command]
 pub async fn uninstall_app(

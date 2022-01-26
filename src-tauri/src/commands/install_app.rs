@@ -7,7 +7,7 @@ use crate::{
     utils::unzip_file,
   },
 };
-use holochain_conductor_client::{AdminWebsocket, InstallAppBundlePayload};
+use holochain_client::{AdminWebsocket, InstallAppBundlePayload};
 use holochain_types::prelude::{AppBundle, AppBundleSource, SerializedBytes, UnsafeBytes};
 use holochain_types::web_app::WebAppBundle;
 use mr_bundle::ResourceBytes;
