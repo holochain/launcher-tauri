@@ -27,6 +27,7 @@ use crate::commands::{
   install_app::install_app,
   open_app::open_app_ui,
   uninstall_app::uninstall_app,
+  install_plugin::execute_plugin_install,
 };
 use crate::menu::build_menu;
 use crate::menu::handle_menu_event;
@@ -107,6 +108,7 @@ fn main() {
       get_web_app_info,
       execute_factory_reset,
       setup::logs::log,
+      execute_plugin_install,
     ])
     .build(tauri::generate_context!());
 
