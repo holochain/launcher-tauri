@@ -56,6 +56,7 @@ pub fn setup_config(admin_port: u16) -> () {
   create_dir_if_necessary(keystore_data_path());
   create_dir_if_necessary(uis_data_path());
   create_dir_if_necessary(logs_folder_path());
+  create_dir_if_necessary(plugins_folder_path());
 
   setup_conductor_config(admin_port);
 }

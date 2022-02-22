@@ -7,11 +7,13 @@
   <Home v-if="isConnected()" style="display: flex; flex: 1"></Home>
   <AlreadyRunning v-else-if="isAlreadyRunning()"></AlreadyRunning>
   <FactoryReset style="display: flex; flex: 1"></FactoryReset>
+  <PluginInstall style="display: flex; flex: 1"></PluginInstall>
   <About></About>
 </template>
 <script lang="ts">
 import Home from "./views/Home.vue";
 import FactoryReset from "./views/FactoryReset.vue";
+import PluginInstall from "./views/PluginInstall.vue";
 import AlreadyRunning from "./components/AlreadyRunning.vue";
 import About from "./components/About.vue";
 import { defineComponent } from "vue";
@@ -21,6 +23,7 @@ export default defineComponent({
   components: {
     Home,
     FactoryReset,
+    PluginInstall,
     About,
     AlreadyRunning,
   },

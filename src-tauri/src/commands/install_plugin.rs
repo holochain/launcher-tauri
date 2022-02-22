@@ -1,3 +1,5 @@
+use reqwest::Url;
+
 use crate::{setup::config::plugins_folder_path, state::LauncherState};
 use std::fs::File;
 use std::io::copy;
@@ -9,16 +11,20 @@ pub async fn execute_plugin_install(
 ) -> Result<(), String> {
   log::info!("Installing plugin: {}", url);
 
+  let url = Url::parse(&url).map_err(|err| {
+    log::error!("Error parse url: {}", err);
+    err.to_string()
+  })?;
+
   let plugins_folder = plugins_folder_path();
 
-  let response = reqwest::get(url).await.map_err(|err| {
+  let response = reqwest::get(url.clone()).await.map_err(|err| {
     log::error!("Error install plugin: {}", err);
     err.to_string()
   })?;
 
   let mut dest = {
-    let fname = response
-      .url()
+    let fname = url
       .path_segments()
       .and_then(|segments| segments.last())
       .and_then(|name| if name.is_empty() { None } else { Some(name) })
