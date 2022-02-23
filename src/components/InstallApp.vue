@@ -103,7 +103,7 @@ import AdminUI from "@holochain/admin-ui";
 import { invoke } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
 import type { TextField } from "@material/mwc-textfield";
-import { InstalledAppInfo } from "@holochain/conductor-api";
+import { InstalledAppInfo } from "@holochain/client";
 import { WebAppInfo } from "../types";
 import { toUint8Array } from "js-base64";
 

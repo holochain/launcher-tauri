@@ -8,7 +8,7 @@ import "@material/mwc-snackbar";
 //import "@material/mwc-button";
 //import "@material/mwc-dialog";
 
-import { AdminWebsocket, AppWebsocket } from "@holochain/conductor-api";
+import { AdminWebsocket, AppWebsocket } from "@holochain/client";
 import HcAdminPlugin from "@holochain/admin-ui";
 import { invoke } from "@tauri-apps/api/tauri";
 

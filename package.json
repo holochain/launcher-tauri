@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@holochain/admin-ui": "github:holochain/admin-ui#build",
-    "@holochain/conductor-api": "^0.2.4",
+    "@holochain/client": "^0.3.2",
     "@material/mwc-button": "^0.25.1",
     "@material/mwc-dialog": "^0.25.1",
     "@material/mwc-fab": "^0.25.1",

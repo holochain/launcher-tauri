@@ -1,4 +1,4 @@
-import { AppRoleManifest } from "@holochain/conductor-api";
+import { AppRoleManifest } from "@holochain/client";
 
 export interface WebAppInfo {
   app_name: string;
