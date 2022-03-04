@@ -1,8 +1,8 @@
 <template>
   <mwc-dialog heading="About" ref="dialog">
     <div class="column">
-      <span> Holochain Launcher v0.3.9 </span>
-      <span style="margin-top: 8px"> Holochain v0.0.126 </span>
+      <span> Holochain Launcher v0.3.10 </span>
+      <span style="margin-top: 8px"> Holochain v0.0.127 </span>
       <span style="margin-top: 8px"> Lair Keystore v0.0.9 </span>
     </div>
   </mwc-dialog>
