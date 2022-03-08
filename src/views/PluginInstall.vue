@@ -23,6 +23,22 @@
       style="flex: 1"
     ></mwc-textfield>
 
+    <mwc-textfield
+      label="Hash file Download Link"
+      outlined
+      @input="hashLink = $event.target.value"
+      class="row-item"
+      style="flex: 1"
+    ></mwc-textfield>
+
+    <mwc-textfield
+      label="Signature file Download Link"
+      outlined
+      @input="signatureLink = $event.target.value"
+      class="row-item"
+      style="flex: 1"
+    ></mwc-textfield>
+
     <mwc-button
       slot="secondaryAction"
       :disabled="isInstalling"
@@ -52,11 +68,15 @@ export default defineComponent({
     snackbarText: string | undefined;
     isInstalling: boolean;
     pluginLink: string | undefined;
+    hashLink: string | undefined;
+    signatureLink: string | undefined;
   } {
     return {
       snackbarText: undefined,
       isInstalling: false,
       pluginLink: undefined,
+      hashLink: undefined,
+      signatureLink: undefined,
     };
   },
   async mounted() {
@@ -73,7 +93,11 @@ export default defineComponent({
     async installPlugin() {
       try {
         this.isInstalling = true;
-        await invoke("execute_plugin_install", { url: this.pluginLink });
+        await invoke("execute_plugin_install", {
+          binaryUrl: this.pluginLink,
+          hashUrl: this.hashLink,
+          signatureUrl: this.signatureLink,
+        });
         this.isInstalling = false;
         this.showMessage(`Installed ${this.pluginLink}`);
         window.location.reload();

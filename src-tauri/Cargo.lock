@@ -1097,6 +1097,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "data-encoding"
+version = "2.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3ee2393c4a91429dffb4bedf19f4d6abf27d8a732c8ce4980305d782e5426d57"
+
+[[package]]
 name = "deflate"
 version = "0.7.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2131,6 +2137,7 @@ version = "0.3.8"
 dependencies = [
  "base64",
  "chrono",
+ "data-encoding",
  "flate2",
  "futures",
  "holochain_client",
@@ -2140,11 +2147,13 @@ dependencies = [
  "holochain_websocket",
  "log",
  "log4rs",
+ "minisign-verify 0.2.0",
  "mr_bundle 0.0.4",
  "open",
  "opener",
  "portpicker",
  "reqwest",
+ "ring",
  "serde",
  "serde_json",
  "serde_yaml",
@@ -3347,6 +3356,12 @@ name = "minisign-verify"
 version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "db0507fe8e3c68cd62961cf9f87f6c2b21d884d3515a7150a4a3fa9d014e5c12"
+
+[[package]]
+name = "minisign-verify"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "95ccf091884470c4b3a80ad6daadbb2e7736611d631cbf0c9e603bb7dbcfdfd9"
 
 [[package]]
 name = "miniz_oxide"
@@ -5830,7 +5845,7 @@ dependencies = [
  "gtk",
  "http",
  "ignore",
- "minisign-verify",
+ "minisign-verify 0.1.8",
  "notify-rust",
  "once_cell",
  "open",
