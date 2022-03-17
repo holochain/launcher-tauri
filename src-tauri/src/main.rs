@@ -8,7 +8,7 @@ use std::sync::Mutex;
 use portpicker;
 use tauri;
 use tauri::api::process::kill_children;
-use tauri::Event;
+use tauri::RunEvent;
 use tauri::SystemTrayEvent;
 
 mod commands;
@@ -113,7 +113,7 @@ fn main() {
   match builder_result {
     Ok(builder) => {
       builder.run(|_app_handle, event| {
-        if let Event::ExitRequested { api, .. } = event {
+        if let RunEvent::ExitRequested { api, .. } = event {
           api.prevent_exit();
         }
       });
