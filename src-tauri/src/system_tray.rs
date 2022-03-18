@@ -1,19 +1,9 @@
 use tauri::{
-  AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem,
-  WindowBuilder, WindowUrl, Wry,
+  window::WindowBuilder, AppHandle, CustomMenuItem, Manager, SystemTrayMenu, SystemTrayMenuItem,
+  WindowUrl, Wry,
 };
 
-pub fn build_system_tray() -> SystemTray {
-  let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-  let show_admin = CustomMenuItem::new("show_admin".to_string(), "Show Admin");
-
-  let sys_tray_menu = SystemTrayMenu::new()
-    .add_item(show_admin)
-    .add_native_item(SystemTrayMenuItem::Separator)
-    .add_item(quit);
-
-  SystemTray::new().with_menu(sys_tray_menu)
-}
+use crate::state::LauncherState;
 
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   match event_id.as_str() {
@@ -27,22 +17,48 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
         window.show().unwrap();
         window.set_focus().unwrap();
       } else {
-        // Window was closed: we need to recreate it
-        let _r = app.create_window(
-          "admin",
-          WindowUrl::App("index.html".into()),
-          move |window_builder, webview_attributes| {
-            (
-              window_builder
-                .title("Holochain Admin")
-                .inner_size(1000.0, 700.0),
-              webview_attributes,
-            )
-          },
-        );
-        log::info!("Creating admin window {:?}", _r);
+        let r = WindowBuilder::new(app, "admin", WindowUrl::App("index.html".into()))
+          .inner_size(1000.0, 700.0)
+          .title("Holochain Admin")
+          .build();
+
+        log::info!("Creating admin window {:?}", r);
       }
     }
-    _ => {}
+    app_id => {
+      let launcher_state: LauncherState = *app.state();
+
+      match launcher_state.get_holochain_manager() {
+        Ok(manager) => {
+          manager.ui_manager.open_app(String::from(app_id), app);
+        }
+        Err(e) => log::error!("Error opening app: {:?}", e),
+      }
+    }
   }
+}
+
+pub fn builtin_system_tray() -> SystemTrayMenu {
+  let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+  let show_admin = CustomMenuItem::new("show_admin".to_string(), "Show Admin");
+
+  SystemTrayMenu::new()
+    .add_item(show_admin)
+    .add_native_item(SystemTrayMenuItem::Separator)
+    .add_item(quit)
+}
+
+pub fn update_system_tray(
+  app_handle: &AppHandle<Wry>,
+  running_apps: Vec<String>,
+) -> () {
+  let mut menu = builtin_system_tray();
+
+  for app in running_apps {
+    menu.add_item(CustomMenuItem::new(app.clone(), app));
+  }
+
+  app_handle.tray_handle().set_menu(menu);
+
+  Ok(())
 }

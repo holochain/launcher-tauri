@@ -4,6 +4,7 @@ use holochain_websocket::{connect, WebsocketConfig};
 use url2;
 
 pub mod config;
+pub mod version;
 pub mod logs;
 
 pub async fn is_holochain_already_running() -> bool {

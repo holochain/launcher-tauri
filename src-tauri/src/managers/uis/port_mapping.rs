@@ -1,17 +1,24 @@
-use crate::setup::config::uis_data_path;
+use crate::{holochain_version::HolochainVersion, managers::file_system::FileSystemManager};
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, fs, io::ErrorKind, path::PathBuf};
+use std::{collections::{BTreeMap, HashMap}, fs, io::ErrorKind, path::PathBuf};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-pub struct PortMapping(BTreeMap<String, u16>);
+pub struct PortMapping(HashMap<HolochainVersion, BTreeMap<String, u16>>);
 
 impl PortMapping {
   fn path() -> PathBuf {
-    uis_data_path().join(String::from("port_mapping.yml"))
+    FileSystemManager::port_mapping_path()
   }
 
-  pub fn get_ui_port_for_app(&self, app_id: &String) -> Option<u16> {
-    self.0.get(app_id).map(|p| p.clone())
+  pub fn get_ui_port_for_app(
+    &self,
+    holochain_version: &HolochainVersion,
+    app_id: &String,
+  ) -> Option<u16> {
+    if let Some(versions) = self.0.get(holochain_version) {
+      versions.get(app_id)
+    }
+    None
   }
 
   pub fn read_port_mapping() -> Result<PortMapping, String> {
@@ -28,10 +35,19 @@ impl PortMapping {
     }
   }
 
-  pub fn set_available_ui_port_for_app(&mut self, app_id: String) -> Result<u16, String> {
+  pub fn set_available_ui_port_for_app(
+    &mut self,
+    holochain_version: HolochainVersion,
+    app_id: String,
+  ) -> Result<u16, String> {
     let port = self.get_next_available_port();
 
-    self.0.insert(app_id, port);
+    let version_map = self
+      .0
+      .entry(holochain_version)
+      .or_insert_with(BTreeMap::new());
+
+    version_map.insert(app_id, port);
 
     self.write_port_mapping()?;
 
@@ -55,8 +71,4 @@ impl PortMapping {
 
     fs::write(Self::path(), s).or(Err("Could not write port mapping to file disk".into()))
   }
-}
-
-pub fn app_ui_folder_path(app_id: String) -> PathBuf {
-  uis_data_path().join(app_id)
 }

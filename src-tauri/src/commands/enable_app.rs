@@ -1,12 +1,15 @@
 use holochain_client::AdminWebsocket;
 
-use crate::{state::LauncherState, uis::caddy};
+use crate::state::LauncherState;
 
 #[tauri::command]
 pub async fn enable_app(
   state: tauri::State<'_, LauncherState>,
   app_id: String,
+  app_handle: tauri::AppHandle,
 ) -> Result<(), String> {
+  let manager = (*state).get_holochain_manager()?;
+
   let ports = state.get_running_ports()?;
 
   let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", ports.admin_interface_port))

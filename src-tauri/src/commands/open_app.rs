@@ -1,17 +1,20 @@
 use std::io;
 
-use crate::uis::port_mapping::PortMapping;
+use crate::{state::LauncherState, uis::port_mapping::PortMapping};
 
 #[tauri::command]
-pub fn open_app_ui(app_id: String) -> Result<(), String> {
-  let port_mapping = PortMapping::read_port_mapping()?;
+pub fn open_app_ui(
+  state: tauri::State<'_, LauncherState>,
+  app_handle: tauri::AppHandle,
+  app_id: String,
+) -> Result<(), String> {
+  let manager = state.get_holochain_manager()?;
 
-  let port = port_mapping
-    .get_ui_port_for_app(&app_id)
-    .ok_or("This application has no UI installed")?;
+  manager
+    .ui_manager
+    .open_app(app_id, &app_handle)
+    .map_err(|err| format!("Error opening app: {}", err))?;
 
-  let app_url = format!("http://localhost:{}", port);
-  let result = open_url(app_url.clone());
   log::info!(
     "Opening app {} at {}, result: {:?}",
     app_id.clone(),

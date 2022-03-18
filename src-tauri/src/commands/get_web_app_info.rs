@@ -1,5 +1,7 @@
-use holochain_types::prelude::{AppRoleManifest, CellProvisioning};
-use holochain_types::web_app::WebAppBundle;
+use crate::holochain_version::holochain_types_latest::{
+  prelude::{AppRoleManifest, CellProvisioning},
+  web_app::WebAppBundle,
+};
 use std::fs;
 
 #[derive(serde::Serialize)]

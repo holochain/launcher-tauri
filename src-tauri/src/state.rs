@@ -1,34 +1,41 @@
 use std::sync::{Arc, Mutex};
 
-use serde::{Deserialize, Serialize};
+use crate::{
+  connection_status::ConnectionStatus,
+  managers::{
+    holochain::{conductor::versions::V0_0_130::ConductorManagerV0_0_130, HolochainManager},
+    launcher::LauncherManager,
+  },
+};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct RunningPorts {
-  pub admin_interface_port: u16,
-  pub caddy_admin_port: u16,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(tag = "type")]
-pub enum ConnectionStatus {
-  // Normal state
-  Connected(RunningPorts),
-  // There was an error running the launcher
-  Error { error: String },
-  // There was already an older instance of the launcher running
-  AlreadyRunning,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct LauncherState {
-  pub connection_status: Arc<Mutex<ConnectionStatus>>,
+pub enum LauncherState {
+  Running(Arc<Mutex<ConnectionStatus<LauncherManager>>>),
+  AnotherInstanceIsAlreadyRunning,
 }
 
 impl LauncherState {
-  pub fn get_running_ports(&self) -> Result<RunningPorts, String> {
-    match self.connection_status.lock().unwrap().clone() {
-      ConnectionStatus::Connected(ports) => Ok(ports),
-      _ => Err(String::from("The conductor is not running")),
+  pub fn get_holochain_manager(
+    &self,
+  ) -> Result<HolochainManager<ConductorManagerV0_0_130>, String> {
+    if let LauncherState::Running(m) = self {
+      if let ConnectionStatus::Connected(holochain_manager) = (*m.lock().unwrap()).holochain_manager
+      {
+        return Ok(holochain_manager);
+      }
+    }
+
+    Err(String::from(
+      "The requested Holochain manager is not running",
+    ))
+  }
+
+  pub fn get_connection_status(&self) -> String {
+    match self {
+      LauncherState::Running(m) => match *m.holochain_manager.lock().unwrap() {
+        ConnectionStatus::Connected(_) => String::from("connected"),
+        ConnectionStatus::Error { error } => format!("err: {}", error),
+      },
+      _ => String::from("another_instance_exists"),
     }
   }
 }

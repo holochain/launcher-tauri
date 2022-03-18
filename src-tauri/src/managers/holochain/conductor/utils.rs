@@ -1,25 +1,20 @@
-use std::{collections::HashMap, thread, time::Duration};
+use std::{collections::HashMap, path::PathBuf, sync::Arc};
 
-use holochain_client::AdminWebsocket;
+use holochain_websocket_0_0_130::{connect, WebsocketConfig};
 use tauri::api::process::{Command, CommandEvent};
 
-use crate::{setup::config, state::RunningPorts, uis::caddy};
+use super::ConductorManager;
 
-pub async fn launch_children_processes(running_ports: RunningPorts) -> Result<(), String> {
-  config::setup_config(running_ports.admin_interface_port);
-
+pub fn launch_lair_keystore_process(
+  log_level: log::Level,
+  keystore_data_path: PathBuf,
+) -> Result<(), String> {
   let mut envs = HashMap::new();
-  envs.insert(String::from("RUST_LOG"), String::from("warn"));
+  envs.insert(String::from("RUST_LOG"), String::from(log_level.as_str()));
 
   let (mut lair_rx, _) = Command::new_sidecar("lair-keystore")
     .or(Err(String::from("Can't find lair-keystore binary")))?
-    .args(&[
-      "-d",
-      config::keystore_data_path()
-        .into_os_string()
-        .to_str()
-        .unwrap(),
-    ])
+    .args(&["-d", keystore_data_path.into_os_string().to_str().unwrap()])
     .envs(envs.clone())
     .spawn()
     .map_err(|err| format!("Failed to execute lair-keystore: {:?}", err))?;
@@ -37,16 +32,21 @@ pub async fn launch_children_processes(running_ports: RunningPorts) -> Result<()
 
   log::info!("Launched lair-keystore");
 
-  thread::sleep(Duration::from_millis(1000));
+  Ok(())
+}
+
+pub fn launch_holochain_process(
+  log_level: log::Level,
+  conductor_config_path: PathBuf,
+) -> Result<(), String> {
+  let mut envs = HashMap::new();
+  envs.insert(String::from("RUST_LOG"), String::from(log_level.as_str()));
 
   let (mut holochain_rx, holochain_child) = Command::new_sidecar("holochain")
     .or(Err(String::from("Can't find holochain binary")))?
     .args(&[
       "-c",
-      config::conductor_config_path()
-        .into_os_string()
-        .to_str()
-        .unwrap(),
+      conductor_config_path.into_os_string().to_str().unwrap(),
     ])
     .envs(envs)
     .spawn()
@@ -71,33 +71,23 @@ pub async fn launch_children_processes(running_ports: RunningPorts) -> Result<()
   });
   log::info!("Launched holochain");
 
-  setup_conductor(running_ports.admin_interface_port).await?;
-
-  caddy::launch_caddy(running_ports).await?;
-
   Ok(())
 }
 
-async fn setup_conductor(admin_port: u16) -> Result<(), String> {
-  let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", admin_port))
-    .await
-    .or(Err(String::from("Could not connect to conductor")))?;
+pub async fn is_conductor_running<M: ConductorManager>() -> bool {
+  match M::get_admin_port_from_conductor_config() {
+    Err(_) => false,
+    Ok(maybe_port) => match maybe_port {
+      None => false,
+      Some(port) => {
+        let url = url2::url2!("ws://localhost:{}", port);
+        let websocket_config = WebsocketConfig::default().default_request_timeout_s(20);
 
-  log::info!("Connected to admin conductor");
-
-  let app_interfaces = ws
-    .list_app_interfaces()
-    .await
-    .or(Err(String::from("Could not list app interfaces")))?;
-
-  if app_interfaces.len() == 0 {
-    let free_port = portpicker::pick_unused_port().expect("No ports free");
-
-    ws.attach_app_interface(free_port)
-      .await
-      .or(Err(String::from("Could not attach app interface")))?;
-    log::info!("Attached app interface to {}", free_port);
+        match connect(url, Arc::new(websocket_config)).await {
+          Ok(_) => true,
+          Err(_) => false,
+        }
+      }
+    },
   }
-
-  Ok(())
 }
