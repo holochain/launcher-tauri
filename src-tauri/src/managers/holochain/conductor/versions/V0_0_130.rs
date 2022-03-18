@@ -104,6 +104,15 @@ impl ConductorManager for ConductorManagerV0_0_130 {
   }
 
   /** */
+  async fn get_app_port(&mut self) -> Result<u16, String> {
+    let app_interfaces = self
+      .ws
+      .list_app_interfaces()
+      .await
+      .or(Err(String::from("Could not list app interfaces")))?;
+
+    Ok(app_interfaces[0])
+  }
 
   // If there are no app_interfaces attached, attach one
   async fn setup_conductor(&self) -> Result<(), String> {
@@ -158,6 +167,36 @@ impl ConductorManager for ConductorManagerV0_0_130 {
       .enable_app(app_id.into())
       .await
       .map_err(|err| format!("Error enabling app: {:?}", err))?;
+
+    Ok(())
+  }
+
+  async fn uninstall_app(&self, app_id: &String) -> Result<(), String> {
+    self
+      .ws
+      .uninstall_app(app_id.into())
+      .await
+      .map_err(|err| format!("Error uninstalling app: {:?}", err))?;
+
+    Ok(())
+  }
+
+  async fn enable_app(&self, app_id: &String) -> Result<(), String> {
+    self
+      .ws
+      .enable_app(app_id.into())
+      .await
+      .map_err(|err| format!("Error enabling app: {:?}", err))?;
+
+    Ok(())
+  }
+
+  async fn disable_app(&self, app_id: &String) -> Result<(), String> {
+    self
+      .ws
+      .disable_app(app_id.into())
+      .await
+      .map_err(|err| format!("Error disabling app: {:?}", err))?;
 
     Ok(())
   }

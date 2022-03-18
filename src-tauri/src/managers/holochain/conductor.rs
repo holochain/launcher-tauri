@@ -49,7 +49,7 @@ pub trait ConductorManager: Sized {
     create_dir_if_necessary(fs_manager.conductor_data_path());
     create_dir_if_necessary(fs_manager.keystore_data_path());
 
-    let mut config = match Self::get_current_conductor_config() {
+    let config = match Self::get_current_conductor_config() {
       Ok(config) => Self::overwrite_config(config, admin_port),
       Err(_) => Self::initial_config(admin_port),
     };
@@ -64,6 +64,8 @@ pub trait ConductorManager: Sized {
   }
 
   fn holochain_version() -> HolochainVersion;
+
+  async fn get_app_port(&self) -> Result<u16, String>;
 
   /** Config */
 
@@ -89,6 +91,12 @@ pub trait ConductorManager: Sized {
     uid: Option<String>,
     membrane_proofs: HashMap<String, SerializedBytes>,
   ) -> Result<(), String>;
+
+  async fn uninstall_app(&self, app_id: &String) -> Result<(), String>;
+
+  async fn enable_app(&self, app_id: &String) -> Result<(), String>;
+
+  async fn disable_app(&self, app_id: &String) -> Result<(), String>;
 
   async fn list_running_apps(&self) -> Result<Vec<String>, String>;
 }

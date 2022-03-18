@@ -13,15 +13,30 @@ impl FileSystemManager {
     FileSystemManager { holochain_version }
   }
 
+  /** Logs */
+
+  pub fn logs_path() -> PathBuf {
+    FileSystemManager::logs_folder_path().join("launcher.log")
+  }
+
+  pub fn logs_folder_path() -> PathBuf {
+    data_dir()
+      .expect("Could not get config dir")
+      .join("holochain-launcher")
+  }
+
   /** Config */
+
+  pub fn root_config_path() -> PathBuf {
+    config_dir()
+      .expect("Could not get config dir")
+      .join("holochain")
+  }
 
   pub fn holochain_config_path(&self) -> PathBuf {
     let version: String = self.holochain_version.into();
 
-    config_dir()
-      .expect("Could not get config dir")
-      .join("holochain")
-      .join(version)
+    Self::root_config_path().join(version)
   }
 
   pub fn conductor_config_path(&self) -> PathBuf {
@@ -30,7 +45,7 @@ impl FileSystemManager {
 
   /** Data */
 
-  pub fn data_path() -> PathBuf {
+  pub fn root_data_path() -> PathBuf {
     data_dir()
       .expect("Could not get config dir")
       .join("holochain")
@@ -39,7 +54,7 @@ impl FileSystemManager {
   pub fn data_path_for_this_holochain_version(&self) -> PathBuf {
     let version: String = self.holochain_version.into();
 
-    Self::data_path().join(version)
+    Self::root_data_path().join(version)
   }
 
   pub fn conductor_data_path(&self) -> PathBuf {
@@ -57,19 +72,24 @@ impl FileSystemManager {
   }
 
   pub fn caddyfile_path() -> PathBuf {
-    Self::data_path().join("Caddyfile")
+    Self::root_data_path().join("Caddyfile")
   }
 
   pub fn port_mapping_path() -> PathBuf {
-    Self::data_path().join("port_mapping.yml")
+    Self::root_data_path().join("port_mapping.yml")
+  }
+
+  pub fn root_lair_path() -> PathBuf {
+    data_dir().expect("Could not get config dir").join("lair")
   }
 
   pub fn keystore_data_path(&self) -> PathBuf {
     let version: String = self.holochain_version.lair_keystore_version().into();
 
-    data_dir()
-      .expect("Could not get config dir")
-      .join("lair")
-      .join(version)
+    Self::root_lair_path().join(version)
+  }
+
+  pub fn pid_file_path() -> PathBuf {
+    FileSystemManager::root_data_path().join("launcher.pid")
   }
 }

@@ -5,12 +5,12 @@
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use managers::holochain::config::ManagerConfig;
-use portpicker;
-use state::LauncherManager;
+use system_tray::builtin_system_tray;
 use tauri;
 use tauri::api::process::kill_children;
+use tauri::Manager;
 use tauri::RunEvent;
+use tauri::SystemTray;
 use tauri::SystemTrayEvent;
 
 mod commands;
@@ -33,11 +33,10 @@ use crate::commands::{
   uninstall_app::uninstall_app,
 };
 use crate::connection_status::ConnectionStatus;
+use crate::managers::launcher::LauncherManager;
 use crate::menu::build_menu;
 use crate::menu::handle_menu_event;
-use crate::setup::is_holochain_already_running;
 use crate::setup::logs::setup_logs;
-use crate::setup::version::get_holochain_version;
 use crate::state::LauncherState;
 use crate::system_tray::handle_system_tray_event;
 
@@ -46,8 +45,7 @@ fn main() {
     println!("Error setting up the logs: {:?}", err);
   }
 
-  let already_running =
-    tauri::async_runtime::block_on(async move { is_holochain_already_running().await });
+  let already_running = LauncherManager::is_launcher_already_running();
 
   // If holochain is already running, only display a small notice window
   if already_running {
@@ -61,10 +59,8 @@ fn main() {
     return ();
   }
 
-  let config = ManagerConfig::default();
-
   let manager_launch =
-    tauri::async_runtime::block_on(async move { LauncherManager::launch(config).await });
+    tauri::async_runtime::block_on(async move { LauncherManager::launch().await });
 
   let connection_status = match manager_launch {
     Ok(launcher_manager) => {
@@ -82,9 +78,9 @@ fn main() {
 
   let builder_result = tauri::Builder::default()
     .manage(state)
-    .menu(SystemTray::new(builtin_system_tray()))
+    .menu(build_menu())
     .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
-    .system_tray(build_system_tray())
+    .system_tray(SystemTray::new().with_menu(builtin_system_tray()))
     .on_system_tray_event(|app, event| match event {
       SystemTrayEvent::MenuItemClick { id, .. } => handle_system_tray_event(app, id),
       _ => {}
@@ -103,9 +99,13 @@ fn main() {
     .setup(|app| {
       let launcher_state: LauncherState = *app.state();
 
-      if let ConnectionStatus::Connected(launcher_manager) = launcher_state {
-        launcher_manager.on_apps_changed(app);
-      }
+      let launcher_manager = launcher_state
+        .get_launcher_manager()
+        .expect("There was a problem setting up the launcher");
+
+      launcher_manager.on_apps_changed(&app.handle());
+
+      Ok(())
     })
     .build(tauri::generate_context!());
 

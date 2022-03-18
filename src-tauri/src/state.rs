@@ -14,24 +14,27 @@ pub enum LauncherState {
 }
 
 impl LauncherState {
+  pub fn get_launcher_manager(&self) -> Result<LauncherManager, String> {
+    match self {
+      LauncherState::Running(m) => match *m.lock().unwrap() {
+        ConnectionStatus::Connected(manager) => Ok(manager),
+        ConnectionStatus::Error { error } => Err(error),
+      },
+      _ => Err(String::from("The LauncherManager is not running")),
+    }
+  }
+
   pub fn get_holochain_manager(
     &self,
   ) -> Result<HolochainManager<ConductorManagerV0_0_130>, String> {
-    if let LauncherState::Running(m) = self {
-      if let ConnectionStatus::Connected(holochain_manager) = (*m.lock().unwrap()).holochain_manager
-      {
-        return Ok(holochain_manager);
-      }
-    }
+    let launcher_manager = self.get_launcher_manager()?;
 
-    Err(String::from(
-      "The requested Holochain manager is not running",
-    ))
+    Ok(launcher_manager.holochain_manager)
   }
 
   pub fn get_connection_status(&self) -> String {
     match self {
-      LauncherState::Running(m) => match *m.holochain_manager.lock().unwrap() {
+      LauncherState::Running(m) => match *m.lock().unwrap() {
         ConnectionStatus::Connected(_) => String::from("connected"),
         ConnectionStatus::Error { error } => format!("err: {}", error),
       },

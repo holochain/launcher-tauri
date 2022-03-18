@@ -3,11 +3,16 @@ use tauri::{
   WindowUrl, Wry,
 };
 
-use crate::state::LauncherState;
+use crate::{managers::launcher::LauncherManager, state::LauncherState};
 
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   match event_id.as_str() {
     "quit" => {
+      match LauncherManager::remove_pid_file() {
+        Ok(()) => {},
+        Err(err) => log::error!("Error removing the pid file app: {:?}", err)
+      };
+
       app.exit(0);
     }
     "show_admin" => {
@@ -48,17 +53,12 @@ pub fn builtin_system_tray() -> SystemTrayMenu {
     .add_item(quit)
 }
 
-pub fn update_system_tray(
-  app_handle: &AppHandle<Wry>,
-  running_apps: Vec<String>,
-) -> () {
+pub fn update_system_tray(app_handle: &AppHandle<Wry>, running_apps: &Vec<String>) -> () {
   let mut menu = builtin_system_tray();
 
   for app in running_apps {
-    menu.add_item(CustomMenuItem::new(app.clone(), app));
+    menu.add_item(CustomMenuItem::new(app.clone(), app.clone()));
   }
 
   app_handle.tray_handle().set_menu(menu);
-
-  Ok(())
 }

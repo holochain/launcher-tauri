@@ -3,15 +3,14 @@ use std::collections::HashMap;
 use crate::holochain_version::holochain_types_latest::{
   prelude::SerializedBytes, web_app::WebAppBundle,
 };
-use crate::holochain_version::HolochainVersion;
 
 use self::conductor::ConductorManager;
 use self::config::ManagerConfig;
 
 use super::uis::UiManager;
 
-pub mod config;
 pub mod conductor;
+pub mod config;
 
 pub struct HolochainManager<CM: ConductorManager> {
   config: ManagerConfig,
@@ -26,10 +25,14 @@ impl<CM: ConductorManager + std::marker::Send> HolochainManager<CM> {
 
     let conductor_manager = CM::launch_holochain(config.log_level, admin_port).await?;
 
+    let app_port = conductor_manager.get_app_port().await?;
+
+    let ui_manager = UiManager::launch(CM::holochain_version(), admin_port, app_port)?;
+
     Ok(HolochainManager {
       config,
       conductor_manager,
-      ui_manager: UiManager::new(HolochainVersion::V0_0_130),
+      ui_manager,
     })
   }
 
@@ -74,6 +77,19 @@ impl<CM: ConductorManager + std::marker::Send> HolochainManager<CM> {
     Ok(())
   }
 
-  async fn handle_on_apps_changed() -> Result<(), String> {}
+  pub async fn uninstall_app(&self, app_id: String) -> Result<(), String> {
+    // Uninstall app in conductor manager
+    self
+      .conductor_manager
+      .uninstall_app(&app_id)
+      .await
+      .map_err(|err| {
+        log::error!("Error uninstalling hApp in the conductor: {}", err);
+        err
+      })?;
 
+    self.ui_manager.uninstall_app_ui(&app_id).await?;
+
+    Ok(())
+  }
 }

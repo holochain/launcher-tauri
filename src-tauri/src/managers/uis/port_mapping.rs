@@ -1,6 +1,11 @@
 use crate::{holochain_version::HolochainVersion, managers::file_system::FileSystemManager};
 use serde::{Deserialize, Serialize};
-use std::{collections::{BTreeMap, HashMap}, fs, io::ErrorKind, path::PathBuf};
+use std::{
+  collections::{BTreeMap, HashMap},
+  fs,
+  io::ErrorKind,
+  path::PathBuf,
+};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct PortMapping(HashMap<HolochainVersion, BTreeMap<String, u16>>);
@@ -16,7 +21,7 @@ impl PortMapping {
     app_id: &String,
   ) -> Option<u16> {
     if let Some(versions) = self.0.get(holochain_version) {
-      versions.get(app_id)
+      return versions.get(app_id).map(|p| p.clone());
     }
     None
   }
@@ -24,7 +29,7 @@ impl PortMapping {
   pub fn read_port_mapping() -> Result<PortMapping, String> {
     match fs::read_to_string(Self::path()) {
       Err(error) => match error.kind() {
-        ErrorKind::NotFound => Ok(PortMapping(BTreeMap::new())),
+        ErrorKind::NotFound => Ok(PortMapping(HashMap::new())),
         _ => Err(format!("Error reading the UIs port mapping {:?}", error)),
       },
       Ok(contents) => {
@@ -45,7 +50,7 @@ impl PortMapping {
     let version_map = self
       .0
       .entry(holochain_version)
-      .or_insert_with(BTreeMap::new());
+      .or_insert_with(|| BTreeMap::new());
 
     version_map.insert(app_id, port);
 
@@ -54,8 +59,14 @@ impl PortMapping {
     Ok(port)
   }
 
-  pub fn remove_app_from_mapping(&mut self, app_id: String) -> Result<(), String> {
-    self.0.remove(&app_id);
+  pub fn remove_app_from_mapping(
+    &mut self,
+    holochain_version: HolochainVersion,
+    app_id: String,
+  ) -> Result<(), String> {
+    if let Some(version_map) = self.0.get(&holochain_version) {
+      version_map.remove(&app_id);
+    }
 
     self.write_port_mapping()?;
 

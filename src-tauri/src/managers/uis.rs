@@ -1,12 +1,15 @@
-use std::fs::{self, File};
+use std::{
+  fs::{self, File},
+  path::Path,
+};
 
 use mr_bundle::ResourceBytes;
 use tauri::{window::WindowBuilder, AppHandle, WindowUrl, Wry};
+use url::Url;
 
-use crate::{
-  holochain_version::HolochainVersion,
-   utils::create_dir_if_necessary,
-};
+use crate::{holochain_version::HolochainVersion, utils::create_dir_if_necessary};
+
+use self::{port_mapping::PortMapping, utils::unzip_file};
 
 use super::file_system::FileSystemManager;
 
@@ -26,7 +29,6 @@ impl UiManager {
     holochain_version: HolochainVersion,
     admin_port: u16,
     app_port: u16,
-    running_apps: Vec<String>,
   ) -> Result<Self, String> {
     let fs_manager = FileSystemManager::new(holochain_version);
 
@@ -42,13 +44,14 @@ impl UiManager {
   pub fn open_app(&self, app_id: String, app_handle: &AppHandle<Wry>) -> Result<(), String> {
     let port_mapping = PortMapping::read_port_mapping()?;
 
+    let port = port_mapping
+      .get_ui_port_for_app(&self.holochain_version, &app_id)
+      .ok_or(String::from("This app doesn't have a UI installed."))?;
+
     WindowBuilder::new(
       app_handle,
-      app_id,
-      WindowUrl::Url(format!(
-        "http://localhost:{}",
-        port_mapping.get_ui_port_for_app(&self.holochain_version, &app_id)
-      )),
+      app_id.clone(),
+      WindowUrl::External(Url::parse(format!("http://localhost:{}", port).as_str()).unwrap()),
     )
     .inner_size(1000.0, 700.0)
     .title(app_id)
@@ -75,14 +78,29 @@ impl UiManager {
     Ok(())
   }
 
-  pub fn caddy_config_for_apps(&self, running_apps: Vec<String>) -> String {
+  pub async fn uninstall_app_ui(&self, app_id: &String) -> Result<(), String> {
+    let fs_manager = FileSystemManager::new(self.holochain_version);
+
+    let ui_folder_path = fs_manager.app_ui_path(app_id);
+
+    if Path::new(&ui_folder_path).exists() {
+      fs::remove_dir_all(ui_folder_path).or(Err("Failed to remove UI folder"))?;
+    }
+
+    let mut port_mapping = PortMapping::read_port_mapping()?;
+    port_mapping.remove_app_from_mapping(self.holochain_version, app_id.clone())?;
+
+    Ok(())
+  }
+
+  pub fn caddy_config_for_apps(&self, running_apps: &Vec<String>) -> Result<String, String> {
     let port_mapping = PortMapping::read_port_mapping()?;
 
-    let mut config_vec: Vec<String> = running_apps
+    let config_vec: Vec<String> = running_apps
       .into_iter()
       .filter_map(|app_id| {
         port_mapping
-          .get_ui_port_for_app(&app_id)
+          .get_ui_port_for_app(&self.holochain_version, &app_id)
           .map(|ui_port| self.caddyfile_config_for_app(ui_port, app_id))
       })
       .collect();
@@ -90,10 +108,10 @@ impl UiManager {
     let empty_line = r#"
 "#;
 
-    config_vec.join(empty_line)
+    Ok(config_vec.join(empty_line))
   }
 
-  fn caddyfile_config_for_app(&self, ui_port: u16, app_id: String) -> String {
+  fn caddyfile_config_for_app(&self, ui_port: u16, app_id: &String) -> String {
     format!(
       r#":{} {{
         handle_path /{} {{

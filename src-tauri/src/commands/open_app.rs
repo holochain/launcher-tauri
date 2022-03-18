@@ -1,6 +1,6 @@
 use std::io;
 
-use crate::{state::LauncherState, uis::port_mapping::PortMapping};
+use crate::state::LauncherState;
 
 #[tauri::command]
 pub fn open_app_ui(
@@ -15,12 +15,7 @@ pub fn open_app_ui(
     .open_app(app_id, &app_handle)
     .map_err(|err| format!("Error opening app: {}", err))?;
 
-  log::info!(
-    "Opening app {} at {}, result: {:?}",
-    app_id.clone(),
-    app_url,
-    result
-  );
+  log::info!("Opening app {}", app_id.clone(),);
 
   Ok(())
 }
