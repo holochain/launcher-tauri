@@ -14,8 +14,6 @@ pub async fn install_app(
   uid: Option<String>,
   membrane_proofs: HashMap<String, Vec<u8>>,
 ) -> Result<(), String> {
-  let manager = state.get_holochain_manager()?;
-
   log::info!("Installing: web_app_bundle = {}", web_app_bundle_path);
 
   let web_app_bundle = WebAppBundle::decode(
@@ -31,7 +29,9 @@ pub async fn install_app(
     );
   }
 
+  let mut manager = state.get_launcher_manager()?.lock().await;
   manager
+    .get_holochain_manager()?
     .install_app(
       app_id.clone(),
       web_app_bundle,

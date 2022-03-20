@@ -9,8 +9,8 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   match event_id.as_str() {
     "quit" => {
       match LauncherManager::remove_pid_file() {
-        Ok(()) => {},
-        Err(err) => log::error!("Error removing the pid file app: {:?}", err)
+        Ok(()) => {}
+        Err(err) => log::error!("Error removing the pid file app: {:?}", err),
       };
 
       app.exit(0);
@@ -31,14 +31,24 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
       }
     }
     app_id => {
-      let launcher_state: LauncherState = *app.state();
-
-      match launcher_state.get_holochain_manager() {
+      match app.state::<LauncherState>().get_launcher_manager() {
         Ok(manager) => {
-          manager.ui_manager.open_app(String::from(app_id), app);
+          tauri::async_runtime::block_on(async move {
+            if let Ok(holochain_manager) = manager.lock().await.get_holochain_manager() {
+              if let Err(err) = holochain_manager
+                .ui_manager
+                .open_app(&String::from(app_id), app)
+              {
+                log::error!("Error opening app: {:?}", err);
+              }
+            }
+          });
         }
-        Err(e) => log::error!("Error opening app: {:?}", e),
-      }
+        Err(e) => {
+          log::error!("Error opening app: {:?}", e);
+        }
+      };
+      ()
     }
   }
 }
@@ -57,8 +67,10 @@ pub fn update_system_tray(app_handle: &AppHandle<Wry>, running_apps: &Vec<String
   let mut menu = builtin_system_tray();
 
   for app in running_apps {
-    menu.add_item(CustomMenuItem::new(app.clone(), app.clone()));
+    menu = menu.add_item(CustomMenuItem::new(app.clone(), app.clone()));
   }
 
-  app_handle.tray_handle().set_menu(menu);
+  if let Err(err) = app_handle.tray_handle().set_menu(menu) {
+    log::error!("Error setting the system tray: {:?}", err);
+  }
 }

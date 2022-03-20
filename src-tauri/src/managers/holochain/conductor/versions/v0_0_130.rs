@@ -28,7 +28,7 @@ impl ConductorManager for ConductorManagerV0_0_130 {
   }
 
   async fn connect(admin_port: u16) -> Result<Self, String> {
-    let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", admin_port))
+    let ws = AdminWebsocket::connect(format!("ws://localhost:{}", admin_port))
       .await
       .or(Err(String::from("Could not connect to conductor")))?;
 
@@ -115,7 +115,7 @@ impl ConductorManager for ConductorManagerV0_0_130 {
   }
 
   // If there are no app_interfaces attached, attach one
-  async fn setup_conductor(&self) -> Result<(), String> {
+  async fn setup_conductor(&mut self) -> Result<(), String> {
     let app_interfaces = self
       .ws
       .list_app_interfaces()
@@ -137,7 +137,7 @@ impl ConductorManager for ConductorManagerV0_0_130 {
   }
 
   async fn install_app(
-    &self,
+    &mut self,
     app_id: &String,
     app_bundle: AppBundle,
     uid: Option<String>,
@@ -171,7 +171,7 @@ impl ConductorManager for ConductorManagerV0_0_130 {
     Ok(())
   }
 
-  async fn uninstall_app(&self, app_id: &String) -> Result<(), String> {
+  async fn uninstall_app(&mut self, app_id: &String) -> Result<(), String> {
     self
       .ws
       .uninstall_app(app_id.into())
@@ -181,7 +181,7 @@ impl ConductorManager for ConductorManagerV0_0_130 {
     Ok(())
   }
 
-  async fn enable_app(&self, app_id: &String) -> Result<(), String> {
+  async fn enable_app(&mut self, app_id: &String) -> Result<(), String> {
     self
       .ws
       .enable_app(app_id.into())
@@ -191,7 +191,7 @@ impl ConductorManager for ConductorManagerV0_0_130 {
     Ok(())
   }
 
-  async fn disable_app(&self, app_id: &String) -> Result<(), String> {
+  async fn disable_app(&mut self, app_id: &String) -> Result<(), String> {
     self
       .ws
       .disable_app(app_id.into())
@@ -201,7 +201,7 @@ impl ConductorManager for ConductorManagerV0_0_130 {
     Ok(())
   }
 
-  async fn list_running_apps(&self) -> Result<Vec<String>, String> {
+  async fn list_running_apps(&mut self) -> Result<Vec<String>, String> {
     let active_apps = self
       .ws
       .list_apps(Some(AppStatusFilter::Running))

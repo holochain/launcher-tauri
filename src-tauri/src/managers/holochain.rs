@@ -13,7 +13,7 @@ pub mod conductor;
 pub mod config;
 
 pub struct HolochainManager<CM: ConductorManager> {
-  config: ManagerConfig,
+  _config: ManagerConfig,
 
   pub conductor_manager: CM,
   pub ui_manager: UiManager,
@@ -23,21 +23,21 @@ impl<CM: ConductorManager + std::marker::Send> HolochainManager<CM> {
   pub async fn launch(config: ManagerConfig) -> Result<Self, String> {
     let admin_port = portpicker::pick_unused_port().expect("No ports free");
 
-    let conductor_manager = CM::launch_holochain(config.log_level, admin_port).await?;
+    let mut conductor_manager = CM::launch_holochain(config.log_level, admin_port).await?;
 
     let app_port = conductor_manager.get_app_port().await?;
 
     let ui_manager = UiManager::launch(CM::holochain_version(), admin_port, app_port)?;
 
     Ok(HolochainManager {
-      config,
+      _config: config,
       conductor_manager,
       ui_manager,
     })
   }
 
   pub async fn install_app(
-    &self,
+    &mut self,
     app_id: String,
     web_app_bundle: WebAppBundle,
     uid: Option<String>,
@@ -77,7 +77,7 @@ impl<CM: ConductorManager + std::marker::Send> HolochainManager<CM> {
     Ok(())
   }
 
-  pub async fn uninstall_app(&self, app_id: String) -> Result<(), String> {
+  pub async fn uninstall_app(&mut self, app_id: String) -> Result<(), String> {
     // Uninstall app in conductor manager
     self
       .conductor_manager

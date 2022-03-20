@@ -6,11 +6,15 @@ pub async fn enable_app(
   app_handle: tauri::AppHandle,
   app_id: String,
 ) -> Result<(), String> {
-  let manager = state.get_holochain_manager()?;
+  let mut manager = state.get_launcher_manager()?.lock().await;
 
-  manager.conductor_manager.enable_app(&app_id);
+  manager
+    .get_holochain_manager()?
+    .conductor_manager
+    .enable_app(&app_id)
+    .await?;
 
-  state.get_launcher_manager()?.on_apps_changed(&app_handle);
+  manager.on_apps_changed(&app_handle).await?;
 
   log::info!("Enabled app: app_id = {}", app_id);
   Ok(())
@@ -22,11 +26,15 @@ pub async fn disable_app(
   app_handle: tauri::AppHandle,
   app_id: String,
 ) -> Result<(), String> {
-  let manager = state.get_holochain_manager()?;
+  let mut manager = state.get_launcher_manager()?.lock().await;
 
-  manager.conductor_manager.disable_app(&app_id);
+  manager
+    .get_holochain_manager()?
+    .conductor_manager
+    .disable_app(&app_id)
+    .await?;
 
-  state.get_launcher_manager()?.on_apps_changed(&app_handle);
+  manager.on_apps_changed(&app_handle).await?;
 
   log::info!("Disabled app: app_id = {}", app_id);
   Ok(())

@@ -31,7 +31,7 @@ pub trait ConductorManager: Sized {
 
     launch_holochain_process(log_level, fs_manager.conductor_config_path())?;
 
-    let manager = Self::connect(admin_port).await?;
+    let mut manager = Self::connect(admin_port).await?;
 
     let f = manager.setup_conductor();
 
@@ -65,7 +65,7 @@ pub trait ConductorManager: Sized {
 
   fn holochain_version() -> HolochainVersion;
 
-  async fn get_app_port(&self) -> Result<u16, String>;
+  async fn get_app_port(&mut self) -> Result<u16, String>;
 
   /** Config */
 
@@ -82,21 +82,21 @@ pub trait ConductorManager: Sized {
 
   /** Possible actions when we successfully connected to the conductor */
 
-  async fn setup_conductor(&self) -> Result<(), String>;
+  async fn setup_conductor(&mut self) -> Result<(), String>;
 
   async fn install_app(
-    &self,
+    &mut self,
     app_id: &String,
     app_bundle: holochain_types_latest::prelude::AppBundle,
     uid: Option<String>,
     membrane_proofs: HashMap<String, SerializedBytes>,
   ) -> Result<(), String>;
 
-  async fn uninstall_app(&self, app_id: &String) -> Result<(), String>;
+  async fn uninstall_app(&mut self, app_id: &String) -> Result<(), String>;
 
-  async fn enable_app(&self, app_id: &String) -> Result<(), String>;
+  async fn enable_app(&mut self, app_id: &String) -> Result<(), String>;
 
-  async fn disable_app(&self, app_id: &String) -> Result<(), String>;
+  async fn disable_app(&mut self, app_id: &String) -> Result<(), String>;
 
-  async fn list_running_apps(&self) -> Result<Vec<String>, String>;
+  async fn list_running_apps(&mut self) -> Result<Vec<String>, String>;
 }

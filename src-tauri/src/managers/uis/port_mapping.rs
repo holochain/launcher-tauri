@@ -42,17 +42,17 @@ impl PortMapping {
 
   pub fn set_available_ui_port_for_app(
     &mut self,
-    holochain_version: HolochainVersion,
-    app_id: String,
+    holochain_version: &HolochainVersion,
+    app_id: &String,
   ) -> Result<u16, String> {
     let port = self.get_next_available_port();
 
     let version_map = self
       .0
-      .entry(holochain_version)
+      .entry(holochain_version.clone())
       .or_insert_with(|| BTreeMap::new());
 
-    version_map.insert(app_id, port);
+    version_map.insert(app_id.clone(), port);
 
     self.write_port_mapping()?;
 
@@ -64,7 +64,7 @@ impl PortMapping {
     holochain_version: HolochainVersion,
     app_id: String,
   ) -> Result<(), String> {
-    if let Some(version_map) = self.0.get(&holochain_version) {
+    if let Some(version_map) = self.0.get_mut(&holochain_version) {
       version_map.remove(&app_id);
     }
 

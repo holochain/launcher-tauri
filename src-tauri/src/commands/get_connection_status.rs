@@ -1,6 +1,8 @@
 use crate::state::LauncherState;
 
 #[tauri::command]
-pub fn get_connection_status(state: tauri::State<'_, LauncherState>) -> String {
-  (*state).get_connection_status()
+pub async fn get_connection_status(
+  state: tauri::State<'_, LauncherState>,
+) -> Result<String, String> {
+  Ok(state.get_connection_status().await)
 }

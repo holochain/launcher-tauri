@@ -3,7 +3,6 @@ use std::{fs, io, path::PathBuf};
 use tauri::api::process::kill_children;
 
 use crate::{
-  connection_status::ConnectionStatus,
   managers::{file_system::FileSystemManager, launcher::LauncherManager},
   state::LauncherState,
 };
@@ -34,7 +33,7 @@ async fn factory_reset(state: tauri::State<'_, LauncherState>) -> Result<(), Str
   let manager = LauncherManager::launch().await?;
 
   if let LauncherState::Running(mutex) = &*state {
-    *mutex.lock().unwrap() = ConnectionStatus::Connected(manager);
+    *mutex.lock().await = manager;
   }
 
   log::info!("Started children processes again, factory reset completed");

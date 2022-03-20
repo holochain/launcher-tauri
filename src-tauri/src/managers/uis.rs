@@ -41,7 +41,7 @@ impl UiManager {
     })
   }
 
-  pub fn open_app(&self, app_id: String, app_handle: &AppHandle<Wry>) -> Result<(), String> {
+  pub fn open_app(&self, app_id: &String, app_handle: &AppHandle<Wry>) -> Result<(), String> {
     let port_mapping = PortMapping::read_port_mapping()?;
 
     let port = port_mapping
@@ -55,7 +55,8 @@ impl UiManager {
     )
     .inner_size(1000.0, 700.0)
     .title(app_id)
-    .build();
+    .build()
+    .map_err(|err| format!("Error opening app: {:?}", err))?;
 
     Ok(())
   }
@@ -74,6 +75,10 @@ impl UiManager {
 
     let file = File::open(ui_zip_path).or(Err("Failed to read Web UI Zip file"))?;
     unzip_file(file, ui_folder_path)?;
+
+    let mut port_mapping = PortMapping::read_port_mapping()?;
+
+    port_mapping.set_available_ui_port_for_app(&self.holochain_version, app_id)?;
 
     Ok(())
   }

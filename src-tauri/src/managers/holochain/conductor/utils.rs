@@ -1,9 +1,5 @@
-use std::{collections::HashMap, path::PathBuf, sync::Arc};
-
-use holochain_websocket_0_0_130::{connect, WebsocketConfig};
+use std::{collections::HashMap, path::PathBuf};
 use tauri::api::process::{Command, CommandEvent};
-
-use super::ConductorManager;
 
 pub fn launch_lair_keystore_process(
   log_level: log::Level,
@@ -72,22 +68,4 @@ pub fn launch_holochain_process(
   log::info!("Launched holochain");
 
   Ok(())
-}
-
-pub async fn is_conductor_running<M: ConductorManager>() -> bool {
-  match M::get_admin_port_from_conductor_config() {
-    Err(_) => false,
-    Ok(maybe_port) => match maybe_port {
-      None => false,
-      Some(port) => {
-        let url = url2::url2!("ws://localhost:{}", port);
-        let websocket_config = WebsocketConfig::default().default_request_timeout_s(20);
-
-        match connect(url, Arc::new(websocket_config)).await {
-          Ok(_) => true,
-          Err(_) => false,
-        }
-      }
-    },
-  }
 }

@@ -6,11 +6,14 @@ pub async fn uninstall_app(
   app_id: String,
   app_handle: tauri::AppHandle,
 ) -> Result<(), String> {
-  let manager = state.get_holochain_manager()?;
+  let mut manager = state.get_launcher_manager()?.lock().await;
 
-  manager.uninstall_app(app_id);
+  manager
+    .get_holochain_manager()?
+    .uninstall_app(app_id)
+    .await?;
 
-  state.get_launcher_manager()?.on_apps_changed(&app_handle);
+  manager.on_apps_changed(&app_handle).await?;
 
   Ok(())
 }

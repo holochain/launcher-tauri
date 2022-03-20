@@ -2,8 +2,8 @@
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
+use futures::lock::Mutex;
 use std::sync::Arc;
-use std::sync::Mutex;
 
 use system_tray::builtin_system_tray;
 use tauri;
@@ -32,7 +32,6 @@ use crate::commands::{
   open_app::open_app_ui,
   uninstall_app::uninstall_app,
 };
-use crate::connection_status::ConnectionStatus;
 use crate::managers::launcher::LauncherManager;
 use crate::menu::build_menu;
 use crate::menu::handle_menu_event;
@@ -62,22 +61,20 @@ fn main() {
   let manager_launch =
     tauri::async_runtime::block_on(async move { LauncherManager::launch().await });
 
-  let connection_status = match manager_launch {
+  let launcher_state = match manager_launch {
     Ok(launcher_manager) => {
       log::info!("Launch setup successful");
-      ConnectionStatus::Connected(launcher_manager)
+      LauncherState::Running(Arc::new(Mutex::new(launcher_manager)))
     }
-    Err(err) => {
+    Err(error) => {
       kill_children();
-      log::error!("There was an error launching holochain: {:?}", err);
-      ConnectionStatus::Error { error: err }
+      log::error!("There was an error launching holochain: {:?}", error);
+      LauncherState::ErrorLaunching { error }
     }
   };
 
-  let state = LauncherState::Running(Arc::new(Mutex::new(connection_status)));
-
   let builder_result = tauri::Builder::default()
-    .manage(state)
+    .manage(launcher_state)
     .menu(build_menu())
     .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
     .system_tray(SystemTray::new().with_menu(builtin_system_tray()))
@@ -97,13 +94,21 @@ fn main() {
       setup::logs::log,
     ])
     .setup(|app| {
-      let launcher_state: LauncherState = *app.state();
+      let launcher_state: &LauncherState = &app.state();
 
-      let launcher_manager = launcher_state
-        .get_launcher_manager()
-        .expect("There was a problem setting up the launcher");
-
-      launcher_manager.on_apps_changed(&app.handle());
+      match launcher_state.get_launcher_manager() {
+        Ok(m) => {
+          tauri::async_runtime::block_on(async {
+            let mut launcher_manager = m.lock().await;
+            if let Err(err) = launcher_manager.on_apps_changed(&app.handle()).await {
+              log::error!("Error setting up the apps: {:?}", err);
+            }
+          });
+        }
+        Err(e) => {
+          log::error!("Error opening app: {:?}", e);
+        }
+      };
 
       Ok(())
     })
