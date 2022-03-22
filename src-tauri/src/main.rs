@@ -14,10 +14,12 @@ use tauri::SystemTray;
 use tauri::SystemTrayEvent;
 
 mod commands;
-mod connection_status;
-mod holochain_version;
-mod managers;
+mod file_system;
+mod holochain;
+mod launcher;
 mod menu;
+mod running_apps;
+mod running_state;
 mod setup;
 mod state;
 mod system_tray;
@@ -32,7 +34,7 @@ use crate::commands::{
   open_app::open_app_ui,
   uninstall_app::uninstall_app,
 };
-use crate::managers::launcher::LauncherManager;
+use crate::launcher::manager::LauncherManager;
 use crate::menu::build_menu;
 use crate::menu::handle_menu_event;
 use crate::setup::logs::setup_logs;

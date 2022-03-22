@@ -3,7 +3,7 @@ use tauri::{
   WindowUrl, Wry,
 };
 
-use crate::{managers::launcher::LauncherManager, state::LauncherState};
+use crate::{launcher::manager::LauncherManager, state::LauncherState};
 
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   match event_id.as_str() {

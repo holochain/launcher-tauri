@@ -1,18 +1,29 @@
 use futures::lock::Mutex;
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
-use crate::{connection_status::ConnectionStatus, managers::launcher::LauncherManager};
+use holochain_versions::HolochainVersion;
+use crate::{
+  managers::launcher::LauncherManager,
+  running_state::RunningState,
+};
 
-pub enum LauncherState {
-  Running(Arc<Mutex<LauncherManager>>),
-  ErrorLaunching { error: String },
+pub type LauncherState = RunningState<Arc<Mutex<LauncherManager>>, RunLauncherError>;
+
+#[derive(Clone)]
+pub enum RunLauncherError {
   AnotherInstanceIsAlreadyRunning,
 }
+
+pub type LauncherStateInfo = RunningState<
+  HashMap<HolochainVersion, RunningState<HolochainStateInfo, RunHolochainError>>,
+  RunLauncherError,
+>;
+
 
 impl LauncherState {
   pub fn get_launcher_manager(&self) -> Result<&Arc<Mutex<LauncherManager>>, String> {
     match self {
-      LauncherState::Running(m) => Ok(m),
+      RunningState::Running(launcher_manager) => Ok(launcher_manager),
       _ => Err(String::from("The LauncherManager is not running")),
     }
   }
@@ -27,6 +38,13 @@ impl LauncherState {
         format!("There was an error launching holochain: {}", error)
       }
       _ => String::from("another_instance_exists"),
+    }
+  }
+
+  pub async fn get_info(&self) -> LauncherStateInfo {
+    match self {
+      RunningState::Running(manager) => &manager.lock().await.holochain_manager,
+      RunningState::Error(err) => LauncherStateInfo::Error(err.clone()),
     }
   }
 }
