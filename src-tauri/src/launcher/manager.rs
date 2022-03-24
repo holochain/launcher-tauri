@@ -1,15 +1,20 @@
-use std::{fs, process, collections::HashMap};
+use std::{collections::HashMap, fs, process};
 use tauri::{AppHandle, Wry};
 
 use std::path::Path;
 
-use holochain_manager::{HolochainManager, versions::{HolochainVersion, launch_holochain}, error::LaunchHolochainError};
+use holochain_manager::{error::LaunchHolochainError, versions::HolochainVersion};
+use holochain_web_happ_manager::WebAppManager;
 
-use crate::{running_state::RunningState, system_tray::update_system_tray, running_apps::RunningApps};
-use crate::file_system::{conductor_config_path, keystore_data_path, conductor_data_path};
+use crate::{
+  caddy::manager::CaddyManager,
+  file_system::{conductor_config_path, data_path_for_holochain_version, keystore_data_path},
+};
+use crate::{running_state::RunningState, system_tray::update_system_tray};
 
 pub struct LauncherManager {
-  pub holochain_managers: HashMap<HolochainVersion, RunningState<Box<dyn HolochainManager>, LaunchHolochainError>>,
+  pub holochain_managers:
+    HashMap<HolochainVersion, RunningState<WebAppManager, LaunchHolochainError>>,
   pub caddy_manager: CaddyManager,
 }
 
@@ -17,24 +22,40 @@ impl LauncherManager {
   pub async fn launch(log_level: log::Level) -> Result<Self, String> {
     let versions = HolochainVersion::supported_versions();
 
-    let mut holochain_managers: HashMap<HolochainVersion, Box<dyn HolochainManager>> = HashMap::new();
+    let mut holochain_managers: HashMap<
+      HolochainVersion,
+      RunningState<WebAppManager, LaunchHolochainError>,
+    > = HashMap::new();
 
     for version in versions {
       let admin_port = portpicker::pick_unused_port().expect("No ports free");
 
       let config_path = conductor_config_path(version);
-      let environment_path = conductor_data_path(version);
+      let environment_path = data_path_for_holochain_version(version);
       let keystore_path = keystore_data_path(version.lair_keystore_version());
 
-      let state = match launch_holochain(version, log_level, admin_port, config_path, environment_path, keystore_path).await {
+      let state = match WebAppManager::launch(
+        version,
+        log_level,
+        admin_port,
+        config_path,
+        environment_path,
+        keystore_path,
+      )
+      .await
+      {
         Ok(manager) => RunningState::Running(manager),
-        Err(error) => RunningState::Error(error)
+        Err(error) => RunningState::Error(error),
       };
 
       holochain_managers.insert(version, state);
     }
-    
-    let caddy_manager = CaddyManager::launch().await?;
+
+    let caddy_manager = CaddyManager::launch(
+      root_data_path(), 
+      
+      
+    ).await?;
 
     LauncherManager::write_pid_file()?;
 
@@ -44,18 +65,26 @@ impl LauncherManager {
     })
   }
 
-  pub fn get_holochain_manager(
+  pub fn get_web_happ_manager(
     &mut self,
-  ) -> Result<&mut HolochainManager<ConductorManagerV0_0_130>, String> {
-    match &mut self.holochain_manager {
-      ConnectionStatus::Connected(m) => Ok(m),
-      ConnectionStatus::Error { error } => Err(error.clone()),
+    holochain_version: HolochainVersion,
+  ) -> Result<&mut WebAppManager, String> {
+    let manager_state = self
+      .holochain_managers
+      .get(&holochain_version)
+      .ok_or(String::from("This holochain version is not running"))?;
+
+    match manager_state {
+      RunningState::Running(mut m) => Ok(&mut m),
+      RunningState::Error(error) => {
+        Err(format!("This holochain version is not running: {}", error))
+      }
     }
   }
 
   /// Connects to the conductor, requests the list of running apps, updates the caddyfile and the system tray
   pub async fn on_apps_changed(&mut self, app_handle: &AppHandle<Wry>) -> Result<(), String> {
-    let running_apps  = self.get_running_apps().await?;
+    let running_apps = self.get_running_apps().await?;
 
     self.refresh_caddyfile(&running_apps)?;
 
@@ -66,16 +95,13 @@ impl LauncherManager {
     Ok(())
   }
 
-  pub fn open_app(&self, holochain_version: HolochainVersion, app_id: &String, app_handle: &AppHandle<Wry>) -> Result<(), String> {
-
-    let free_port = portpicker::pick_unused_port().expect("No ports free");
-
-    let caddyfile_path = FileSystemManager::caddyfile_path();
-    let caddyfile_contents = 
-
-    let port = port_mapping
-      .get_ui_port_for_app(&self.holochain_version, &app_id)
-      .ok_or(String::from("This app doesn't have a UI installed."))?;
+  pub fn open_app(
+    &self,
+    holochain_version: HolochainVersion,
+    app_id: &String,
+    app_handle: &AppHandle<Wry>,
+  ) -> Result<(), String> {
+    // Iterate over the open windows, focus if the app is already open
 
     WindowBuilder::new(
       app_handle,
@@ -88,14 +114,6 @@ impl LauncherManager {
     .map_err(|err| format!("Error opening app: {:?}", err))?;
 
     Ok(())
-  }
-
-  pub async fn get_running_apps(&self) -> Result<RunningApps, String> {
-    let running_apps = self
-      .get_holochain_manager()?
-      .conductor_manager
-      .list_running_apps()
-      .await?;
   }
 
   fn write_pid_file() -> Result<(), String> {

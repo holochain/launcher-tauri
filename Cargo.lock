@@ -2363,10 +2363,11 @@ dependencies = [
  "flate2",
  "futures",
  "holochain_manager",
+ "holochain_web_app_manager",
  "lair_keystore_manager",
  "log",
  "log4rs",
- "mr_bundle",
+ "mr_bundle 0.0.8",
  "open",
  "opener",
  "portpicker",
@@ -2378,7 +2379,6 @@ dependencies = [
  "tauri-build",
  "url",
  "url2",
- "zip",
 ]
 
 [[package]]
@@ -2455,6 +2455,7 @@ dependencies = [
  "holochain_websocket",
  "lair_keystore_manager",
  "log",
+ "mr_bundle 0.0.9",
  "portpicker",
  "serde",
  "serde_yaml",
@@ -2476,7 +2477,7 @@ dependencies = [
  "holochain_keystore",
  "holochain_serialized_bytes",
  "holochain_types",
- "holochain_util",
+ "holochain_util 0.0.8",
  "holochain_zome_types",
  "kitsune_p2p",
  "kitsune_p2p_types",
@@ -2537,7 +2538,7 @@ dependencies = [
  "futures",
  "holo_hash",
  "holochain_serialized_bytes",
- "holochain_util",
+ "holochain_util 0.0.8",
  "holochain_zome_types",
  "kitsune_p2p",
  "lazy_static",
@@ -2588,7 +2589,7 @@ dependencies = [
  "holochain_serialized_bytes",
  "holochain_sqlite",
  "holochain_types",
- "holochain_util",
+ "holochain_util 0.0.8",
  "holochain_zome_types",
  "kitsune_p2p",
  "mockall",
@@ -2630,12 +2631,12 @@ dependencies = [
  "holochain_keystore",
  "holochain_serialized_bytes",
  "holochain_sqlite",
- "holochain_util",
+ "holochain_util 0.0.8",
  "holochain_zome_types",
  "itertools 0.10.3",
  "lazy_static",
  "mockall",
- "mr_bundle",
+ "mr_bundle 0.0.8",
  "must_future",
  "nanoid 0.3.0",
  "observability",
@@ -2673,6 +2674,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "holochain_util"
+version = "0.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e05c20b2a8f4937b1232605b1c2c13160638ab5cceaae5d7c4ac2d0a850cdfaa"
+dependencies = [
+ "cfg-if 0.1.10",
+ "derive_more",
+ "dunce",
+ "futures",
+ "num_cpus",
+ "once_cell",
+ "tokio",
+]
+
+[[package]]
 name = "holochain_wasmer_common"
 version = "0.0.77"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2682,6 +2698,21 @@ dependencies = [
  "serde",
  "serde_bytes",
  "thiserror",
+]
+
+[[package]]
+name = "holochain_web_app_manager"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "holochain_manager",
+ "log",
+ "portpicker",
+ "serde",
+ "serde_yaml",
+ "tauri",
+ "url2",
+ "zip",
 ]
 
 [[package]]
@@ -3800,13 +3831,33 @@ dependencies = [
  "either",
  "flate2",
  "futures",
- "holochain_util",
+ "holochain_util 0.0.8",
  "reqwest",
  "rmp-serde",
  "serde",
  "serde_bytes",
  "serde_derive",
  "serde_yaml",
+ "thiserror",
+]
+
+[[package]]
+name = "mr_bundle"
+version = "0.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a0629cc22550461c9d3ec998c10082ba433b3bc620eb71933f41681217613c8"
+dependencies = [
+ "bytes",
+ "derive_more",
+ "either",
+ "flate2",
+ "futures",
+ "holochain_util 0.0.9",
+ "reqwest",
+ "rmp-serde",
+ "serde",
+ "serde_bytes",
+ "serde_derive",
  "thiserror",
 ]
 

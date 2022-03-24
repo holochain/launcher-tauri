@@ -13,17 +13,15 @@ use tauri::RunEvent;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
 
+mod caddy;
 mod commands;
 mod file_system;
-mod holochain;
 mod launcher;
 mod menu;
-mod running_apps;
 mod running_state;
 mod setup;
 mod state;
 mod system_tray;
-mod utils;
 
 use crate::commands::{
   enable_app::{disable_app, enable_app},

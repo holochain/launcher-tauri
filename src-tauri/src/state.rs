@@ -1,11 +1,8 @@
 use futures::lock::Mutex;
 use std::{collections::HashMap, sync::Arc};
 
+use crate::{managers::launcher::LauncherManager, running_state::RunningState};
 use holochain_versions::HolochainVersion;
-use crate::{
-  managers::launcher::LauncherManager,
-  running_state::RunningState,
-};
 
 pub type LauncherState = RunningState<Arc<Mutex<LauncherManager>>, RunLauncherError>;
 
@@ -18,7 +15,6 @@ pub type LauncherStateInfo = RunningState<
   HashMap<HolochainVersion, RunningState<HolochainStateInfo, RunHolochainError>>,
   RunLauncherError,
 >;
-
 
 impl LauncherState {
   pub fn get_launcher_manager(&self) -> Result<&Arc<Mutex<LauncherManager>>, String> {

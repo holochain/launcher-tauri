@@ -1,11 +1,9 @@
-use holochain_versions::HolochainVersion;
-use std::{collections::HashMap, path::PathBuf};
-use tauri::{
-  api::process::{Command, CommandEvent},
-  async_runtime::Receiver,
-};
+use std::path::PathBuf;
+use tauri::api::process::{Command, CommandEvent};
 
-pub fn launch_caddy_process(caddyfile_path: PathBuf) -> Result<Receiver<CommandEvent>, String> {
+use super::manager::RunningWebApps;
+
+pub fn launch_caddy_process(caddyfile_path: PathBuf) -> Result<(), String> {
   let (mut caddy_rx, _) = Command::new_sidecar("caddy")
     .or(Err(String::from("Can't find caddy binary")))?
     .args(&[
@@ -16,10 +14,22 @@ pub fn launch_caddy_process(caddyfile_path: PathBuf) -> Result<Receiver<CommandE
     .spawn()
     .map_err(|err| format!("Error running caddy {:?}", err))?;
 
-  Ok(caddy_rx)
+  tauri::async_runtime::spawn(async move {
+    // read events such as stdout
+    while let Some(event) = caddy_rx.recv().await {
+      match event.clone() {
+        CommandEvent::Stdout(line) => log::info!("[CADDY] {}", line),
+        CommandEvent::Stderr(line) => log::info!("[CADDY] {}", line),
+        _ => log::info!("[CADDY] {:?}", event),
+      }
+    }
+  });
+  log::info!("Launched caddy");
+
+  Ok(())
 }
 
-pub fn reload_caddy(caddyfile_path: PathBuf) -> Result<Receiver<CommandEvent>, String> {
+pub fn reload_caddy(caddyfile_path: PathBuf) -> Result<(), String> {
   Command::new_sidecar("caddy")
     .or(Err(String::from("Can't find caddy binary")))?
     .args(&[
@@ -29,19 +39,17 @@ pub fn reload_caddy(caddyfile_path: PathBuf) -> Result<Receiver<CommandEvent>, S
     ])
     .spawn()
     .map_err(|err| format!("Error reloading caddy {:?}", err))?;
+
+  Ok(())
 }
 
 pub const LAUNCHER_ENV_URL: &str = ".launcher-env.json";
 
-pub struct HolochainWebAppsConfig {
-  admin_port: u16,
-  app_interface_port: u16,
-  running_apps: RunningApps,
-}
-
 pub fn build_caddyfile_contents(
   caddy_admin_port: u16,
-  web_apps_config: HashMap<HolochainVersion, HolochainWebAppsConfig>,
+  conductor_admin_port: u16,
+  conductor_app_interface_port: u16,
+  web_apps_config: RunningWebApps,
 ) -> String {
   let mut caddyfile = format!(
     r#"{{
@@ -52,20 +60,28 @@ pub fn build_caddyfile_contents(
   );
 
   for (holochain_version, holochain_web_apps) in web_apps_config {
-    let admin_port = holochain_web_apps.admin_port;
-    let app_interface_port = holochain_web_apps.app_interface_port;
+    let admin_port = conductor_admin_port;
+    let app_interface_port = conductor_app_interface_port;
 
-    for (app_id, app_config) in holochain_web_apps.web_apps_config {
-      let app_ui_port = app_config.app_ui_port;
-      let web_app_files_path = app_config.web_app_files_path;
+    for (holochain_version, web_app_config) in web_apps_config {
+      for (app_id, config) in web_app_config {
+        let app_ui_port = config.app_ui_port;
+        let web_app_files_path = config.path_to_web_app;
 
-      caddyfile = format!(
+        caddyfile = format!(
           "{}
 
 {}",
           caddyfile,
-          caddyfile_config_for_app(admin_port, app_interface_port, &app_id, app_ui_port, web_app_files_path);
-      );
+          caddyfile_config_for_app(
+            admin_port,
+            app_interface_port,
+            &app_id,
+            app_ui_port,
+            web_app_files_path
+          )
+        );
+      }
     }
   }
 

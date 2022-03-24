@@ -9,38 +9,38 @@ use crate::versions::HolochainVersion;
 
 #[async_trait]
 pub trait HolochainManager {
-    /// Launch the conductor
-    /// If there already was an instantiated conductor in the given paths, use those folders
-    /// If not, create the necessary files and folder to start afresh
-    async fn launch(
-        log_level: log::Level,
-        admin_port: u16,
-        conductor_config_path: PathBuf,
-        environment_path: PathBuf,
-        keystore_path: PathBuf,
-    ) -> Result<Self, LaunchHolochainError>
-    where
-        Self: Sized;
+  /// Launch the conductor
+  /// If there already was an instantiated conductor in the given paths, use those folders
+  /// If not, create the necessary files and folder to start afresh
+  async fn launch(
+    log_level: log::Level,
+    admin_port: u16,
+    conductor_config_path: PathBuf,
+    environment_path: PathBuf,
+    keystore_path: PathBuf,
+  ) -> Result<Self, LaunchHolochainError>
+  where
+    Self: Sized;
 
-    fn holochain_version() -> HolochainVersion
-    where
-        Self: Sized;
+  fn holochain_version() -> HolochainVersion
+  where
+    Self: Sized;
 
-    async fn get_app_port(&mut self) -> Result<u16, String>;
+  async fn get_app_interface_port(&mut self) -> Result<u16, String>;
 
-    async fn install_app(
-        &mut self,
-        app_id: String,
-        app_bundle: AppBundle,
-        uid: Option<String>,
-        membrane_proofs: HashMap<String, SerializedBytes>,
-    ) -> Result<(), String>;
+  async fn install_app(
+    &mut self,
+    app_id: String,
+    app_bundle: AppBundle,
+    uid: Option<String>,
+    membrane_proofs: HashMap<String, SerializedBytes>,
+  ) -> Result<(), String>;
 
-    async fn uninstall_app(&mut self, app_id: String) -> Result<(), String>;
+  async fn uninstall_app(&mut self, app_id: String) -> Result<(), String>;
 
-    async fn enable_app(&mut self, app_id: String) -> Result<(), String>;
+  async fn enable_app(&mut self, app_id: String) -> Result<(), String>;
 
-    async fn disable_app(&mut self, app_id: String) -> Result<(), String>;
+  async fn disable_app(&mut self, app_id: String) -> Result<(), String>;
 
-    async fn list_running_apps(&mut self) -> Result<Vec<String>, String>;
+  async fn list_running_apps(&mut self) -> Result<Vec<String>, String>;
 }
