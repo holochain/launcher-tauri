@@ -1561,6 +1561,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "event-emitter-rs"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7dccdd0a59457ba353cc44c26d431ca5089f2cf93035c780a1b3f2814a017ebd"
+dependencies = [
+ "bincode",
+ "lazy_static",
+ "serde",
+ "uuid",
+]
+
+[[package]]
 name = "event-listener"
 version = "2.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2705,7 +2717,9 @@ name = "holochain_web_app_manager"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "event-emitter-rs",
  "holochain_manager",
+ "lair_keystore_manager",
  "log",
  "portpicker",
  "serde",

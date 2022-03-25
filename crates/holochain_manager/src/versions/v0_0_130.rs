@@ -1,4 +1,4 @@
-use lair_keystore_manager::{v0_0_9::LairKeystoreManagerV0_0_9, LairKeystoreManager};
+use lair_keystore_manager::{versions::v0_0_9::LairKeystoreManagerV0_0_9, LairKeystoreManager};
 use portpicker;
 use std::collections::HashMap;
 use std::fs;
@@ -15,7 +15,10 @@ use holochain_types_0_0_130::prelude::{AppBundle, AppBundleSource, SerializedByt
 
 use super::{launch::launch_holochain_process, utils::create_dir_if_necessary, HolochainVersion};
 
-use crate::{error::LaunchHolochainError, holochain_manager::HolochainManager};
+use crate::{
+  app_manager::AppManager,
+  config::LaunchHolochainConfig, error::LaunchHolochainError, holochain_manager::HolochainManager,
+};
 
 pub struct HolochainManagerV0_0_130 {
   ws: AdminWebsocket,
@@ -27,42 +30,68 @@ impl HolochainManager for HolochainManagerV0_0_130 {
     HolochainVersion::V0_0_130
   }
 
-  async fn launch(
-    log_level: log::Level,
-    admin_port: u16,
-    conductor_config_path: PathBuf,
-    environment_path: PathBuf,
-    keystore_path: PathBuf,
-  ) -> Result<Self, LaunchHolochainError> {
-    create_dir_if_necessary(&conductor_config_path);
-    create_dir_if_necessary(&environment_path);
-    create_dir_if_necessary(&keystore_path);
+  async fn launch(config: LaunchHolochainConfig) -> Result<Self, LaunchHolochainError> {
+    create_dir_if_necessary(&config.conductor_config_path);
+    create_dir_if_necessary(&config.environment_path);
+    create_dir_if_necessary(&config.keystore_path);
 
     let new_conductor_config: ConductorConfig = conductor_config(
-      admin_port,
-      conductor_config_path.clone(),
-      environment_path,
-      keystore_path.clone(),
+      config.admin_port,
+      config.conductor_config_path.clone(),
+      config.environment_path,
+      config.keystore_path.clone(),
     );
 
     let serde_config = serde_yaml::to_string(&new_conductor_config)
       .expect("Could not serialize initial conductor config");
 
-    fs::write(conductor_config_path.clone(), serde_config)
+    fs::write(config.conductor_config_path.clone(), serde_config)
       .expect("Could not write conductor config");
 
-    LairKeystoreManagerV0_0_9::launch(log_level, keystore_path)
+    LairKeystoreManagerV0_0_9::launch(config.log_level, config.keystore_path)
       .await
-      .map_err(|err| LaunchHolochainError::KeystoreError(err))?;
+      .map_err(|err| LaunchHolochainError::LaunchKeystoreError(err))?;
 
-    launch_holochain_process(log_level, Self::holochain_version(), conductor_config_path)?;
+    launch_holochain_process(
+      config.log_level,
+      Self::holochain_version(),
+      config.conductor_config_path,
+    )
+    .map_err(|err| LaunchHolochainError::LaunchHolochainError(err))?;
 
-    let ws = AdminWebsocket::connect(format!("ws://localhost:{}", admin_port))
+    let ws = AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
       .await
       .map_err(|err| LaunchHolochainError::CouldNotConnectToConductor(format!("{}", err)))?;
 
     Ok(HolochainManagerV0_0_130 { ws })
   }
+
+  async fn get_app_interface_port(&mut self) -> Result<u16, String> {
+    let app_interfaces = self
+      .ws
+      .list_app_interfaces()
+      .await
+      .or(Err(String::from("Could not list app interfaces")))?;
+
+    if app_interfaces.len() > 0 {
+      return Ok(app_interfaces[0]);
+    }
+
+    let free_port = portpicker::pick_unused_port().expect("No ports free");
+
+    self
+      .ws
+      .attach_app_interface(free_port)
+      .await
+      .or(Err(String::from("Could not attach app interface")))?;
+
+    Ok(free_port)
+  }
+}
+
+#[async_trait]
+impl AppManager for HolochainManagerV0_0_130 {
+  type RunningApps = Vec<String>;
 
   async fn install_app(
     &mut self,
@@ -129,7 +158,7 @@ impl HolochainManager for HolochainManagerV0_0_130 {
     Ok(())
   }
 
-  async fn list_running_apps(&mut self) -> Result<Vec<String>, String> {
+  async fn get_running_apps(&mut self) -> Result<Vec<String>, String> {
     let active_apps = self
       .ws
       .list_apps(Some(AppStatusFilter::Running))
@@ -144,27 +173,6 @@ impl HolochainManager for HolochainManagerV0_0_130 {
     Ok(active_app_ids)
   }
 
-  async fn get_app_interface_port(&mut self) -> Result<u16, String> {
-    let app_interfaces = self
-      .ws
-      .list_app_interfaces()
-      .await
-      .or(Err(String::from("Could not list app interfaces")))?;
-
-    if app_interfaces.len() > 0 {
-      return Ok(app_interfaces[0]);
-    }
-
-    let free_port = portpicker::pick_unused_port().expect("No ports free");
-
-    self
-      .ws
-      .attach_app_interface(free_port)
-      .await
-      .or(Err(String::from("Could not attach app interface")))?;
-
-    Ok(free_port)
-  }
 }
 
 fn conductor_config(

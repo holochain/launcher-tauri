@@ -3,21 +3,21 @@ use std::path::PathBuf;
 
 use tauri::api::process::{Command, CommandEvent};
 
-use crate::error::LaunchLairKeystoreError;
+use crate::error::LaunchTauriSidecarError;
 
 pub fn launch_lair_keystore_process(
     log_level: log::Level,
     keystore_data_path: PathBuf,
-) -> Result<(), LaunchLairKeystoreError> {
+) -> Result<(), LaunchTauriSidecarError> {
     let mut envs = HashMap::new();
     envs.insert(String::from("RUST_LOG"), String::from(log_level.as_str()));
 
     let (mut lair_rx, _) = Command::new_sidecar("lair-keystore")
-        .or(Err(LaunchLairKeystoreError::BinaryNotFound))?
+        .or(Err(LaunchTauriSidecarError::BinaryNotFound))?
         .args(&["-d", keystore_data_path.into_os_string().to_str().unwrap()])
         .envs(envs.clone())
         .spawn()
-        .map_err(|err| LaunchLairKeystoreError::FailedToExecute(format!("{:?}", err)))?;
+        .map_err(|err| LaunchTauriSidecarError::FailedToExecute(format!("{:?}", err)))?;
 
     tauri::async_runtime::spawn(async move {
         // read events such as stdout

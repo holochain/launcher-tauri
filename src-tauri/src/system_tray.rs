@@ -1,9 +1,13 @@
+use std::{collections::HashMap, convert::TryFrom};
+
+use holochain_manager::versions::HolochainVersion;
+use holochain_web_app_manager::running_apps::RunningApps;
 use tauri::{
   window::WindowBuilder, AppHandle, CustomMenuItem, Manager, SystemTrayMenu, SystemTrayMenuItem,
   WindowUrl, Wry,
 };
 
-use crate::{launcher::manager::LauncherManager, state::LauncherState};
+use crate::launcher::{manager::LauncherManager, state::LauncherState};
 
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   match event_id.as_str() {
@@ -30,17 +34,15 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
         log::info!("Creating admin window {:?}", r);
       }
     }
-    app_id => {
+    menu_item_id => {
+      let (version, app_id) =
+        expand_version_and_app_id(String::from(menu_item_id)).expect("Bad menu item?");
+
       match app.state::<LauncherState>().get_launcher_manager() {
         Ok(manager) => {
           tauri::async_runtime::block_on(async move {
-            if let Ok(holochain_manager) = manager.lock().await.get_holochain_manager() {
-              if let Err(err) = holochain_manager
-                .ui_manager
-                .open_app(&String::from(app_id), app)
-              {
-                log::error!("Error opening app: {:?}", err);
-              }
+            if let Err(err) = manager.lock().await.open_app(version, &app_id, app) {
+              log::error!("Error opening app: {:?}", err);
             }
           });
         }
@@ -63,14 +65,40 @@ pub fn builtin_system_tray() -> SystemTrayMenu {
     .add_item(quit)
 }
 
-pub fn update_system_tray(app_handle: &AppHandle<Wry>, running_apps: &Vec<String>) -> () {
+pub fn update_system_tray(
+  app_handle: &AppHandle<Wry>,
+  running_apps_by_version: &HashMap<HolochainVersion, RunningApps>,
+) -> () {
   let mut menu = builtin_system_tray();
 
-  for app in running_apps {
-    menu = menu.add_item(CustomMenuItem::new(app.clone(), app.clone()));
+  for (version, running_apps) in running_apps_by_version {
+    for (app_id, _) in running_apps {
+      menu = menu.add_item(CustomMenuItem::new(
+        collapse_version_and_app_id(version.clone(), app_id.clone()),
+        app_id.clone(),
+      ));
+    }
+    menu = menu.add_native_item(SystemTrayMenuItem::Separator);
   }
 
   if let Err(err) = app_handle.tray_handle().set_menu(menu) {
     log::error!("Error setting the system tray: {:?}", err);
   }
+}
+
+pub fn collapse_version_and_app_id(holochain_version: HolochainVersion, app_id: String) -> String {
+  let version_string: String = holochain_version.into();
+  format!("{}:{}", version_string, app_id)
+}
+
+pub fn expand_version_and_app_id(
+  menu_item_id: String,
+) -> Result<(HolochainVersion, String), String> {
+  let components: Vec<&str> = menu_item_id.split(":").collect();
+
+  let version = HolochainVersion::try_from(String::from(components[0]))?;
+
+  let app_id = components[1..].join(":");
+
+  Ok((version, app_id))
 }

@@ -1,14 +1,18 @@
-use crate::holochain_version::holochain_types_latest::{
-  prelude::{SerializedBytes, UnsafeBytes},
-  web_app::WebAppBundle,
+use holochain_manager::versions::{
+  holochain_types_latest::{
+    prelude::{SerializedBytes, UnsafeBytes},
+    web_app::WebAppBundle,
+  },
+  HolochainVersion,
 };
-use crate::state::LauncherState;
-
 use std::{collections::HashMap, fs};
+
+use crate::launcher::state::LauncherState;
 
 #[tauri::command]
 pub async fn install_app(
   state: tauri::State<'_, LauncherState>,
+  holochain_version: HolochainVersion,
   app_id: String,
   web_app_bundle_path: String,
   uid: Option<String>,
@@ -30,9 +34,10 @@ pub async fn install_app(
   }
 
   let mut manager = state.get_launcher_manager()?.lock().await;
+
   manager
-    .get_holochain_manager()?
-    .install_app(
+    .get_web_happ_manager(holochain_version)?
+    .install_web_app(
       app_id.clone(),
       web_app_bundle,
       uid,

@@ -1,19 +1,19 @@
+use holochain_manager::versions::HolochainVersion;
 use std::io;
 
-use crate::state::LauncherState;
+use crate::launcher::state::LauncherState;
 
 #[tauri::command]
 pub async fn open_app_ui(
   state: tauri::State<'_, LauncherState>,
   app_handle: tauri::AppHandle,
+  holochain_version: HolochainVersion,
   app_id: String,
 ) -> Result<(), String> {
-  let mut manager = state.get_launcher_manager()?.lock().await;
+  let manager = state.get_launcher_manager()?.lock().await;
 
   manager
-    .get_holochain_manager()?
-    .ui_manager
-    .open_app(&app_id, &app_handle)
+    .open_app(holochain_version, &app_id, &app_handle)
     .map_err(|err| format!("Error opening app: {}", err))?;
 
   log::info!("Opening app {}", app_id.clone(),);

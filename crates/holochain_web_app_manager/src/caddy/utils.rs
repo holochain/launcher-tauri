@@ -1,18 +1,19 @@
+use lair_keystore_manager::error::LaunchTauriSidecarError;
 use std::path::PathBuf;
 use tauri::api::process::{Command, CommandEvent};
 
-use super::manager::RunningWebApps;
+use crate::running_apps::{AppUiInfo, RunningApps};
 
-pub fn launch_caddy_process(caddyfile_path: PathBuf) -> Result<(), String> {
+pub fn launch_caddy_process(caddyfile_path: PathBuf) -> Result<(), LaunchTauriSidecarError> {
   let (mut caddy_rx, _) = Command::new_sidecar("caddy")
-    .or(Err(String::from("Can't find caddy binary")))?
+    .or(Err(LaunchTauriSidecarError::BinaryNotFound))?
     .args(&[
       "run",
       "--config",
       caddyfile_path.as_os_str().to_str().unwrap(),
     ])
     .spawn()
-    .map_err(|err| format!("Error running caddy {:?}", err))?;
+    .map_err(|err| LaunchTauriSidecarError::FailedToExecute(format!("{:?}", err)))?;
 
   tauri::async_runtime::spawn(async move {
     // read events such as stdout
@@ -29,16 +30,16 @@ pub fn launch_caddy_process(caddyfile_path: PathBuf) -> Result<(), String> {
   Ok(())
 }
 
-pub fn reload_caddy(caddyfile_path: PathBuf) -> Result<(), String> {
+pub fn reload_caddy(caddyfile_path: PathBuf) -> Result<(), LaunchTauriSidecarError> {
   Command::new_sidecar("caddy")
-    .or(Err(String::from("Can't find caddy binary")))?
+    .or(Err(LaunchTauriSidecarError::BinaryNotFound))?
     .args(&[
       "reload",
       "--config",
       caddyfile_path.as_os_str().to_str().unwrap(),
     ])
     .spawn()
-    .map_err(|err| format!("Error reloading caddy {:?}", err))?;
+    .map_err(|err| LaunchTauriSidecarError::FailedToExecute(format!("{:?}", err)))?;
 
   Ok(())
 }
@@ -49,7 +50,7 @@ pub fn build_caddyfile_contents(
   caddy_admin_port: u16,
   conductor_admin_port: u16,
   conductor_app_interface_port: u16,
-  web_apps_config: RunningWebApps,
+  running_apps: &RunningApps,
 ) -> String {
   let mut caddyfile = format!(
     r#"{{
@@ -59,29 +60,24 @@ pub fn build_caddyfile_contents(
     caddy_admin_port
   );
 
-  for (holochain_version, holochain_web_apps) in web_apps_config {
-    let admin_port = conductor_admin_port;
-    let app_interface_port = conductor_app_interface_port;
+  for (app_id, app_ui_info) in running_apps {
+    if let AppUiInfo::WebApp(web_app_info) = app_ui_info {
+      let app_ui_port = web_app_info.app_ui_port;
+      let web_app_files_path = web_app_info.path_to_web_app.clone();
 
-    for (holochain_version, web_app_config) in web_apps_config {
-      for (app_id, config) in web_app_config {
-        let app_ui_port = config.app_ui_port;
-        let web_app_files_path = config.path_to_web_app;
+      caddyfile = format!(
+        "{}
 
-        caddyfile = format!(
-          "{}
-
-{}",
-          caddyfile,
-          caddyfile_config_for_app(
-            admin_port,
-            app_interface_port,
-            &app_id,
-            app_ui_port,
-            web_app_files_path
-          )
-        );
-      }
+        {}",
+        caddyfile,
+        caddyfile_config_for_app(
+          conductor_admin_port,
+          conductor_app_interface_port,
+          &app_id,
+          app_ui_port,
+          web_app_files_path
+        )
+      );
     }
   }
 
@@ -89,8 +85,8 @@ pub fn build_caddyfile_contents(
 }
 
 fn caddyfile_config_for_app(
-  admin_port: u16,
-  app_interface_port: u16,
+  conductor_admin_port: u16,
+  conductor_app_interface_port: u16,
   app_id: &String,
   app_ui_port: u16,
   web_app_files_path: PathBuf,
@@ -119,8 +115,8 @@ fn caddyfile_config_for_app(
 "#,
     app_ui_port,
     LAUNCHER_ENV_URL,
-    app_interface_port,
-    admin_port,
+    conductor_app_interface_port,
+    conductor_admin_port,
     app_id.clone(),
     web_app_files_path.into_os_string().to_str().unwrap(),
   )

@@ -48,7 +48,7 @@ pub fn data_path_for_holochain_version(holochain_version: HolochainVersion) -> P
   root_data_path().join(version)
 }
 
-fn root_lair_path() -> PathBuf {
+pub fn root_lair_path() -> PathBuf {
   data_dir().expect("Could not get config dir").join("lair")
 }
 

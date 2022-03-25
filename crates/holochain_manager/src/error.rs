@@ -1,8 +1,9 @@
-use lair_keystore_manager::error::LaunchLairKeystoreError;
+use lair_keystore_manager::error::LaunchTauriSidecarError;
+use serde::{Deserialize, Serialize};
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum LaunchHolochainError {
-    BinaryNotFound,
-    FailedToExecute(String),
-    CouldNotConnectToConductor(String),
-    KeystoreError(LaunchLairKeystoreError),
+  LaunchHolochainError(LaunchTauriSidecarError),
+  CouldNotConnectToConductor(String),
+  LaunchKeystoreError(LaunchTauriSidecarError),
 }

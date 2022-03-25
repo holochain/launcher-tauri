@@ -4,4 +4,4 @@ pub mod install_app;
 pub mod open_app;
 pub mod uninstall_app;
 pub mod factory_reset;
-pub mod get_connection_status;
+pub mod get_state_info;

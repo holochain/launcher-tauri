@@ -1,11 +1,14 @@
 use std::path::PathBuf;
 
-use crate::{LairKeystoreVersion, error::LaunchLairKeystoreError};
+use crate::{error::LaunchTauriSidecarError, versions::LairKeystoreVersion};
 use async_trait::async_trait;
 
 #[async_trait]
 pub trait LairKeystoreManager: Sized {
-    fn lair_keystore_version() -> LairKeystoreVersion;
+  fn lair_keystore_version() -> LairKeystoreVersion;
 
-    async fn launch(log_level: log::Level, keystore_path: PathBuf) -> Result<Self, LaunchLairKeystoreError>;
+  async fn launch(
+    log_level: log::Level,
+    keystore_path: PathBuf,
+  ) -> Result<Self, LaunchTauriSidecarError>;
 }

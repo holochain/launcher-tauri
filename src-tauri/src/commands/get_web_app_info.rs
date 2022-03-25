@@ -1,4 +1,4 @@
-use crate::holochain_version::holochain_types_latest::{
+use holochain_manager::versions::holochain_types_latest::{
   prelude::{AppRoleManifest, CellProvisioning},
   web_app::WebAppBundle,
 };

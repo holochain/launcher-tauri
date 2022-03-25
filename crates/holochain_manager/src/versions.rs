@@ -2,14 +2,12 @@ pub mod launch;
 pub mod utils;
 pub mod v0_0_130;
 
-use std::path::PathBuf;
-
 pub use holochain_types_0_0_130 as holochain_types_latest;
-use lair_keystore_manager::LairKeystoreVersion;
+use lair_keystore_manager::versions::LairKeystoreVersion;
 pub use mr_bundle_0_0_9 as mr_bundle_latest;
 use serde::{Deserialize, Serialize};
 
-use crate::{error::LaunchHolochainError, HolochainManager};
+use crate::{config::LaunchHolochainConfig, error::LaunchHolochainError, HolochainManager};
 
 use self::v0_0_130::HolochainManagerV0_0_130;
 
@@ -52,24 +50,21 @@ impl Into<String> for HolochainVersion {
   }
 }
 
+impl TryFrom<String> for HolochainVersion {
+  type Error = String;
+  fn try_from(s: String) -> Result<HolochainVersion, String> {
+    match s.as_str() {
+      "v0.0.130" => Ok(HolochainVersion::V0_0_130),
+      _ => Err(format!("Bad Holochain version")),
+    }
+  }
+}
+
 pub async fn launch_holochain(
   holochain_version: HolochainVersion,
-  log_level: log::Level,
-  admin_port: u16,
-  conductor_config_path: PathBuf,
-  environment_path: PathBuf,
-  keystore_path: PathBuf,
+  config: LaunchHolochainConfig,
 ) -> Result<Box<dyn HolochainManager>, LaunchHolochainError> {
   match holochain_version {
-    HolochainVersion::V0_0_130 => Ok(Box::new(
-      HolochainManagerV0_0_130::launch(
-        log_level,
-        admin_port,
-        conductor_config_path,
-        environment_path,
-        keystore_path,
-      )
-      .await?,
-    )),
+    HolochainVersion::V0_0_130 => Ok(Box::new(HolochainManagerV0_0_130::launch(config).await?)),
   }
 }

@@ -3,6 +3,8 @@
   windows_subsystem = "windows"
 )]
 use futures::lock::Mutex;
+use launcher::config::LauncherConfig;
+use launcher::error::RunLauncherError;
 use std::sync::Arc;
 
 use system_tray::builtin_system_tray;
@@ -13,30 +15,28 @@ use tauri::RunEvent;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
 
-mod caddy;
 mod commands;
 mod file_system;
 mod launcher;
 mod menu;
 mod running_state;
 mod setup;
-mod state;
 mod system_tray;
 
 use crate::commands::{
   enable_app::{disable_app, enable_app},
   factory_reset::execute_factory_reset,
-  get_connection_status::get_connection_status,
+  get_state_info::get_state_info,
   get_web_app_info::get_web_app_info,
   install_app::install_app,
   open_app::open_app_ui,
   uninstall_app::uninstall_app,
 };
 use crate::launcher::manager::LauncherManager;
+use crate::launcher::state::LauncherState;
 use crate::menu::build_menu;
 use crate::menu::handle_menu_event;
 use crate::setup::logs::setup_logs;
-use crate::state::LauncherState;
 use crate::system_tray::handle_system_tray_event;
 
 fn main() {
@@ -49,8 +49,10 @@ fn main() {
   // If holochain is already running, only display a small notice window
   if already_running {
     let build_result = tauri::Builder::default()
-      .manage(LauncherState::AnotherInstanceIsAlreadyRunning)
-      .invoke_handler(tauri::generate_handler![get_connection_status])
+      .manage(LauncherState::Error(
+        RunLauncherError::AnotherInstanceIsAlreadyRunning,
+      ))
+      .invoke_handler(tauri::generate_handler![get_state_info])
       .run(tauri::generate_context!());
     if let Err(err) = build_result {
       log::error!("Error building the window: {}", err);
@@ -58,23 +60,7 @@ fn main() {
     return ();
   }
 
-  let manager_launch =
-    tauri::async_runtime::block_on(async move { LauncherManager::launch().await });
-
-  let launcher_state = match manager_launch {
-    Ok(launcher_manager) => {
-      log::info!("Launch setup successful");
-      LauncherState::Running(Arc::new(Mutex::new(launcher_manager)))
-    }
-    Err(error) => {
-      kill_children();
-      log::error!("There was an error launching holochain: {:?}", error);
-      LauncherState::ErrorLaunching { error }
-    }
-  };
-
   let builder_result = tauri::Builder::default()
-    .manage(launcher_state)
     .menu(build_menu())
     .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
     .system_tray(SystemTray::new().with_menu(builtin_system_tray()))
@@ -83,7 +69,7 @@ fn main() {
       _ => {}
     })
     .invoke_handler(tauri::generate_handler![
-      get_connection_status,
+      get_state_info,
       open_app_ui,
       install_app,
       enable_app,
@@ -94,21 +80,33 @@ fn main() {
       setup::logs::log,
     ])
     .setup(|app| {
-      let launcher_state: &LauncherState = &app.state();
+      let mut manager_launch = tauri::async_runtime::block_on(async move {
+        LauncherManager::launch(
+          LauncherConfig {
+            log_level: log::Level::Info,
+          },
+          &app.handle(),
+        )
+        .await
+      });
 
-      match launcher_state.get_launcher_manager() {
-        Ok(m) => {
-          tauri::async_runtime::block_on(async {
-            let mut launcher_manager = m.lock().await;
-            if let Err(err) = launcher_manager.on_apps_changed(&app.handle()).await {
-              log::error!("Error setting up the apps: {:?}", err);
-            }
+      let launcher_state = match manager_launch {
+        Ok(mut launcher_manager) => {
+          let id = app.listen_global("running_apps_changed", |event| {
+            launcher_manager.on_apps_changed(&app.handle());
           });
+
+          log::info!("Launch setup successful");
+          LauncherState::Running(Arc::new(Mutex::new(launcher_manager)))
         }
-        Err(e) => {
-          log::error!("Error opening app: {:?}", e);
+        Err(error) => {
+          kill_children();
+          log::error!("There was an error launching holochain: {:?}", error);
+          LauncherState::Error(RunLauncherError::ErrorLaunching(error))
         }
       };
+
+      app.manage(launcher_state);
 
       Ok(())
     })
