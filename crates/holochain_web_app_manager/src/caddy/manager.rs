@@ -1,9 +1,9 @@
 use std::{fs, path::PathBuf};
 
-use holochain_manager::versions::utils::create_dir_if_necessary;
+use lair_keystore_manager::utils::create_dir_if_necessary;
 use lair_keystore_manager::error::LaunchTauriSidecarError;
 
-use crate::running_apps::RunningApps;
+use crate::installed_web_app_info::InstalledWebAppInfo;
 
 use super::utils::{build_caddyfile_contents, launch_caddy_process, reload_caddy};
 pub struct CaddyManager {
@@ -35,13 +35,13 @@ impl CaddyManager {
 
   pub fn update_running_apps(
     &mut self,
-    running_apps: &RunningApps,
+    installed_apps: &Vec<InstalledWebAppInfo>,
   ) -> Result<(), LaunchTauriSidecarError> {
     let new_caddyfile = build_caddyfile_contents(
       self.caddy_admin_port,
       self.conductor_admin_port,
       self.conductor_app_interface_port,
-      running_apps,
+      installed_apps,
     );
 
     let caddyfile_path = caddyfile_path(self.environment_path.clone());

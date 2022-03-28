@@ -33,7 +33,7 @@ pub async fn execute_factory_reset(
     LauncherConfig {
       log_level: log::Level::Info,
     },
-    &app_handle,
+    app_handle,
   )
   .await?;
 

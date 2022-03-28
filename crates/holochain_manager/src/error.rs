@@ -5,5 +5,4 @@ use serde::{Deserialize, Serialize};
 pub enum LaunchHolochainError {
   LaunchHolochainError(LaunchTauriSidecarError),
   CouldNotConnectToConductor(String),
-  LaunchKeystoreError(LaunchTauriSidecarError),
 }

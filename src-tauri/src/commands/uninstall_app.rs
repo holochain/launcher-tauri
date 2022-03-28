@@ -16,7 +16,7 @@ pub async fn uninstall_app(
     .uninstall_app(app_id)
     .await?;
 
-  manager.on_apps_changed(&app_handle).await?;
+  manager.on_apps_changed().await?;
 
   Ok(())
 }

@@ -2,7 +2,7 @@ use lair_keystore_manager::error::LaunchTauriSidecarError;
 use std::path::PathBuf;
 use tauri::api::process::{Command, CommandEvent};
 
-use crate::running_apps::{AppUiInfo, RunningApps};
+use crate::installed_web_app_info::{InstalledWebAppInfo, WebUiInfo};
 
 pub fn launch_caddy_process(caddyfile_path: PathBuf) -> Result<(), LaunchTauriSidecarError> {
   let (mut caddy_rx, _) = Command::new_sidecar("caddy")
@@ -50,7 +50,7 @@ pub fn build_caddyfile_contents(
   caddy_admin_port: u16,
   conductor_admin_port: u16,
   conductor_app_interface_port: u16,
-  running_apps: &RunningApps,
+  installed_apps: &Vec<InstalledWebAppInfo>,
 ) -> String {
   let mut caddyfile = format!(
     r#"{{
@@ -60,11 +60,12 @@ pub fn build_caddyfile_contents(
     caddy_admin_port
   );
 
-  for (app_id, app_ui_info) in running_apps {
-    if let AppUiInfo::WebApp(web_app_info) = app_ui_info {
-      let app_ui_port = web_app_info.app_ui_port;
-      let web_app_files_path = web_app_info.path_to_web_app.clone();
-
+  for installed_web_app_info in installed_apps {
+    if let WebUiInfo::WebApp {
+      path_to_web_app,
+      app_ui_port,
+    } = installed_web_app_info.web_ui_info.clone()
+    {
       caddyfile = format!(
         "{}
 
@@ -73,9 +74,9 @@ pub fn build_caddyfile_contents(
         caddyfile_config_for_app(
           conductor_admin_port,
           conductor_app_interface_port,
-          &app_id,
+          &installed_web_app_info.installed_app_info.installed_app_id,
           app_ui_port,
-          web_app_files_path
+          path_to_web_app
         )
       );
     }

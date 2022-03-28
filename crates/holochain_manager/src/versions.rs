@@ -1,7 +1,7 @@
 pub mod launch;
-pub mod utils;
 pub mod v0_0_130;
 
+pub use holochain_conductor_api_0_0_130 as holochain_conductor_api_latest;
 pub use holochain_types_0_0_130 as holochain_types_latest;
 use lair_keystore_manager::versions::LairKeystoreVersion;
 pub use mr_bundle_0_0_9 as mr_bundle_latest;
@@ -29,7 +29,7 @@ impl HolochainVersion {
 
   pub fn lair_keystore_version(&self) -> LairKeystoreVersion {
     match self {
-      HolochainVersion::V0_0_130 => LairKeystoreVersion::V0_0_9,
+      HolochainVersion::V0_0_130 => LairKeystoreVersion::V0_1_0,
     }
   }
 

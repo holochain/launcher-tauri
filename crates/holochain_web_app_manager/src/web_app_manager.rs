@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use event_emitter_rs::EventEmitter;
 use holochain_manager::{
   app_manager::AppManager,
   config::LaunchHolochainConfig,
@@ -10,36 +9,38 @@ use holochain_manager::{
     },
     launch_holochain,
     mr_bundle_latest::ResourceBytes,
-    utils::create_dir_if_necessary,
     HolochainVersion,
   },
   HolochainManager,
 };
+use lair_keystore_manager::utils::create_dir_if_necessary;
 use std::{
   collections::HashMap,
   fs::{self, File},
   path::{Path, PathBuf},
 };
+use tauri::{AppHandle, Manager};
 
 use crate::{
   caddy::manager::CaddyManager,
   error::LaunchWebAppManagerError,
-  running_apps::{AppUiInfo, RunningApps},
+  installed_web_app_info::{InstalledWebAppInfo, WebUiInfo},
+  utils::unzip_file,
 };
-use crate::{running_apps::WebUiInfo, utils::unzip_file};
 
 pub struct WebAppManager {
   environment_path: PathBuf,
   holochain_manager: Box<dyn HolochainManager>,
   caddy_manager: CaddyManager,
   allocated_ports: HashMap<String, u16>,
-  on_running_apps_changed_event_emitter: EventEmitter,
+  app_handle: AppHandle,
 }
 
 impl WebAppManager {
   pub async fn launch(
     version: HolochainVersion,
     config: LaunchHolochainConfig,
+    app_handle: AppHandle,
   ) -> Result<Self, LaunchWebAppManagerError> {
     let environment_path = config.environment_path.clone();
 
@@ -75,7 +76,7 @@ impl WebAppManager {
       environment_path,
       caddy_manager,
       allocated_ports: HashMap::new(),
-      on_running_apps_changed_event_emitter: EventEmitter::new(),
+      app_handle,
     })
   }
 
@@ -164,33 +165,45 @@ impl WebAppManager {
     self.allocated_ports.remove(&app_id);
   }
 
-  pub fn on_running_apps_changed<F>(&mut self, callback: F) -> ()
-  where
-    F: Fn(RunningApps) + 'static + Sync + Send,
-  {
-    self
-      .on_running_apps_changed_event_emitter
-      .on("apps_changed", callback);
-  }
-
   async fn execute_on_running_apps_changed(&mut self) -> Result<(), String> {
-    let running_apps = self.get_running_apps().await?;
+    let installed_apps = self.list_apps().await?;
 
     self
       .caddy_manager
-      .update_running_apps(&running_apps)
+      .update_running_apps(&installed_apps)
       .map_err(|err| format!("Error reloading caddy {:?}", err))?;
+
     self
-      .on_running_apps_changed_event_emitter
-      .emit("apps_changed", running_apps);
+      .app_handle
+      .emit_all("running_apps_changed", ())
+      .map_err(|err| format!("Error sending running_apps_changed event {:?}", err))?;
 
     Ok(())
+  }
+
+  fn get_web_ui_info(&self, app_id: String) -> Result<WebUiInfo, String> {
+    let ui_folder_path = app_ui_path(&self.environment_path, &app_id);
+
+    match Path::new(&ui_folder_path).exists() {
+      true => Ok(WebUiInfo::WebApp {
+        path_to_web_app: ui_folder_path,
+        app_ui_port: self
+          .allocated_ports
+          .get(&app_id)
+          .ok_or(format!(
+            "This application was installed but we didn't allocate any port to it: {}",
+            app_id,
+          ))?
+          .clone(),
+      }),
+      false => Ok(WebUiInfo::Headless),
+    }
   }
 }
 
 #[async_trait]
 impl AppManager for WebAppManager {
-  type RunningApps = RunningApps;
+  type InstalledApps = Vec<InstalledWebAppInfo>;
 
   async fn install_app(
     &mut self,
@@ -234,8 +247,6 @@ impl AppManager for WebAppManager {
   async fn enable_app(&mut self, app_id: String) -> Result<(), String> {
     self.holochain_manager.enable_app(app_id.clone()).await?;
 
-    self.allocate_new_port_for_app(app_id);
-
     self.execute_on_running_apps_changed().await?;
 
     Ok(())
@@ -244,39 +255,26 @@ impl AppManager for WebAppManager {
   async fn disable_app(&mut self, app_id: String) -> Result<(), String> {
     self.holochain_manager.disable_app(app_id.clone()).await?;
 
-    self.deallocate_port_for_app(app_id);
-
     self.execute_on_running_apps_changed().await?;
 
     Ok(())
   }
 
-  async fn get_running_apps(&mut self) -> Result<RunningApps, String> {
-    let active_apps = self.holochain_manager.get_running_apps().await?;
+  async fn list_apps(&mut self) -> Result<Vec<InstalledWebAppInfo>, String> {
+    let installed_apps = self.holochain_manager.list_apps().await?;
 
-    let mut running_apps_map: HashMap<String, AppUiInfo> = HashMap::new();
+    let installed_web_apps = installed_apps
+      .into_iter()
+      .map(|installed_app| {
+        let web_ui_info = self.get_web_ui_info(installed_app.installed_app_id.clone())?;
+        Ok(InstalledWebAppInfo {
+          installed_app_info: installed_app,
+          web_ui_info,
+        })
+      })
+      .collect::<Result<Vec<InstalledWebAppInfo>, String>>()?;
 
-    for app_id in active_apps {
-      let ui_folder_path = app_ui_path(&self.environment_path, &app_id);
-
-      let running_app = match Path::new(&ui_folder_path).exists() {
-        true => AppUiInfo::WebApp(WebUiInfo {
-          path_to_web_app: ui_folder_path,
-          app_ui_port: self
-            .allocated_ports
-            .get(&app_id)
-            .ok_or(format!(
-              "This application was installed but we didn't allocate any port to it: {}",
-              app_id,
-            ))?
-            .clone(),
-        }),
-        false => AppUiInfo::Headless,
-      };
-      running_apps_map.insert(app_id, running_app);
-    }
-
-    Ok(running_apps_map)
+    Ok(installed_web_apps)
   }
 }
 

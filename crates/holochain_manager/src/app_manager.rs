@@ -6,7 +6,7 @@ use crate::versions::holochain_types_latest::prelude::*;
 
 #[async_trait]
 pub trait AppManager {
-  type RunningApps;
+  type InstalledApps;
 
   async fn install_app(
     &mut self,
@@ -22,5 +22,5 @@ pub trait AppManager {
 
   async fn disable_app(&mut self, app_id: String) -> Result<(), String>;
 
-  async fn get_running_apps(&mut self) -> Result<Self::RunningApps, String>;
+  async fn list_apps(&mut self) -> Result<Self::InstalledApps, String>;
 }

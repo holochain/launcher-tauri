@@ -1,7 +1,9 @@
 use std::{collections::HashMap, convert::TryFrom};
 
-use holochain_manager::versions::HolochainVersion;
-use holochain_web_app_manager::running_apps::RunningApps;
+use holochain_manager::versions::{
+  holochain_conductor_api_latest::InstalledAppInfoStatus, HolochainVersion,
+};
+use holochain_web_app_manager::installed_web_app_info::{InstalledWebAppInfo, WebUiInfo};
 use tauri::{
   window::WindowBuilder, AppHandle, CustomMenuItem, Manager, SystemTrayMenu, SystemTrayMenuItem,
   WindowUrl, Wry,
@@ -67,16 +69,22 @@ pub fn builtin_system_tray() -> SystemTrayMenu {
 
 pub fn update_system_tray(
   app_handle: &AppHandle<Wry>,
-  running_apps_by_version: &HashMap<HolochainVersion, RunningApps>,
+  installed_apps_by_version: &HashMap<HolochainVersion, Vec<InstalledWebAppInfo>>,
 ) -> () {
   let mut menu = builtin_system_tray();
 
-  for (version, running_apps) in running_apps_by_version {
-    for (app_id, _) in running_apps {
-      menu = menu.add_item(CustomMenuItem::new(
-        collapse_version_and_app_id(version.clone(), app_id.clone()),
-        app_id.clone(),
-      ));
+  for (version, installed_apps) in installed_apps_by_version {
+    for app in installed_apps {
+      if let InstalledAppInfoStatus::Running = app.installed_app_info.status {
+        if let WebUiInfo::WebApp { .. } = app.web_ui_info {
+          let app_id = app.installed_app_info.installed_app_id;
+
+          menu = menu.add_item(CustomMenuItem::new(
+            collapse_version_and_app_id(version.clone(), app_id.clone()),
+            app_id.clone(),
+          ));
+        }
+      }
     }
     menu = menu.add_native_item(SystemTrayMenuItem::Separator);
   }

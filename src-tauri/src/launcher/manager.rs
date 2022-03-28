@@ -1,10 +1,13 @@
 use holochain_manager::app_manager::AppManager;
 use holochain_manager::config::LaunchHolochainConfig;
 use holochain_web_app_manager::error::LaunchWebAppManagerError;
-use holochain_web_app_manager::running_apps::RunningApps;
+use holochain_web_app_manager::installed_web_app_info::InstalledWebAppInfo;
+use lair_keystore_manager::error::LairKeystoreError;
+use lair_keystore_manager::versions::v0_1_0::LairKeystoreManagerV0_1_0;
+use lair_keystore_manager::LairKeystoreManager;
+use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs, process};
-use tauri::Manager;
-use tauri::{window::WindowBuilder, AppHandle, WindowUrl, Wry};
+use tauri::{window::WindowBuilder, AppHandle, Manager, WindowUrl, Wry};
 use url::Url;
 
 use std::path::Path;
@@ -15,67 +18,130 @@ use holochain_web_app_manager::WebAppManager;
 use crate::file_system::{
   conductor_config_path, data_path_for_holochain_version, keystore_data_path, pid_file_path,
 };
-use crate::{running_state::RunningState, system_tray::update_system_tray};
+use crate::{running_state::RunningState, system_tray::update_system_tray, LauncherState};
 
 use super::config::LauncherConfig;
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(tag = "type")]
+pub enum KeystoreStatus {
+  InitNecessary,
+  PasswordNecessary,
+  LaunchKeystoreError(LairKeystoreError),
+}
+
 pub struct LauncherManager {
+  app_handle: AppHandle,
   config: LauncherConfig,
   pub holochain_managers:
     HashMap<HolochainVersion, RunningState<WebAppManager, LaunchWebAppManagerError>>,
+  pub lair_keystore_manager: RunningState<Box<dyn LairKeystoreManager>, KeystoreStatus>,
 }
 
 impl LauncherManager {
   pub async fn launch(
     launcher_config: LauncherConfig,
-    app_handle: &AppHandle<Wry>,
+    app_handle: AppHandle,
   ) -> Result<Self, String> {
     let versions = HolochainVersion::supported_versions();
 
-    let mut manager = LauncherManager {
-      holochain_managers: HashMap::new(),
-      config: launcher_config,
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_0::lair_keystore_version());
+
+    let is_initialized = LairKeystoreManagerV0_1_0::is_initialized(keystore_path);
+
+    let keystore_status = match is_initialized {
+      true => KeystoreStatus::PasswordNecessary,
+      false => KeystoreStatus::InitNecessary,
     };
 
-    for version in versions {
-      manager.launch_holochain_manager(version, app_handle).await;
-    }
+    let app_handle2 = app_handle.clone();
+    let manager = LauncherManager {
+      app_handle: app_handle.clone(),
+      holochain_managers: HashMap::new(),
+      config: launcher_config,
+      lair_keystore_manager: RunningState::Error(keystore_status),
+    };
 
+    app_handle.listen_global("running_apps_changed", move |event| {
+      let launcher_state: &LauncherState = &app_handle2.state();
+      tauri::async_runtime::block_on(async move {
+        launcher_state
+          .get_launcher_manager()
+          .unwrap()
+          .lock()
+          .await
+          .on_apps_changed();
+      });
+    });
     LauncherManager::write_pid_file()?;
 
     Ok(manager)
   }
 
-  async fn launch_holochain_manager(
+  pub async fn initialize_and_launch_keystore(&mut self, password: String) -> Result<(), String> {
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_0::lair_keystore_version());
+
+    LairKeystoreManagerV0_1_0::initialize(keystore_path, password.clone())
+      .map_err(|err| format!("Error initializing the keystore: {:?}", err))?;
+
+    self.launch_keystore(password).await?;
+
+    Ok(())
+  }
+
+  pub async fn launch_keystore(&mut self, password: String) -> Result<(), String> {
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_0::lair_keystore_version());
+    let lair_keystore_manager =
+      LairKeystoreManagerV0_1_0::launch(self.config.log_level, keystore_path, password)
+        .map_err(|err| format!("Error launching the keystore: {:?}", err))?;
+
+    self.lair_keystore_manager = RunningState::Running(Box::new(lair_keystore_manager));
+
+    for version in HolochainVersion::supported_versions() {
+      self.launch_holochain_manager(version).await?;
+    }
+
+    Ok(())
+  }
+
+  pub async fn launch_holochain_manager(
     &mut self,
     version: HolochainVersion,
-    app_handle: &AppHandle<Wry>,
-  ) -> () {
+  ) -> Result<(), String> {
     let admin_port = portpicker::pick_unused_port().expect("No ports free");
 
     let conductor_config_path = conductor_config_path(version);
     let environment_path = data_path_for_holochain_version(version);
     let keystore_path = keystore_data_path(version.lair_keystore_version());
 
+    let keystore_connection_url = self.get_lair_keystore_manager()?.connection_url();
+
     let config = LaunchHolochainConfig {
       log_level: self.config.log_level,
       admin_port,
       conductor_config_path,
       environment_path,
-      keystore_path,
+      keystore_connection_url,
     };
 
-    let state = match WebAppManager::launch(version, config).await {
-      Ok(mut manager) => {
-        manager.on_running_apps_changed(move |_| {
-          app_handle.emit_all("running_apps_changed", ());
-        });
-        RunningState::Running(manager)
-      }
+    let state = match WebAppManager::launch(version, config, self.app_handle.clone()).await {
+      Ok(manager) => RunningState::Running(manager),
       Err(error) => RunningState::Error(error),
     };
 
     self.holochain_managers.insert(version, state);
+
+    Ok(())
+  }
+
+  pub fn get_lair_keystore_manager(&mut self) -> Result<&Box<dyn LairKeystoreManager>, String> {
+    match &self.lair_keystore_manager {
+      RunningState::Running(mut m) => Ok(&m),
+      RunningState::Error(error) => Err(format!(
+        "This lair-keystore version is not running: {:?}",
+        error
+      )),
+    }
   }
 
   pub fn get_web_happ_manager(
@@ -97,20 +163,21 @@ impl LauncherManager {
   }
 
   /// Connects to the conductor, requests the list of running apps, updates the caddyfile and the system tray
-  pub async fn on_apps_changed(&mut self, app_handle: &AppHandle<Wry>) -> Result<(), String> {
-    let mut running_apps_by_version: HashMap<HolochainVersion, RunningApps> = HashMap::new();
+  pub async fn on_apps_changed(&mut self) -> Result<(), String> {
+    let mut running_apps_by_version: HashMap<HolochainVersion, Vec<InstalledWebAppInfo>> =
+      HashMap::new();
 
     let versions: Vec<HolochainVersion> = self.holochain_managers.keys().cloned().collect();
 
     for version in versions {
       if let Ok(manager) = self.get_web_happ_manager(version.clone()) {
-        let running_apps = manager.get_running_apps().await?;
+        let running_apps = manager.list_apps().await?;
 
         running_apps_by_version.insert(version.clone(), running_apps);
       }
     }
 
-    update_system_tray(app_handle, &running_apps_by_version);
+    update_system_tray(&self.app_handle, &running_apps_by_version);
 
     // Iterate over the open windows, close any that has been uninstalled/disabled
 

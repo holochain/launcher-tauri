@@ -132,6 +132,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8da52d66c7071e2e3fa2a1e5c6d088fec47b593032b254f5e980de8ea54454d6"
 
 [[package]]
+name = "ascii"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbf56136a5198c7b01a49e3afcbef6cf84597273d298f54432926024107b0109"
+
+[[package]]
 name = "ashpd"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1561,18 +1567,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "event-emitter-rs"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7dccdd0a59457ba353cc44c26d431ca5089f2cf93035c780a1b3f2814a017ebd"
-dependencies = [
- "bincode",
- "lazy_static",
- "serde",
- "uuid",
-]
-
-[[package]]
 name = "event-listener"
 version = "2.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2717,7 +2711,6 @@ name = "holochain_web_app_manager"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "event-emitter-rs",
  "holochain_manager",
  "lair_keystore_manager",
  "log",
@@ -3404,11 +3397,12 @@ dependencies = [
 name = "lair_keystore_manager"
 version = "0.1.0"
 dependencies = [
+ "ascii",
  "async-trait",
- "lair_keystore_api 0.0.9",
  "log",
  "serde",
  "tauri",
+ "url2",
 ]
 
 [[package]]

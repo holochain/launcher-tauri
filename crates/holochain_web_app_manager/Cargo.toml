@@ -11,7 +11,6 @@ async-trait = "0.1.52"
 holochain_manager = {path = "../holochain_manager"}
 lair_keystore_manager = {path = "../lair_keystore_manager"}
 
-event-emitter-rs = "0.1.4"
 log = "0.4.14"
 portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}

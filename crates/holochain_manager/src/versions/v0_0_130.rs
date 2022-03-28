@@ -1,11 +1,12 @@
-use lair_keystore_manager::{versions::v0_0_9::LairKeystoreManagerV0_0_9, LairKeystoreManager};
+use lair_keystore_manager::{utils::create_dir_if_necessary, versions::LairKeystoreVersion};
 use portpicker;
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
+use url2::Url2;
 
 use async_trait::async_trait;
-use holochain_client_0_0_130::{AdminWebsocket, AppStatusFilter, InstallAppBundlePayload};
+use holochain_client_0_0_130::{AdminWebsocket, InstallAppBundlePayload, InstalledAppInfo};
 use holochain_conductor_api_0_0_130::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
@@ -13,11 +14,11 @@ use holochain_conductor_api_0_0_130::{
 use holochain_p2p_0_0_130::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig};
 use holochain_types_0_0_130::prelude::{AppBundle, AppBundleSource, SerializedBytes};
 
-use super::{launch::launch_holochain_process, utils::create_dir_if_necessary, HolochainVersion};
+use super::{launch::launch_holochain_process, HolochainVersion};
 
 use crate::{
-  app_manager::AppManager,
-  config::LaunchHolochainConfig, error::LaunchHolochainError, holochain_manager::HolochainManager,
+  app_manager::AppManager, config::LaunchHolochainConfig, error::LaunchHolochainError,
+  holochain_manager::HolochainManager,
 };
 
 pub struct HolochainManagerV0_0_130 {
@@ -30,16 +31,19 @@ impl HolochainManager for HolochainManagerV0_0_130 {
     HolochainVersion::V0_0_130
   }
 
+  fn lair_keystore_version(&self) -> LairKeystoreVersion {
+    LairKeystoreVersion::V0_1_0
+  }
+
   async fn launch(config: LaunchHolochainConfig) -> Result<Self, LaunchHolochainError> {
     create_dir_if_necessary(&config.conductor_config_path);
     create_dir_if_necessary(&config.environment_path);
-    create_dir_if_necessary(&config.keystore_path);
 
     let new_conductor_config: ConductorConfig = conductor_config(
       config.admin_port,
       config.conductor_config_path.clone(),
       config.environment_path,
-      config.keystore_path.clone(),
+      config.keystore_connection_url.clone(),
     );
 
     let serde_config = serde_yaml::to_string(&new_conductor_config)
@@ -47,10 +51,6 @@ impl HolochainManager for HolochainManagerV0_0_130 {
 
     fs::write(config.conductor_config_path.clone(), serde_config)
       .expect("Could not write conductor config");
-
-    LairKeystoreManagerV0_0_9::launch(config.log_level, config.keystore_path)
-      .await
-      .map_err(|err| LaunchHolochainError::LaunchKeystoreError(err))?;
 
     launch_holochain_process(
       config.log_level,
@@ -91,7 +91,7 @@ impl HolochainManager for HolochainManagerV0_0_130 {
 
 #[async_trait]
 impl AppManager for HolochainManagerV0_0_130 {
-  type RunningApps = Vec<String>;
+  type InstalledApps = Vec<InstalledAppInfo>;
 
   async fn install_app(
     &mut self,
@@ -158,43 +158,37 @@ impl AppManager for HolochainManagerV0_0_130 {
     Ok(())
   }
 
-  async fn get_running_apps(&mut self) -> Result<Vec<String>, String> {
-    let active_apps = self
+  async fn list_apps(&mut self) -> Result<Vec<InstalledAppInfo>, String> {
+    let installed_apps = self
       .ws
-      .list_apps(Some(AppStatusFilter::Running))
+      .list_apps(None)
       .await
-      .or(Err("Could not get the currently active apps"))?;
+      .or(Err("Could not get the currently installed apps"))?;
 
-    let active_app_ids = active_apps
-      .into_iter()
-      .map(|a| a.installed_app_id)
-      .collect();
-
-    Ok(active_app_ids)
+    Ok(installed_apps)
   }
-
 }
 
 fn conductor_config(
   admin_port: u16,
   conductor_config_path: PathBuf,
   environment_path: PathBuf,
-  keystore_path: PathBuf,
+  keystore_connection_url: Url2,
 ) -> ConductorConfig {
   if let Ok(current_config_str) = fs::read_to_string(conductor_config_path) {
     if let Ok(conductor_config) =
       serde_yaml::from_str::<ConductorConfig>(String::from(current_config_str).as_str())
     {
-      return overwrite_admin_port(conductor_config, admin_port);
+      return overwrite_config(conductor_config, admin_port, keystore_connection_url);
     }
   }
-  initial_config(admin_port, environment_path, keystore_path)
+  initial_config(admin_port, environment_path, keystore_connection_url)
 }
 
 fn initial_config(
   admin_port: u16,
   conductor_environment_path: PathBuf,
-  keystore_path: PathBuf,
+  keystore_connection_url: Url2,
 ) -> ConductorConfig {
   let mut network_config = KitsuneP2pConfig::default();
   network_config.bootstrap_service = Some(url2::url2!("https://bootstrap.holo.host"));
@@ -213,9 +207,8 @@ fn initial_config(
   ConductorConfig {
     environment_path: conductor_environment_path.into(),
     dpki: None,
-    keystore: KeystoreConfig::LairServerLegacyDeprecated {
-      keystore_path: Some(keystore_path),
-      danger_passphrase_insecure_from_config: "test-passphrase".to_string(),
+    keystore: KeystoreConfig::LairServer {
+      connection_url: keystore_connection_url,
     },
     admin_interfaces: Some(vec![AdminInterfaceConfig {
       driver: InterfaceDriver::Websocket { port: admin_port },
@@ -225,12 +218,20 @@ fn initial_config(
   }
 }
 
-fn overwrite_admin_port(conductor_config: ConductorConfig, admin_port: u16) -> ConductorConfig {
+fn overwrite_config(
+  conductor_config: ConductorConfig,
+  admin_port: u16,
+  keystore_connection_url: Url2,
+) -> ConductorConfig {
   let mut config = conductor_config.clone();
 
   config.admin_interfaces = Some(vec![AdminInterfaceConfig {
     driver: InterfaceDriver::Websocket { port: admin_port },
   }]);
+
+  config.keystore = KeystoreConfig::LairServer {
+    connection_url: keystore_connection_url,
+  };
 
   config
 }

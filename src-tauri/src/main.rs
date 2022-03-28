@@ -30,6 +30,7 @@ use crate::commands::{
   get_web_app_info::get_web_app_info,
   install_app::install_app,
   open_app::open_app_ui,
+  password::{initialize_keystore, introduce_keystore_password},
   uninstall_app::uninstall_app,
 };
 use crate::launcher::manager::LauncherManager;
@@ -71,6 +72,8 @@ fn main() {
     .invoke_handler(tauri::generate_handler![
       get_state_info,
       open_app_ui,
+      initialize_keystore,
+      introduce_keystore_password,
       install_app,
       enable_app,
       disable_app,
@@ -80,22 +83,18 @@ fn main() {
       setup::logs::log,
     ])
     .setup(|app| {
+      let handle = app.handle().clone();
+
       let mut manager_launch = tauri::async_runtime::block_on(async move {
-        LauncherManager::launch(
-          LauncherConfig {
-            log_level: log::Level::Info,
-          },
-          &app.handle(),
-        )
+        LauncherManager::launch(LauncherConfig {
+          log_level: log::Level::Info,
+        }, handle)
         .await
       });
 
+
       let launcher_state = match manager_launch {
         Ok(mut launcher_manager) => {
-          let id = app.listen_global("running_apps_changed", |event| {
-            launcher_manager.on_apps_changed(&app.handle());
-          });
-
           log::info!("Launch setup successful");
           LauncherState::Running(Arc::new(Mutex::new(launcher_manager)))
         }
