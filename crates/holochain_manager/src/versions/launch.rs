@@ -5,24 +5,40 @@ use tauri::api::process::{Command, CommandEvent};
 use lair_keystore_manager::error::LaunchTauriSidecarError;
 
 use super::HolochainVersion;
+use crate::error::LaunchHolochainError;
 
 pub fn launch_holochain_process(
   log_level: log::Level,
   holochain_version: HolochainVersion,
   conductor_config_path: PathBuf,
-) -> Result<(), LaunchTauriSidecarError> {
+  password: String,
+) -> Result<(), LaunchHolochainError> {
   let mut envs = HashMap::new();
   envs.insert(String::from("RUST_LOG"), String::from(log_level.as_str()));
 
-  let (mut holochain_rx, holochain_child) = Command::new_sidecar("holochain") // TODO: Fix
-    .or(Err(LaunchTauriSidecarError::BinaryNotFound))?
-    .args(&[
-      "-c",
-      conductor_config_path.into_os_string().to_str().unwrap(),
-    ])
-    .envs(envs)
-    .spawn()
-    .map_err(|err| LaunchTauriSidecarError::FailedToExecute(format!("{}", err)))?;
+  let (mut holochain_rx, mut holochain_child) =
+    Command::new_sidecar("holochain") // TODO: Fix
+      .or(Err(LaunchHolochainError::LaunchTauriSidecarError(
+        LaunchTauriSidecarError::BinaryNotFound,
+      )))?
+      .args(&[
+        "-c",
+        conductor_config_path.into_os_string().to_str().unwrap(),
+        "-p",
+      ])
+      .envs(envs)
+      .spawn()
+      .map_err(|err| {
+        LaunchHolochainError::LaunchTauriSidecarError(LaunchTauriSidecarError::FailedToExecute(
+          format!("{}", err),
+        ))
+      })?;
+  holochain_child
+    .write(password.as_bytes())
+    .map_err(|err| LaunchHolochainError::ErrorWritingPassword(format!("{:?}", err)))?;
+  holochain_child
+    .write(&[ascii::AsciiChar::EOT.as_byte()])
+    .map_err(|err| LaunchHolochainError::ErrorWritingPassword(format!("{:?}", err)))?;
 
   tauri::async_runtime::spawn(async move {
     // read events such as stdout

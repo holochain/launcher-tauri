@@ -6,7 +6,7 @@ use crate::error::{LairKeystoreError, LaunchTauriSidecarError};
 
 pub fn is_initialized(keystore_path: PathBuf) -> bool {
   Path::new(&keystore_path)
-    .join("lair-keystore-config.yml")
+    .join("lair-keystore-config.yaml")
     .exists()
 }
 

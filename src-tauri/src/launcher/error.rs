@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(tag = "type")]
+#[serde(tag = "type", content = "content")]
 pub enum RunLauncherError {
   AnotherInstanceIsAlreadyRunning,
   ErrorLaunching(String),

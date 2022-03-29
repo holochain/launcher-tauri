@@ -99,15 +99,14 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import AdminUI from "@holochain/admin-ui";
 import { invoke } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
 import type { TextField } from "@material/mwc-textfield";
 import { InstalledAppInfo } from "@holochain/client";
-import { WebAppInfo } from "../types";
+import { HolochainVersion, WebAppInfo } from "../types";
 import { toUint8Array } from "js-base64";
-
-type Dictionary<T> = { [key: string]: T };
+import { ActionTypes } from "@/store/actions";
+import { flatten } from "lodash-es";
 
 export default defineComponent({
   name: "InstallApp",
@@ -151,7 +150,7 @@ export default defineComponent({
   methods: {
     async selectWebHappFile() {
       this.webAppBundlePath = (await open({
-        filters: [{ name: "webhapp", extensions: ["webhapp"] }],
+        filters: [{ name: "webhapp", extensions: ["webhapp", "happ"] }],
       })) as string;
 
       if (!this.webAppBundlePath) return;
@@ -175,11 +174,20 @@ export default defineComponent({
               };
             }
 
-            const alreadyInstalledAppIds =
-              this.$store.state.admin.installedApps.appsInfo.map(
-                (appInfo: InstalledAppInfo) => appInfo.installed_app_id
-              );
-            const isValid = !alreadyInstalledAppIds.includes(newValue);
+            const holochainVersions: HolochainVersion[] =
+              this.$store.getters["holochainVersions"];
+
+            const appsForVersion = flatten(
+              holochainVersions.map((version) =>
+                this.$store.getters["appsForVersion"](version)
+              )
+            );
+
+            const alreadyExists = appsForVersion.find(
+              (appInfo: InstalledAppInfo) =>
+                appInfo.installed_app_id === newValue
+            );
+            const isValid = !alreadyExists;
 
             // changes to make to the native validity
             if (!isValid) {
@@ -208,29 +216,30 @@ export default defineComponent({
     getEncodedMembraneProofs() {
       if (!this.membraneProofs) return {};
 
-      const encodedMembraneProofs: Dictionary<Array<number>> = {};
+      const encodedMembraneProofs: Record<string, Array<number>> = {};
       for (const dnaSlot of Object.keys(this.membraneProofs)) {
         encodedMembraneProofs[dnaSlot] = Array.from(
           toUint8Array(this.membraneProofs[dnaSlot])
         );
       }
-      console.log(encodedMembraneProofs);
       return encodedMembraneProofs;
     },
     async installApp() {
       try {
         this.installing = true;
+        const holochainVersions: HolochainVersion[] =
+          this.$store.getters["holochainVersions"];
+
         await invoke("install_app", {
           appId: this.appId,
           webAppBundlePath: this.webAppBundlePath,
           membraneProofs: this.getEncodedMembraneProofs(),
           uid: this.uid,
+          holochainVersion: holochainVersions[0],
         });
 
         this.installing = false;
-        await this.$store.dispatch(
-          `${AdminUI.ADMIN_UI_MODULE}/${AdminUI.ActionTypes.fetchInstalledApps}`
-        );
+        await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
         this.showMessage(`Installed ${this.appId}`);
 

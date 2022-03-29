@@ -5,6 +5,7 @@ pub async fn initialize_keystore(
   state: tauri::State<'_, LauncherState>,
   password: String,
 ) -> Result<(), String> {
+  println!("{}", password);
   let mut launcher_manager = state.get_launcher_manager()?.lock().await;
 
   launcher_manager
@@ -15,7 +16,7 @@ pub async fn initialize_keystore(
 }
 
 #[tauri::command]
-pub async fn introduce_keystore_password(
+pub async fn unlock_and_launch(
   state: tauri::State<'_, LauncherState>,
   password: String,
 ) -> Result<(), String> {

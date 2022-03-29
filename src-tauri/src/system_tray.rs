@@ -9,16 +9,11 @@ use tauri::{
   WindowUrl, Wry,
 };
 
-use crate::launcher::{manager::LauncherManager, state::LauncherState};
+use crate::launcher::state::LauncherState;
 
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   match event_id.as_str() {
     "quit" => {
-      match LauncherManager::remove_pid_file() {
-        Ok(()) => {}
-        Err(err) => log::error!("Error removing the pid file app: {:?}", err),
-      };
-
       app.exit(0);
     }
     "show_admin" => {
@@ -43,7 +38,7 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
       match app.state::<LauncherState>().get_launcher_manager() {
         Ok(manager) => {
           tauri::async_runtime::block_on(async move {
-            if let Err(err) = manager.lock().await.open_app(version, &app_id, app) {
+            if let Err(err) = manager.lock().await.open_app(version, &app_id) {
               log::error!("Error opening app: {:?}", err);
             }
           });
@@ -57,27 +52,33 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   }
 }
 
-pub fn builtin_system_tray() -> SystemTrayMenu {
-  let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-  let show_admin = CustomMenuItem::new("show_admin".to_string(), "Show Admin");
+pub fn initial_system_tray() -> SystemTrayMenu {
+  let mut menu = SystemTrayMenu::new();
 
-  SystemTrayMenu::new()
-    .add_item(show_admin)
-    .add_native_item(SystemTrayMenuItem::Separator)
-    .add_item(quit)
+  for item in builtin_system_tray() {
+    menu = menu.add_item(item);
+  }
+  menu
+}
+
+pub fn builtin_system_tray() -> Vec<CustomMenuItem> {
+  vec![
+    CustomMenuItem::new("show_admin".to_string(), "Show Admin"),
+    CustomMenuItem::new("quit".to_string(), "Quit"),
+  ]
 }
 
 pub fn update_system_tray(
   app_handle: &AppHandle<Wry>,
   installed_apps_by_version: &HashMap<HolochainVersion, Vec<InstalledWebAppInfo>>,
 ) -> () {
-  let mut menu = builtin_system_tray();
+  let mut menu = SystemTrayMenu::new();
 
   for (version, installed_apps) in installed_apps_by_version {
     for app in installed_apps {
       if let InstalledAppInfoStatus::Running = app.installed_app_info.status {
         if let WebUiInfo::WebApp { .. } = app.web_ui_info {
-          let app_id = app.installed_app_info.installed_app_id;
+          let app_id = app.installed_app_info.installed_app_id.clone();
 
           menu = menu.add_item(CustomMenuItem::new(
             collapse_version_and_app_id(version.clone(), app_id.clone()),
@@ -89,6 +90,9 @@ pub fn update_system_tray(
     menu = menu.add_native_item(SystemTrayMenuItem::Separator);
   }
 
+  for item in builtin_system_tray() {
+    menu = menu.add_item(item);
+  }
   if let Err(err) = app_handle.tray_handle().set_menu(menu) {
     log::error!("Error setting the system tray: {:?}", err);
   }

@@ -10,10 +10,10 @@ pub async fn open_app_ui(
   holochain_version: HolochainVersion,
   app_id: String,
 ) -> Result<(), String> {
-  let manager = state.get_launcher_manager()?.lock().await;
+  let mut manager = state.get_launcher_manager()?.lock().await;
 
   manager
-    .open_app(holochain_version, &app_id, &app_handle)
+    .open_app(holochain_version, &app_id)
     .map_err(|err| format!("Error opening app: {}", err))?;
 
   log::info!("Opening app {}", app_id.clone(),);

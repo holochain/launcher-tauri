@@ -1,10 +1,5 @@
 <template>
-  <mwc-dialog
-    heading="Holochain Launcher is already running"
-    scrimClickAction=""
-    escapeKeyAction=""
-    open
-  >
+  <Error heading="Holochain Launcher is already running">
     <div class="column">
       <span style="margin-top: 8px">
         Holochain Launcher is already running in the background. Check the
@@ -17,13 +12,17 @@
       >
       <span style="margin-top: 8px"> You can safely close this window. </span>
     </div>
-  </mwc-dialog>
+  </Error>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import Error from "./Error.vue";
 
 export default defineComponent({
   name: "AlreadyRunning",
+  components: {
+    Error,
+  },
 });
 </script>

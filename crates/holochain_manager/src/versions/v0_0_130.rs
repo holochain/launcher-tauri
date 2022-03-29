@@ -1,8 +1,8 @@
 use lair_keystore_manager::{utils::create_dir_if_necessary, versions::LairKeystoreVersion};
 use portpicker;
-use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
+use std::{collections::HashMap, time::Duration};
 use url2::Url2;
 
 use async_trait::async_trait;
@@ -35,13 +35,17 @@ impl HolochainManager for HolochainManagerV0_0_130 {
     LairKeystoreVersion::V0_1_0
   }
 
-  async fn launch(config: LaunchHolochainConfig) -> Result<Self, LaunchHolochainError> {
-    create_dir_if_necessary(&config.conductor_config_path);
+  async fn launch(
+    config: LaunchHolochainConfig,
+    password: String,
+  ) -> Result<Self, LaunchHolochainError> {
+    let conductor_config_path = config.config_environment_path.join("conductor-config.yaml");
+    create_dir_if_necessary(&config.config_environment_path);
     create_dir_if_necessary(&config.environment_path);
 
     let new_conductor_config: ConductorConfig = conductor_config(
       config.admin_port,
-      config.conductor_config_path.clone(),
+      conductor_config_path.clone(),
       config.environment_path,
       config.keystore_connection_url.clone(),
     );
@@ -49,15 +53,17 @@ impl HolochainManager for HolochainManagerV0_0_130 {
     let serde_config = serde_yaml::to_string(&new_conductor_config)
       .expect("Could not serialize initial conductor config");
 
-    fs::write(config.conductor_config_path.clone(), serde_config)
+    fs::write(conductor_config_path.clone(), serde_config)
       .expect("Could not write conductor config");
 
     launch_holochain_process(
       config.log_level,
       Self::holochain_version(),
-      config.conductor_config_path,
-    )
-    .map_err(|err| LaunchHolochainError::LaunchHolochainError(err))?;
+      conductor_config_path,
+      password,
+    )?;
+
+    std::thread::sleep(Duration::from_millis(3000));
 
     let ws = AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
       .await

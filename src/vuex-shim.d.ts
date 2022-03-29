@@ -6,6 +6,6 @@ declare module "@vue/runtime-core" {
   import { ComponentCustomProperties } from "vue";
 
   interface ComponentCustomProperties {
-    $store: Store<{ admin: HcAdminState } & LauncherAdminState>;
+    $store: Store<LauncherAdminState>;
   }
 }

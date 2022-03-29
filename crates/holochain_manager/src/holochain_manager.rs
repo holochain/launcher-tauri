@@ -16,7 +16,7 @@ pub trait HolochainManager:
   /// If not, create the necessary files and folder to start afresh
   /// 
   /// This assumes that lair_keystore is already running in the configured path
-  async fn launch(config: LaunchHolochainConfig) -> Result<Self, LaunchHolochainError>
+  async fn launch(config: LaunchHolochainConfig, password: String) -> Result<Self, LaunchHolochainError>
   where
     Self: Sized;
 

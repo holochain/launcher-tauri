@@ -6,8 +6,6 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-trait = "0.1.52"
-
 holochain_client_0_0_130 = {package = "holochain_client", git = "https://github.com/holochain/holochain-client-rust", rev = "9f7b9525c5dc9913d9e7f78b257da26ba7a076a8"}
 holochain_conductor_api_0_0_130 = {package = "holochain_conductor_api", version = "0.0.30"}
 holochain_p2p_0_0_130 = {package = "holochain_p2p", version = "0.0.30"}
@@ -18,9 +16,11 @@ lair_keystore_manager = {path = "../lair_keystore_manager"}
 
 mr_bundle_0_0_9 = {package = "mr_bundle", version = "0.0.9"}
 
+ascii = "1.0.0"
+async-trait = "0.1.52"
 log = "0.4.14"
 portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}
 serde_yaml = "0.8"
-tauri = {version = "1.0.0-rc.4", features = ["api-all", "system-tray"]}
+tauri = {version = "1.0.0-rc.6", features = ["api-all", "system-tray"]}
 url2 = "0.0.6"

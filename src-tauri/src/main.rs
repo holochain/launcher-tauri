@@ -7,7 +7,7 @@ use launcher::config::LauncherConfig;
 use launcher::error::RunLauncherError;
 use std::sync::Arc;
 
-use system_tray::builtin_system_tray;
+use system_tray::initial_system_tray;
 use tauri;
 use tauri::api::process::kill_children;
 use tauri::Manager;
@@ -30,7 +30,7 @@ use crate::commands::{
   get_web_app_info::get_web_app_info,
   install_app::install_app,
   open_app::open_app_ui,
-  password::{initialize_keystore, introduce_keystore_password},
+  password::{initialize_keystore, unlock_and_launch},
   uninstall_app::uninstall_app,
 };
 use crate::launcher::manager::LauncherManager;
@@ -64,7 +64,7 @@ fn main() {
   let builder_result = tauri::Builder::default()
     .menu(build_menu())
     .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
-    .system_tray(SystemTray::new().with_menu(builtin_system_tray()))
+    .system_tray(SystemTray::new().with_menu(initial_system_tray()))
     .on_system_tray_event(|app, event| match event {
       SystemTrayEvent::MenuItemClick { id, .. } => handle_system_tray_event(app, id),
       _ => {}
@@ -73,7 +73,7 @@ fn main() {
       get_state_info,
       open_app_ui,
       initialize_keystore,
-      introduce_keystore_password,
+      unlock_and_launch,
       install_app,
       enable_app,
       disable_app,
@@ -85,16 +85,18 @@ fn main() {
     .setup(|app| {
       let handle = app.handle().clone();
 
-      let mut manager_launch = tauri::async_runtime::block_on(async move {
-        LauncherManager::launch(LauncherConfig {
-          log_level: log::Level::Info,
-        }, handle)
+      let manager_launch = tauri::async_runtime::block_on(async move {
+        LauncherManager::launch(
+          LauncherConfig {
+            log_level: log::Level::Info,
+          },
+          handle,
+        )
         .await
       });
 
-
       let launcher_state = match manager_launch {
-        Ok(mut launcher_manager) => {
+        Ok(launcher_manager) => {
           log::info!("Launch setup successful");
           LauncherState::Running(Arc::new(Mutex::new(launcher_manager)))
         }

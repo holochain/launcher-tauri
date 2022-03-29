@@ -40,6 +40,7 @@ impl WebAppManager {
   pub async fn launch(
     version: HolochainVersion,
     config: LaunchHolochainConfig,
+    password: String,
     app_handle: AppHandle,
   ) -> Result<Self, LaunchWebAppManagerError> {
     let environment_path = config.environment_path.clone();
@@ -55,7 +56,7 @@ impl WebAppManager {
     create_dir_if_necessary(&conductor_data_path);
     create_dir_if_necessary(&ui_data_path);
 
-    let mut holochain_manager = launch_holochain(version, new_config)
+    let mut holochain_manager = launch_holochain(version, new_config, password)
       .await
       .map_err(|err| LaunchWebAppManagerError::LaunchHolochainError(err))?;
 

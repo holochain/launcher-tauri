@@ -1,31 +1,11 @@
 <template>
   <mwc-dialog
-    :heading="!launchError() ? 'Factory Reset' : 'Launch Error'"
+    heading="Factory Reset"
     ref="dialog"
     scrimClickAction=""
     escapeKeyAction=""
   >
     <div class="column">
-      <span v-if="launchError()">There was an error launching Holochain:</span>
-      <pre v-if="launchError()" style="word-wrap: break-word">{{
-        $store.state.connectionStatus.error
-      }}</pre>
-      <span v-if="launchError()" style="margin-top: 8px">
-        If you are upgrading from a previous version of Holochain, it is most
-        likely that the new version is not compatible with the data that this
-        computer has stored.
-      </span>
-      <span v-if="launchError()" style="margin-top: 8px">
-        In the future, Holochain will include a smooth mechanism to upgrade from
-        one version to the next. Unfortunately, at the moment there is no way of
-        upgrade old Holochain apps to be compatible with newer versions of
-        Holochain.
-      </span>
-      <span v-if="launchError()" style="margin-top: 8px">
-        <b>If you don't want to lose old Holochain data,</b> uninstall this
-        version of the Holochain Launcher and downgrade with the version that
-        you were already using.
-      </span>
       <span style="margin-top: 8px">
         <b>If you don't mind losing old Holochain data</b>, you can execute a
         factory reset.
@@ -38,7 +18,6 @@
 
     <mwc-button
       slot="secondaryAction"
-      v-if="!launchError()"
       :disabled="executing"
       dialogAction="close"
       label="Cancel"
@@ -72,21 +51,14 @@ export default defineComponent({
   },
   async mounted() {
     this.$nextTick(async () => {
-      if (this.launchError()) {
-        this.showDialog();
-      } else {
-        const current = await getCurrent().listen("request-factory-reset", () =>
-          this.showDialog()
-        );
-      }
+      const current = await getCurrent().listen("request-factory-reset", () =>
+        this.showDialog()
+      );
     });
   },
   methods: {
     showDialog() {
       (this.$refs.dialog as Dialog).show();
-    },
-    launchError() {
-      return this.$store.state.connectionStatus.type === "Error";
     },
     async executeFactoryReset() {
       try {

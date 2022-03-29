@@ -63,8 +63,9 @@ impl TryFrom<String> for HolochainVersion {
 pub async fn launch_holochain(
   holochain_version: HolochainVersion,
   config: LaunchHolochainConfig,
+  password: String
 ) -> Result<Box<dyn HolochainManager>, LaunchHolochainError> {
   match holochain_version {
-    HolochainVersion::V0_0_130 => Ok(Box::new(HolochainManagerV0_0_130::launch(config).await?)),
+    HolochainVersion::V0_0_130 => Ok(Box::new(HolochainManagerV0_0_130::launch(config, password).await?)),
   }
 }

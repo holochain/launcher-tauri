@@ -11,5 +11,5 @@ ascii = "1.0.0"
 async-trait = "0.1.52"
 log = "0.4.14"
 serde = {version = "1", features = ["derive"]}
-tauri = {version = "1.0.0-rc.4", features = ["api-all", "system-tray"]}
+tauri = {version = "1.0.0-rc.6", features = ["api-all", "system-tray"]}
 url2 = "0.0.6"

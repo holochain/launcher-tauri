@@ -18,8 +18,8 @@ pub fn holochain_config_path(holochain_version: HolochainVersion) -> PathBuf {
   root_config_path().join(version)
 }
 
-pub fn conductor_config_path(holochain_version: HolochainVersion) -> PathBuf {
-  holochain_config_path(holochain_version).join("conductor-config.yml")
+pub fn config_environment_path(holochain_version: HolochainVersion) -> PathBuf {
+  holochain_config_path(holochain_version)
 }
 
 /** Logs */
@@ -56,8 +56,4 @@ pub fn keystore_data_path(lair_keystore_version: LairKeystoreVersion) -> PathBuf
   let version: String = lair_keystore_version.into();
 
   root_lair_path().join(version)
-}
-
-pub fn pid_file_path() -> PathBuf {
-  root_data_path().join("launcher.pid")
 }

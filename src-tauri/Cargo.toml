@@ -12,19 +12,18 @@ version = "0.3.10"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = {version = "1.0.0-rc.4", features = [] }
+tauri-build = {version = "1.0.0-rc.5", features = [] }
 
 [dependencies]
+holochain_manager = {path = "../crates/holochain_manager"}
+holochain_web_app_manager = {path = "../crates/holochain_web_app_manager"}
+lair_keystore_manager = {path = "../crates/lair_keystore_manager"}
+
 async-trait = "0.1.52"
 base64 = "0.13.0"
 chrono = {version = "0.4", features = ["serde"] }
 flate2 = "1.0.20"
 futures = "0.3"
-
-holochain_manager = {path = "../crates/holochain_manager"}
-holochain_web_app_manager = {path = "../crates/holochain_web_app_manager"}
-lair_keystore_manager = {path = "../crates/lair_keystore_manager"}
-
 log = "0.4.14"
 log4rs = "1.0.0"
 mr_bundle = "0.0.8"
@@ -35,7 +34,8 @@ remoteprocess = "0.4.8"
 serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
-tauri = {version = "1.0.0-rc.4", features = ["api-all", "system-tray"] }
+sysinfo = "0.23.5"
+tauri = {version = "1.0.0-rc.6", features = ["api-all", "system-tray"] }
 url = "2.2.2"
 url2 = "0.0.6"
 

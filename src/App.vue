@@ -4,32 +4,58 @@
     <router-link to="/about">About</router-link>
   </div>
  -->
-  <Home v-if="isConnected()" style="display: flex; flex: 1"></Home>
-  <AlreadyRunning v-else-if="isAlreadyRunning()"></AlreadyRunning>
-  <FactoryReset style="display: flex; flex: 1"></FactoryReset>
-  <About></About>
+
+  <div
+    v-if="isLoading()"
+    style="flex: 1; display: flex; align-items: center; justify-content: center"
+  >
+    <mwc-circular-progress indeterminate></mwc-circular-progress>
+  </div>
+
+  <div v-else>
+    <AlreadyRunning v-if="$store.getters[`isAlreadyRunning`]"> </AlreadyRunning>
+    <Error
+      v-else-if="$store.getters[`errorLaunching`]"
+      heading="Error Launching Holochain"
+    >
+      <span style="margin-top: 8px">
+        {{ $store.getters[`errorLaunching`] }}
+      </span>
+    </Error>
+    <Setup v-else-if="$store.getters[`setupNeeded`]"></Setup>
+    <IntroducePassword
+      v-else-if="$store.getters[`passwordNeeded`]"
+    ></IntroducePassword>
+    <Home v-else style="display: flex; flex: 1"></Home>
+    <FactoryReset style="display: flex; flex: 1"></FactoryReset>
+    <About></About>
+  </div>
 </template>
 <script lang="ts">
 import Home from "./views/Home.vue";
 import FactoryReset from "./views/FactoryReset.vue";
+import Error from "./components/Error.vue";
 import AlreadyRunning from "./components/AlreadyRunning.vue";
+import IntroducePassword from "./components/IntroducePassword.vue";
+import Setup from "./components/Setup.vue";
 import About from "./components/About.vue";
 import { defineComponent } from "vue";
+import "@material/mwc-circular-progress";
 
 export default defineComponent({
   name: "App",
   components: {
+    IntroducePassword,
+    Setup,
     Home,
     FactoryReset,
     About,
+    Error,
     AlreadyRunning,
   },
   methods: {
-    isConnected() {
-      return this.$store.state.connectionStatus.type === "Connected";
-    },
-    isAlreadyRunning() {
-      return this.$store.state.connectionStatus.type === "AlreadyRunning";
+    isLoading() {
+      return this.$store.state.launcherStateInfo === "loading";
     },
   },
 });

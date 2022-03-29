@@ -34,7 +34,7 @@ pub fn launch_lair_keystore_process(
     while let Some(event) = lair_rx.recv().await {
       match event.clone() {
         CommandEvent::Stdout(line) => log::info!("[LAIR] {}", line),
-        CommandEvent::Stderr(line) => log::info!("[LAIR] {}", line),
+        CommandEvent::Stderr(line) => log::error!("[LAIR] {}", line),
         _ => log::info!("[LAIR] {:?}", event),
       }
     }
@@ -61,6 +61,12 @@ pub fn launch_lair_keystore_process(
         err
       )))
     })?;
+
+  if output.stderr.len() > 0 {
+    return Err(LairKeystoreError::LaunchTauriSidecarError(
+      LaunchTauriSidecarError::FailedToExecute(output.stderr),
+    ));
+  }
 
   let url = Url2::parse(output.stdout);
 
