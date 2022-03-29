@@ -43,10 +43,10 @@ pub fn launch_lair_keystore_process(
   command_child
     .write(password.as_bytes())
     .map_err(|err| LairKeystoreError::ErrorWritingPassword(format!("{:?}", err)))?;
-  command_child
+/*   command_child
     .write(&[ascii::AsciiChar::EOT.as_byte()])
     .map_err(|err| LairKeystoreError::ErrorWritingPassword(format!("{:?}", err)))?;
-
+ */
   let output = Command::new_sidecar("lair-keystore")
     .or(Err(LairKeystoreError::LaunchTauriSidecarError(
       LaunchTauriSidecarError::BinaryNotFound,

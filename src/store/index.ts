@@ -51,6 +51,16 @@ export const store = createStore<LauncherAdminState>({
           }
         }
       }
+
+      if (
+        state.launcherStateInfo.type === "Running" &&
+        state.launcherStateInfo.content.type === "Running"
+      ) {
+        const error = Object.values(
+          state.launcherStateInfo.content.content
+        ).find((v) => v.type === "Error");
+        if (error) return error.content as string;
+      }
     },
     setupNeeded(state) {
       if (state.launcherStateInfo === "loading") return undefined;

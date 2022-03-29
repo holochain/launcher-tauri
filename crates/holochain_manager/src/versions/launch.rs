@@ -33,31 +33,25 @@ pub fn launch_holochain_process(
           format!("{}", err),
         ))
       })?;
-  holochain_child
-    .write(password.as_bytes())
-    .map_err(|err| LaunchHolochainError::ErrorWritingPassword(format!("{:?}", err)))?;
-  holochain_child
-    .write(&[ascii::AsciiChar::EOT.as_byte()])
-    .map_err(|err| LaunchHolochainError::ErrorWritingPassword(format!("{:?}", err)))?;
 
   tauri::async_runtime::spawn(async move {
     // read events such as stdout
     while let Some(event) = holochain_rx.recv().await {
       match event.clone() {
         CommandEvent::Stdout(line) => log::info!("[HOLOCHAIN] {}", line),
-        CommandEvent::Stderr(line) => log::info!("[HOLOCHAIN] {}", line),
+        CommandEvent::Stderr(line) => log::error!("[HOLOCHAIN] {}", line),
         _ => log::info!("[HOLOCHAIN] {:?}", event),
       };
-      if format!("{:?}", event).contains("Installing lair_keystore") {
-        // Lair keystore can't be executed, Holochain is trying to download and install Lair, kill it
-        log::error!("Holochain is trying to download and install lair_keystore directly! Killing Holochain...");
-        let result = holochain_child.kill();
-        log::error!("Holochain terminated: {:?}", result);
-        break;
-      }
     }
   });
   log::info!("Launched holochain");
+
+  holochain_child
+    .write(password.as_bytes())
+    .map_err(|err| LaunchHolochainError::ErrorWritingPassword(format!("{:?}", err)))?;
+  holochain_child
+    .write("\n".as_bytes())
+    .map_err(|err| LaunchHolochainError::ErrorWritingPassword(format!("{:?}", err)))?;
 
   Ok(())
 }

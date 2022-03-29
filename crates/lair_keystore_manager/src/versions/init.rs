@@ -28,9 +28,9 @@ pub fn initialize(keystore_path: PathBuf, password: String) -> Result<(), LairKe
   command_child
     .write(password.as_bytes())
     .map_err(|err| LairKeystoreError::ErrorWritingPassword(format!("{:?}", err)))?;
-  command_child
+/*   command_child
     .write(&[ascii::AsciiChar::EOT.as_byte()])
     .map_err(|err| LairKeystoreError::ErrorWritingPassword(format!("{:?}", err)))?;
-
+ */
   Ok(())
 }

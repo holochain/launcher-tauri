@@ -7,20 +7,18 @@ use lair_keystore_manager::utils::create_dir_if_necessary;
 use lair_keystore_manager::versions::v0_1_0::LairKeystoreManagerV0_1_0;
 use lair_keystore_manager::LairKeystoreManager;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::time::Duration;
-use std::{collections::HashMap, fs, process};
-use sysinfo::{ProcessExt, System, SystemExt};
+use sysinfo::{System, SystemExt};
 use tauri::{window::WindowBuilder, AppHandle, Manager, WindowUrl};
 use url::Url;
-
-use std::path::Path;
 
 use holochain_manager::versions::HolochainVersion;
 use holochain_web_app_manager::WebAppManager;
 
 use crate::file_system::{
-  data_path_for_holochain_version, keystore_data_path, root_config_path,
-  root_data_path, root_lair_path, config_environment_path,
+  config_environment_path, data_path_for_holochain_version, keystore_data_path, root_config_path,
+  root_data_path, root_lair_path,
 };
 use crate::{running_state::RunningState, system_tray::update_system_tray, LauncherState};
 
@@ -93,8 +91,6 @@ impl LauncherManager {
     LairKeystoreManagerV0_1_0::initialize(keystore_path, password.clone())
       .map_err(|err| format!("Error initializing the keystore: {:?}", err))?;
 
-    std::thread::sleep(Duration::from_millis(3000));
-
     self.launch_keystore(password).await?;
 
     Ok(())
@@ -107,6 +103,8 @@ impl LauncherManager {
         .map_err(|err| format!("Error launching the keystore: {:?}", err))?;
 
     self.lair_keystore_manager = RunningState::Running(Box::new(lair_keystore_manager));
+
+    std::thread::sleep(Duration::from_millis(1000));
 
     for version in HolochainVersion::supported_versions() {
       self
