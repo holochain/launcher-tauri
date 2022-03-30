@@ -7,4 +7,5 @@ pub enum LaunchWebAppManagerError {
   LaunchHolochainError(LaunchHolochainError),
   LaunchCaddyError(LaunchTauriSidecarError),
   CouldNotGetAppPort(String),
+  Other(String),
 }

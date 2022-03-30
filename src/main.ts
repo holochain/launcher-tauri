@@ -1,3 +1,4 @@
+import "@webcomponents/scoped-custom-element-registry";
 import "array-flat-polyfill";
 import "blob-polyfill";
 import { createApp } from "vue";

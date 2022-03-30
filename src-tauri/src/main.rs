@@ -27,7 +27,7 @@ use crate::commands::{
   enable_app::{disable_app, enable_app},
   factory_reset::execute_factory_reset,
   get_state_info::get_state_info,
-  get_web_app_info::get_web_app_info,
+  get_app_info::get_app_info,
   install_app::install_app,
   open_app::open_app_ui,
   password::{initialize_keystore, unlock_and_launch},
@@ -78,7 +78,7 @@ fn main() {
       enable_app,
       disable_app,
       uninstall_app,
-      get_web_app_info,
+      get_app_info,
       execute_factory_reset,
       setup::logs::log,
     ])
@@ -88,7 +88,7 @@ fn main() {
       let manager_launch = tauri::async_runtime::block_on(async move {
         LauncherManager::launch(
           LauncherConfig {
-            log_level: log::Level::Info,
+            log_level: log::Level::Debug,
           },
           handle,
         )

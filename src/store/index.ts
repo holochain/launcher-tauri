@@ -89,7 +89,7 @@ export const store = createStore<LauncherAdminState>({
         stateInfo.content.type === "Error"
       )
         return [];
-
+      console.log(Object.keys(stateInfo.content.content));
       return Object.keys(stateInfo.content.content);
     },
     appsForVersion: (state) => (holochainVersion: HolochainVersion) => {

@@ -1,11 +1,13 @@
 use lair_keystore_manager::error::LaunchTauriSidecarError;
 use std::path::PathBuf;
-use tauri::api::process::{Command, CommandEvent};
+use tauri::api::process::{Command, CommandChild, CommandEvent};
 
 use crate::installed_web_app_info::{InstalledWebAppInfo, WebUiInfo};
 
-pub fn launch_caddy_process(caddyfile_path: PathBuf) -> Result<(), LaunchTauriSidecarError> {
-  let (mut caddy_rx, _) = Command::new_sidecar("caddy")
+pub fn launch_caddy_process(
+  caddyfile_path: PathBuf,
+) -> Result<CommandChild, LaunchTauriSidecarError> {
+  let (mut caddy_rx, command_child) = Command::new_sidecar("caddy")
     .or(Err(LaunchTauriSidecarError::BinaryNotFound))?
     .args(&[
       "run",
@@ -27,7 +29,7 @@ pub fn launch_caddy_process(caddyfile_path: PathBuf) -> Result<(), LaunchTauriSi
   });
   log::info!("Launched caddy");
 
-  Ok(())
+  Ok(command_child)
 }
 
 pub fn reload_caddy(caddyfile_path: PathBuf) -> Result<(), LaunchTauriSidecarError> {

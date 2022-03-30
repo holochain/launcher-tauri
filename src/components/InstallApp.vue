@@ -14,7 +14,7 @@
   ></mwc-fab>
   <mwc-dialog
     heading="Install App"
-    :open="!!webAppBundlePath"
+    :open="!!appBundlePath"
     scrimClickAction=""
     escapeKeyAction=""
   >
@@ -27,10 +27,10 @@
     <div
       class="column"
       style="width: 512px"
-      v-else-if="webAppBundlePath && appInfo"
+      v-else-if="appBundlePath && appInfo"
     >
       <span style="margin-right: 8px"
-        >Bundle: {{ pathToFilename(webAppBundlePath) }}</span
+        >Bundle: {{ pathToFilename(appBundlePath) }}</span
       >
 
       <div class="column" style="flex: 1">
@@ -113,7 +113,7 @@ export default defineComponent({
   data(): {
     installing: boolean;
     appId: string | undefined;
-    webAppBundlePath: string | undefined;
+    appBundlePath: string | undefined;
     uid: string | undefined;
     membraneProofs: { [key: string]: string } | undefined;
     appInfo: WebAppInfo | undefined;
@@ -123,7 +123,7 @@ export default defineComponent({
     return {
       installing: false,
       appId: undefined,
-      webAppBundlePath: undefined,
+      appBundlePath: undefined,
       uid: undefined,
       membraneProofs: undefined,
       appInfo: undefined,
@@ -134,7 +134,7 @@ export default defineComponent({
   computed: {
     isAppReadyToInstall() {
       if (!this.appId) return false;
-      if (!this.webAppBundlePath) return false;
+      if (!this.appBundlePath) return false;
       if (!this.isAppIdValid) return false;
       return true;
     },
@@ -143,21 +143,23 @@ export default defineComponent({
       return false;
     },
     isLoadingFile() {
-      if (this.webAppBundlePath && !this.appInfo) return true;
+      if (this.appBundlePath && !this.appInfo) return true;
       return false;
     },
   },
   methods: {
     async selectWebHappFile() {
-      this.webAppBundlePath = (await open({
-        filters: [{ name: "webhapp", extensions: ["webhapp", "happ"] }],
+      this.appBundlePath = (await open({
+        filters: [
+          { name: "Holochain Application", extensions: ["webhapp", "happ"] },
+        ],
       })) as string;
 
-      if (!this.webAppBundlePath) return;
+      if (!this.appBundlePath) return;
 
       this.membraneProofs = {};
-      this.appInfo = (await invoke("get_web_app_info", {
-        webAppBundlePath: this.webAppBundlePath,
+      this.appInfo = (await invoke("get_app_info", {
+        appBundlePath: this.appBundlePath,
       })) as WebAppInfo;
       this.appId = this.appInfo.app_name;
 
@@ -204,7 +206,7 @@ export default defineComponent({
       });
     },
     cleanStateAndClose() {
-      this.webAppBundlePath = undefined;
+      this.appBundlePath = undefined;
       this.uid = undefined;
       this.membraneProofs = undefined;
       this.appInfo = undefined;
@@ -232,7 +234,7 @@ export default defineComponent({
 
         await invoke("install_app", {
           appId: this.appId,
-          webAppBundlePath: this.webAppBundlePath,
+          appBundlePath: this.appBundlePath,
           membraneProofs: this.getEncodedMembraneProofs(),
           uid: this.uid,
           holochainVersion: holochainVersions[0],

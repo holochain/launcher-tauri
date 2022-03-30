@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { isAppRunning, isAppDisabled, isAppPaused } from "../utils";
-import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { deserializeHash, serializeHash } from "@holochain-open-dev/utils";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import "@shoelace-style/shoelace/dist/components/badge/badge.js";
 import { InstalledAppInfo } from "@holochain/client";

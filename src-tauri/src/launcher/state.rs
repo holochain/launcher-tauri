@@ -1,5 +1,5 @@
 use futures::lock::Mutex;
-use holochain_manager::{app_manager::AppManager, versions::HolochainVersion};
+use holochain_manager::versions::HolochainVersion;
 use holochain_web_app_manager::installed_web_app_info::InstalledWebAppInfo;
 use std::{collections::HashMap, sync::Arc};
 

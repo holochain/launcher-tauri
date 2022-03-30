@@ -3,39 +3,31 @@ use portpicker;
 use std::fs;
 use std::path::PathBuf;
 use std::{collections::HashMap, time::Duration};
+use tauri::api::process::CommandChild;
 use url2::Url2;
 
 use async_trait::async_trait;
-use holochain_client_0_0_130::{AdminWebsocket, InstallAppBundlePayload, InstalledAppInfo};
-use holochain_conductor_api_0_0_130::{
+use holochain_client_0_0_131::{AdminWebsocket, InstallAppBundlePayload, InstalledAppInfo};
+use holochain_conductor_api_0_0_131::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_0_130::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig};
-use holochain_types_0_0_130::prelude::{AppBundle, AppBundleSource, SerializedBytes};
+use holochain_p2p_0_0_131::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig};
+use holochain_types_0_0_131::prelude::{AppBundle, AppBundleSource, SerializedBytes};
 
 use super::{launch::launch_holochain_process, HolochainVersion};
 
 use crate::{
-  app_manager::AppManager, config::LaunchHolochainConfig, error::LaunchHolochainError,
-  holochain_manager::HolochainManager,
+  config::LaunchHolochainConfig, error::LaunchHolochainError, holochain_manager::HolochainManager,
 };
 
-pub struct HolochainManagerV0_0_130 {
+pub struct HolochainManagerV0_0_131 {
   ws: AdminWebsocket,
+  command_child: CommandChild,
 }
 
-#[async_trait]
-impl HolochainManager for HolochainManagerV0_0_130 {
-  fn holochain_version() -> HolochainVersion {
-    HolochainVersion::V0_0_130
-  }
-
-  fn lair_keystore_version(&self) -> LairKeystoreVersion {
-    LairKeystoreVersion::V0_1_0
-  }
-
-  async fn launch(
+impl HolochainManagerV0_0_131 {
+  pub async fn launch(
     config: LaunchHolochainConfig,
     password: String,
   ) -> Result<Self, LaunchHolochainError> {
@@ -56,9 +48,9 @@ impl HolochainManager for HolochainManagerV0_0_130 {
     fs::write(conductor_config_path.clone(), serde_config)
       .expect("Could not write conductor config");
 
-    launch_holochain_process(
+    let command_child = launch_holochain_process(
       config.log_level,
-      Self::holochain_version(),
+      HolochainVersion::V0_0_131,
       conductor_config_path,
       password,
     )?;
@@ -69,7 +61,18 @@ impl HolochainManager for HolochainManagerV0_0_130 {
       .await
       .map_err(|err| LaunchHolochainError::CouldNotConnectToConductor(format!("{}", err)))?;
 
-    Ok(HolochainManagerV0_0_130 { ws })
+    Ok(HolochainManagerV0_0_131 { ws, command_child })
+  }
+}
+
+#[async_trait]
+impl HolochainManager for HolochainManagerV0_0_131 {
+  fn holochain_version(&self) -> HolochainVersion {
+    HolochainVersion::V0_0_131
+  }
+
+  fn lair_keystore_version(&self) -> LairKeystoreVersion {
+    LairKeystoreVersion::V0_1_0
   }
 
   async fn get_app_interface_port(&mut self) -> Result<u16, String> {
@@ -93,11 +96,16 @@ impl HolochainManager for HolochainManagerV0_0_130 {
 
     Ok(free_port)
   }
-}
 
-#[async_trait]
-impl AppManager for HolochainManagerV0_0_130 {
-  type InstalledApps = Vec<InstalledAppInfo>;
+  fn kill(mut self) -> Result<(), String> {
+    self.ws.close();
+    self
+      .command_child
+      .kill()
+      .map_err(|err| format!("Could not kill the holochain process: {}", err))?;
+
+    Ok(())
+  }
 
   async fn install_app(
     &mut self,

@@ -1,30 +1,37 @@
+use std::collections::HashMap;
+
 use async_trait::async_trait;
-use holochain_client_0_0_130::InstalledAppInfo;
+use enum_dispatch::enum_dispatch;
 use lair_keystore_manager::versions::LairKeystoreVersion;
 
-use crate::app_manager::AppManager;
-use crate::config::LaunchHolochainConfig;
-use crate::error::LaunchHolochainError;
+use crate::versions::holochain_conductor_api_latest::InstalledAppInfo;
+use crate::versions::holochain_types_latest::prelude::*;
 use crate::versions::HolochainVersion;
 
 #[async_trait]
-pub trait HolochainManager:
-  Send + Sync + AppManager<InstalledApps = Vec<InstalledAppInfo>>
-{
-  /// Launch the conductor
-  /// If there already was an instantiated conductor in the given paths, use those folders
-  /// If not, create the necessary files and folder to start afresh
-  /// 
-  /// This assumes that lair_keystore is already running in the configured path
-  async fn launch(config: LaunchHolochainConfig, password: String) -> Result<Self, LaunchHolochainError>
-  where
-    Self: Sized;
-
-  fn holochain_version() -> HolochainVersion
-  where
-    Self: Sized;
+#[enum_dispatch]
+pub trait HolochainManager: Send + Sync {
+  fn holochain_version(&self) -> HolochainVersion;
 
   fn lair_keystore_version(&self) -> LairKeystoreVersion;
 
   async fn get_app_interface_port(&mut self) -> Result<u16, String>;
+
+  async fn install_app(
+    &mut self,
+    app_id: String,
+    app_bundle: AppBundle,
+    uid: Option<String>,
+    membrane_proofs: HashMap<String, SerializedBytes>,
+  ) -> Result<(), String>;
+
+  async fn uninstall_app(&mut self, app_id: String) -> Result<(), String>;
+
+  async fn enable_app(&mut self, app_id: String) -> Result<(), String>;
+
+  async fn disable_app(&mut self, app_id: String) -> Result<(), String>;
+
+  async fn list_apps(&mut self) -> Result<Vec<InstalledAppInfo>, String>;
+
+  fn kill(self) -> Result<(), String>;
 }

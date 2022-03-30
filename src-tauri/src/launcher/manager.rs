@@ -1,4 +1,3 @@
-use holochain_manager::app_manager::AppManager;
 use holochain_manager::config::LaunchHolochainConfig;
 use holochain_web_app_manager::error::LaunchWebAppManagerError;
 use holochain_web_app_manager::installed_web_app_info::InstalledWebAppInfo;
@@ -23,6 +22,7 @@ use crate::file_system::{
 use crate::{running_state::RunningState, system_tray::update_system_tray, LauncherState};
 
 use super::config::LauncherConfig;
+use super::default_apps::install_default_apps_if_necessary;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "type", content = "content")]
@@ -137,7 +137,15 @@ impl LauncherManager {
 
     let state =
       match WebAppManager::launch(version, config, password, self.app_handle.clone()).await {
-        Ok(manager) => RunningState::Running(manager),
+        Ok(mut manager) => {
+          match install_default_apps_if_necessary(&mut manager).await {
+            Ok(()) => RunningState::Running(manager),
+            Err(err) => {
+              manager.kill()?;
+              RunningState::Error(LaunchWebAppManagerError::Other(format!("Could not install default apps: {}", err)))
+            }
+          }
+        }
         Err(error) => RunningState::Error(error),
       };
 

@@ -1,6 +1,4 @@
-use async_trait::async_trait;
 use holochain_manager::{
-  app_manager::AppManager,
   config::LaunchHolochainConfig,
   versions::{
     holochain_types_latest::{
@@ -9,7 +7,7 @@ use holochain_manager::{
     },
     launch_holochain,
     mr_bundle_latest::ResourceBytes,
-    HolochainVersion,
+    HolochainManagerEnum, HolochainVersion,
   },
   HolochainManager,
 };
@@ -30,7 +28,7 @@ use crate::{
 
 pub struct WebAppManager {
   environment_path: PathBuf,
-  holochain_manager: Box<dyn HolochainManager>,
+  holochain_manager: HolochainManagerEnum,
   caddy_manager: CaddyManager,
   allocated_ports: HashMap<String, u16>,
   app_handle: AppHandle,
@@ -117,7 +115,7 @@ impl WebAppManager {
         err
       })?;
 
-    self.execute_on_running_apps_changed().await?;
+    self.on_running_apps_changed().await?;
 
     Ok(())
   }
@@ -166,7 +164,7 @@ impl WebAppManager {
     self.allocated_ports.remove(&app_id);
   }
 
-  async fn execute_on_running_apps_changed(&mut self) -> Result<(), String> {
+  async fn on_running_apps_changed(&mut self) -> Result<(), String> {
     let installed_apps = self.list_apps().await?;
 
     self
@@ -200,13 +198,13 @@ impl WebAppManager {
       false => Ok(WebUiInfo::Headless),
     }
   }
-}
 
-#[async_trait]
-impl AppManager for WebAppManager {
-  type InstalledApps = Vec<InstalledWebAppInfo>;
+  pub fn kill(self) -> Result<(), String> {
+    self.holochain_manager.kill()?;
+    self.caddy_manager.kill()
+  }
 
-  async fn install_app(
+  pub async fn install_app(
     &mut self,
     app_id: String,
     app_bundle: AppBundle,
@@ -223,12 +221,12 @@ impl AppManager for WebAppManager {
         err
       })?;
 
-    self.execute_on_running_apps_changed().await?;
+    self.on_running_apps_changed().await?;
 
     Ok(())
   }
 
-  async fn uninstall_app(&mut self, app_id: String) -> Result<(), String> {
+  pub async fn uninstall_app(&mut self, app_id: String) -> Result<(), String> {
     self
       .holochain_manager
       .uninstall_app(app_id.clone())
@@ -240,28 +238,28 @@ impl AppManager for WebAppManager {
 
     self.uninstall_app_ui(app_id)?;
 
-    self.execute_on_running_apps_changed().await?;
+    self.on_running_apps_changed().await?;
 
     Ok(())
   }
 
-  async fn enable_app(&mut self, app_id: String) -> Result<(), String> {
+  pub async fn enable_app(&mut self, app_id: String) -> Result<(), String> {
     self.holochain_manager.enable_app(app_id.clone()).await?;
 
-    self.execute_on_running_apps_changed().await?;
+    self.on_running_apps_changed().await?;
 
     Ok(())
   }
 
-  async fn disable_app(&mut self, app_id: String) -> Result<(), String> {
+  pub async fn disable_app(&mut self, app_id: String) -> Result<(), String> {
     self.holochain_manager.disable_app(app_id.clone()).await?;
 
-    self.execute_on_running_apps_changed().await?;
+    self.on_running_apps_changed().await?;
 
     Ok(())
   }
 
-  async fn list_apps(&mut self) -> Result<Vec<InstalledWebAppInfo>, String> {
+  pub async fn list_apps(&mut self) -> Result<Vec<InstalledWebAppInfo>, String> {
     let installed_apps = self.holochain_manager.list_apps().await?;
 
     let installed_web_apps = installed_apps

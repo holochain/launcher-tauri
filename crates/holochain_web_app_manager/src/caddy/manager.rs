@@ -2,6 +2,7 @@ use std::{fs, path::PathBuf};
 
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use lair_keystore_manager::error::LaunchTauriSidecarError;
+use tauri::api::process::CommandChild;
 
 use crate::installed_web_app_info::InstalledWebAppInfo;
 
@@ -11,6 +12,7 @@ pub struct CaddyManager {
   caddy_admin_port: u16,
   conductor_admin_port: u16,
   conductor_app_interface_port: u16,
+  command_child: CommandChild
 }
 
 impl CaddyManager {
@@ -23,13 +25,14 @@ impl CaddyManager {
 
     create_dir_if_necessary(&environment_path);
 
-    launch_caddy_process(caddyfile_path(environment_path.clone()))?;
+    let command_child = launch_caddy_process(caddyfile_path(environment_path.clone()))?;
 
     Ok(CaddyManager {
       environment_path,
       caddy_admin_port,
       conductor_admin_port,
       conductor_app_interface_port,
+      command_child
     })
   }
 
@@ -51,6 +54,10 @@ impl CaddyManager {
     reload_caddy(caddyfile_path)?;
 
     Ok(())
+  }
+
+  pub fn kill(self) -> Result<(), String> {
+    self.command_child.kill().map_err(|err| format!("Could not kill the caddy process: {}", err))
   }
 }
 

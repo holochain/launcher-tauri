@@ -1,5 +1,5 @@
 use crate::launcher::state::LauncherState;
-use holochain_manager::{app_manager::AppManager, versions::HolochainVersion};
+use holochain_manager::versions::HolochainVersion;
 
 #[tauri::command]
 pub async fn enable_app(

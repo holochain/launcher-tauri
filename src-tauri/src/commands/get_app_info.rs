@@ -1,5 +1,5 @@
 use holochain_manager::versions::holochain_types_latest::{
-  prelude::{AppRoleManifest, CellProvisioning},
+  prelude::{AppBundle, AppRoleManifest, CellProvisioning},
   web_app::WebAppBundle,
 };
 use std::fs;
@@ -11,18 +11,8 @@ pub struct WebAppInfo {
 }
 
 #[tauri::command]
-pub async fn get_web_app_info(web_app_bundle_path: String) -> Result<WebAppInfo, String> {
-  log::info!("Installing: web_app_bundle = {}", web_app_bundle_path);
-
-  let web_app_bundle = WebAppBundle::decode(
-    &fs::read(&web_app_bundle_path).or(Err("Failed to read Web hApp bundle file"))?,
-  )
-  .or(Err("Malformed Web hApp bundle file"))?;
-
-  let app_bundle = web_app_bundle
-    .happ_bundle()
-    .await
-    .or(Err("Failed to resolve hApp bundle"))?;
+pub async fn get_app_info(app_bundle_path: String) -> Result<WebAppInfo, String> {
+  let app_bundle = read_app_bundle(app_bundle_path).await?;
 
   let app_slots = app_bundle.manifest().app_roles();
 
@@ -42,4 +32,22 @@ pub async fn get_web_app_info(web_app_bundle_path: String) -> Result<WebAppInfo,
     app_name: app_bundle.manifest().app_name().to_string(),
     roles_to_create,
   })
+}
+
+async fn read_app_bundle(path: String) -> Result<AppBundle, String> {
+  let bytes = fs::read(&path).or(Err("Failed to read Web hApp bundle file"))?;
+  match WebAppBundle::decode(&bytes) {
+    Ok(web_app_bundle) => {
+      let app_bundle = web_app_bundle
+        .happ_bundle()
+        .await
+        .or(Err("Failed to resolve hApp bundle"))?;
+
+      Ok(app_bundle)
+    }
+    Err(_) => {
+      let bundle = AppBundle::decode(&bytes).or(Err("Failed to resolve hApp bundle"))?;
+      Ok(bundle)
+    }
+  }
 }

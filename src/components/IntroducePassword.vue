@@ -9,7 +9,13 @@
       <span
         >This is the password with which you initialized the keystore.
       </span>
-      <mwc-textfield ref="password" label="Password" outlined></mwc-textfield>
+      <mwc-textfield
+        ref="password"
+        type="password"
+        style="margin-top: 16px"
+        label="Password"
+        outlined
+      ></mwc-textfield>
     </div>
 
     <mwc-button

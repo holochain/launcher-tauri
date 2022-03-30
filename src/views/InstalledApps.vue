@@ -2,7 +2,7 @@
   <div style="display: flex; flex: 1; flex-direction: column">
     <span style="margin-bottom: 16px; font-size: 1.5em">Installed Apps</span>
     <div
-      v-for="version in $store.getters[`holochainVersions`]"
+      v-for="version of $store.getters[`holochainVersions`]"
       :key="version"
       style="
         flex: 1;

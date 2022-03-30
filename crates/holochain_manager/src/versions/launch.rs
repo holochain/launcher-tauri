@@ -1,6 +1,6 @@
 use log;
 use std::{collections::HashMap, path::PathBuf};
-use tauri::api::process::{Command, CommandEvent};
+use tauri::api::process::{Command, CommandEvent, CommandChild};
 
 use lair_keystore_manager::error::LaunchTauriSidecarError;
 
@@ -12,7 +12,7 @@ pub fn launch_holochain_process(
   holochain_version: HolochainVersion,
   conductor_config_path: PathBuf,
   password: String,
-) -> Result<(), LaunchHolochainError> {
+) -> Result<CommandChild, LaunchHolochainError> {
   let mut envs = HashMap::new();
   envs.insert(String::from("RUST_LOG"), String::from(log_level.as_str()));
 
@@ -53,5 +53,5 @@ pub fn launch_holochain_process(
     .write("\n".as_bytes())
     .map_err(|err| LaunchHolochainError::ErrorWritingPassword(format!("{:?}", err)))?;
 
-  Ok(())
+  Ok(holochain_child)
 }

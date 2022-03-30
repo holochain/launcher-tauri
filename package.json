@@ -12,8 +12,10 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@holochain-open-dev/utils": "^0.0.9",
     "@holochain/client": "^0.3.2",
     "@material/mwc-button": "^0.25.1",
+    "@material/mwc-circular-progress": "0.25.1",
     "@material/mwc-dialog": "^0.25.1",
     "@material/mwc-fab": "^0.25.1",
     "@material/mwc-snackbar": "0.25.1",
@@ -21,6 +23,7 @@
     "@material/mwc-textfield": "^0.25.1",
     "@msgpack/msgpack": "^2.7.1",
     "@tauri-apps/api": "1.0.0-rc.3",
+    "@webcomponents/scoped-custom-element-registry": "^0.0.5",
     "array-flat-polyfill": "^1.0.1",
     "blob-polyfill": "^5.0.20210201",
     "core-js": "^3.6.5",

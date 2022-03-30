@@ -34,13 +34,14 @@
 
 <script lang="ts">
 import InstallApp from "@/components/InstallApp.vue";
+import InstalledApps from "./InstalledApps.vue";
 import { defineComponent } from "vue";
-import { ActionTypes } from "@/store/actions";
 
 export default defineComponent({
   name: "Home",
   components: {
     InstallApp,
+    InstalledApps,
   },
   data(): {
     snackbarText: string | undefined;

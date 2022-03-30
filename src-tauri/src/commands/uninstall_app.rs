@@ -1,4 +1,4 @@
-use holochain_manager::{app_manager::AppManager, versions::HolochainVersion};
+use holochain_manager::versions::HolochainVersion;
 
 use crate::launcher::state::LauncherState;
 

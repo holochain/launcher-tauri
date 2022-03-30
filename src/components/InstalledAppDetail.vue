@@ -78,7 +78,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { InstalledWebAppInfo } from "../types";
-import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { deserializeHash, serializeHash } from "@holochain-open-dev/utils";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import "@shoelace-style/shoelace/dist/components/tag/tag.js";
 import InstalledAppStatus from "./InstalledAppStatus.vue";
