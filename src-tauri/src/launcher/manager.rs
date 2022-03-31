@@ -91,6 +91,8 @@ impl LauncherManager {
     LairKeystoreManagerV0_1_0::initialize(keystore_path, password.clone())
       .map_err(|err| format!("Error initializing the keystore: {:?}", err))?;
 
+    std::thread::sleep(Duration::from_millis(1000));
+
     self.launch_keystore(password).await?;
 
     Ok(())
@@ -137,15 +139,16 @@ impl LauncherManager {
 
     let state =
       match WebAppManager::launch(version, config, password, self.app_handle.clone()).await {
-        Ok(mut manager) => {
-          match install_default_apps_if_necessary(&mut manager).await {
-            Ok(()) => RunningState::Running(manager),
-            Err(err) => {
-              manager.kill()?;
-              RunningState::Error(LaunchWebAppManagerError::Other(format!("Could not install default apps: {}", err)))
-            }
+        Ok(mut manager) => match install_default_apps_if_necessary(&mut manager).await {
+          Ok(()) => RunningState::Running(manager),
+          Err(err) => {
+            manager.kill()?;
+            RunningState::Error(LaunchWebAppManagerError::Other(format!(
+              "Could not install default apps: {}",
+              err
+            )))
           }
-        }
+        },
         Err(error) => RunningState::Error(error),
       };
 

@@ -1,7 +1,7 @@
 import { DisabledAppReason, InstalledAppInfo } from "@holochain/client";
 
 export function isAppRunning(app: InstalledAppInfo): boolean {
-  return Object.keys(app.status).includes("running");
+  return (app.status as any) === "running";
 }
 export function isAppDisabled(app: InstalledAppInfo): boolean {
   return Object.keys(app.status).includes("disabled");
@@ -10,6 +10,7 @@ export function isAppPaused(app: InstalledAppInfo): boolean {
   return Object.keys(app.status).includes("paused");
 }
 export function getReason(app: InstalledAppInfo): string | undefined {
+  console.log(app);
   if (isAppRunning(app)) return undefined;
   if (isAppDisabled(app)) {
     const reason = (

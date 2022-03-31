@@ -21,6 +21,11 @@ pub async fn open_app_ui(
   Ok(())
 }
 
+#[tauri::command]
+pub fn report_issue() -> () {
+  open_url("https://github.com/holochain/launcher/issues/new?assignees=&labels=bug&template=bug_report.md&title=".into()).unwrap();
+}
+
 pub fn open_url(url: String) -> io::Result<()> {
   tauri::async_runtime::spawn(async move {
     if let Err(_) = open::with(url.clone().as_str(), "firefox") {

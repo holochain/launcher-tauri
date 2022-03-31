@@ -1,4 +1,4 @@
-use crate::{commands::open_app::open_url, setup::logs};
+use crate::{commands::open_app::{open_url, report_issue}, setup::logs};
 use tauri::{CustomMenuItem, Manager, Menu, Submenu, Window, Wry};
 
 pub fn build_menu() -> Menu {
@@ -27,8 +27,8 @@ pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
     "about" => window.emit("about", ()).unwrap(),
     "quit" => {
       window.app_handle().exit(0);
-    },
-    "report_issue" => open_url("https://github.com/holochain/launcher/issues/new?assignees=&labels=bug&template=bug_report.md&title=".into()).unwrap(),
+    }
+    "report_issue" => report_issue(),
     "open_logs" => {
       logs::open_logs_folder();
     }

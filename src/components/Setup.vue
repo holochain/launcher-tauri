@@ -10,17 +10,21 @@
         >This is the password with which the keystore where your private keys
         live will be initialized.
       </span>
+
       <mwc-textfield
         outlined
         type="password"
         ref="password"
         autoValidate
+        style="margin-top: 16px"
         label="Password"
       ></mwc-textfield>
+
       <mwc-textfield
         outlined
         autoValidate
         ref="repeatPassword"
+        style="margin-top: 16px"
         type="password"
         label="Repeat Password"
       ></mwc-textfield>
@@ -30,7 +34,7 @@
       label="Initialize Keystore"
       slot="primaryAction"
       @click="initialize()"
-      :disabled="!isPasswordValid()"
+      :disabled="!isPasswordValid"
     ></mwc-button>
   </mwc-dialog>
 </template>
@@ -43,28 +47,32 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Setup",
-  created() {
-    const repeatPassword = this.$refs.repeatPassword as TextField;
-    repeatPassword.validityTransform = (newValue: string, nativeValidity) => {
-      if (newValue !== (this.$refs.password as TextField).value) {
-        repeatPassword.setCustomValidity("Passwords don't match");
-
-        return {
-          valid: false,
-        };
-      } else {
-        return {
-          valid: true,
-        };
-      }
+  data() {
+    return {
+      isPasswordValid: false,
     };
   },
-  methods: {
-    isPasswordValid() {
-      const password = this.$refs.password as TextField;
+  created() {
+    this.$nextTick(() => {
       const repeatPassword = this.$refs.repeatPassword as TextField;
-      return password.validity.valid && repeatPassword.validity.valid;
-    },
+      repeatPassword.validityTransform = (newValue: string, nativeValidity) => {
+        if (newValue !== (this.$refs.password as TextField).value) {
+          repeatPassword.setCustomValidity("Passwords don't match");
+
+          this.isPasswordValid = false;
+          return {
+            valid: false,
+          };
+        } else {
+          this.isPasswordValid = true;
+          return {
+            valid: true,
+          };
+        }
+      };
+    });
+  },
+  methods: {
     async initialize() {
       const password = (this.$refs["password"] as TextField).value;
 

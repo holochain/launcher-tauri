@@ -23,6 +23,7 @@ mod running_state;
 mod setup;
 mod system_tray;
 
+use crate::commands::open_app::report_issue;
 use crate::commands::{
   enable_app::{disable_app, enable_app},
   factory_reset::execute_factory_reset,
@@ -73,6 +74,7 @@ fn main() {
       get_state_info,
       open_app_ui,
       initialize_keystore,
+      report_issue,
       unlock_and_launch,
       install_app,
       enable_app,

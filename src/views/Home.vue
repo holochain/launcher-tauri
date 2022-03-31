@@ -1,11 +1,10 @@
 <template>
-  <div class="column" style="flex: 1">
+  <div class="column" style="flex: 1; margin: 24px">
     <div class="flex-scrollable-parent">
       <div class="flex-scrollable-container">
         <div class="flex-scrollable-y">
-          <span style="font-size: 20px">Installed Apps</span>
           <InstalledApps
-            style="padding: 24px; display: flex; margin-bottom: 50px"
+            style="display: flex; margin-bottom: 50px"
           ></InstalledApps>
         </div>
       </div>

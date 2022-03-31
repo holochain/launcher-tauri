@@ -12,7 +12,7 @@
     <mwc-circular-progress indeterminate></mwc-circular-progress>
   </div>
 
-  <div v-else>
+  <div v-else style="flex: 1; display: flex">
     <AlreadyRunning v-if="$store.getters[`isAlreadyRunning`]"> </AlreadyRunning>
     <Error
       v-else-if="$store.getters[`errorLaunching`]"

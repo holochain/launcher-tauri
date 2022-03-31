@@ -46,7 +46,7 @@
               <InstalledAppStatus :installedAppInfo="app.installed_app_info" />
 
               <mwc-icon-button
-                @click="$refs[app.installed_app_info.installed_app_id].open()"
+                @click="$refs[app.installed_app_info.installed_app_id].show()"
                 style="margin-left: 8px"
                 icon="settings"
               >
@@ -70,7 +70,7 @@
             style="display: flex; flex-direction: row; align-items: flex-end"
           >
             <mwc-button
-              v-if="isAppRunning(app, installed_app_info)"
+              v-if="isAppRunning(app.installed_app_info) && !isAppHeadless(app)"
               @click="$emit('openApp', app.installed_app_info.installed_app_id)"
               style="margin-left: 8px"
               label="Open"
@@ -86,6 +86,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import "@ui5/webcomponents/dist/Card.js";
+import "@material/mwc-button";
+import "@material/mwc-icon-button";
+
 import { InstalledWebAppInfo } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppStatus from "./InstalledAppStatus.vue";
@@ -103,6 +107,9 @@ export default defineComponent({
   emits: ["openApp"],
   methods: {
     isAppRunning,
+    isAppHeadless(app: InstalledWebAppInfo) {
+      return app.web_ui_info.type === "Headless";
+    },
   },
 });
 </script>

@@ -2,7 +2,7 @@
   <div style="display: flex; flex-direction: column">
     <span style="margin-right: 8px; opacity: 0.9">Your Public Key:</span>
     <span style="margin-right: 16px; opacity: 0.7; font-family: monospace">{{
-      serializeHash(app.cell_data[0].cell_id[1])
+      serializeHash(installedAppInfo.cell_data[0].cell_id[1])
     }}</span>
 
     <table style="text-align: left; margin-top: 8px">
@@ -33,10 +33,10 @@
     <span
       >Status:
 
-      <InstalledAppStatus :installedAppInfo="installedappInfo" />
+      <InstalledAppStatus :installedAppInfo="installedAppInfo" />
     </span>
-    <span style="margin-top: 8px">
-      {{ getReason() }}
+    <span v-if="getReason(installedAppInfo)" style="margin-top: 8px">
+      {{ getReason(installedAppInfo) }}
     </span>
     <div style="display: flex; flex-direction: row">
       <mwc-button
@@ -77,11 +77,12 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { InstalledWebAppInfo } from "../types";
 import { deserializeHash, serializeHash } from "@holochain-open-dev/utils";
-import "@shoelace-style/shoelace/dist/themes/light.css";
-import "@shoelace-style/shoelace/dist/components/tag/tag.js";
+import "@material/mwc-button";
+
 import InstalledAppStatus from "./InstalledAppStatus.vue";
+import { InstalledWebAppInfo } from "../types";
+import { getReason, isAppDisabled, isAppPaused } from "../utils";
 
 export default defineComponent({
   name: "InstalledAppDetail",
@@ -104,7 +105,9 @@ export default defineComponent({
   methods: {
     deserializeHash,
     serializeHash,
-
+    getReason,
+    isAppDisabled,
+    isAppPaused,
     async enableApp() {
       this.$emit("enableApp", this.appId);
     },
