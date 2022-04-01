@@ -4,7 +4,8 @@ use tauri::api::process::kill_children;
 
 use crate::{
   file_system::{root_config_path, root_data_path, root_lair_path},
-  launcher::{config::LauncherConfig, manager::LauncherManager, state::LauncherState},
+  launcher::{manager::LauncherManager, state::LauncherState},
+  running_state::RunningState,
 };
 
 #[tauri::command]
@@ -29,17 +30,11 @@ pub async fn execute_factory_reset(
   remove_dir_if_exists(root_data_path())
     .or(Err(String::from("Could not remove holochain data path")))?;
 
-  let manager = LauncherManager::launch(
-    LauncherConfig {
-      log_level: log::Level::Info,
-    },
-    app_handle,
-  )
-  .await?;
+  let manager = LauncherManager::launch(app_handle).await?;
 
-  if let LauncherState::Running(mutex) = &*state {
-    *mutex.lock().await = manager;
-  }
+  let mut m = state.lock().await;
+
+  (*m) = RunningState::Running(manager);
 
   log::info!("Started children processes again, factory reset completed");
 

@@ -35,18 +35,22 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
       let (version, app_id) =
         expand_version_and_app_id(String::from(menu_item_id)).expect("Bad menu item?");
 
-      match app.state::<LauncherState>().get_launcher_manager() {
-        Ok(manager) => {
-          tauri::async_runtime::block_on(async move {
-            if let Err(err) = manager.lock().await.open_app(version, &app_id) {
+      let launcher_state = app.state::<LauncherState>();
+      tauri::async_runtime::block_on(async move {
+        let mut mutex = (*launcher_state).lock().await;
+
+        match mutex.get_running() {
+          Ok(manager) => {
+            if let Err(err) = manager.open_app(version, &app_id) {
               log::error!("Error opening app: {:?}", err);
             }
-          });
-        }
-        Err(e) => {
-          log::error!("Error opening app: {:?}", e);
-        }
-      };
+          }
+          Err(e) => {
+            log::error!("Error opening app: {:?}", e);
+          }
+        };
+      });
+
       ()
     }
   }

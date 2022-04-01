@@ -4,5 +4,6 @@ use serde::{Deserialize, Serialize};
 #[serde(tag = "type", content = "content")]
 pub enum RunLauncherError {
   AnotherInstanceIsAlreadyRunning,
+  OldFilesExist,
   ErrorLaunching(String),
 }

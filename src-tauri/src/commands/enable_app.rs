@@ -8,7 +8,8 @@ pub async fn enable_app(
   holochain_version: HolochainVersion,
   app_id: String,
 ) -> Result<(), String> {
-  let mut manager = (*state).get_launcher_manager()?.lock().await;
+  let mut mutex = (*state).lock().await;
+  let manager = mutex.get_running()?;
 
   manager
     .get_web_happ_manager(holochain_version)?
@@ -26,7 +27,8 @@ pub async fn disable_app(
   holochain_version: HolochainVersion,
   app_id: String,
 ) -> Result<(), String> {
-  let mut manager = state.get_launcher_manager()?.lock().await;
+  let mut mutex = (*state).lock().await;
+  let manager = mutex.get_running()?;
 
   manager
     .get_web_happ_manager(holochain_version)?

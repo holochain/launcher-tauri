@@ -2,10 +2,14 @@
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
+use file_system::root_data_path;
 use futures::lock::Mutex;
 use launcher::config::LauncherConfig;
 use launcher::error::RunLauncherError;
+use running_state::RunningState;
+use std::path::Path;
 use std::sync::Arc;
+use tauri::AppHandle;
 
 use system_tray::initial_system_tray;
 use tauri;
@@ -25,10 +29,11 @@ mod system_tray;
 
 use crate::commands::open_app::report_issue;
 use crate::commands::{
+  config::write_config,
   enable_app::{disable_app, enable_app},
   factory_reset::execute_factory_reset,
-  get_state_info::get_state_info,
   get_app_info::get_app_info,
+  get_state_info::get_state_info,
   install_app::install_app,
   open_app::open_app_ui,
   password::{initialize_keystore, unlock_and_launch},
@@ -50,10 +55,12 @@ fn main() {
 
   // If holochain is already running, only display a small notice window
   if already_running {
+    let state: LauncherState = Arc::new(Mutex::new(RunningState::Error(
+      RunLauncherError::AnotherInstanceIsAlreadyRunning,
+    )));
+
     let build_result = tauri::Builder::default()
-      .manage(LauncherState::Error(
-        RunLauncherError::AnotherInstanceIsAlreadyRunning,
-      ))
+      .manage(state)
       .invoke_handler(tauri::generate_handler![get_state_info])
       .run(tauri::generate_context!());
     if let Err(err) = build_result {
@@ -82,34 +89,15 @@ fn main() {
       uninstall_app,
       get_app_info,
       execute_factory_reset,
+      write_config,
       setup::logs::log,
     ])
     .setup(|app| {
       let handle = app.handle().clone();
+      let launcher_state =
+        tauri::async_runtime::block_on(async move { launch_manager(handle).await });
 
-      let manager_launch = tauri::async_runtime::block_on(async move {
-        LauncherManager::launch(
-          LauncherConfig {
-            log_level: log::Level::Debug,
-          },
-          handle,
-        )
-        .await
-      });
-
-      let launcher_state = match manager_launch {
-        Ok(launcher_manager) => {
-          log::info!("Launch setup successful");
-          LauncherState::Running(Arc::new(Mutex::new(launcher_manager)))
-        }
-        Err(error) => {
-          kill_children();
-          log::error!("There was an error launching holochain: {:?}", error);
-          LauncherState::Error(RunLauncherError::ErrorLaunching(error))
-        }
-      };
-
-      app.manage(launcher_state);
+      app.manage(Arc::new(Mutex::new(launcher_state)));
 
       Ok(())
     })
@@ -124,5 +112,25 @@ fn main() {
       });
     }
     Err(err) => log::error!("Error building the app: {:?}", err),
+  }
+}
+
+async fn launch_manager(app_handle: AppHandle) -> RunningState<LauncherManager, RunLauncherError> {
+  if Path::new(&root_data_path().join("conductor")).exists() {
+    return RunningState::Error(RunLauncherError::OldFilesExist);
+  }
+
+  let manager_launch = LauncherManager::launch(app_handle).await;
+
+  match manager_launch {
+    Ok(launcher_manager) => {
+      log::info!("Launch setup successful");
+      RunningState::Running(launcher_manager)
+    }
+    Err(error) => {
+      kill_children();
+      log::error!("There was an error launching holochain: {:?}", error);
+      RunningState::Error(RunLauncherError::ErrorLaunching(error))
+    }
   }
 }

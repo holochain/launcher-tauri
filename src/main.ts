@@ -13,7 +13,6 @@ import { invoke } from "@tauri-apps/api/tauri";
 
 import App from "./App.vue";
 import { store } from "./store";
-import { ActionTypes } from "./store/actions";
 
 window.onerror = function (message, source, lineno, colno, error) {
   invoke("log", {
@@ -23,12 +22,7 @@ window.onerror = function (message, source, lineno, colno, error) {
   });
 };
 
-async function setup() {
-  const app = createApp(App);
+const app = createApp(App);
 
-  app.use(store);
-  store.dispatch(ActionTypes.fetchStateInfo);
-  app.mount("#app");
-}
-
-setup();
+app.use(store);
+app.mount("#app");

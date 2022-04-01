@@ -5,9 +5,10 @@ pub async fn initialize_keystore(
   state: tauri::State<'_, LauncherState>,
   password: String,
 ) -> Result<(), String> {
-  let mut launcher_manager = state.get_launcher_manager()?.lock().await;
+  let mut mutex = (*state).lock().await;
+  let manager = mutex.get_running()?;
 
-  launcher_manager
+  manager
     .initialize_and_launch_keystore(password)
     .await?;
 
@@ -19,9 +20,10 @@ pub async fn unlock_and_launch(
   state: tauri::State<'_, LauncherState>,
   password: String,
 ) -> Result<(), String> {
-  let mut launcher_manager = state.get_launcher_manager()?.lock().await;
+  let mut mutex = (*state).lock().await;
+  let manager = mutex.get_running()?;
 
-  launcher_manager.launch_keystore(password).await?;
+  manager.launch_keystore(password).await?;
 
   Ok(())
 }

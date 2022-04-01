@@ -26,20 +26,26 @@
     <IntroducePassword
       v-else-if="$store.getters[`passwordNeeded`]"
     ></IntroducePassword>
-    <Home v-else style="display: flex; flex: 1"></Home>
+    <Home
+      v-else-if="!$store.getters['oldFiles']"
+      style="display: flex; flex: 1"
+    ></Home>
     <FactoryReset style="display: flex; flex: 1"></FactoryReset>
     <About></About>
+    <Config></Config>
   </div>
 </template>
 <script lang="ts">
 import Home from "./views/Home.vue";
 import FactoryReset from "./views/FactoryReset.vue";
+import Config from "./components/Config.vue";
 import Error from "./components/Error.vue";
 import AlreadyRunning from "./components/AlreadyRunning.vue";
 import IntroducePassword from "./components/IntroducePassword.vue";
 import Setup from "./components/Setup.vue";
 import About from "./components/About.vue";
 import { defineComponent } from "vue";
+import { ActionTypes } from "./store/actions";
 import "@material/mwc-circular-progress";
 
 export default defineComponent({
@@ -51,12 +57,16 @@ export default defineComponent({
     FactoryReset,
     About,
     Error,
+    Config,
     AlreadyRunning,
   },
   methods: {
     isLoading() {
       return this.$store.state.launcherStateInfo === "loading";
     },
+  },
+  async created() {
+    this.$store.dispatch(ActionTypes.fetchStateInfo);
   },
 });
 </script>

@@ -39,7 +39,7 @@ pub fn launch_holochain_process(
     while let Some(event) = holochain_rx.recv().await {
       match event.clone() {
         CommandEvent::Stdout(line) => log::info!("[HOLOCHAIN] {}", line),
-        CommandEvent::Stderr(line) => log::error!("[HOLOCHAIN] {}", line),
+        CommandEvent::Stderr(line) => log::info!("[HOLOCHAIN] {}", line),
         _ => log::info!("[HOLOCHAIN] {:?}", event),
       };
     }

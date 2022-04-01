@@ -1,9 +1,10 @@
-use crate::{commands::open_app::{open_url, report_issue}, setup::logs};
+use crate::{commands::open_app::report_issue, setup::logs};
 use tauri::{CustomMenuItem, Manager, Menu, Submenu, Window, Wry};
 
 pub fn build_menu() -> Menu {
   let factory_reset = CustomMenuItem::new("factory_reset".to_string(), "Factory Reset");
   let open_logs = CustomMenuItem::new("open_logs".to_string(), "Open Logs");
+  let config = CustomMenuItem::new("config".to_string(), "Configuration");
   let quit = CustomMenuItem::new("quit".to_string(), "Quit");
 
   let settings_submenu = Submenu::new(
@@ -11,6 +12,7 @@ pub fn build_menu() -> Menu {
     Menu::new()
       .add_item(factory_reset)
       .add_item(open_logs)
+      .add_item(config)
       .add_item(quit),
   );
   let about = CustomMenuItem::new("about".to_string(), "About");
@@ -24,6 +26,7 @@ pub fn build_menu() -> Menu {
 pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
   match event_id {
     "factory_reset" => window.emit("request-factory-reset", ()).unwrap(),
+    "config" => window.emit("open-config", ()).unwrap(),
     "about" => window.emit("about", ()).unwrap(),
     "quit" => {
       window.app_handle().exit(0);

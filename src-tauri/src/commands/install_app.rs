@@ -28,7 +28,8 @@ pub async fn install_app(
     );
   }
 
-  let mut manager = state.get_launcher_manager()?.lock().await;
+  let mut mutex = (*state).lock().await;
+  let manager = mutex.get_running()?;
 
   let bytes = fs::read(&app_bundle_path).or(Err("Failed to read Web hApp bundle file"))?;
 

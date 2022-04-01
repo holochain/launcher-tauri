@@ -22,6 +22,10 @@ pub fn config_environment_path(holochain_version: HolochainVersion) -> PathBuf {
   holochain_config_path(holochain_version)
 }
 
+pub fn launcher_config_path() -> PathBuf {
+  root_config_path().join("launcher-config.yaml")
+}
+
 /** Logs */
 
 pub fn logs_path() -> PathBuf {

@@ -41,10 +41,7 @@ pub struct LauncherManager {
 }
 
 impl LauncherManager {
-  pub async fn launch(
-    launcher_config: LauncherConfig,
-    app_handle: AppHandle,
-  ) -> Result<Self, String> {
+  pub async fn launch(app_handle: AppHandle) -> Result<Self, String> {
     create_dir_if_necessary(&root_lair_path());
     create_dir_if_necessary(&root_data_path());
     create_dir_if_necessary(&root_config_path());
@@ -58,28 +55,27 @@ impl LauncherManager {
       false => KeystoreStatus::InitNecessary,
     };
 
+    let config = LauncherConfig::read()?;
+
     let app_handle2 = app_handle.clone();
     let manager = LauncherManager {
       app_handle: app_handle.clone(),
       holochain_managers: HashMap::new(),
-      config: launcher_config,
+      config,
       lair_keystore_manager: RunningState::Error(keystore_status),
     };
 
     app_handle.listen_global("running_apps_changed", move |_| {
       let launcher_state: &LauncherState = &app_handle2.state();
-      tauri::async_runtime::block_on(async move {
-        if let Err(err) = launcher_state
-          .get_launcher_manager()
-          .unwrap()
-          .lock()
-          .await
-          .on_apps_changed()
-          .await
-        {
-          log::error!("Couldn't refresh apps: {:?}", err)
-        }
+      let result = tauri::async_runtime::block_on(async move {
+        let mut mutex = (*launcher_state).lock().await;
+        let manager = mutex.get_running()?;
+        manager.on_apps_changed().await
       });
+
+      if let Err(err) = result {
+        log::error!("Couldn't refresh apps: {:?}", err);
+      }
     });
 
     Ok(manager)

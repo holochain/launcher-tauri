@@ -10,7 +10,8 @@ pub async fn open_app_ui(
   holochain_version: HolochainVersion,
   app_id: String,
 ) -> Result<(), String> {
-  let mut manager = state.get_launcher_manager()?.lock().await;
+  let mut mutex = (*state).lock().await;
+  let manager = mutex.get_running()?;
 
   manager
     .open_app(holochain_version, &app_id)

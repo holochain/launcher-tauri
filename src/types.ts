@@ -50,14 +50,26 @@ export type KeystoreStatus =
 export type RunLauncherError =
   | { type: "AnotherInstanceIsAlreadyRunning" }
   | {
+      type: "OldFilesExist";
+    }
+  | {
       type: "ErrorLaunching";
       content: string;
     };
 
-export type LauncherStateInfo = RunningState<
-  RunningState<Record<HolochainVersion, HolochainStateInfo>, KeystoreStatus>,
-  RunLauncherError
->;
+export interface LauncherStateInfo {
+  state: RunningState<
+    RunningState<Record<HolochainVersion, HolochainStateInfo>, KeystoreStatus>,
+    RunLauncherError
+  >;
+  config: LauncherConfig;
+}
+
+export type LogLevel = "Error" | "Warn" | "Info" | "Debug" | "Trace";
+
+export interface LauncherConfig {
+  log_level: LogLevel;
+}
 
 export type WebUiInfo =
   | {
