@@ -53,6 +53,10 @@ export type RunLauncherError =
       type: "OldFilesExist";
     }
   | {
+      type: "FileSystemError";
+      content: string;
+    }
+  | {
       type: "ErrorLaunching";
       content: string;
     };

@@ -37,6 +37,12 @@ export const store = createStore<LauncherAdminState>({
         return state.launcherStateInfo.state.content.content;
 
       if (
+        state.launcherStateInfo.state.type === "Error" &&
+        state.launcherStateInfo.state.content.type === "FileSystemError"
+      )
+        return state.launcherStateInfo.state.content.content;
+
+      if (
         state.launcherStateInfo.state.type === "Running" &&
         state.launcherStateInfo.state.content.type === "Error" &&
         state.launcherStateInfo.state.content.content.type ===
@@ -140,7 +146,7 @@ export const store = createStore<LauncherAdminState>({
     async fetchStateInfo({ commit }) {
       commit("loadStateInfo");
       const StateInfo = await invoke("get_state_info", {});
-
+      console.log(StateInfo);
       commit("setStateInfo", StateInfo);
     },
   },

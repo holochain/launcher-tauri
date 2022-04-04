@@ -6,12 +6,12 @@ use std::{collections::HashMap, sync::Arc};
 
 use super::{
   config::LauncherConfig,
-  error::RunLauncherError,
+  error::LauncherError,
   manager::{KeystoreStatus, LauncherManager},
 };
 use crate::running_state::RunningState;
 
-pub type LauncherState = Arc<Mutex<RunningState<LauncherManager, RunLauncherError>>>;
+pub type LauncherState = Arc<Mutex<RunningState<LauncherManager, LauncherError>>>;
 
 pub type HolochainStateInfo = RunningState<Vec<InstalledWebAppInfo>, String>;
 
@@ -19,7 +19,7 @@ pub type HolochainStateInfo = RunningState<Vec<InstalledWebAppInfo>, String>;
 pub struct LauncherStateInfo {
   pub state: RunningState<
     RunningState<HashMap<HolochainVersion, HolochainStateInfo>, KeystoreStatus>,
-    RunLauncherError,
+    LauncherError,
   >,
   pub config: LauncherConfig,
 }

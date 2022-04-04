@@ -1,9 +1,18 @@
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
+use lair_keystore_manager::error::FileSystemError;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Error, Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "type", content = "content")]
-pub enum RunLauncherError {
+pub enum LauncherError {
+  #[error("There is already another instance of the Holochain Launcher running")]
   AnotherInstanceIsAlreadyRunning,
+  #[error("Failed to read or write from the filesystem: `{0}`")]
+  FileSystemError(#[from] FileSystemError),
+  #[error("There are still files from previous versions of the Holochain Launcher")]
   OldFilesExist,
+  #[error("There was an error with the launcher configuration: `{0}`")]
+  ConfigError(String),
+  #[error("Error Launching: `{0}`")]
   ErrorLaunching(String),
 }

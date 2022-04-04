@@ -4,8 +4,7 @@
 )]
 use file_system::root_data_path;
 use futures::lock::Mutex;
-use launcher::config::LauncherConfig;
-use launcher::error::RunLauncherError;
+use launcher::error::LauncherError;
 use running_state::RunningState;
 use std::path::Path;
 use std::sync::Arc;
@@ -56,7 +55,7 @@ fn main() {
   // If holochain is already running, only display a small notice window
   if already_running {
     let state: LauncherState = Arc::new(Mutex::new(RunningState::Error(
-      RunLauncherError::AnotherInstanceIsAlreadyRunning,
+      LauncherError::AnotherInstanceIsAlreadyRunning,
     )));
 
     let build_result = tauri::Builder::default()
@@ -115,9 +114,9 @@ fn main() {
   }
 }
 
-async fn launch_manager(app_handle: AppHandle) -> RunningState<LauncherManager, RunLauncherError> {
+async fn launch_manager(app_handle: AppHandle) -> RunningState<LauncherManager, LauncherError> {
   if Path::new(&root_data_path().join("conductor")).exists() {
-    return RunningState::Error(RunLauncherError::OldFilesExist);
+    return RunningState::Error(LauncherError::OldFilesExist);
   }
 
   let manager_launch = LauncherManager::launch(app_handle).await;
@@ -130,7 +129,7 @@ async fn launch_manager(app_handle: AppHandle) -> RunningState<LauncherManager, 
     Err(error) => {
       kill_children();
       log::error!("There was an error launching holochain: {:?}", error);
-      RunningState::Error(RunLauncherError::ErrorLaunching(error))
+      RunningState::Error(error)
     }
   }
 }

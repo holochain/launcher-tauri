@@ -1,15 +1,46 @@
+use std::{fmt, io};
+use thiserror::Error;
+
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Error, Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "type", content = "content")]
 pub enum LairKeystoreError {
-  LaunchTauriSidecarError(LaunchTauriSidecarError),
+  #[error("Failed to launch child: `{0}`")]
+  LaunchChildError(#[from] LaunchChildError),
+  #[error("Failed to write the password: `{0}`")]
   ErrorWritingPassword(String),
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Error, Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type", content = "content")]
-pub enum LaunchTauriSidecarError {
+pub enum LaunchChildError {
+  #[error("Sidecar binary was not found")]
   BinaryNotFound,
+  #[error("Failed to execute sidecar binary: `{0}`")]
   FailedToExecute(String),
+  #[error("Failed to read or write from the filesystem: `{0}`")]
+  FileSystemError(#[from] FileSystemError),
+}
+
+#[derive(Error, Debug, Serialize, Deserialize, Clone)]
+pub struct FileSystemError(String);
+
+impl fmt::Display for FileSystemError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    // Use `self.number` to refer to each positional data point.
+    write!(f, "{}", self.0)
+  }
+}
+
+impl From<io::Error> for FileSystemError {
+  fn from(err: io::Error) -> Self {
+    FileSystemError(format!("{:?}", err))
+  }
+}
+
+impl From<FileSystemError> for LairKeystoreError {
+  fn from(err: FileSystemError) -> Self {
+    LairKeystoreError::LaunchChildError(LaunchChildError::FileSystemError(err))
+  }
 }

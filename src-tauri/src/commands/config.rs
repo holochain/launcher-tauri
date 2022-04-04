@@ -1,7 +1,9 @@
 use tauri::api::process::kill_children;
 
 use crate::{
-  launcher::{config::LauncherConfig, manager::LauncherManager, state::LauncherState},
+  launcher::{
+    config::LauncherConfig, error::LauncherError, manager::LauncherManager, state::LauncherState,
+  },
   running_state::RunningState,
 };
 
@@ -10,7 +12,7 @@ pub async fn write_config(
   state: tauri::State<'_, LauncherState>,
   app_handle: tauri::AppHandle,
   config: LauncherConfig,
-) -> Result<(), String> {
+) -> Result<(), LauncherError> {
   config.write()?;
 
   kill_children();

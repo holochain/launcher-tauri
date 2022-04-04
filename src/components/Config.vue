@@ -32,7 +32,7 @@
     <mwc-button
       slot="primaryAction"
       @click="saveConfig()"
-      label="Save and reload"
+      label="Save and Restart"
     ></mwc-button>
   </mwc-dialog>
 </template>

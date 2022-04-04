@@ -4,7 +4,7 @@ use url2::Url2;
 
 use tauri::api::process::{Command, CommandEvent};
 
-use crate::error::{LairKeystoreError, LaunchTauriSidecarError};
+use crate::error::{LairKeystoreError, LaunchChildError};
 
 pub fn launch_lair_keystore_process(
   log_level: log::Level,
@@ -15,15 +15,15 @@ pub fn launch_lair_keystore_process(
   envs.insert(String::from("RUST_LOG"), String::from(log_level.as_str()));
 
   let (mut lair_rx, mut command_child) = Command::new_sidecar("lair-keystore")
-    .or(Err(LairKeystoreError::LaunchTauriSidecarError(
-      LaunchTauriSidecarError::BinaryNotFound,
+    .or(Err(LairKeystoreError::LaunchChildError(
+      LaunchChildError::BinaryNotFound,
     )))?
     .args(&["server", "-p"])
     .current_dir(keystore_data_path.clone())
     .envs(envs.clone())
     .spawn()
     .map_err(|err| {
-      LairKeystoreError::LaunchTauriSidecarError(LaunchTauriSidecarError::FailedToExecute(format!(
+      LairKeystoreError::LaunchChildError(LaunchChildError::FailedToExecute(format!(
         "{:?}",
         err
       )))
@@ -45,23 +45,23 @@ pub fn launch_lair_keystore_process(
     .map_err(|err| LairKeystoreError::ErrorWritingPassword(format!("{:?}", err)))?;
 
   let output = Command::new_sidecar("lair-keystore")
-    .or(Err(LairKeystoreError::LaunchTauriSidecarError(
-      LaunchTauriSidecarError::BinaryNotFound,
+    .or(Err(LairKeystoreError::LaunchChildError(
+      LaunchChildError::BinaryNotFound,
     )))?
     .args(&["url"])
     .current_dir(keystore_data_path)
     .envs(envs.clone())
     .output()
     .map_err(|err| {
-      LairKeystoreError::LaunchTauriSidecarError(LaunchTauriSidecarError::FailedToExecute(format!(
+      LairKeystoreError::LaunchChildError(LaunchChildError::FailedToExecute(format!(
         "{:?}",
         err
       )))
     })?;
 
   if output.stderr.len() > 0 {
-    return Err(LairKeystoreError::LaunchTauriSidecarError(
-      LaunchTauriSidecarError::FailedToExecute(output.stderr),
+    return Err(LairKeystoreError::LaunchChildError(
+      LaunchChildError::FailedToExecute(output.stderr),
     ));
   }
 

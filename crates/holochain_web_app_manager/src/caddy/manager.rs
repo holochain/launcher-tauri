@@ -1,18 +1,19 @@
-use std::{fs, path::PathBuf};
+use std::path::PathBuf;
 
+use lair_keystore_manager::error::LaunchChildError;
 use lair_keystore_manager::utils::create_dir_if_necessary;
-use lair_keystore_manager::error::LaunchTauriSidecarError;
 use tauri::api::process::CommandChild;
 
 use crate::installed_web_app_info::InstalledWebAppInfo;
 
-use super::utils::{build_caddyfile_contents, launch_caddy_process, reload_caddy};
+use super::utils::{launch_caddy_process, reload_caddy, write_caddyfile};
+
 pub struct CaddyManager {
   environment_path: PathBuf,
   caddy_admin_port: u16,
   conductor_admin_port: u16,
   conductor_app_interface_port: u16,
-  command_child: CommandChild
+  command_child: CommandChild,
 }
 
 impl CaddyManager {
@@ -20,44 +21,53 @@ impl CaddyManager {
     environment_path: PathBuf,
     conductor_admin_port: u16,
     conductor_app_interface_port: u16,
-  ) -> Result<Self, LaunchTauriSidecarError> {
+  ) -> Result<Self, LaunchChildError> {
     let caddy_admin_port = portpicker::pick_unused_port().expect("No ports free");
 
-    create_dir_if_necessary(&environment_path);
+    create_dir_if_necessary(&environment_path)?;
+    let caddyfile = caddyfile_path(environment_path.clone());
 
-    let command_child = launch_caddy_process(caddyfile_path(environment_path.clone()))?;
+    write_caddyfile(
+      caddyfile.clone(),
+      caddy_admin_port,
+      conductor_admin_port,
+      conductor_app_interface_port,
+      &vec![],
+    );
+    let command_child = launch_caddy_process(caddyfile)?;
 
     Ok(CaddyManager {
       environment_path,
       caddy_admin_port,
       conductor_admin_port,
       conductor_app_interface_port,
-      command_child
+      command_child,
     })
   }
 
   pub fn update_running_apps(
     &mut self,
     installed_apps: &Vec<InstalledWebAppInfo>,
-  ) -> Result<(), LaunchTauriSidecarError> {
-    let new_caddyfile = build_caddyfile_contents(
+  ) -> Result<(), LaunchChildError> {
+    let caddyfile = caddyfile_path(self.environment_path.clone());
+
+    write_caddyfile(
+      caddyfile.clone(),
       self.caddy_admin_port,
       self.conductor_admin_port,
       self.conductor_app_interface_port,
       installed_apps,
     );
-
-    let caddyfile_path = caddyfile_path(self.environment_path.clone());
-
-    fs::write(caddyfile_path.clone(), new_caddyfile).expect("Could not write Caddyfile");
-
-    reload_caddy(caddyfile_path)?;
+    reload_caddy(caddyfile)?;
 
     Ok(())
   }
 
   pub fn kill(self) -> Result<(), String> {
-    self.command_child.kill().map_err(|err| format!("Could not kill the caddy process: {}", err))
+    self
+      .command_child
+      .kill()
+      .map_err(|err| format!("Could not kill the caddy process: {}", err))
   }
 }
 

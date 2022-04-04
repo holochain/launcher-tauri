@@ -7,13 +7,13 @@ use tauri::api::process::CommandChild;
 use url2::Url2;
 
 use async_trait::async_trait;
-use holochain_client_0_0_131::{AdminWebsocket, InstallAppBundlePayload, InstalledAppInfo};
-use holochain_conductor_api_0_0_131::{
+use holochain_client_0_0_132::{AdminWebsocket, InstallAppBundlePayload, InstalledAppInfo};
+use holochain_conductor_api_0_0_132::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_0_131::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig};
-use holochain_types_0_0_131::prelude::{AppBundle, AppBundleSource, SerializedBytes};
+use holochain_p2p_0_0_132::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig};
+use holochain_types_0_0_132::prelude::{AppBundle, AppBundleSource, SerializedBytes};
 
 use super::{launch::launch_holochain_process, HolochainVersion};
 
@@ -21,19 +21,19 @@ use crate::{
   config::LaunchHolochainConfig, error::LaunchHolochainError, holochain_manager::HolochainManager,
 };
 
-pub struct HolochainManagerV0_0_131 {
+pub struct HolochainManagerV0_0_132 {
   ws: AdminWebsocket,
   command_child: CommandChild,
 }
 
-impl HolochainManagerV0_0_131 {
+impl HolochainManagerV0_0_132 {
   pub async fn launch(
     config: LaunchHolochainConfig,
     password: String,
   ) -> Result<Self, LaunchHolochainError> {
     let conductor_config_path = config.config_environment_path.join("conductor-config.yaml");
-    create_dir_if_necessary(&config.config_environment_path);
-    create_dir_if_necessary(&config.environment_path);
+    create_dir_if_necessary(&config.config_environment_path)?;
+    create_dir_if_necessary(&config.environment_path)?;
 
     let new_conductor_config: ConductorConfig = conductor_config(
       config.admin_port,
@@ -50,7 +50,7 @@ impl HolochainManagerV0_0_131 {
 
     let command_child = launch_holochain_process(
       config.log_level,
-      HolochainVersion::V0_0_131,
+      HolochainVersion::V0_0_132,
       conductor_config_path,
       password,
     )?;
@@ -61,14 +61,14 @@ impl HolochainManagerV0_0_131 {
       .await
       .map_err(|err| LaunchHolochainError::CouldNotConnectToConductor(format!("{}", err)))?;
 
-    Ok(HolochainManagerV0_0_131 { ws, command_child })
+    Ok(HolochainManagerV0_0_132 { ws, command_child })
   }
 }
 
 #[async_trait]
-impl HolochainManager for HolochainManagerV0_0_131 {
+impl HolochainManager for HolochainManagerV0_0_132 {
   fn holochain_version(&self) -> HolochainVersion {
-    HolochainVersion::V0_0_131
+    HolochainVersion::V0_0_132
   }
 
   fn lair_keystore_version(&self) -> LairKeystoreVersion {

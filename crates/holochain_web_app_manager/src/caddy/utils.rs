@@ -1,21 +1,21 @@
-use lair_keystore_manager::error::LaunchTauriSidecarError;
-use std::path::PathBuf;
+use lair_keystore_manager::error::LaunchChildError;
+use std::{fs, path::PathBuf};
 use tauri::api::process::{Command, CommandChild, CommandEvent};
 
 use crate::installed_web_app_info::{InstalledWebAppInfo, WebUiInfo};
 
 pub fn launch_caddy_process(
   caddyfile_path: PathBuf,
-) -> Result<CommandChild, LaunchTauriSidecarError> {
+) -> Result<CommandChild, LaunchChildError> {
   let (mut caddy_rx, command_child) = Command::new_sidecar("caddy")
-    .or(Err(LaunchTauriSidecarError::BinaryNotFound))?
+    .or(Err(LaunchChildError::BinaryNotFound))?
     .args(&[
       "run",
       "--config",
       caddyfile_path.as_os_str().to_str().unwrap(),
     ])
     .spawn()
-    .map_err(|err| LaunchTauriSidecarError::FailedToExecute(format!("{:?}", err)))?;
+    .map_err(|err| LaunchChildError::FailedToExecute(format!("{:?}", err)))?;
 
   tauri::async_runtime::spawn(async move {
     // read events such as stdout
@@ -32,23 +32,40 @@ pub fn launch_caddy_process(
   Ok(command_child)
 }
 
-pub fn reload_caddy(caddyfile_path: PathBuf) -> Result<(), LaunchTauriSidecarError> {
+pub fn reload_caddy(caddyfile_path: PathBuf) -> Result<(), LaunchChildError> {
   Command::new_sidecar("caddy")
-    .or(Err(LaunchTauriSidecarError::BinaryNotFound))?
+    .or(Err(LaunchChildError::BinaryNotFound))?
     .args(&[
       "reload",
       "--config",
       caddyfile_path.as_os_str().to_str().unwrap(),
     ])
     .spawn()
-    .map_err(|err| LaunchTauriSidecarError::FailedToExecute(format!("{:?}", err)))?;
+    .map_err(|err| LaunchChildError::FailedToExecute(format!("{:?}", err)))?;
 
   Ok(())
 }
 
 pub const LAUNCHER_ENV_URL: &str = ".launcher-env.json";
 
-pub fn build_caddyfile_contents(
+pub fn write_caddyfile(
+  caddyfile_path: PathBuf,
+  caddy_admin_port: u16,
+  conductor_admin_port: u16,
+  conductor_app_interface_port: u16,
+  installed_apps: &Vec<InstalledWebAppInfo>,
+) -> () {
+  let new_caddyfile = build_caddyfile_contents(
+    caddy_admin_port,
+    conductor_admin_port,
+    conductor_app_interface_port,
+    installed_apps,
+  );
+
+  fs::write(caddyfile_path.clone(), new_caddyfile).expect("Could not write Caddyfile");
+}
+
+fn build_caddyfile_contents(
   caddy_admin_port: u16,
   conductor_admin_port: u16,
   conductor_app_interface_port: u16,

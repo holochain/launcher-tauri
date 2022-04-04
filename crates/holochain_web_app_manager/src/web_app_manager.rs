@@ -1,6 +1,7 @@
 use holochain_manager::{
   config::LaunchHolochainConfig,
   versions::{
+    holochain_conductor_api_latest::InstalledAppInfo,
     holochain_types_latest::{
       prelude::{AppBundle, SerializedBytes},
       web_app::WebAppBundle,
@@ -51,8 +52,8 @@ impl WebAppManager {
       ..config.clone()
     };
 
-    create_dir_if_necessary(&conductor_data_path);
-    create_dir_if_necessary(&ui_data_path);
+    create_dir_if_necessary(&conductor_data_path)?;
+    create_dir_if_necessary(&ui_data_path)?;
 
     let mut holochain_manager = launch_holochain(version, new_config, password)
       .await
@@ -70,13 +71,20 @@ impl WebAppManager {
     )
     .map_err(|err| LaunchWebAppManagerError::LaunchCaddyError(err))?;
 
-    Ok(WebAppManager {
+    // Fetch the running apps and update caddyfile to already serve them
+    let mut manager = WebAppManager {
       holochain_manager,
       environment_path,
       caddy_manager,
       allocated_ports: HashMap::new(),
       app_handle,
-    })
+    };
+    manager
+      .on_running_apps_changed()
+      .await
+      .map_err(|err| LaunchWebAppManagerError::Other(err))?;
+
+    Ok(manager)
   }
 
   pub async fn install_web_app(
@@ -137,8 +145,6 @@ impl WebAppManager {
     let file = File::open(ui_zip_path).or(Err("Failed to read Web UI Zip file"))?;
     unzip_file(file, ui_folder_path)?;
 
-    self.allocate_new_port_for_app(app_id);
-
     Ok(())
   }
 
@@ -149,19 +155,7 @@ impl WebAppManager {
       fs::remove_dir_all(ui_folder_path).or(Err("Failed to remove UI folder"))?;
     }
 
-    self.deallocate_port_for_app(app_id);
-
     Ok(())
-  }
-
-  fn allocate_new_port_for_app(&mut self, app_id: String) -> () {
-    let free_port = portpicker::pick_unused_port().expect("No ports free");
-
-    self.allocated_ports.insert(app_id, free_port);
-  }
-
-  fn deallocate_port_for_app(&mut self, app_id: String) {
-    self.allocated_ports.remove(&app_id);
   }
 
   async fn on_running_apps_changed(&mut self) -> Result<(), String> {
@@ -183,7 +177,7 @@ impl WebAppManager {
   fn get_web_ui_info(&self, app_id: String) -> Result<WebUiInfo, String> {
     let ui_folder_path = app_ui_path(&self.environment_path, &app_id);
 
-    match Path::new(&ui_folder_path).exists() {
+    match self.is_web_app(app_id.clone()) {
       true => Ok(WebUiInfo::WebApp {
         path_to_web_app: ui_folder_path,
         app_ui_port: self
@@ -262,6 +256,8 @@ impl WebAppManager {
   pub async fn list_apps(&mut self) -> Result<Vec<InstalledWebAppInfo>, String> {
     let installed_apps = self.holochain_manager.list_apps().await?;
 
+    self.allocate_necessary_ports(&installed_apps);
+
     let installed_web_apps = installed_apps
       .into_iter()
       .map(|installed_app| {
@@ -274,6 +270,43 @@ impl WebAppManager {
       .collect::<Result<Vec<InstalledWebAppInfo>, String>>()?;
 
     Ok(installed_web_apps)
+  }
+
+  fn is_web_app(&self, app_id: String) -> bool {
+    let ui_folder_path = app_ui_path(&self.environment_path, &app_id);
+
+    Path::new(&ui_folder_path).exists()
+  }
+
+  fn allocate_necessary_ports(&mut self, installed_apps: &Vec<InstalledAppInfo>) -> () {
+    let web_apps: Vec<InstalledAppInfo> = installed_apps
+      .iter()
+      .filter(|app| self.is_web_app(app.installed_app_id.clone()))
+      .cloned()
+      .collect();
+
+    let mut installed_app_ids: HashMap<String, bool> = HashMap::new();
+
+    // Allocate new ports for newly installed apps
+    for web_app in web_apps {
+      if !self.allocated_ports.contains_key(&web_app.installed_app_id) {
+        let free_port = portpicker::pick_unused_port().expect("No ports free");
+        self
+          .allocated_ports
+          .insert(web_app.installed_app_id.clone(), free_port);
+      }
+
+      installed_app_ids.insert(web_app.installed_app_id, true);
+    }
+
+    let allocated_app_ids: Vec<String> = self.allocated_ports.keys().cloned().collect();
+
+    // Remove apps no longer installed
+    for allocated_app_id in allocated_app_ids {
+      if !installed_app_ids.contains_key(&allocated_app_id) {
+        self.allocated_ports.remove(&allocated_app_id);
+      }
+    }
   }
 }
 

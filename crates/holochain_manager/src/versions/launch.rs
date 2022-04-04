@@ -2,7 +2,7 @@ use log;
 use std::{collections::HashMap, path::PathBuf};
 use tauri::api::process::{Command, CommandEvent, CommandChild};
 
-use lair_keystore_manager::error::LaunchTauriSidecarError;
+use lair_keystore_manager::error::LaunchChildError;
 
 use super::HolochainVersion;
 use crate::error::LaunchHolochainError;
@@ -18,8 +18,8 @@ pub fn launch_holochain_process(
 
   let (mut holochain_rx, mut holochain_child) =
     Command::new_sidecar("holochain") // TODO: Fix
-      .or(Err(LaunchHolochainError::LaunchTauriSidecarError(
-        LaunchTauriSidecarError::BinaryNotFound,
+      .or(Err(LaunchHolochainError::LaunchChildError(
+        LaunchChildError::BinaryNotFound,
       )))?
       .args(&[
         "-c",
@@ -29,7 +29,7 @@ pub fn launch_holochain_process(
       .envs(envs)
       .spawn()
       .map_err(|err| {
-        LaunchHolochainError::LaunchTauriSidecarError(LaunchTauriSidecarError::FailedToExecute(
+        LaunchHolochainError::LaunchChildError(LaunchChildError::FailedToExecute(
           format!("{}", err),
         ))
       })?;

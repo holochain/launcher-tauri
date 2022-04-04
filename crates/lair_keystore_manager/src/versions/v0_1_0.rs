@@ -26,7 +26,7 @@ impl LairKeystoreManager for LairKeystoreManagerV0_1_0 {
   }
 
   fn initialize(keystore_path: PathBuf, password: String) -> Result<(), LairKeystoreError> {
-    create_dir_if_necessary(&keystore_path);
+    create_dir_if_necessary(&keystore_path)?;
 
     initialize(keystore_path, password)
   }

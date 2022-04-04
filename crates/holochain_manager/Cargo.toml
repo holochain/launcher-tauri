@@ -6,11 +6,11 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-holochain_client_0_0_131 = {package = "holochain_client", git = "https://github.com/holochain/holochain-client-rust", rev = "a13aad20ad1a4697e7af62dccb812c6c18d871f6"}
-holochain_conductor_api_0_0_131 = {package = "holochain_conductor_api", version = "0.0.31"}
-holochain_p2p_0_0_131 = {package = "holochain_p2p", version = "0.0.31"}
-holochain_types_0_0_131 = {package = "holochain_types", version = "0.0.31"}
-holochain_websocket_0_0_131 = {package = "holochain_websocket", version = "0.0.31"}
+holochain_client_0_0_132 = {package = "holochain_client", git = "https://github.com/holochain/holochain-client-rust", rev = "c5637788120885785bac0cba43cf2f1a2e4e4386"}
+holochain_conductor_api_0_0_132 = {package = "holochain_conductor_api", version = "0.0.32"}
+holochain_p2p_0_0_132 = {package = "holochain_p2p", version = "0.0.32"}
+holochain_types_0_0_132 = {package = "holochain_types", version = "0.0.32"}
+holochain_websocket_0_0_132 = {package = "holochain_websocket", version = "0.0.32"}
 
 lair_keystore_manager = {path = "../lair_keystore_manager"}
 
@@ -24,4 +24,5 @@ portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}
 serde_yaml = "0.8"
 tauri = {version = "1.0.0-rc.6", features = ["api-all", "system-tray"]}
+thiserror = "1.0.30"
 url2 = "0.0.6"

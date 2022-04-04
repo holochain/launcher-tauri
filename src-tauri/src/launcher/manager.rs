@@ -23,6 +23,7 @@ use crate::{running_state::RunningState, system_tray::update_system_tray, Launch
 
 use super::config::LauncherConfig;
 use super::default_apps::install_default_apps_if_necessary;
+use super::error::LauncherError;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "type", content = "content")]
@@ -41,10 +42,10 @@ pub struct LauncherManager {
 }
 
 impl LauncherManager {
-  pub async fn launch(app_handle: AppHandle) -> Result<Self, String> {
-    create_dir_if_necessary(&root_lair_path());
-    create_dir_if_necessary(&root_data_path());
-    create_dir_if_necessary(&root_config_path());
+  pub async fn launch(app_handle: AppHandle) -> Result<Self, LauncherError> {
+    create_dir_if_necessary(&root_lair_path())?;
+    create_dir_if_necessary(&root_data_path())?;
+    create_dir_if_necessary(&root_config_path())?;
 
     let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_0::lair_keystore_version());
 

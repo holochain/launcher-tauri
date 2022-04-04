@@ -30,7 +30,9 @@ pub async fn execute_factory_reset(
   remove_dir_if_exists(root_data_path())
     .or(Err(String::from("Could not remove holochain data path")))?;
 
-  let manager = LauncherManager::launch(app_handle).await?;
+  let manager = LauncherManager::launch(app_handle)
+    .await
+    .map_err(|err| format!("{:?}", err))?;
 
   let mut m = state.lock().await;
 
