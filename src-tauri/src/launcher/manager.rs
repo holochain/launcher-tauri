@@ -151,6 +151,8 @@ impl LauncherManager {
 
     self.holochain_managers.insert(version, state);
 
+    self.on_apps_changed().await?;
+
     Ok(())
   }
 
@@ -199,7 +201,7 @@ impl LauncherManager {
 
     update_system_tray(&self.app_handle, &running_apps_by_version);
 
-    // Iterate over the open windows, close any that has been uninstalled/disabled
+    // TODO: Iterate over the open windows, close any that has been uninstalled/disabled
 
     Ok(())
   }

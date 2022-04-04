@@ -52,6 +52,7 @@ impl WebAppManager {
       ..config.clone()
     };
 
+    create_dir_if_necessary(&environment_path)?;
     create_dir_if_necessary(&conductor_data_path)?;
     create_dir_if_necessary(&ui_data_path)?;
 
@@ -99,29 +100,24 @@ impl WebAppManager {
       .await
       .or(Err("Failed to resolve hApp bundle"))?;
 
-    // Install app in conductor manager
-    self
-      .holochain_manager
-      .install_app(app_id.clone(), app_bundle, uid, membrane_proofs)
-      .await
-      .map_err(|err| {
-        log::error!("Error installing hApp in the conductor: {}", err);
-        err
-      })?;
-
-    // Install app in UI manager
-
     let web_ui_zip_bytes = web_app_bundle
       .web_ui_zip_bytes()
       .await
       .or(Err("Failed to resolve Web UI"))?;
 
-    self
-      .install_app_ui(app_id, web_ui_zip_bytes.to_vec())
-      .map_err(|err| {
-        log::error!("Error installing the UI for hApp: {}", err);
-        err
-      })?;
+    // Install app UI in folder
+    self.install_app_ui(app_id.clone(), web_ui_zip_bytes.to_vec())?;
+
+    // Install app in conductor manager
+    if let Err(err) = self
+      .holochain_manager
+      .install_app(app_id.clone(), app_bundle, uid, membrane_proofs)
+      .await
+    {
+      self.uninstall_app_ui(app_id)?;
+
+      return Err(err);
+    }
 
     self.on_running_apps_changed().await?;
 
