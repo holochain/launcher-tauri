@@ -56,14 +56,11 @@ impl WebAppManager {
     create_dir_if_necessary(&conductor_data_path)?;
     create_dir_if_necessary(&ui_data_path)?;
 
-    let mut holochain_manager = launch_holochain(version, new_config, password)
+    let holochain_manager = launch_holochain(version, new_config, password)
       .await
       .map_err(|err| LaunchWebAppManagerError::LaunchHolochainError(err))?;
 
-    let app_interface_port = holochain_manager
-      .get_app_interface_port()
-      .await
-      .map_err(|err| LaunchWebAppManagerError::CouldNotGetAppPort(err))?;
+    let app_interface_port = holochain_manager.app_interface_port();
 
     let caddy_manager = CaddyManager::launch(
       environment_path.clone(),
@@ -138,8 +135,10 @@ impl WebAppManager {
 
     fs::write(ui_zip_path.clone(), web_ui_zip_bytes).or(Err("Failed to write Web UI Zip file"))?;
 
-    let file = File::open(ui_zip_path).or(Err("Failed to read Web UI Zip file"))?;
+    let file = File::open(ui_zip_path.clone()).or(Err("Failed to read Web UI Zip file"))?;
     unzip_file(file, ui_folder_path)?;
+
+    fs::remove_file(ui_zip_path).or(Err("Failed to remove happ bundle"))?;
 
     Ok(())
   }
@@ -303,6 +302,14 @@ impl WebAppManager {
         self.allocated_ports.remove(&allocated_app_id);
       }
     }
+  }
+
+  pub fn admin_interface_port(&self) -> u16 {
+    self.holochain_manager.admin_interface_port()
+  }
+
+  pub fn app_interface_port(&mut self) -> u16 {
+    self.holochain_manager.app_interface_port()
   }
 }
 

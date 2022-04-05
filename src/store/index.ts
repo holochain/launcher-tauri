@@ -123,15 +123,37 @@ export const store = createStore<LauncherAdminState>({
 
       // Sort apps alphabetically
 
-      return appsByVersion.content.sort((app1, app2) => {
-        if (app1.installed_app_id < app2.installed_app_id) {
+      return appsByVersion.content.installed_apps.sort((app1, app2) => {
+        if (
+          app1.installed_app_info.installed_app_id <
+          app2.installed_app_info.installed_app_id
+        ) {
           return -1;
         }
-        if (app1.installed_app_id > app2.installed_app_id) {
+        if (
+          app1.installed_app_info.installed_app_id >
+          app2.installed_app_info.installed_app_id
+        ) {
           return 1;
         }
         return 0;
       });
+    },
+    appInterfacePort(state) {
+      const stateInfo = state.launcherStateInfo;
+
+      if (
+        stateInfo === "loading" ||
+        stateInfo.state.type === "Error" ||
+        stateInfo.state.content.type === "Error"
+      )
+        return undefined;
+
+      const holochainState = Object.values(stateInfo.state.content.content)[0];
+
+      if (holochainState.type === "Error") return undefined;
+
+      return holochainState.content.app_interface_port;
     },
   },
   mutations: {

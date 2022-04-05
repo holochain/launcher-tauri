@@ -11,8 +11,6 @@ pub enum LaunchWebAppManagerError {
   LaunchCaddyError(#[from] LaunchChildError),
   #[error("Failed to read or write from the filesystem: `{0}`")]
   FileSystemError(#[from] FileSystemError),
-  #[error("Could not get a free application port: `{0}`")]
-  CouldNotGetAppPort(String),
   #[error("Error launching the WebAppManager: `{0}`")]
   Other(String),
 }

@@ -7,7 +7,7 @@ use crate::{
     config::LauncherConfig,
     error::LauncherError,
     manager::{KeystoreStatus, LauncherManager},
-    state::{HolochainStateInfo, LauncherState, LauncherStateInfo},
+    state::{HolochainInfo, HolochainState, LauncherState, LauncherStateInfo},
   },
   running_state::RunningState,
 };
@@ -30,7 +30,7 @@ async fn inner_get_state_info(
   state: tauri::State<'_, LauncherState>,
 ) -> Result<
   RunningState<
-    RunningState<HashMap<HolochainVersion, HolochainStateInfo>, KeystoreStatus>,
+    RunningState<HashMap<HolochainVersion, HolochainState>, KeystoreStatus>,
     LauncherError,
   >,
   LauncherError,
@@ -45,7 +45,7 @@ async fn inner_get_state_info(
         return Ok(RunningState::Running(RunningState::Error(err.clone())));
       }
 
-      let mut holochain_manager_states: HashMap<HolochainVersion, HolochainStateInfo> =
+      let mut holochain_manager_states: HashMap<HolochainVersion, HolochainState> =
         HashMap::new();
 
       let versions: Vec<HolochainVersion> = manager.holochain_managers.keys().cloned().collect();
@@ -54,7 +54,11 @@ async fn inner_get_state_info(
         match manager.get_web_happ_manager(holochain_version.clone()) {
           Ok(holochain_manager) => {
             let running_state = match holochain_manager.list_apps().await {
-              Ok(running_apps) => RunningState::Running(running_apps),
+              Ok(installed_apps) => RunningState::Running(HolochainInfo {
+                installed_apps,
+                app_interface_port: holochain_manager.app_interface_port(),
+                admin_interface_port: holochain_manager.admin_interface_port(),
+              }),
               Err(err) => RunningState::Error(format!("Could not fetch installed apps: {}", err)),
             };
 

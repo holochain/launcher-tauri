@@ -9,7 +9,25 @@
         </div>
       </div>
     </div>
-    <InstallApp></InstallApp>
+    <InstallApp
+      v-if="showInstallApp"
+      @app-installed="showInstallApp = false"
+    ></InstallApp>
+
+    <mwc-fab
+      extended
+      icon="add"
+      label="Install new app"
+      @click="showInstallApp = true"
+      style="
+        margin: 16px;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        --mdc-theme-secondary: #4720e3;
+      "
+    ></mwc-fab>
+
     <mwc-dialog
       heading="Uninstall App"
       :open="appToBeUninstalled"
@@ -32,9 +50,10 @@
 </template>
 
 <script lang="ts">
-import InstallApp from "@/components/InstallApp.vue";
+import InstallApp from "@/components/install-app/InstallApp.vue";
 import InstalledApps from "./InstalledApps.vue";
 import { defineComponent } from "vue";
+import "@material/mwc-fab";
 
 export default defineComponent({
   name: "Home",
@@ -44,9 +63,9 @@ export default defineComponent({
   },
   data(): {
     snackbarText: string | undefined;
-    appToBeUninstalled: string | undefined;
+    showInstallApp: boolean;
   } {
-    return { snackbarText: undefined, appToBeUninstalled: undefined };
+    return { snackbarText: undefined, showInstallApp: false };
   },
   methods: {},
 });

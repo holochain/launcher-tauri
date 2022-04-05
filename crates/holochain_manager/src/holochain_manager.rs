@@ -15,7 +15,9 @@ pub trait HolochainManager: Send + Sync {
 
   fn lair_keystore_version(&self) -> LairKeystoreVersion;
 
-  async fn get_app_interface_port(&mut self) -> Result<u16, String>;
+  fn app_interface_port(&self) -> u16;
+
+  fn admin_interface_port(&self) -> u16;
 
   async fn install_app(
     &mut self,

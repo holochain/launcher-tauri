@@ -23,6 +23,8 @@ use crate::{
 
 pub struct HolochainManagerV0_0_132 {
   ws: AdminWebsocket,
+  admin_interface_port: u16,
+  app_interface_port: u16,
   command_child: CommandChild,
 }
 
@@ -57,11 +59,33 @@ impl HolochainManagerV0_0_132 {
 
     std::thread::sleep(Duration::from_millis(3000));
 
-    let ws = AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
+    let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
       .await
       .map_err(|err| LaunchHolochainError::CouldNotConnectToConductor(format!("{}", err)))?;
 
-    Ok(HolochainManagerV0_0_132 { ws, command_child })
+    let app_interface_port = {
+      let app_interfaces = ws.list_app_interfaces().await.or(Err(
+        LaunchHolochainError::CouldNotConnectToConductor("Could not list app interfaces".into()),
+      ))?;
+
+      if app_interfaces.len() > 0 {
+        app_interfaces[0]
+      } else {
+        let free_port = portpicker::pick_unused_port().expect("No ports free");
+
+        ws.attach_app_interface(free_port).await.or(Err(
+          LaunchHolochainError::CouldNotConnectToConductor("Could not attach app interface".into()),
+        ))?;
+        free_port
+      }
+    };
+
+    Ok(HolochainManagerV0_0_132 {
+      ws,
+      admin_interface_port: config.admin_port,
+      app_interface_port,
+      command_child,
+    })
   }
 }
 
@@ -75,26 +99,12 @@ impl HolochainManager for HolochainManagerV0_0_132 {
     LairKeystoreVersion::V0_1_0
   }
 
-  async fn get_app_interface_port(&mut self) -> Result<u16, String> {
-    let app_interfaces = self
-      .ws
-      .list_app_interfaces()
-      .await
-      .or(Err(String::from("Could not list app interfaces")))?;
+  fn admin_interface_port(&self) -> u16 {
+    self.admin_interface_port
+  }
 
-    if app_interfaces.len() > 0 {
-      return Ok(app_interfaces[0]);
-    }
-
-    let free_port = portpicker::pick_unused_port().expect("No ports free");
-
-    self
-      .ws
-      .attach_app_interface(free_port)
-      .await
-      .or(Err(String::from("Could not attach app interface")))?;
-
-    Ok(free_port)
+  fn app_interface_port(&self) -> u16 {
+    self.app_interface_port
   }
 
   fn kill(mut self) -> Result<(), String> {

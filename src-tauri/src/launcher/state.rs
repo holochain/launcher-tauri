@@ -13,12 +13,19 @@ use crate::running_state::RunningState;
 
 pub type LauncherState = Arc<Mutex<RunningState<LauncherManager, LauncherError>>>;
 
-pub type HolochainStateInfo = RunningState<Vec<InstalledWebAppInfo>, String>;
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HolochainInfo {
+  pub installed_apps: Vec<InstalledWebAppInfo>,
+  pub app_interface_port: u16,
+  pub admin_interface_port: u16,
+}
+
+pub type HolochainState = RunningState<HolochainInfo, String>;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LauncherStateInfo {
   pub state: RunningState<
-    RunningState<HashMap<HolochainVersion, HolochainStateInfo>, KeystoreStatus>,
+    RunningState<HashMap<HolochainVersion, HolochainState>, KeystoreStatus>,
     LauncherError,
   >,
   pub config: LauncherConfig,

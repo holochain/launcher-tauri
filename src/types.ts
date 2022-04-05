@@ -15,7 +15,13 @@ export type RunningState<T, E> =
       content: E;
     };
 
-export type HolochainStateInfo = RunningState<InstalledAppInfo[], string>;
+export interface HolochainInfo {
+  installed_apps: InstalledWebAppInfo[];
+  app_interface_port: number;
+  admin_interface_port: number;
+}
+
+export type HolochainState = RunningState<HolochainInfo, string>;
 
 export type HolochainVersion = string;
 
@@ -63,7 +69,7 @@ export type RunLauncherError =
 
 export interface LauncherStateInfo {
   state: RunningState<
-    RunningState<Record<HolochainVersion, HolochainStateInfo>, KeystoreStatus>,
+    RunningState<Record<HolochainVersion, HolochainState>, KeystoreStatus>,
     RunLauncherError
   >;
   config: LauncherConfig;
@@ -88,4 +94,10 @@ export type WebUiInfo =
 export interface InstalledWebAppInfo {
   installed_app_info: InstalledAppInfo;
   web_ui_info: WebUiInfo;
+}
+
+export interface AppSetup {
+  appId: string;
+  uid: string | undefined;
+  membraneProofs: { [key: string]: Array<number> } | undefined;
 }
