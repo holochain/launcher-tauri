@@ -17,26 +17,36 @@ export interface AppWithReleases {
   releases: Array<ContentAddress<HappRelease>>;
 }
 
-export async function getAppsForHdk(
+export function filterByHdkVersion(
+  hdkVersion: HdkVersion,
+  apps: Array<AppWithReleases>
+): Array<AppWithReleases> {
+  const filteredReleases: Array<AppWithReleases> = apps.map((app) => ({
+    app: app.app,
+    releases: app.releases.filter((r) => r.content.hdk_version === hdkVersion),
+  }));
+
+  return filteredReleases.filter((app) => app.releases.length > 0);
+}
+
+export async function getAllPublishedApps(
   appWebsocket: AppWebsocket,
-  devhubHappCell: InstalledCell,
-  hdkVersion: HdkVersion
+  devhubHapp: InstalledAppInfo
 ): Promise<Array<AppWithReleases>> {
+  const cells = devhubCells(devhubHapp);
   const allAppsOutput = await appWebsocket.callZome({
     cap_secret: null,
-    cell_id: devhubHappCell.cell_id,
+    cell_id: cells.happs.cell_id,
     fn_name: "get_all_happs",
     zome_name: "happ_library",
     payload: null,
-    provenance: devhubHappCell.cell_id[1],
+    provenance: cells.happs.cell_id[1],
   });
 
   const allApps: Array<ContentAddress<Happ>> = allAppsOutput.payload.items;
 
-  console.log(allApps);
-
   const promises = allApps.map((app) =>
-    getAppsReleases(appWebsocket, devhubHappCell, app)
+    getAppsReleases(appWebsocket, devhubHapp, app)
   );
 
   return Promise.all(promises);
@@ -44,18 +54,20 @@ export async function getAppsForHdk(
 
 export async function getAppsReleases(
   appWebsocket: AppWebsocket,
-  devhubHappCell: InstalledCell,
+  devhubHapp: InstalledAppInfo,
   app: ContentAddress<Happ>
 ): Promise<AppWithReleases> {
+  const cells = devhubCells(devhubHapp);
+
   const appReleasesOutput = await appWebsocket.callZome({
     cap_secret: null,
-    cell_id: devhubHappCell.cell_id,
-    fn_name: "get_all_happs",
+    cell_id: cells.happs.cell_id,
+    fn_name: "get_happ_releases",
     zome_name: "happ_library",
     payload: {
       for_happ: app.address,
     },
-    provenance: devhubHappCell.cell_id[1],
+    provenance: cells.happs.cell_id[1],
   });
 
   const releases = appReleasesOutput.payload.items;
@@ -66,24 +78,50 @@ export async function getAppsReleases(
   };
 }
 
-export async function getWebHapp(
+export function getLatestRelease(
+  apps: AppWithReleases
+): ContentAddress<HappRelease> {
+  const guiReleases = apps.releases.filter((r) => !!r.content.gui);
+  return guiReleases.sort(
+    (r1, r2) => r1.content.last_updated - r2.content.last_updated
+  )[0];
+}
+
+export async function fetchWebHapp(
   appWebsocket: AppWebsocket,
-  devhubHappCell: InstalledCell,
-  devhubDnaCell: InstalledCell,
-  devhubWebAssetsCell: InstalledCell,
+  devhubHapp: InstalledAppInfo,
+  name: string,
   happReleaseEntryHash: EntryHash
 ): Promise<Uint8Array> {
-  return appWebsocket.callZome({
+  const cells = devhubCells(devhubHapp);
+
+  const result = await appWebsocket.callZome({
     cap_secret: null,
-    cell_id: devhubHappCell.cell_id,
+    cell_id: cells.happs.cell_id,
     fn_name: "get_webhapp_package",
     zome_name: "happ_library",
     payload: {
-      name: String,
+      name,
       id: happReleaseEntryHash,
-      dnarepo_dna_hash: devhubDnaCell.cell_id[0],
-      webassets_dna_hash: devhubWebAssetsCell.cell_id[0],
+      dnarepo_dna_hash: cells.dnarepo.cell_id[0],
+      webassets_dna_hash: cells.webassets.cell_id[0],
     },
-    provenance: devhubHappCell.cell_id[1],
+    provenance: cells.happs.cell_id[1],
   });
+
+  return result.payload;
+}
+
+function devhubCells(devhubHapp: InstalledAppInfo) {
+  const happs = devhubHapp.cell_data.find((c) => c.role_id === "happs");
+  const dnarepo = devhubHapp.cell_data.find((c) => c.role_id === "dnarepo");
+  const webassets = devhubHapp.cell_data.find((c) => c.role_id === "webassets");
+
+  if (!happs || !dnarepo || !webassets) throw new Error("Bad app info");
+
+  return {
+    happs,
+    dnarepo,
+    webassets,
+  };
 }

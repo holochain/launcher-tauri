@@ -27,6 +27,7 @@ mod setup;
 mod system_tray;
 
 use crate::commands::open_app::report_issue;
+use crate::commands::save_app::save_app;
 use crate::commands::{
   config::write_config,
   enable_app::{disable_app, enable_app},
@@ -83,6 +84,7 @@ fn main() {
       report_issue,
       unlock_and_launch,
       install_app,
+      save_app,
       enable_app,
       disable_app,
       uninstall_app,

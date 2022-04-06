@@ -15,6 +15,7 @@ pub fn launch_holochain_process(
 ) -> Result<CommandChild, LaunchHolochainError> {
   let mut envs = HashMap::new();
   envs.insert(String::from("RUST_LOG"), String::from(log_level.as_str()));
+  envs.insert(String::from("WASM_LOG"), String::from(log_level.as_str()));
 
   let (mut holochain_rx, mut holochain_child) =
     Command::new_sidecar("holochain") // TODO: Fix

@@ -6,7 +6,7 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-holochain_client_0_0_132 = {package = "holochain_client", git = "https://github.com/holochain/holochain-client-rust", rev = "c5637788120885785bac0cba43cf2f1a2e4e4386"}
+holochain_client_0_0_132 = {package = "holochain_client", git = "https://github.com/holochain/holochain-client-rust", rev = "77fae4a989fd75d5a01580e0226f733a65a1716f"}
 holochain_conductor_api_0_0_132 = {package = "holochain_conductor_api", version = "0.0.32"}
 holochain_p2p_0_0_132 = {package = "holochain_p2p", version = "0.0.32"}
 holochain_types_0_0_132 = {package = "holochain_types", version = "0.0.32"}

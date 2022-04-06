@@ -36,6 +36,7 @@ pub enum KeystoreStatus {
 pub struct LauncherManager {
   app_handle: AppHandle,
   config: LauncherConfig,
+  
   pub holochain_managers:
     HashMap<HolochainVersion, RunningState<WebAppManager, LaunchWebAppManagerError>>,
   pub lair_keystore_manager: RunningState<Box<dyn LairKeystoreManager>, KeystoreStatus>,
