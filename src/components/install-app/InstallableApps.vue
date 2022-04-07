@@ -49,12 +49,12 @@ export default defineComponent({
 
     const allApps = await getAllPublishedApps(appWs, devhubInfo);
 
-    const supportedHdks: HdkVersion[] = await invoke(
-      "get_supported_hdk_versions",
+    const { hdk_versions }: { hdk_versions: HdkVersion[] } = await invoke(
+      "get_supported_versions",
       {}
     );
 
-    this.installableApps = filterByHdkVersion(supportedHdks, allApps);
+    this.installableApps = filterByHdkVersion(hdk_versions, allApps);
 
     this.loading = false;
   },
@@ -66,7 +66,7 @@ export default defineComponent({
       const version = this.$store.getters["holochainVersionForDevhub"];
 
       const port = this.$store.getters["appInterfacePort"](version);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`);
+      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       const devhubInfo = await appWs.appInfo({ installed_app_id: "DevHub" });
 
       const bytes = await fetchWebHapp(

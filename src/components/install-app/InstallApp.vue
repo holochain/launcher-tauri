@@ -1,5 +1,11 @@
 <template>
-  <mwc-dialog heading="Install App" open scrimClickAction="" escapeKeyAction="">
+  <mwc-dialog
+    heading="Install App"
+    open
+    @closing="$emit('closing-dialog')"
+    scrimClickAction=""
+    escapeKeyAction=""
+  >
     <div v-if="!appBundlePath">
       <InstallableApps
         @selected-app-bundle="onAppBundleSelected($event)"
@@ -15,7 +21,7 @@
     <div v-else>
       <SetupApp
         :appBundlePath="appBundlePath"
-        :hdkVersion="hdkVersion"
+        :hdkVersionForApp="hdkVersionForApp"
         @setup-changed="appSetup = $event"
       ></SetupApp>
     </div>
@@ -42,7 +48,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
-import { AppSetup, HolochainVersion, WebAppInfo } from "../../types";
+import { AppSetup } from "../../types";
 import { ActionTypes } from "@/store/actions";
 import InstallableApps from "./InstallableApps.vue";
 import SetupApp from "./SetupApp.vue";
@@ -59,13 +65,13 @@ export default defineComponent({
     installing: boolean;
     appSetup: AppSetup | undefined;
     appBundlePath: string | undefined;
-    hdkVersion: string | undefined;
+    hdkVersionForApp: string | undefined;
     snackbarText: string | undefined;
   } {
     return {
       installing: false,
       appBundlePath: undefined,
-      hdkVersion: undefined,
+      hdkVersionForApp: undefined,
       appSetup: undefined,
       snackbarText: undefined,
     };
@@ -73,14 +79,14 @@ export default defineComponent({
   methods: {
     onAppBundleSelected({
       appBundlePath,
-      hdkVersion,
+      hdkVersionForApp,
     }: {
       appBundlePath: string;
-      hdkVersion: string;
+      hdkVersionForApp: string;
     }) {
       this.appBundlePath = appBundlePath;
 
-      this.hdkVersion = hdkVersion;
+      this.hdkVersionForApp = hdkVersionForApp;
     },
     async selectFromFileSystem() {
       this.appBundlePath = (await open({

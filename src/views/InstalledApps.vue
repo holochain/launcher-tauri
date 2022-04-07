@@ -9,9 +9,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
       "
     >
-      <span>Holochain v{{version}}><span>
+      <span style="margin-bottom: 8px">Holochain v{{ version }}</span>
 
       <InstalledAppsList
         :installedWebApps="$store.getters[`appsForVersion`](version)"

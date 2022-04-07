@@ -11,6 +11,7 @@ ascii = "1.0.0"
 async-trait = "0.1.52"
 log = "0.4.14"
 serde = {version = "1", features = ["derive"]}
+serde-enum-str = "0.2"
 tauri = {version = "1.0.0-rc.6", features = ["api-all", "system-tray"]}
 thiserror = "1.0.30"
 url2 = "0.0.6"

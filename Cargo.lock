@@ -3944,6 +3944,7 @@ dependencies = [
  "async-trait",
  "log",
  "serde",
+ "serde-enum-str",
  "tauri",
  "thiserror",
  "url2",

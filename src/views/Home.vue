@@ -12,6 +12,7 @@
     <InstallApp
       v-if="showInstallApp"
       @app-installed="showInstallApp = false"
+      @closing-dialog="showInstallApp = false"
     ></InstallApp>
 
     <mwc-fab

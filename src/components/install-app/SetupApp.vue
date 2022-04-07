@@ -37,16 +37,38 @@
         style="flex: 1"
       ></mwc-textfield>
 
+      <mwc-select
+        v-if="!holochainVersion"
+        label="Holochain Version to Install To"
+        outlined
+        @selected="
+          holochainVersion = supportedHolochainVersions[$event.detail.index];
+          onChange();
+        "
+        @closing="$event.stopPropagation()"
+      >
+        <mwc-list-item
+          v-for="holochainVersion of supportedHolochainVersions"
+          :key="holochainVersion"
+          :value="holochainVersion"
+          >{{ holochainVersion }}</mwc-list-item
+        >
+      </mwc-select>
+
       <span>Advanced</span>
 
       <mwc-select
         label="Agent Public Key"
+        outlined
         @selected="
           reuseAgentPubKey = allPubKeys[$event.detail.index - 1];
           onChange();
         "
+        @closing="$event.stopPropagation()"
       >
-        <mwc-list-item selected>Generate new Public Key</mwc-list-item>
+        <mwc-list-item selected value="1"
+          >Generate new Public Key</mwc-list-item
+        >
         <mwc-list-item
           v-for="pubKey of allPubKeys"
           :key="pubKey"
@@ -92,6 +114,7 @@ import { toUint8Array } from "js-base64";
 import { flatten } from "lodash-es";
 import { serializeHash } from "@holochain-open-dev/utils";
 import "@material/mwc-textarea";
+import "@material/mwc-select";
 
 export default defineComponent({
   name: "SetupApp",
@@ -100,7 +123,7 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    hdkVersion: {
+    hdkVersionForApp: {
       type: String,
     },
   },
@@ -112,6 +135,7 @@ export default defineComponent({
     isAppIdValid: boolean;
     reuseAgentPubKey: AgentPubKey | undefined;
     holochainVersion: HolochainVersion | undefined;
+    supportedHolochainVersions: HolochainVersion[];
   } {
     return {
       appId: undefined,
@@ -121,6 +145,7 @@ export default defineComponent({
       isAppIdValid: true,
       reuseAgentPubKey: undefined,
       holochainVersion: undefined,
+      supportedHolochainVersions: [],
     };
   },
   computed: {
@@ -147,10 +172,14 @@ export default defineComponent({
     },
   },
   async created() {
-    if (this.hdkVersion) {
+    const { holochain_versions }: { holochain_versions: HolochainVersion[] } =
+      await invoke("get_supported_versions", {});
+    this.supportedHolochainVersions = holochain_versions;
+
+    if (this.hdkVersionForApp) {
       // Get Holochain Version
       this.holochainVersion = await invoke("choose_version_for_hdk", {
-        hdkVersion: this.hdkVersion,
+        hdkVersion: this.hdkVersionForApp,
       });
     }
 
@@ -204,6 +233,7 @@ export default defineComponent({
   methods: {
     serializeHash,
     onChange() {
+      console.log(this.isAppReadyToInstall);
       if (!this.isAppReadyToInstall) {
         this.$emit("setup-changed", undefined);
       }

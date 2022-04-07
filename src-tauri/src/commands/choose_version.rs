@@ -1,4 +1,5 @@
 use holochain_manager::versions::{version_manager::VersionManager, HdkVersion, HolochainVersion};
+use serde::{Deserialize, Serialize};
 
 use crate::{launcher::state::LauncherState, running_state::RunningState};
 
@@ -29,10 +30,23 @@ pub async fn choose_version_for_hdk(
   ))
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SupportedVersions {
+  hdk_versions: Vec<HdkVersion>,
+  holochain_versions: Vec<HolochainVersion>,
+}
+
 #[tauri::command]
-pub fn get_supported_hdk_versions() -> Vec<HdkVersion> {
-  HolochainVersion::supported_versions()
-    .into_iter()
+pub fn get_supported_versions() -> SupportedVersions {
+  let holochain_versions = HolochainVersion::supported_versions();
+
+  let hdk_versions = holochain_versions
+    .iter()
     .map(|v| v.manager().hdk_version())
-    .collect()
+    .collect();
+
+  SupportedVersions {
+    holochain_versions,
+    hdk_versions,
+  }
 }
