@@ -18,12 +18,14 @@ export interface AppWithReleases {
 }
 
 export function filterByHdkVersion(
-  hdkVersion: HdkVersion,
+  hdkVersions: HdkVersion[],
   apps: Array<AppWithReleases>
 ): Array<AppWithReleases> {
   const filteredReleases: Array<AppWithReleases> = apps.map((app) => ({
     app: app.app,
-    releases: app.releases.filter((r) => r.content.hdk_version === hdkVersion),
+    releases: app.releases.filter((r) =>
+      hdkVersions.includes(r.content.hdk_version)
+    ),
   }));
 
   return filteredReleases.filter((app) => app.releases.length > 0);

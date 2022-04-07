@@ -112,7 +112,9 @@ pub fn expand_version_and_app_id(
 ) -> Result<(HolochainVersion, String), String> {
   let components: Vec<&str> = menu_item_id.split(":").collect();
 
-  let version = HolochainVersion::try_from(String::from(components[0]))?;
+  let version = String::from(components[0])
+    .parse::<HolochainVersion>()
+    .or(Err(String::from("Invalid version")))?;
 
   let app_id = components[1..].join(":");
 

@@ -28,6 +28,7 @@ enum_dispatch = "0.3.8"
 log = "0.4.14"
 portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}
+serde-enum-str = "0.2"
 serde_yaml = "0.8"
 tauri = {version = "1.0.0-rc.6", features = ["api-all", "system-tray"]}
 thiserror = "1.0.30"

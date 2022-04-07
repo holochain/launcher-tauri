@@ -26,6 +26,7 @@ use crate::{
   utils::unzip_file,
 };
 
+
 pub struct WebAppManager {
   environment_path: PathBuf,
   holochain_manager: HolochainManager,

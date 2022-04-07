@@ -106,5 +106,6 @@ export interface AppSetup {
   appId: string;
   uid: string | undefined;
   reuseAgentPubKey: AgentPubKey | undefined;
+  holochainVersion: HolochainVersion;
   membraneProofs: { [key: string]: Array<number> } | undefined;
 }

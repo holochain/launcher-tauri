@@ -26,9 +26,11 @@ mod running_state;
 mod setup;
 mod system_tray;
 
+use crate::commands::choose_version::get_supported_hdk_versions;
 use crate::commands::open_app::report_issue;
 use crate::commands::save_app::save_app;
 use crate::commands::{
+  choose_version::choose_version_for_hdk,
   config::write_config,
   enable_app::{disable_app, enable_app},
   factory_reset::execute_factory_reset,
@@ -87,6 +89,8 @@ fn main() {
       save_app,
       enable_app,
       disable_app,
+      choose_version_for_hdk,
+      get_supported_hdk_versions,
       uninstall_app,
       get_app_info,
       execute_factory_reset,

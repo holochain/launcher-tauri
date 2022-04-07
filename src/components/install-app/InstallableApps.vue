@@ -14,10 +14,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent } from "vue";
 import "@material/mwc-dialog";
 import "@material/mwc-circular-progress";
-import { HappRelease } from "@/devhub/types";
 import { AppWebsocket } from "@holochain/client";
 import {
   AppWithReleases,
@@ -40,7 +39,9 @@ export default defineComponent({
   },
 
   async mounted() {
-    const port = this.$store.getters["appInterfacePort"];
+    const version = this.$store.getters["holochainVersionForDevhub"];
+
+    const port = this.$store.getters["appInterfacePort"](version);
 
     const appWs = await AppWebsocket.connect(`ws://localhost:${port}`);
 
@@ -48,11 +49,14 @@ export default defineComponent({
 
     const allApps = await getAllPublishedApps(appWs, devhubInfo);
 
-    this.installableApps = filterByHdkVersion(HdkVersion.v0_0_127, allApps);
+    const supportedHdks: HdkVersion[] = await invoke(
+      "get_supported_hdk_versions",
+      {}
+    );
+
+    this.installableApps = filterByHdkVersion(supportedHdks, allApps);
 
     this.loading = false;
-
-    console.log(this.installableApps);
   },
   methods: {
     getLatestRelease,
@@ -71,8 +75,6 @@ export default defineComponent({
         app.app.content.title,
         release.address
       );
-
-      console.log(bytes);
 
       const appBundlePath = await invoke("save_app", {
         appBundleBytes: bytes,

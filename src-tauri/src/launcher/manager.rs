@@ -36,7 +36,7 @@ pub enum KeystoreStatus {
 pub struct LauncherManager {
   app_handle: AppHandle,
   config: LauncherConfig,
-  
+
   pub holochain_managers:
     HashMap<HolochainVersion, RunningState<WebAppManager, LaunchWebAppManagerError>>,
   pub lair_keystore_manager: RunningState<Box<dyn LairKeystoreManager>, KeystoreStatus>,
@@ -107,9 +107,7 @@ impl LauncherManager {
     std::thread::sleep(Duration::from_millis(1000));
 
     for version in self.config.running_versions.clone() {
-      self
-        .launch_holochain_manager(version)
-        .await?;
+      self.launch_holochain_manager(version).await?;
     }
 
     Ok(())
@@ -140,16 +138,28 @@ impl LauncherManager {
     let state =
       match WebAppManager::launch(version, config, password, self.app_handle.clone()).await {
         Ok(mut manager) => match install_default_apps_if_necessary(&mut manager).await {
-          Ok(()) => RunningState::Running(manager),
+          Ok(()) => {
+            log::info!("Launched Holochain v{:?}", version);
+            RunningState::Running(manager)
+          }
           Err(err) => {
             manager.kill()?;
+            log::error!(
+              "Error launching Holochain v{:?}: Could not install default apps: {}",
+              version,
+              err
+            );
+
             RunningState::Error(LaunchWebAppManagerError::Other(format!(
               "Could not install default apps: {}",
               err
             )))
           }
         },
-        Err(error) => RunningState::Error(error),
+        Err(error) => {
+          log::error!("Error launching Holochain v{:?}: {}", version, error);
+          RunningState::Error(error)
+        }
       };
 
     self.holochain_managers.insert(version, state);
@@ -169,27 +179,20 @@ impl LauncherManager {
     }
   }
 
-  pub async fn get_or_launch_holochain_for_hdk(    &mut self,
-    hdk_version: HdkVersion,
-) -> Result<&mut WebAppManager, String> {
-for (version, state) in self.holochain_managers {
-  if let RunnningState::Running(manager)  = state {
-    if version.hdk_version().eq(&hdk_version) {
-      return manager;
+  pub async fn get_or_launch_holochain(
+    &mut self,
+    holochain_version: HolochainVersion,
+  ) -> Result<&mut WebAppManager, String> {
+    if let None = self.holochain_managers.get(&holochain_version) {
+      self.launch_holochain_manager(holochain_version).await?;
     }
+
+    self
+      .holochain_managers
+      .get_mut(&holochain_version)
+      .unwrap()
+      .get_running()
   }
-}
-
-for version in HolochainVersion::supported_versions() {
-    if version.hdk_version().eq(&hdk_version) {
-      return self.launch_holochain_manager(version).await;
-    }
-}
-
-Err(String::from("This HDK version is not supported"))
-
-  
-}
 
   pub fn get_web_happ_manager(
     &mut self,

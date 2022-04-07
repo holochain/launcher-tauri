@@ -15,7 +15,7 @@
     <div v-else>
       <SetupApp
         :appBundlePath="appBundlePath"
-        :holochainVersion="holochainVersion"
+        :hdkVersion="hdkVersion"
         @setup-changed="appSetup = $event"
       ></SetupApp>
     </div>
@@ -59,13 +59,13 @@ export default defineComponent({
     installing: boolean;
     appSetup: AppSetup | undefined;
     appBundlePath: string | undefined;
-    holochainVersion: HolochainVersion | undefined;
+    hdkVersion: string | undefined;
     snackbarText: string | undefined;
   } {
     return {
       installing: false,
       appBundlePath: undefined,
-      holochainVersion: undefined,
+      hdkVersion: undefined,
       appSetup: undefined,
       snackbarText: undefined,
     };
@@ -73,14 +73,14 @@ export default defineComponent({
   methods: {
     onAppBundleSelected({
       appBundlePath,
-      holochainVersion,
+      hdkVersion,
     }: {
       appBundlePath: string;
-      holochainVersion: HolochainVersion;
+      hdkVersion: string;
     }) {
       this.appBundlePath = appBundlePath;
 
-      this.holochainVersion = holochainVersion;
+      this.hdkVersion = hdkVersion;
     },
     async selectFromFileSystem() {
       this.appBundlePath = (await open({
@@ -88,9 +88,6 @@ export default defineComponent({
           { name: "Holochain Application", extensions: ["webhapp", "happ"] },
         ],
       })) as string;
-    },
-    selectBundlePath(path: string, hdkVersion: string | undefined) {
-      invoke("");
     },
     async installApp() {
       if (!this.appSetup) return;
@@ -103,7 +100,8 @@ export default defineComponent({
           appBundlePath: this.appBundlePath,
           membraneProofs: this.appSetup.membraneProofs,
           uid: this.appSetup.uid,
-          holochainVersion: this.holochainVersion,
+          reuseAgentPubKey: this.appSetup.reuseAgentPubKey,
+          holochainVersion: this.appSetup.holochainVersion,
         });
 
         this.installing = false;

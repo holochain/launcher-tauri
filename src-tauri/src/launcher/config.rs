@@ -18,7 +18,7 @@ pub struct LauncherConfig {
 impl Default for LauncherConfig {
   fn default() -> Self {
     LauncherConfig {
-      log_level: log::Level::Info,
+      log_level: log::Level::Warn,
       running_versions: vec![HolochainVersion::default()],
       version_for_devhub: HolochainVersion::default(),
     }

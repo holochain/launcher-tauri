@@ -159,8 +159,9 @@ export const store = createStore<LauncherAdminState>({
 
       const holochainState = stateInfo.state.content.content[version];
 
-      if (holochainState.type === "Error") return undefined;
+      if (!holochainState || holochainState.type === "Error") return undefined;
 
+      console.log(holochainState);
       const allCells = flatten(
         holochainState.content.installed_apps.map(
           (app) => app.installed_app_info.cell_data

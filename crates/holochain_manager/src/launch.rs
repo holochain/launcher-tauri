@@ -19,7 +19,7 @@ pub fn launch_holochain_process(
   let version_str: String = holochain_version.into();
 
   let (mut holochain_rx, mut holochain_child) =
-    Command::new_sidecar(format!("holochain-{:?}", version_str))
+    Command::new_sidecar(format!("holochain-v{}", version_str))
       .or(Err(LaunchHolochainError::LaunchChildError(
         LaunchChildError::BinaryNotFound,
       )))?

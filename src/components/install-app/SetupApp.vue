@@ -89,9 +89,9 @@ import type { TextField } from "@material/mwc-textfield";
 import { InstalledAppInfo, AgentPubKey } from "@holochain/client";
 import { AppSetup, HolochainVersion, WebAppInfo } from "../../types";
 import { toUint8Array } from "js-base64";
-import { ActionTypes } from "@/store/actions";
 import { flatten } from "lodash-es";
 import { serializeHash } from "@holochain-open-dev/utils";
+import "@material/mwc-textarea";
 
 export default defineComponent({
   name: "SetupApp",
@@ -100,9 +100,8 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    holochainVersion: {
+    hdkVersion: {
       type: String,
-      required: true,
     },
   },
   data(): {
@@ -112,6 +111,7 @@ export default defineComponent({
     appInfo: WebAppInfo | undefined;
     isAppIdValid: boolean;
     reuseAgentPubKey: AgentPubKey | undefined;
+    holochainVersion: HolochainVersion | undefined;
   } {
     return {
       appId: undefined,
@@ -120,11 +120,13 @@ export default defineComponent({
       appInfo: undefined,
       isAppIdValid: true,
       reuseAgentPubKey: undefined,
+      holochainVersion: undefined,
     };
   },
   computed: {
     isAppReadyToInstall() {
       if (!this.appId) return false;
+      if (!this.holochainVersion) return false;
       if (!this.isAppIdValid) return false;
       return true;
     },
@@ -137,12 +139,21 @@ export default defineComponent({
       return false;
     },
     allPubKeys() {
+      if (!this.holochainVersion) return [];
+
       return this.$store.getters["allPublicKeysForVersion"](
         this.holochainVersion
       );
     },
   },
   async created() {
+    if (this.hdkVersion) {
+      // Get Holochain Version
+      this.holochainVersion = await invoke("choose_version_for_hdk", {
+        hdkVersion: this.hdkVersion,
+      });
+    }
+
     this.membraneProofs = {};
     this.appInfo = (await invoke("get_app_info", {
       appBundlePath: this.appBundlePath,
@@ -201,7 +212,8 @@ export default defineComponent({
         appId: this.appId as string,
         uid: this.uid,
         membraneProofs: this.getEncodedMembraneProofs(),
-        reuseAgentPubKey: this.reuseAgentPubKey,
+        reuseAgentPubKey: this.reuseAgentPubKey as any,
+        holochainVersion: this.holochainVersion!,
       };
 
       this.$emit("setup-changed", setup);

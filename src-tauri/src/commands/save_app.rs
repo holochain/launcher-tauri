@@ -1,7 +1,4 @@
-use holochain_manager::versions::HolochainVersion;
 use std::{env::temp_dir, fs, path::PathBuf, time::SystemTime};
-
-use crate::file_system::data_path_for_holochain_version;
 
 #[tauri::command]
 pub fn save_app(

@@ -11,6 +11,8 @@
         justify-content: center;
       "
     >
+      <span>Holochain v{{version}}><span>
+
       <InstalledAppsList
         :installedWebApps="$store.getters[`appsForVersion`](version)"
         @open-app="openApp(version, $event)"
