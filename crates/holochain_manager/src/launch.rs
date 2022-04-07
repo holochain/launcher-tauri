@@ -1,11 +1,10 @@
 use log;
 use std::{collections::HashMap, path::PathBuf};
-use tauri::api::process::{Command, CommandEvent, CommandChild};
+use tauri::api::process::{Command, CommandChild, CommandEvent};
 
 use lair_keystore_manager::error::LaunchChildError;
 
-use super::HolochainVersion;
-use crate::error::LaunchHolochainError;
+use crate::{error::LaunchHolochainError, versions::HolochainVersion};
 
 pub fn launch_holochain_process(
   log_level: log::Level,
@@ -17,8 +16,10 @@ pub fn launch_holochain_process(
   envs.insert(String::from("RUST_LOG"), String::from(log_level.as_str()));
   envs.insert(String::from("WASM_LOG"), String::from(log_level.as_str()));
 
+  let version_str: String = holochain_version.into();
+
   let (mut holochain_rx, mut holochain_child) =
-    Command::new_sidecar("holochain") // TODO: Fix
+    Command::new_sidecar(format!("holochain-{:?}", version_str))
       .or(Err(LaunchHolochainError::LaunchChildError(
         LaunchChildError::BinaryNotFound,
       )))?
@@ -30,9 +31,10 @@ pub fn launch_holochain_process(
       .envs(envs)
       .spawn()
       .map_err(|err| {
-        LaunchHolochainError::LaunchChildError(LaunchChildError::FailedToExecute(
-          format!("{}", err),
-        ))
+        LaunchHolochainError::LaunchChildError(LaunchChildError::FailedToExecute(format!(
+          "{}",
+          err
+        )))
       })?;
 
   tauri::async_runtime::spawn(async move {

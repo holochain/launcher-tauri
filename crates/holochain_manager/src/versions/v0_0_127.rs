@@ -1,23 +1,23 @@
 use std::path::PathBuf;
 use url2::Url2;
 
-use holochain_conductor_api_0_0_132::{
+use holochain_conductor_api_0_0_127::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_0_132::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig};
+use holochain_p2p_0_0_127::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig};
 
 use super::{version_manager::VersionManager, HdkVersion, HolochainVersion};
 
-pub struct HolochainV0_0_132;
+pub struct HolochainV0_0_127;
 
-impl VersionManager for HolochainV0_0_132 {
+impl VersionManager for HolochainV0_0_127 {
   fn holochain_version(&self) -> HolochainVersion {
     HolochainVersion::V0_0_132
   }
 
   fn hdk_version(&self) -> HdkVersion {
-    HdkVersion::V0_0_127
+    HdkVersion::V0_0_123
   }
 
   fn initial_config(
@@ -34,10 +34,9 @@ impl VersionManager for HolochainV0_0_132 {
                 override_host: None,
                 override_port: None,
             }),
-            proxy_config: ProxyConfig::RemoteProxyClientFromBootstrap {
-                bootstrap_url: url2::url2!("https://bootstrap.holo.host"),
-                fallback_proxy_url: Some(url2::url2!("kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--")),
-            },
+            proxy_config: ProxyConfig::RemoteProxyClient { 
+              proxy_url: url2::url2!("kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--") 
+            }
         });
 
     let config = ConductorConfig {

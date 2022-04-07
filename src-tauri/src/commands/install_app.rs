@@ -1,6 +1,6 @@
 use holochain_manager::versions::{
   holochain_types_latest::{
-    prelude::{AppBundle, SerializedBytes, UnsafeBytes},
+    prelude::{AppBundle, SerializedBytes, UnsafeBytes, AgentPubKey},
     web_app::WebAppBundle,
   },
   HolochainVersion,
@@ -17,6 +17,7 @@ pub async fn install_app(
   app_bundle_path: String,
   uid: Option<String>,
   membrane_proofs: HashMap<String, Vec<u8>>,
+  reuse_agent_pub_key: Option<AgentPubKey>,
 ) -> Result<(), String> {
   log::info!("Installing: web_app_bundle = {}", app_bundle_path);
 
@@ -42,6 +43,7 @@ pub async fn install_app(
           web_app_bundle,
           uid,
           converted_membrane_proofs,
+          reuse_agent_pub_key,
         )
         .await?;
     }
@@ -49,7 +51,13 @@ pub async fn install_app(
       let app_bundle = AppBundle::decode(&bytes).or(Err("Failed to read Web hApp bundle file"))?;
       manager
         .get_web_happ_manager(holochain_version)?
-        .install_app(app_id.clone(), app_bundle, uid, converted_membrane_proofs)
+        .install_app(
+          app_id.clone(),
+          app_bundle,
+          uid,
+          converted_membrane_proofs,
+          reuse_agent_pub_key,
+        )
         .await?;
     }
   }

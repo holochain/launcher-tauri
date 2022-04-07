@@ -16,7 +16,10 @@
         outlined
         ref="appIdField"
         class="row-item"
-        @input="appId = $event.target.value"
+        @input="
+          appId = $event.target.value;
+          onChange();
+        "
         autoValidate
         required
         helper="Has to be unique"
@@ -25,11 +28,32 @@
       <mwc-textfield
         label="UID"
         outlined
-        @input="uid = $event.target.value"
+        @input="
+          uid = $event.target.value;
+          onChange();
+        "
         helper="Change it to create a new network"
         class="row-item"
         style="flex: 1"
       ></mwc-textfield>
+
+      <span>Advanced</span>
+
+      <mwc-select
+        label="Agent Public Key"
+        @selected="
+          reuseAgentPubKey = allPubKeys[$event.detail.index - 1];
+          onChange();
+        "
+      >
+        <mwc-list-item selected>Generate new Public Key</mwc-list-item>
+        <mwc-list-item
+          v-for="pubKey of allPubKeys"
+          :key="pubKey"
+          :value="pubKey"
+          >{{ serializeHash(pubKey) }}</mwc-list-item
+        >
+      </mwc-select>
 
       <span
         class="row-item"
@@ -48,7 +72,10 @@
           label="Membrane Proof"
           outlined
           helper="Check with the author if this is required"
-          @input="membraneProofs[appRole.id] = $event.target.value"
+          @input="
+            membraneProofs[appRole.id] = $event.target.value;
+            onChange();
+          "
         ></mwc-textarea>
       </div>
     </div>
@@ -59,16 +86,21 @@
 import { defineComponent } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import type { TextField } from "@material/mwc-textfield";
-import { InstalledAppInfo } from "@holochain/client";
+import { InstalledAppInfo, AgentPubKey } from "@holochain/client";
 import { AppSetup, HolochainVersion, WebAppInfo } from "../../types";
 import { toUint8Array } from "js-base64";
 import { ActionTypes } from "@/store/actions";
 import { flatten } from "lodash-es";
+import { serializeHash } from "@holochain-open-dev/utils";
 
 export default defineComponent({
   name: "SetupApp",
   props: {
     appBundlePath: {
+      type: String,
+      required: true,
+    },
+    holochainVersion: {
       type: String,
       required: true,
     },
@@ -79,6 +111,7 @@ export default defineComponent({
     membraneProofs: { [key: string]: string } | undefined;
     appInfo: WebAppInfo | undefined;
     isAppIdValid: boolean;
+    reuseAgentPubKey: AgentPubKey | undefined;
   } {
     return {
       appId: undefined,
@@ -86,6 +119,7 @@ export default defineComponent({
       membraneProofs: undefined,
       appInfo: undefined,
       isAppIdValid: true,
+      reuseAgentPubKey: undefined,
     };
   },
   computed: {
@@ -101,6 +135,11 @@ export default defineComponent({
     isLoadingFile() {
       if (this.appBundlePath && !this.appInfo) return true;
       return false;
+    },
+    allPubKeys() {
+      return this.$store.getters["allPublicKeysForVersion"](
+        this.holochainVersion
+      );
     },
   },
   async created() {
@@ -152,6 +191,7 @@ export default defineComponent({
     });
   },
   methods: {
+    serializeHash,
     onChange() {
       if (!this.isAppReadyToInstall) {
         this.$emit("setup-changed", undefined);
@@ -161,6 +201,7 @@ export default defineComponent({
         appId: this.appId as string,
         uid: this.uid,
         membraneProofs: this.getEncodedMembraneProofs(),
+        reuseAgentPubKey: this.reuseAgentPubKey,
       };
 
       this.$emit("setup-changed", setup);

@@ -57,7 +57,7 @@ impl LauncherManager {
       false => KeystoreStatus::InitNecessary,
     };
 
-    let config = LauncherConfig::read()?;
+    let config = LauncherConfig::read();
 
     let app_handle2 = app_handle.clone();
     let manager = LauncherManager {
@@ -106,9 +106,9 @@ impl LauncherManager {
 
     std::thread::sleep(Duration::from_millis(1000));
 
-    for version in HolochainVersion::supported_versions() {
+    for version in self.config.running_versions.clone() {
       self
-        .launch_holochain_manager(version, password.clone())
+        .launch_holochain_manager(version)
         .await?;
     }
 
@@ -118,14 +118,16 @@ impl LauncherManager {
   pub async fn launch_holochain_manager(
     &mut self,
     version: HolochainVersion,
-    password: String,
   ) -> Result<(), String> {
     let admin_port = portpicker::pick_unused_port().expect("No ports free");
 
     let conductor_config_path = config_environment_path(version);
     let environment_path = data_path_for_holochain_version(version);
 
-    let keystore_connection_url = self.get_lair_keystore_manager()?.connection_url();
+    let lair_manager = self.get_lair_keystore_manager()?;
+
+    let keystore_connection_url = lair_manager.connection_url();
+    let password = lair_manager.password();
 
     let config = LaunchHolochainConfig {
       log_level: self.config.log_level,
@@ -166,6 +168,28 @@ impl LauncherManager {
       )),
     }
   }
+
+  pub async fn get_or_launch_holochain_for_hdk(    &mut self,
+    hdk_version: HdkVersion,
+) -> Result<&mut WebAppManager, String> {
+for (version, state) in self.holochain_managers {
+  if let RunnningState::Running(manager)  = state {
+    if version.hdk_version().eq(&hdk_version) {
+      return manager;
+    }
+  }
+}
+
+for version in HolochainVersion::supported_versions() {
+    if version.hdk_version().eq(&hdk_version) {
+      return self.launch_holochain_manager(version).await;
+    }
+}
+
+Err(String::from("This HDK version is not supported"))
+
+  
+}
 
   pub fn get_web_happ_manager(
     &mut self,

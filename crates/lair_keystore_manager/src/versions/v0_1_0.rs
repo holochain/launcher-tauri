@@ -13,6 +13,7 @@ use crate::{error::LairKeystoreError, utils::create_dir_if_necessary, LairKeysto
 pub struct LairKeystoreManagerV0_1_0 {
   _keystore_path: PathBuf,
   connection_url: Url2,
+  password: String,
 }
 
 #[async_trait]
@@ -36,9 +37,11 @@ impl LairKeystoreManager for LairKeystoreManagerV0_1_0 {
     keystore_path: PathBuf,
     password: String,
   ) -> Result<Self, LairKeystoreError> {
-    let connection_url = launch_lair_keystore_process(log_level, keystore_path.clone(), password)?;
+    let connection_url =
+      launch_lair_keystore_process(log_level, keystore_path.clone(), password.clone())?;
 
     Ok(LairKeystoreManagerV0_1_0 {
+      password,
       connection_url,
       _keystore_path: keystore_path,
     })
@@ -46,5 +49,9 @@ impl LairKeystoreManager for LairKeystoreManagerV0_1_0 {
 
   fn connection_url(&self) -> Url2 {
     self.connection_url.clone()
+  }
+
+  fn password(&self) -> String {
+    self.password.clone()
   }
 }

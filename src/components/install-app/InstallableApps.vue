@@ -58,7 +58,10 @@ export default defineComponent({
     getLatestRelease,
     async saveApp(app: AppWithReleases) {
       const release = getLatestRelease(app);
-      const port = this.$store.getters["appInterfacePort"];
+
+      const version = this.$store.getters["holochainVersionForDevhub"];
+
+      const port = this.$store.getters["appInterfacePort"](version);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`);
       const devhubInfo = await appWs.appInfo({ installed_app_id: "DevHub" });
 
@@ -73,10 +76,12 @@ export default defineComponent({
 
       const appBundlePath = await invoke("save_app", {
         appBundleBytes: bytes,
-        holochainVersion: "V0_0_132",
       });
 
-      this.$emit("selected-app-bundle", appBundlePath);
+      this.$emit("selected-app-bundle", {
+        appBundlePath,
+        hdkVersionForApp: release.content.hdk_version,
+      });
     },
   },
 });

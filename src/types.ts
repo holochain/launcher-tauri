@@ -1,4 +1,8 @@
-import { AppRoleManifest, InstalledAppInfo } from "@holochain/client";
+import {
+  AgentPubKey,
+  AppRoleManifest,
+  InstalledAppInfo,
+} from "@holochain/client";
 
 export interface WebAppInfo {
   app_name: string;
@@ -79,6 +83,8 @@ export type LogLevel = "Error" | "Warn" | "Info" | "Debug" | "Trace";
 
 export interface LauncherConfig {
   log_level: LogLevel;
+  running_versions: HolochainVersion[];
+  version_for_devhub: HolochainVersion;
 }
 
 export type WebUiInfo =
@@ -99,5 +105,6 @@ export interface InstalledWebAppInfo {
 export interface AppSetup {
   appId: string;
   uid: string | undefined;
+  reuseAgentPubKey: AgentPubKey | undefined;
   membraneProofs: { [key: string]: Array<number> } | undefined;
 }

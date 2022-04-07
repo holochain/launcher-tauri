@@ -27,4 +27,6 @@ pub trait LairKeystoreManager: Send + Sync {
     Self: Sized;
 
   fn connection_url(&self) -> Url2;
+
+  fn password(&self) -> String;
 }

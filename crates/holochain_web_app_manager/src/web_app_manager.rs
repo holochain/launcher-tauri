@@ -3,12 +3,11 @@ use holochain_manager::{
   versions::{
     holochain_conductor_api_latest::InstalledAppInfo,
     holochain_types_latest::{
-      prelude::{AppBundle, SerializedBytes},
+      prelude::{AgentPubKey, AppBundle, SerializedBytes},
       web_app::WebAppBundle,
     },
-    launch_holochain,
     mr_bundle_latest::ResourceBytes,
-    HolochainManagerEnum, HolochainVersion,
+    HolochainVersion,
   },
   HolochainManager,
 };
@@ -29,7 +28,7 @@ use crate::{
 
 pub struct WebAppManager {
   environment_path: PathBuf,
-  holochain_manager: HolochainManagerEnum,
+  holochain_manager: HolochainManager,
   caddy_manager: CaddyManager,
   allocated_ports: HashMap<String, u16>,
   app_handle: AppHandle,
@@ -56,7 +55,7 @@ impl WebAppManager {
     create_dir_if_necessary(&conductor_data_path)?;
     create_dir_if_necessary(&ui_data_path)?;
 
-    let holochain_manager = launch_holochain(version, new_config, password)
+    let holochain_manager = HolochainManager::launch(version, new_config, password)
       .await
       .map_err(|err| LaunchWebAppManagerError::LaunchHolochainError(err))?;
 
@@ -91,6 +90,7 @@ impl WebAppManager {
     web_app_bundle: WebAppBundle,
     uid: Option<String>,
     membrane_proofs: HashMap<String, SerializedBytes>,
+    agent_pub_key: Option<AgentPubKey>,
   ) -> Result<(), String> {
     let app_bundle = web_app_bundle
       .happ_bundle()
@@ -108,7 +108,13 @@ impl WebAppManager {
     // Install app in conductor manager
     if let Err(err) = self
       .holochain_manager
-      .install_app(app_id.clone(), app_bundle, uid, membrane_proofs)
+      .install_app(
+        app_id.clone(),
+        app_bundle,
+        uid,
+        membrane_proofs,
+        agent_pub_key,
+      )
       .await
     {
       self.uninstall_app_ui(app_id)?;
@@ -199,11 +205,12 @@ impl WebAppManager {
     app_bundle: AppBundle,
     uid: Option<String>,
     membrane_proofs: HashMap<String, SerializedBytes>,
+    agent_pub_key: Option<AgentPubKey>,
   ) -> Result<(), String> {
     // Install app in conductor manager
     self
       .holochain_manager
-      .install_app(app_id, app_bundle, uid, membrane_proofs)
+      .install_app(app_id, app_bundle, uid, membrane_proofs, agent_pub_key)
       .await
       .map_err(|err| {
         log::error!("Error installing hApp in the conductor: {}", err);

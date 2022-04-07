@@ -2,7 +2,7 @@
   <mwc-dialog heading="Install App" open scrimClickAction="" escapeKeyAction="">
     <div v-if="!appBundlePath">
       <InstallableApps
-        @selected-app-bundle="appBundlePath = $event"
+        @selected-app-bundle="onAppBundleSelected($event)"
       ></InstallableApps>
 
       <mwc-button
@@ -15,6 +15,7 @@
     <div v-else>
       <SetupApp
         :appBundlePath="appBundlePath"
+        :holochainVersion="holochainVersion"
         @setup-changed="appSetup = $event"
       ></SetupApp>
     </div>
@@ -58,16 +59,29 @@ export default defineComponent({
     installing: boolean;
     appSetup: AppSetup | undefined;
     appBundlePath: string | undefined;
+    holochainVersion: HolochainVersion | undefined;
     snackbarText: string | undefined;
   } {
     return {
       installing: false,
       appBundlePath: undefined,
+      holochainVersion: undefined,
       appSetup: undefined,
       snackbarText: undefined,
     };
   },
   methods: {
+    onAppBundleSelected({
+      appBundlePath,
+      holochainVersion,
+    }: {
+      appBundlePath: string;
+      holochainVersion: HolochainVersion;
+    }) {
+      this.appBundlePath = appBundlePath;
+
+      this.holochainVersion = holochainVersion;
+    },
     async selectFromFileSystem() {
       this.appBundlePath = (await open({
         filters: [
@@ -75,20 +89,21 @@ export default defineComponent({
         ],
       })) as string;
     },
+    selectBundlePath(path: string, hdkVersion: string | undefined) {
+      invoke("");
+    },
     async installApp() {
       if (!this.appSetup) return;
 
       try {
         this.installing = true;
-        const holochainVersions: HolochainVersion[] =
-          this.$store.getters["holochainVersions"];
 
         await invoke("install_app", {
           appId: this.appSetup.appId,
           appBundlePath: this.appBundlePath,
           membraneProofs: this.appSetup.membraneProofs,
           uid: this.appSetup.uid,
-          holochainVersion: holochainVersions[0],
+          holochainVersion: this.holochainVersion,
         });
 
         this.installing = false;

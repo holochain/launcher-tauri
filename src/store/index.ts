@@ -1,6 +1,7 @@
 import { HolochainVersion, LauncherStateInfo } from "@/types";
 import { invoke } from "@tauri-apps/api/tauri";
 import { createStore } from "vuex";
+import { flatten, uniq } from "lodash-es";
 
 export interface LauncherAdminState {
   launcherStateInfo: "loading" | LauncherStateInfo;
@@ -76,6 +77,13 @@ export const store = createStore<LauncherAdminState>({
         if (error) return error.content as string;
       }
     },
+    holochainVersionForDevhub(state) {
+      const stateInfo = state.launcherStateInfo;
+
+      if (stateInfo === "loading") return undefined;
+
+      return stateInfo.config.version_for_devhub;
+    },
     setupNeeded(state) {
       if (state.launcherStateInfo === "loading") return undefined;
 
@@ -139,7 +147,7 @@ export const store = createStore<LauncherAdminState>({
         return 0;
       });
     },
-    appInterfacePort(state) {
+    allPublicKeysForVersion: (state) => (version: HolochainVersion) => {
       const stateInfo = state.launcherStateInfo;
 
       if (
@@ -149,7 +157,29 @@ export const store = createStore<LauncherAdminState>({
       )
         return undefined;
 
-      const holochainState = Object.values(stateInfo.state.content.content)[0];
+      const holochainState = stateInfo.state.content.content[version];
+
+      if (holochainState.type === "Error") return undefined;
+
+      const allCells = flatten(
+        holochainState.content.installed_apps.map(
+          (app) => app.installed_app_info.cell_data
+        )
+      );
+
+      return uniq(allCells.map((c) => c.cell_id[1]));
+    },
+    appInterfacePort: (state) => (version: HolochainVersion) => {
+      const stateInfo = state.launcherStateInfo;
+
+      if (
+        stateInfo === "loading" ||
+        stateInfo.state.type === "Error" ||
+        stateInfo.state.content.type === "Error"
+      )
+        return undefined;
+
+      const holochainState = stateInfo.state.content.content[version];
 
       if (holochainState.type === "Error") return undefined;
 

@@ -26,7 +26,12 @@
         "icons/128x128@2x.png"
       ],
       "resources": [],
-      "externalBin": ["bins/holochain", "bins/lair-keystore", "bins/caddy"],
+      "externalBin": [
+        "bins/holochain-v0.0.132",
+        "bins/holochain-v0.0.127",
+        "bins/lair-keystore",
+        "bins/caddy"
+      ],
       "copyright": "",
       "category": "DeveloperTool",
       "shortDescription": "",

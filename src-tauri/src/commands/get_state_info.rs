@@ -18,7 +18,7 @@ pub async fn get_state_info(
 ) -> Result<LauncherStateInfo, LauncherError> {
   let state_info = inner_get_state_info(state).await?;
 
-  let config = LauncherConfig::read()?;
+  let config = LauncherConfig::read();
 
   Ok(LauncherStateInfo {
     state: state_info,
@@ -45,8 +45,7 @@ async fn inner_get_state_info(
         return Ok(RunningState::Running(RunningState::Error(err.clone())));
       }
 
-      let mut holochain_manager_states: HashMap<HolochainVersion, HolochainState> =
-        HashMap::new();
+      let mut holochain_manager_states: HashMap<HolochainVersion, HolochainState> = HashMap::new();
 
       let versions: Vec<HolochainVersion> = manager.holochain_managers.keys().cloned().collect();
 
