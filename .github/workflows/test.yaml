@@ -39,7 +39,7 @@ jobs:
         run: |
           mkdir src-tauri/bins
           cargo install lair_keystore --version 0.1.0
-          LAIR_PATH=$(which holochain)
+          LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-unknown-linux-gnu
 
           cargo install --locked holochain --git https://github.com/holochain/holochain.git --tag holochain-0.0.127
