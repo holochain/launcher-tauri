@@ -1,6 +1,6 @@
 <template>
   <mwc-dialog
-    heading="Introduce Password"
+    heading="Enter Password"
     scrimClickAction=""
     escapeKeyAction=""
     open
@@ -19,7 +19,7 @@
     </div>
 
     <mwc-button
-      :label="introducing ? 'Introducing...' : 'Introduce Password'"
+      :label="introducing ? 'Entering...' : 'Enter Password'"
       :disabled="introducing"
       slot="primaryAction"
       @click="introducePassword()"

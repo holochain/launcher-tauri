@@ -36,7 +36,7 @@
 
         <mwc-select
           v-if="!hdkVersionForApp"
-          label="Holochain Version to Install To"
+          label="Install To Holochain Version:"
           outlined
           :fixedMenuPosition="true"
           required

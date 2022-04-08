@@ -64,7 +64,8 @@ export default defineComponent({
     this.$nextTick(() => {
       const repeatPassword = this.$refs.repeatPassword as TextField;
       repeatPassword.validityTransform = (newValue: string, nativeValidity) => {
-        if (newValue !== (this.$refs.password as TextField).value) {
+        const password = (this.$refs.password as TextField).value;
+        if (newValue !== password) {
           repeatPassword.setCustomValidity("Passwords don't match");
 
           this.isPasswordValid = false;
@@ -72,7 +73,7 @@ export default defineComponent({
             valid: false,
           };
         } else {
-          this.isPasswordValid = true;
+          this.isPasswordValid = password.length > 0;
           return {
             valid: true,
           };
