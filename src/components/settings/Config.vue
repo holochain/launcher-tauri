@@ -5,8 +5,8 @@
     scrimClickAction=""
     escapeKeyAction=""
   >
-    <div class="column" style="min-height: 400px; min-width: 400px">
-      <div class="row">
+    <div class="column" style="min-height: 200px; min-width: 400px">
+      <div class="row" style="margin-top: 8px">
         <mwc-select
           outlined
           :fixedMenuPosition="true"

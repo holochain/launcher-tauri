@@ -21,9 +21,9 @@ export function getReason(app: InstalledAppInfo): string | undefined {
       }
     ).disabled.reason;
 
-    if (Object.keys(reason).includes("never_started")) {
+    if ((reason as any) === "never_started") {
       return "App was never started";
-    } else if (Object.keys(reason).includes("user")) {
+    } else if ((reason as any) === "user") {
       return "App was disabled by the user";
     } else {
       return `There was an error with this app: ${

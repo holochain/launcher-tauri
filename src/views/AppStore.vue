@@ -2,8 +2,8 @@
   <div v-if="loading" class="column center-content" style="flex: 1">
     <mwc-circular-progress indeterminate></mwc-circular-progress>
   </div>
-  <div v-else>
-    <div class="row center-content" style="flex: 1">
+  <div v-else class="column" style="flex: 1; margin: 8px">
+    <div class="row center-content">
       <mwc-icon-button
         icon="arrow_back"
         @click="$emit('go-back')"
@@ -23,7 +23,7 @@
         v-for="(app, i) of installableApps"
         :key="i"
         class="column"
-        style="width: 400px; margin-right: 16px; margin-top: 16px"
+        style="width: 400px; margin-right: 16px; margin-bottom: 16px"
       >
         <ui5-card style="width: auto">
           <div class="column" style="margin: 8px">

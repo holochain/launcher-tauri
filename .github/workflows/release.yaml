@@ -27,12 +27,33 @@ jobs:
           toolchain: 1.58
       - name: install app dependencies and info
         run: npm install && npm run tauri info
+
+      - name: fetch DevHub
+        run: |
+          curl -L --output DevHub.webhapp https://github.com/holochain/launcher/releases/download/v0.3.9/DevHub.webhapp
+
       - name: download caddy (Windows only)
         if: matrix.platform == 'windows-latest'
         run: |
           mkdir src-tauri/bins
           cd src-tauri/bins
           curl.exe --output caddy-x86_64-pc-windows-msvc.exe "https://caddyserver.com/api/download?os=windows&arch=amd64&idempotency=22435878078631"
+
+      - name: setup binaries (Windows only)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          cargo install lair_keystore --version 0.1.0
+          $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
+          Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
+
+          cargo install --locked holochain --git https://github.com/holochain/holochain.git --tag holochain-0.0.127
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.127-x86_64-pc-windows-msvc.exe
+
+          cargo install holochain --version 0.0.132
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.132-x86_64-pc-windows-msvc.exe
+
       - name: download caddy (MacOS only)
         if: matrix.platform == 'macos-latest'
         run: |
@@ -41,11 +62,28 @@ jobs:
           curl -L --output caddy.tar.gz "https://github.com/caddyserver/caddy/releases/download/v2.4.3/caddy_2.4.3_mac_amd64.tar.gz"
           gunzip -c caddy.tar.gz | tar xopf -
           mv caddy caddy-x86_64-apple-darwin
+
+      - name: setup binaries (macos only)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          cargo install lair_keystore --version 0.1.0
+          LAIR_PATH=$(which holochain)
+          cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-apple-darwin
+
+          cargo install --locked holochain --git https://github.com/holochain/holochain.git --tag holochain-0.0.127
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.127-x86_64-apple-darwin
+
+          cargo install holochain --version 0.0.132
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.132-x86_64-apple-darwin
+
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev libcanberra-gtk-module libcanberra-gtk3-module build-essential curl wget libssl-dev libgtk-3-dev squashfs-tools libgtksourceview-3.0-dev libappindicator3-dev patchelf librsvg2-dev
+
       - name: install Caddy (ubuntu)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
@@ -54,28 +92,25 @@ jobs:
           curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
           sudo apt update
           sudo apt install caddy
-      - name: install Holochain 
-        run: |
-          cargo install --locked holochain --git https://github.com/holochain/holochain.git --tag holochain-0.0.127
-          cargo install lair_keystore --version 0.1.0
+
+          CADDY_PATH=$(which caddy)
+          cp $CADDY_PATH src-tauri/bins/caddy-unknown-linux-gnu
+
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
-          sh scripts/setup-binaries.sh
-      - name: setup binaries (macos only)
-        if: matrix.platform == 'macos-latest'
-        run: |
+          cargo install lair_keystore --version 0.1.0
+          LAIR_PATH=$(which holochain)
+          cp $LAIR_PATH src-tauri/bins/lair-keystore-unknown-linux-gnu
+
+          cargo install --locked holochain --git https://github.com/holochain/holochain.git --tag holochain-0.0.127
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-x86_64-apple-darwin
-          LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-apple-darwin
-      - name: setup binaries (Windows only)
-        if: matrix.platform == 'windows-latest'
-        run: |
-          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
-          $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
-          Copy-Item $HcPath -Destination src-tauri/bins/holochain-x86_64-pc-windows-msvc.exe
-          Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.127-unknown-linux-gnu
+
+          cargo install holochain --version 0.0.132
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.132-unknown-linux-gnu
+
       - name: build the app
         run: npm run build
       - uses: tauri-apps/tauri-action@v0
