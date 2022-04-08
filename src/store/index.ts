@@ -82,7 +82,7 @@ export const store = createStore<LauncherAdminState>({
 
       if (stateInfo === "loading") return undefined;
 
-      return stateInfo.config.version_for_devhub;
+      return stateInfo.config.default_version;
     },
     setupNeeded(state) {
       if (state.launcherStateInfo === "loading") return undefined;
@@ -155,13 +155,12 @@ export const store = createStore<LauncherAdminState>({
         stateInfo.state.type === "Error" ||
         stateInfo.state.content.type === "Error"
       )
-        return undefined;
+        return [];
 
       const holochainState = stateInfo.state.content.content[version];
 
-      if (!holochainState || holochainState.type === "Error") return undefined;
+      if (!holochainState || holochainState.type === "Error") return [];
 
-      console.log(holochainState);
       const allCells = flatten(
         holochainState.content.installed_apps.map(
           (app) => app.installed_app_info.cell_data

@@ -1,18 +1,5 @@
 <template>
-  <!--   <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </div>
- -->
-
-  <div
-    v-if="isLoading()"
-    style="flex: 1; display: flex; align-items: center; justify-content: center"
-  >
-    <mwc-circular-progress indeterminate></mwc-circular-progress>
-  </div>
-
-  <div v-else style="flex: 1; display: flex">
+  <div style="flex: 1; display: flex">
     <AlreadyRunning v-if="$store.getters[`isAlreadyRunning`]"> </AlreadyRunning>
     <Error
       v-else-if="$store.getters[`errorLaunching`]"
@@ -38,12 +25,12 @@
 <script lang="ts">
 import Home from "./views/Home.vue";
 import FactoryReset from "./views/FactoryReset.vue";
-import Config from "./components/Config.vue";
-import Error from "./components/Error.vue";
-import AlreadyRunning from "./components/AlreadyRunning.vue";
-import IntroducePassword from "./components/IntroducePassword.vue";
-import Setup from "./components/Setup.vue";
-import About from "./components/About.vue";
+import Config from "./components/settings/Config.vue";
+import Error from "./components/settings/Error.vue";
+import AlreadyRunning from "./components/settings/AlreadyRunning.vue";
+import IntroducePassword from "./components/setup/IntroducePassword.vue";
+import Setup from "./components/setup/Setup.vue";
+import About from "./components/settings/About.vue";
 import { defineComponent } from "vue";
 import { ActionTypes } from "./store/actions";
 import "@material/mwc-circular-progress";
@@ -59,11 +46,6 @@ export default defineComponent({
     Error,
     Config,
     AlreadyRunning,
-  },
-  methods: {
-    isLoading() {
-      return this.$store.state.launcherStateInfo === "loading";
-    },
   },
   async created() {
     this.$store.dispatch(ActionTypes.fetchStateInfo);
@@ -116,6 +98,11 @@ body,
   flex-direction: row;
 }
 
+.center-content {
+  align-items: center;
+  justify-content: center;
+}
+
 .title {
   font-size: 1.5em;
 }
@@ -139,6 +126,11 @@ body,
 .flex-scrollable-y {
   max-height: 100%;
   overflow-y: auto;
+}
+
+mwc-button,
+mwc-icon-button {
+  --mdc-theme-primary: rgb(61, 61, 61);
 }
 
 @font-face {

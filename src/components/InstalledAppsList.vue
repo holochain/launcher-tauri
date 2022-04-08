@@ -20,9 +20,7 @@
       style="display: flex; flex-direction: column; margin-bottom: 16px"
     >
       <ui5-card style="width: auto">
-        <div
-          style="display: flex; flex-direction: column; flex: 1; padding: 8px"
-        >
+        <div style="display: flex; flex-direction: column; flex: 1">
           <div style="display: flex; flex-direction: row">
             <span
               style="
@@ -30,6 +28,8 @@
                 width: 300px;
                 text-overflow: ellipsis;
                 overflow: hidden;
+                margin-top: 8px;
+                margin-left: 8px;
               "
               >{{ app.installed_app_info.installed_app_id }}</span
             >
@@ -43,40 +43,30 @@
                 justify-content: center;
               "
             >
+              <mwc-button
+                v-if="
+                  isAppRunning(app.installed_app_info) && !isAppHeadless(app)
+                "
+                @click="
+                  $emit('openApp', app.installed_app_info.installed_app_id)
+                "
+                style="margin-right: 8px"
+                label="Open"
+                icon="launch"
+              >
+              </mwc-button>
+
               <InstalledAppStatus :installedAppInfo="app.installed_app_info" />
 
               <mwc-icon-button
-                @click="$refs[app.installed_app_info.installed_app_id].show()"
+                @click="
+                  $emit('app-selected', app.installed_app_info.installed_app_id)
+                "
                 style="margin-left: 8px"
                 icon="settings"
               >
               </mwc-icon-button>
-              <mwc-dialog
-                :ref="app.installed_app_info.installed_app_id"
-                :heading="app.installed_app_info.installed_app_id"
-              >
-                <InstalledAppDetail :installedWebAppInfo="app" />
-
-                <mwc-button
-                  label="Ok"
-                  slot="primaryAction"
-                  dialogAction="close"
-                ></mwc-button>
-              </mwc-dialog>
             </div>
-          </div>
-
-          <div
-            style="display: flex; flex-direction: row; align-items: flex-end"
-          >
-            <mwc-button
-              v-if="isAppRunning(app.installed_app_info) && !isAppHeadless(app)"
-              @click="$emit('openApp', app.installed_app_info.installed_app_id)"
-              style="margin-left: 8px"
-              label="Open"
-              icon="launch"
-            >
-            </mwc-button>
           </div>
         </div>
       </ui5-card>
@@ -93,11 +83,10 @@ import "@material/mwc-icon-button";
 import { InstalledWebAppInfo } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppStatus from "./InstalledAppStatus.vue";
-import InstalledAppDetail from "./InstalledAppDetail.vue";
 
 export default defineComponent({
   name: "InstalledAppsList",
-  components: { InstalledAppStatus, InstalledAppDetail },
+  components: { InstalledAppStatus },
   props: {
     installedWebApps: {
       type: Object as PropType<Array<InstalledWebAppInfo>>,

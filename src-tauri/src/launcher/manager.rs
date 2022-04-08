@@ -137,23 +137,29 @@ impl LauncherManager {
 
     let state =
       match WebAppManager::launch(version, config, password, self.app_handle.clone()).await {
-        Ok(mut manager) => match install_default_apps_if_necessary(&mut manager).await {
-          Ok(()) => {
+        Ok(mut manager) => match version.eq(&self.config.default_version) {
+          true => match install_default_apps_if_necessary(&mut manager).await {
+            Ok(()) => {
+              log::info!("Launched Holochain v{:?}", version);
+              RunningState::Running(manager)
+            }
+            Err(err) => {
+              manager.kill()?;
+              log::error!(
+                "Error launching Holochain v{:?}: Could not install default apps: {}",
+                version,
+                err
+              );
+
+              RunningState::Error(LaunchWebAppManagerError::Other(format!(
+                "Could not install default apps: {}",
+                err
+              )))
+            }
+          },
+          false => {
             log::info!("Launched Holochain v{:?}", version);
             RunningState::Running(manager)
-          }
-          Err(err) => {
-            manager.kill()?;
-            log::error!(
-              "Error launching Holochain v{:?}: Could not install default apps: {}",
-              version,
-              err
-            );
-
-            RunningState::Error(LaunchWebAppManagerError::Other(format!(
-              "Could not install default apps: {}",
-              err
-            )))
           }
         },
         Err(error) => {
@@ -162,7 +168,13 @@ impl LauncherManager {
         }
       };
 
-    self.holochain_managers.insert(version, state);
+    self.holochain_managers.insert(version.clone(), state);
+
+    self.config.running_versions.insert(version);
+    self
+      .config
+      .write()
+      .map_err(|err| format!("Could not write launcher config: {}", err))?;
 
     self.on_apps_changed().await?;
 

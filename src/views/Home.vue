@@ -1,72 +1,52 @@
 <template>
-  <div class="column" style="flex: 1; margin: 24px">
-    <div class="flex-scrollable-parent">
+  <div class="column" style="flex: 1">
+    <div v-if="view.type === 'installedApps'" class="flex-scrollable-parent">
       <div class="flex-scrollable-container">
         <div class="flex-scrollable-y">
           <InstalledApps
-            style="display: flex; margin-bottom: 50px"
+            @open-app-store="view = { type: 'appStore' }"
+            style="display: flex; margin: 24px; margin-bottom: 50px"
           ></InstalledApps>
         </div>
       </div>
     </div>
-    <InstallApp
-      v-if="showInstallApp"
-      @app-installed="showInstallApp = false"
-      @closing-dialog="showInstallApp = false"
-    ></InstallApp>
 
-    <mwc-fab
-      extended
-      icon="add"
-      label="Install new app"
-      @click="showInstallApp = true"
-      style="
-        margin: 16px;
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        --mdc-theme-secondary: #4720e3;
-      "
-    ></mwc-fab>
-
-    <mwc-dialog
-      heading="Uninstall App"
-      :open="appToBeUninstalled"
-      @closing="appToBeUninstalled = undefined"
-    >
-      <div>Are you sure you want to uninstall {{ appToBeUninstalled }}?</div>
-
-      <mwc-button
-        label="Cancel"
-        slot="secondaryAction"
-        dialogAction="close"
-      ></mwc-button>
-      <mwc-button
-        label="Uninstall"
-        slot="primaryAction"
-        @click="uninstallApp(appToBeUninstalled)"
-      ></mwc-button>
-    </mwc-dialog>
+    <div v-else style="flex: 1; display: flex">
+      <AppStore @go-back="view = { type: 'installedApps' }"></AppStore>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import InstallApp from "@/components/install-app/InstallApp.vue";
+import AppStore from "./AppStore.vue";
 import InstalledApps from "./InstalledApps.vue";
 import { defineComponent } from "vue";
 import "@material/mwc-fab";
 
+type View =
+  | {
+      type: "installedApps";
+    }
+  | {
+      type: "appStore";
+    };
+
 export default defineComponent({
   name: "Home",
   components: {
-    InstallApp,
+    AppStore,
     InstalledApps,
   },
   data(): {
     snackbarText: string | undefined;
-    showInstallApp: boolean;
+    view: View;
   } {
-    return { snackbarText: undefined, showInstallApp: false };
+    return {
+      snackbarText: undefined,
+      view: {
+        type: "installedApps",
+      },
+    };
   },
   methods: {},
 });

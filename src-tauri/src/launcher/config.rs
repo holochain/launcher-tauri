@@ -1,7 +1,7 @@
 use holochain_manager::versions::HolochainVersion;
 use log::Level;
 use serde::{Deserialize, Serialize};
-use std::fs;
+use std::{fs, collections::HashSet};
 
 use crate::file_system::launcher_config_path;
 
@@ -11,16 +11,16 @@ use super::error::LauncherError;
 pub struct LauncherConfig {
   pub log_level: Level,
 
-  pub running_versions: Vec<HolochainVersion>,
-  pub version_for_devhub: HolochainVersion,
+  pub running_versions: HashSet<HolochainVersion>,
+  pub default_version: HolochainVersion,
 }
 
 impl Default for LauncherConfig {
   fn default() -> Self {
     LauncherConfig {
       log_level: log::Level::Warn,
-      running_versions: vec![HolochainVersion::default()],
-      version_for_devhub: HolochainVersion::default(),
+      running_versions: HashSet::from([HolochainVersion::default()]),
+      default_version: HolochainVersion::default(),
     }
   }
 }
@@ -31,7 +31,11 @@ impl LauncherConfig {
       Ok(str) => {
         serde_yaml::from_str::<LauncherConfig>(str.as_str()).unwrap_or(LauncherConfig::default())
       }
-      Err(_) => LauncherConfig::default(),
+      Err(_) => {
+        let config = LauncherConfig::default();
+        config.write().expect("Could not write launcher config");
+        config
+      }
     }
   }
 

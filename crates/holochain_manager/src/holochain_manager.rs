@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::env::temp_dir;
+use std::time::SystemTime;
 use std::{fs, time::Duration};
 
 use holochain_client::{AdminWebsocket, AgentPubKey, InstallAppBundlePayload, InstalledAppInfo};
@@ -127,8 +129,20 @@ impl HolochainManager {
         .map_err(|err| format!("Error generating public key: {:?}", err)),
     }?;
 
+    // TODO: make this more performant
+    // We could be passing the app bundle path directly if what we want to install is a headless app
+    // Also consider if the AppBundleSource::Path is a viable alternative in production mode
+    let now = SystemTime::now();
+
+    let path = temp_dir().join(format!("app_to_install{:?}.webhapp", now));
+
+    app_bundle
+      .write_to_file(&path)
+      .await
+      .map_err(|err| format!("Could not write app bundle to temp file: {}", err))?;
+
     let payload = InstallAppBundlePayload {
-      source: AppBundleSource::Bundle(app_bundle),
+      source: AppBundleSource::Path(path),
       agent_key,
       installed_app_id: Some(app_id.clone().into()),
       membrane_proofs,

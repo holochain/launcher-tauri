@@ -19,7 +19,8 @@
     </div>
 
     <mwc-button
-      label="Introduce Password"
+      :label="introducing ? 'Introducing...' : 'Introduce Password'"
+      :disabled="introducing"
       slot="primaryAction"
       @click="introducePassword()"
     ></mwc-button>
@@ -39,8 +40,14 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "IntroducePassword",
+  data(): { introducing: boolean } {
+    return {
+      introducing: false,
+    };
+  },
   methods: {
     async introducePassword() {
+      this.introducing = true;
       const password = (this.$refs["password"] as TextField).value;
       try {
         await invoke("unlock_and_launch", { password });
@@ -49,6 +56,7 @@ export default defineComponent({
         console.error(e);
         (this.$refs as any).snackbar.show();
       }
+      this.introducing = false;
     },
   },
 });

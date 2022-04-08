@@ -84,7 +84,7 @@ export type LogLevel = "Error" | "Warn" | "Info" | "Debug" | "Trace";
 export interface LauncherConfig {
   log_level: LogLevel;
   running_versions: HolochainVersion[];
-  version_for_devhub: HolochainVersion;
+  default_version: HolochainVersion;
 }
 
 export type WebUiInfo =
@@ -100,12 +100,4 @@ export type WebUiInfo =
 export interface InstalledWebAppInfo {
   installed_app_info: InstalledAppInfo;
   web_ui_info: WebUiInfo;
-}
-
-export interface AppSetup {
-  appId: string;
-  uid: string | undefined;
-  reuseAgentPubKey: AgentPubKey | undefined;
-  holochainVersion: HolochainVersion;
-  membraneProofs: { [key: string]: Array<number> } | undefined;
 }
