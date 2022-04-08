@@ -3,20 +3,24 @@ use std::path::PathBuf;
 use url2::Url2;
 use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};
 
+// NEW_VERSION: Upgrade these two crates so that they refer to the latest version of them
 pub use holochain_conductor_api_0_0_132 as holochain_conductor_api_latest;
 pub use holochain_types_0_0_132 as holochain_types_latest;
-use lair_keystore_manager::versions::LairKeystoreVersion;
-pub use mr_bundle_0_0_9 as mr_bundle_latest;
 
+pub use mr_bundle_0_0_9 as mr_bundle_latest;
+use lair_keystore_manager::versions::LairKeystoreVersion;
+
+pub mod version_manager;
+use version_manager::VersionManager;
+
+// NEW_VERSION: Import the new VersionManager
 pub mod v0_0_127;
 pub mod v0_0_132;
-pub mod version_manager;
-
-use version_manager::VersionManager;
 
 use v0_0_127::HolochainV0_0_127;
 use v0_0_132::HolochainV0_0_132;
 
+// NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HdkVersion {
   #[serde(rename = "0.0.123")]
@@ -25,6 +29,7 @@ pub enum HdkVersion {
   V0_0_127,
 }
 
+// NEW_VERSION: Add the new Holochain version to this enum
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HolochainVersion {
   #[serde(rename = "0.0.127")]
@@ -46,10 +51,13 @@ impl HolochainVersion {
   }
 
   pub fn supported_versions() -> Vec<HolochainVersion> {
+    // NEW_VERSION: Add the new version to this array
     return vec![HolochainVersion::V0_0_127, HolochainVersion::V0_0_132];
   }
-
+  
   pub fn manager(&self) -> HolochainVersionManager {
+    // NEW_VERSION: Create a new version manager, duplicating one of the files in this folder
+    // Then, import and add the new version manager here
     match self {
       HolochainVersion::V0_0_127 => HolochainVersionManager::HolochainV0_0_127(HolochainV0_0_127),
       HolochainVersion::V0_0_132 => HolochainVersionManager::HolochainV0_0_132(HolochainV0_0_132),
@@ -57,7 +65,7 @@ impl HolochainVersion {
   }
 }
 
-
+// NEW_VERSION: Add the new version manager to this enum
 #[enum_dispatch(VersionManager)]
 pub enum HolochainVersionManager {
   HolochainV0_0_127,

@@ -11,16 +11,15 @@ holochain_client = {package = "holochain_client", git = "https://github.com/holo
 holochain_conductor_api_0_0_127 = {package = "holochain_conductor_api", version = "0.0.27"}
 holochain_p2p_0_0_127 = {package = "holochain_p2p", version = "0.0.27"}
 holochain_types_0_0_127 = {package = "holochain_types", version = "0.0.27"}
-holochain_websocket_0_0_127 = {package = "holochain_websocket", version = "0.0.27"}
 
+# NEW_VERSION: Copy and paste these lines, upgrading the crates version
 holochain_conductor_api_0_0_132 = {package = "holochain_conductor_api", version = "0.0.32"}
 holochain_p2p_0_0_132 = {package = "holochain_p2p", version = "0.0.32"}
 holochain_types_0_0_132 = {package = "holochain_types", version = "0.0.32"}
-holochain_websocket_0_0_132 = {package = "holochain_websocket", version = "0.0.32"}
-
-lair_keystore_manager = {path = "../lair_keystore_manager"}
 
 mr_bundle_0_0_9 = {package = "mr_bundle", version = "0.0.9"}
+
+lair_keystore_manager = {path = "../lair_keystore_manager"}
 
 ascii = "1.0.0"
 async-trait = "0.1.52"

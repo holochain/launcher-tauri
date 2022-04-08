@@ -53,6 +53,8 @@ jobs:
           cargo install holochain --version 0.0.132
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.132-x86_64-pc-windows-msvc.exe
+         
+          # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
       - name: download caddy (MacOS only)
         if: matrix.platform == 'macos-latest'
@@ -77,6 +79,8 @@ jobs:
           cargo install holochain --version 0.0.132
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.132-x86_64-apple-darwin
+          
+          # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
@@ -110,6 +114,8 @@ jobs:
           cargo install holochain --version 0.0.132
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.132-unknown-linux-gnu
+
+          # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
       - name: build the app
         run: npm run build

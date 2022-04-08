@@ -13,6 +13,7 @@
       <mwc-button
         icon="folder"
         raised
+        style="--mdc-theme-primary: #4720e3"
         label="Select app from FileSystem"
         @click="selectFromFileSystem()"
       >

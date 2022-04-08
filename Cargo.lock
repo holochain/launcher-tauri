@@ -2476,7 +2476,7 @@ dependencies = [
  "anyhow",
  "holochain_conductor_api 0.0.32",
  "holochain_types 0.0.32",
- "holochain_websocket 0.0.32",
+ "holochain_websocket",
  "serde",
  "url",
 ]
@@ -2591,8 +2591,6 @@ dependencies = [
  "holochain_p2p 0.0.32",
  "holochain_types 0.0.27",
  "holochain_types 0.0.32",
- "holochain_websocket 0.0.27",
- "holochain_websocket 0.0.32",
  "lair_keystore_manager",
  "log",
  "mr_bundle 0.0.9",
@@ -3040,31 +3038,6 @@ dependencies = [
  "thiserror",
  "url2",
  "zip",
-]
-
-[[package]]
-name = "holochain_websocket"
-version = "0.0.27"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a30bce71bf2553e5aa06e54011f687ac7e43ccaa3638e3754c6888233200af6"
-dependencies = [
- "futures",
- "ghost_actor 0.4.0-alpha.5",
- "holochain_serialized_bytes",
- "must_future",
- "nanoid 0.3.0",
- "net2",
- "serde",
- "serde_bytes",
- "stream-cancel",
- "thiserror",
- "tokio",
- "tokio-stream",
- "tokio-tungstenite",
- "tracing",
- "tracing-futures",
- "tungstenite",
- "url2",
 ]
 
 [[package]]

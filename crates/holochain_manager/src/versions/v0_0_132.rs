@@ -12,10 +12,6 @@ use super::{version_manager::VersionManager, HdkVersion, HolochainVersion};
 pub struct HolochainV0_0_132;
 
 impl VersionManager for HolochainV0_0_132 {
-  fn holochain_version(&self) -> HolochainVersion {
-    HolochainVersion::V0_0_132
-  }
-
   fn hdk_version(&self) -> HdkVersion {
     HdkVersion::V0_0_127
   }

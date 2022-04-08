@@ -9,8 +9,6 @@ use super::{HolochainVersion, HdkVersion};
 
 #[enum_dispatch]
 pub trait VersionManager {
-  fn holochain_version(&self) -> HolochainVersion;
-
   fn hdk_version(&self) -> HdkVersion;
 
   fn lair_keystore_version(&self) -> LairKeystoreVersion {

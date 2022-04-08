@@ -1,25 +1,24 @@
 use std::path::PathBuf;
 use url2::Url2;
 
+// NEW_VERSION: Import the exact same types but from the new crates
 use holochain_conductor_api_0_0_127::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
 use holochain_p2p_0_0_127::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig};
 
-use super::{version_manager::VersionManager, HdkVersion, HolochainVersion};
+use super::{version_manager::VersionManager, HdkVersion};
 
 pub struct HolochainV0_0_127;
 
 impl VersionManager for HolochainV0_0_127 {
-  fn holochain_version(&self) -> HolochainVersion {
-    HolochainVersion::V0_0_132
-  }
-
+  // NEW_VERSION: Careful! Indicate here which HDK version comes bundled with this Holochain version
   fn hdk_version(&self) -> HdkVersion {
     HdkVersion::V0_0_123
   }
 
+  // NEW_VERSION: Duplicate and change whatever config is necessary to change
   fn initial_config(
     &self,
     admin_port: u16,
@@ -55,6 +54,8 @@ impl VersionManager for HolochainV0_0_127 {
     serde_yaml::to_string(&config).expect("Could not convert conductor config to string")
   }
 
+  // NEW_VERSION: You shouldn't have to change this function if the shape 
+  // of the configuration concerning the admin port and the keystore connection haven't changed
   fn overwrite_config(
     &self,
     conductor_config_str: String,

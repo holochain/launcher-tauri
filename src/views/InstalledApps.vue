@@ -17,7 +17,7 @@
           v-for="version of $store.getters[`holochainVersions`]"
           :key="version"
           class="column"
-          style="flex: 1; width: 600px"
+          style="flex: 1; width: 600px; margin-bottom: 16px"
         >
           <span style="margin-bottom: 8px">Holochain v{{ version }}</span>
 
