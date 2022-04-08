@@ -21,7 +21,8 @@
         type="password"
         ref="password"
         autoValidate
-        style="margin-top: 16px"
+        helper=" "
+        style="margin-top: 24px"
         label="Password"
       ></mwc-textfield>
 
@@ -29,6 +30,7 @@
         outlined
         autoValidate
         ref="repeatPassword"
+        helper=" "
         style="margin-top: 16px"
         type="password"
         label="Repeat Password"
@@ -36,10 +38,10 @@
     </div>
 
     <mwc-button
-      label="Initialize Keystore"
+      :disabled="initializing || !isPasswordValid"
+      :label="initializing ? 'Initializing...' : 'Initialize'"
       slot="primaryAction"
       @click="initialize()"
-      :disabled="!isPasswordValid"
     ></mwc-button>
   </mwc-dialog>
 </template>
@@ -55,6 +57,7 @@ export default defineComponent({
   data() {
     return {
       isPasswordValid: false,
+      initializing: false,
     };
   },
   created() {
@@ -79,10 +82,12 @@ export default defineComponent({
   },
   methods: {
     async initialize() {
+      this.initializing = true;
       const password = (this.$refs["password"] as TextField).value;
 
       await invoke("initialize_keystore", { password });
       await this.$store.dispatch(ActionTypes.fetchStateInfo);
+      this.initializing = false;
     },
   },
 });
