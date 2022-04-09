@@ -19,8 +19,8 @@
     </div>
 
     <mwc-button
-      :label="introducing ? 'Entering...' : 'Enter Password'"
-      :disabled="introducing"
+      :label="entering ? 'Entering...' : 'Enter Password'"
+      :disabled="entering"
       slot="primaryAction"
       @click="introducePassword()"
     ></mwc-button>
@@ -39,15 +39,15 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "IntroducePassword",
-  data(): { introducing: boolean } {
+  name: "EnterPassword",
+  data(): { entering: boolean } {
     return {
-      introducing: false,
+      entering: false,
     };
   },
   methods: {
     async introducePassword() {
-      this.introducing = true;
+      this.entering = true;
       const password = (this.$refs["password"] as TextField).value;
       try {
         await invoke("unlock_and_launch", { password });
@@ -56,7 +56,7 @@ export default defineComponent({
         console.error(e);
         (this.$refs as any).snackbar.show();
       }
-      this.introducing = false;
+      this.entering = false;
     },
   },
 });

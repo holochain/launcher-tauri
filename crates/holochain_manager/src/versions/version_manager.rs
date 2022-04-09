@@ -4,8 +4,7 @@ use enum_dispatch::enum_dispatch;
 use lair_keystore_manager::versions::LairKeystoreVersion;
 use url2::Url2;
 
-use super::{HolochainVersion, HdkVersion};
-
+use super::HdkVersion;
 
 #[enum_dispatch]
 pub trait VersionManager {

@@ -10,9 +10,7 @@
       </span>
     </Error>
     <Setup v-else-if="$store.getters[`setupNeeded`]"></Setup>
-    <IntroducePassword
-      v-else-if="$store.getters[`passwordNeeded`]"
-    ></IntroducePassword>
+    <EnterPassword v-else-if="$store.getters[`passwordNeeded`]"></EnterPassword>
     <Home
       v-else-if="!$store.getters['oldFiles']"
       style="display: flex; flex: 1"
@@ -28,7 +26,7 @@ import FactoryReset from "./views/FactoryReset.vue";
 import Config from "./components/settings/Config.vue";
 import Error from "./components/settings/Error.vue";
 import AlreadyRunning from "./components/settings/AlreadyRunning.vue";
-import IntroducePassword from "./components/setup/IntroducePassword.vue";
+import EnterPassword from "./components/setup/EnterPassword.vue";
 import Setup from "./components/setup/Setup.vue";
 import About from "./components/settings/About.vue";
 import { defineComponent } from "vue";
@@ -38,7 +36,7 @@ import "@material/mwc-circular-progress";
 export default defineComponent({
   name: "App",
   components: {
-    IntroducePassword,
+    EnterPassword,
     Setup,
     Home,
     FactoryReset,
