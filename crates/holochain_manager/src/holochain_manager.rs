@@ -62,7 +62,7 @@ impl HolochainManager {
     let command_child =
       launch_holochain_process(config.log_level, version, conductor_config_path, password)?;
 
-    std::thread::sleep(Duration::from_millis(3000));
+    std::thread::sleep(Duration::from_millis(1000));
 
     let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
       .await

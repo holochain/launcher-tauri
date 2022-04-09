@@ -135,19 +135,21 @@ impl LauncherManager {
       keystore_connection_url,
     };
 
+    let version_str: String = version.into();
+
     let state =
       match WebAppManager::launch(version, config, password, self.app_handle.clone()).await {
         Ok(mut manager) => match version.eq(&self.config.default_version) {
           true => match install_default_apps_if_necessary(&mut manager).await {
             Ok(()) => {
-              log::info!("Launched Holochain v{:?}", version);
+              log::info!("Launched Holochain v{}", version_str);
               RunningState::Running(manager)
             }
             Err(err) => {
               manager.kill()?;
               log::error!(
-                "Error launching Holochain v{:?}: Could not install default apps: {}",
-                version,
+                "Error launching Holochain v{}: Could not install default apps: {}",
+                version_str,
                 err
               );
 
@@ -158,12 +160,13 @@ impl LauncherManager {
             }
           },
           false => {
-            log::info!("Launched Holochain v{:?}", version);
+            let version_str: String = version.into();
+            log::info!("Launched Holochain v{}", version_str);
             RunningState::Running(manager)
           }
         },
         Err(error) => {
-          log::error!("Error launching Holochain v{:?}: {}", version, error);
+          log::error!("Error launching Holochain v{}: {}", version_str, error);
           RunningState::Error(error)
         }
       };

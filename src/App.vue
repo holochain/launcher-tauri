@@ -46,7 +46,7 @@ export default defineComponent({
     AlreadyRunning,
   },
   async created() {
-    this.$store.dispatch(ActionTypes.fetchStateInfo);
+    await this.$store.dispatch(ActionTypes.fetchStateInfo);
   },
 });
 </script>
@@ -128,7 +128,7 @@ body,
 
 mwc-button,
 mwc-icon-button {
-  --mdc-theme-primary: rgb(61, 61, 61);
+  --mdc-theme-primary: rgb(85, 85, 85);
 }
 
 @font-face {

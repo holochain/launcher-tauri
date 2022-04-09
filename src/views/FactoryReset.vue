@@ -58,6 +58,7 @@ import { defineComponent } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import { getCurrent } from "@tauri-apps/api/window";
 import type { Dialog } from "@material/mwc-dialog";
+import { ActionTypes } from "@/store/actions";
 
 export default defineComponent({
   name: "FactoryReset",
@@ -73,6 +74,8 @@ export default defineComponent({
     };
   },
   async mounted() {
+    await this.$store.dispatch(ActionTypes.fetchStateInfo);
+
     this.$nextTick(async () => {
       if (this.$store.getters["oldFiles"]) {
         this.oldFiles = true;

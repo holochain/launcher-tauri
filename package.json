@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.3.10",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run dev:ui\" \"sleep 7 && cargo tauri dev\"",
