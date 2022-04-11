@@ -198,7 +198,7 @@ export const store = createStore<LauncherAdminState>({
     async fetchStateInfo({ commit }) {
       commit("loadStateInfo");
       const StateInfo = await invoke("get_state_info", {});
-      console.log(StateInfo);
+
       commit("setStateInfo", StateInfo);
     },
   },

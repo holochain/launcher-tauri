@@ -3,7 +3,7 @@ use holochain_manager::versions::HolochainVersion;
 use crate::launcher::state::LauncherState;
 
 #[tauri::command]
-pub async fn uninstall_app(
+pub async fn start_app(
   state: tauri::State<'_, LauncherState>,
   app_id: String,
   holochain_version: HolochainVersion,
@@ -13,7 +13,7 @@ pub async fn uninstall_app(
 
   manager
     .get_web_happ_manager(holochain_version)?
-    .uninstall_app(app_id)
+    .start_app(app_id)
     .await?;
 
   manager.on_apps_changed().await?;

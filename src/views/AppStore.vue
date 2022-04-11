@@ -11,15 +11,38 @@
 
       <span style="flex: 1; font-size: 1.5em">App Store</span>
       <mwc-button
+        label="How to publish an app"
+        @click="howToPublish()"
+        style=""
+      >
+      </mwc-button>
+      <mwc-button
         icon="folder"
         raised
-        style="--mdc-theme-primary: #4720e3"
+        style="--mdc-theme-primary: #4720e3; margin-left: 8px"
         label="Select app from FileSystem"
         @click="selectFromFileSystem()"
       >
       </mwc-button>
     </div>
-    <div class="row" style="flex-wrap: wrap; margin: 16px">
+
+    <div
+      v-if="installableApps.length === 0"
+      class="column center-content"
+      style="flex: 1"
+    >
+      <span>There are no apps available yet in the DevHub.</span>
+      <span style="margin-top: 8px"
+        ><span
+          style="cursor: pointer; text-decoration: underline"
+          @click="howToPublish()"
+          >Read this</span
+        >
+        to learn how to publish a Holochain application to the DevHub.</span
+      >
+    </div>
+
+    <div v-else class="row" style="flex-wrap: wrap; margin: 16px">
       <div
         v-for="(app, i) of installableApps"
         :key="i"
@@ -122,6 +145,11 @@ export default defineComponent({
     this.loading = false;
   },
   methods: {
+    async howToPublish() {
+      await invoke("open_url", {
+        url: "https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub",
+      });
+    },
     getLatestRelease,
     async saveApp(app: AppWithReleases) {
       this.loading = true;

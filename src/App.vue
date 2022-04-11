@@ -128,7 +128,7 @@ body,
 
 mwc-button,
 mwc-icon-button {
-  --mdc-theme-primary: rgb(85, 85, 85);
+  --mdc-theme-primary: rgb(90, 90, 90);
 }
 
 @font-face {

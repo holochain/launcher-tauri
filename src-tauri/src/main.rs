@@ -27,8 +27,10 @@ mod setup;
 mod system_tray;
 
 use crate::commands::choose_version::get_supported_versions;
+use crate::commands::open_app::open_url;
 use crate::commands::open_app::report_issue;
 use crate::commands::save_app::save_app;
+use crate::commands::start_app::start_app;
 use crate::commands::{
   choose_version::choose_version_for_hdk,
   config::write_config,
@@ -93,6 +95,8 @@ fn main() {
       get_supported_versions,
       uninstall_app,
       get_app_info,
+      open_url,
+      start_app,
       execute_factory_reset,
       write_config,
       setup::logs::log,

@@ -10,7 +10,6 @@ export function isAppPaused(app: InstalledAppInfo): boolean {
   return Object.keys(app.status).includes("paused");
 }
 export function getReason(app: InstalledAppInfo): string | undefined {
-  console.log(app);
   if (isAppRunning(app)) return undefined;
   if (isAppDisabled(app)) {
     const reason = (

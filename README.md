@@ -21,11 +21,11 @@ WARNING! If you lose this password, you will also lose access any data from your
 
 When you are on the `Installed Apps` section, click `Install New App`. This will bring up the `App Store`, from which you can:
 
-1.a) Install an application from the list of published applications.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.a) Install an application from the list of published applications.
 
-or
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;or
 
-1.b) Select Application from the FileSystem`.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.b) Select Application from the FileSystem`.
 
 2. Set a unique `AppId` for the app, and click install, it may take a while.
    > This AppId only needs to be unique inside your Holochain Launcher, it doesn't affect other users.

@@ -7,5 +7,6 @@ pub mod choose_version;
 pub mod install_app;
 pub mod save_app;
 pub mod open_app;
+pub mod start_app;
 pub mod password;
 pub mod uninstall_app;

@@ -26,7 +26,6 @@ use crate::{
   utils::unzip_file,
 };
 
-
 pub struct WebAppManager {
   environment_path: PathBuf,
   holochain_manager: HolochainManager,
@@ -234,6 +233,14 @@ impl WebAppManager {
       })?;
 
     self.uninstall_app_ui(app_id)?;
+
+    self.on_running_apps_changed().await?;
+
+    Ok(())
+  }
+
+  pub async fn start_app(&mut self, app_id: String) -> Result<(), String> {
+    self.holochain_manager.start_app(app_id.clone()).await?;
 
     self.on_running_apps_changed().await?;
 
