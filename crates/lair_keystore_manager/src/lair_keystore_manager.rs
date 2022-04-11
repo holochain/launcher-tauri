@@ -18,7 +18,7 @@ pub trait LairKeystoreManager: Send + Sync {
   where
     Self: Sized;
 
-  fn launch(
+  async fn launch(
     log_level: log::Level,
     keystore_path: PathBuf,
     password: String,

@@ -7,7 +7,7 @@ use holochain_conductor_api_0_0_132::{
 };
 use holochain_p2p_0_0_132::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig};
 
-use super::{version_manager::VersionManager, HdkVersion, HolochainVersion};
+use super::{version_manager::VersionManager, HdkVersion};
 
 pub struct HolochainV0_0_132;
 

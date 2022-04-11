@@ -1,4 +1,4 @@
-use std::{collections::HashMap, convert::TryFrom};
+use std::collections::HashMap;
 
 use holochain_manager::versions::{
   holochain_conductor_api_latest::InstalledAppInfoStatus, HolochainVersion,

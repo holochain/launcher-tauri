@@ -10,6 +10,8 @@ pub enum LairKeystoreError {
   LaunchChildError(#[from] LaunchChildError),
   #[error("Failed to write the password: `{0}`")]
   ErrorWritingPassword(String),
+  #[error("Incorrect password")]
+  IncorrectPassword
 }
 
 #[derive(Error, Debug, Serialize, Deserialize, Clone)]

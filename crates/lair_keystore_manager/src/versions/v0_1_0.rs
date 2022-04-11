@@ -32,13 +32,13 @@ impl LairKeystoreManager for LairKeystoreManagerV0_1_0 {
     initialize(keystore_path, password)
   }
 
-  fn launch(
+  async fn launch(
     log_level: log::Level,
     keystore_path: PathBuf,
     password: String,
   ) -> Result<Self, LairKeystoreError> {
     let connection_url =
-      launch_lair_keystore_process(log_level, keystore_path.clone(), password.clone())?;
+      launch_lair_keystore_process(log_level, keystore_path.clone(), password.clone()).await?;
 
     Ok(LairKeystoreManagerV0_1_0 {
       password,

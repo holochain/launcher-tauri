@@ -100,11 +100,10 @@ impl LauncherManager {
     let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_0::lair_keystore_version());
     let lair_keystore_manager =
       LairKeystoreManagerV0_1_0::launch(self.config.log_level, keystore_path, password.clone())
+        .await
         .map_err(|err| format!("Error launching the keystore: {:?}", err))?;
 
     self.lair_keystore_manager = RunningState::Running(Box::new(lair_keystore_manager));
-
-    std::thread::sleep(Duration::from_millis(1000));
 
     for version in self.config.running_versions.clone() {
       self.launch_holochain_manager(version).await?;

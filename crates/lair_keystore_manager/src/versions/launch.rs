@@ -1,12 +1,12 @@
-use std::collections::HashMap;
 use std::path::PathBuf;
+use std::{collections::HashMap, time::Duration};
 use url2::Url2;
 
 use tauri::api::process::{Command, CommandEvent};
 
 use crate::error::{LairKeystoreError, LaunchChildError};
 
-pub fn launch_lair_keystore_process(
+pub async fn launch_lair_keystore_process(
   log_level: log::Level,
   keystore_data_path: PathBuf,
   password: String,
@@ -23,11 +23,38 @@ pub fn launch_lair_keystore_process(
     .envs(envs.clone())
     .spawn()
     .map_err(|err| {
-      LairKeystoreError::LaunchChildError(LaunchChildError::FailedToExecute(format!(
-        "{:?}",
-        err
-      )))
+      LairKeystoreError::LaunchChildError(LaunchChildError::FailedToExecute(format!("{:?}", err)))
     })?;
+
+  tauri::async_runtime::spawn(async move {
+    std::thread::sleep(Duration::from_millis(10));
+    command_child
+      .write(password.as_bytes())
+      .expect("Could not write password");
+  });
+
+  let mut started = false;
+  while !started {
+    if let Some(event) = lair_rx.recv().await {
+      match event.clone() {
+        CommandEvent::Stdout(line) => {
+          log::info!("[LAIR] {}", line);
+          if line.contains("lair-keystore running") {
+            started = true;
+          }
+        }
+        CommandEvent::Stderr(line) => {
+          log::error!("[LAIR] {}", line);
+          if line.contains("InternalSodium") {
+            return Err(LairKeystoreError::IncorrectPassword);
+          }
+        }
+        _ => {
+          log::info!("[LAIR] {:?}", event);
+        }
+      }
+    }
+  }
 
   tauri::async_runtime::spawn(async move {
     // read events such as stdout
@@ -40,10 +67,6 @@ pub fn launch_lair_keystore_process(
     }
   });
 
-  command_child
-    .write(password.as_bytes())
-    .map_err(|err| LairKeystoreError::ErrorWritingPassword(format!("{:?}", err)))?;
-
   let output = Command::new_sidecar("lair-keystore")
     .or(Err(LairKeystoreError::LaunchChildError(
       LaunchChildError::BinaryNotFound,
@@ -53,10 +76,7 @@ pub fn launch_lair_keystore_process(
     .envs(envs.clone())
     .output()
     .map_err(|err| {
-      LairKeystoreError::LaunchChildError(LaunchChildError::FailedToExecute(format!(
-        "{:?}",
-        err
-      )))
+      LairKeystoreError::LaunchChildError(LaunchChildError::FailedToExecute(format!("{:?}", err)))
     })?;
 
   if output.stderr.len() > 0 {

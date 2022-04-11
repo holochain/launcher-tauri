@@ -4,7 +4,6 @@ use holochain_manager::versions::HolochainVersion;
 #[tauri::command]
 pub async fn enable_app(
   state: tauri::State<'_, LauncherState>,
-  app_handle: tauri::AppHandle,
   holochain_version: HolochainVersion,
   app_id: String,
 ) -> Result<(), String> {
@@ -23,7 +22,6 @@ pub async fn enable_app(
 #[tauri::command]
 pub async fn disable_app(
   state: tauri::State<'_, LauncherState>,
-  app_handle: tauri::AppHandle,
   holochain_version: HolochainVersion,
   app_id: String,
 ) -> Result<(), String> {
