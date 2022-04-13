@@ -42,15 +42,15 @@ jobs:
       - name: setup binaries (Windows only)
         if: matrix.platform == 'windows-latest'
         run: |
-          cargo install lair_keystore --version 0.1.0
+          cargo install --version 0.1.0 lair_keystore
           $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
           Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
 
-          cargo install --locked holochain --git https://github.com/holochain/holochain.git --tag holochain-0.0.127
+          cargo install --locked --git https://github.com/holochain/holochain.git --tag holochain-0.0.127 holochain
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.127-x86_64-pc-windows-msvc.exe
 
-          cargo install holochain --version 0.0.132
+          cargo install --version 0.0.132 holochain
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.132-x86_64-pc-windows-msvc.exe
 
@@ -68,15 +68,15 @@ jobs:
       - name: setup binaries (macos only)
         if: matrix.platform == 'macos-latest'
         run: |
-          cargo install lair_keystore --version 0.1.0
+          cargo install --version 0.1.0 lair_keystore
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-apple-darwin
 
-          cargo install --locked holochain --git https://github.com/holochain/holochain.git --tag holochain-0.0.127
+          cargo install --locked --git https://github.com/holochain/holochain.git --tag holochain-0.0.127 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.127-x86_64-apple-darwin
 
-          cargo install holochain --version 0.0.132
+          cargo install --version 0.0.132 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.132-x86_64-apple-darwin
 
@@ -104,15 +104,15 @@ jobs:
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
-          cargo install lair_keystore --version 0.1.0
+          cargo install --version 0.1.0 lair_keystore
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-unknown-linux-gnu
 
-          cargo install --locked holochain --git https://github.com/holochain/holochain.git --tag holochain-0.0.127
+          cargo install --locked --git https://github.com/holochain/holochain.git --tag holochain-0.0.127 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.127-x86_64-unknown-linux-gnu
 
-          cargo install holochain --version 0.0.132
+          cargo install --version 0.0.132 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.132-x86_64-unknown-linux-gnu
 
