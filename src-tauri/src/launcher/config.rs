@@ -1,7 +1,7 @@
 use holochain_manager::versions::HolochainVersion;
 use log::Level;
 use serde::{Deserialize, Serialize};
-use std::{fs, collections::HashSet};
+use std::{collections::HashSet, fs, path::PathBuf};
 
 use crate::file_system::launcher_config_path;
 
@@ -10,6 +10,7 @@ use super::error::LauncherError;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LauncherConfig {
   pub log_level: Level,
+  pub custom_binary_path: Option<PathBuf>,
 
   pub running_versions: HashSet<HolochainVersion>,
   pub default_version: HolochainVersion,
@@ -19,6 +20,7 @@ impl Default for LauncherConfig {
   fn default() -> Self {
     LauncherConfig {
       log_level: log::Level::Warn,
+      custom_binary_path: None,
       running_versions: HashSet::from([HolochainVersion::default()]),
       default_version: HolochainVersion::default(),
     }
