@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-18.04, windows-latest]
+        platform: [macos-10.15, ubuntu-18.04, windows-2019]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -33,31 +33,31 @@ jobs:
           curl -L --output DevHub.webhapp https://github.com/holochain/launcher/releases/download/v0.3.9/DevHub.webhapp
 
       - name: download caddy (Windows only)
-        if: matrix.platform == 'windows-latest'
+        if: matrix.platform == 'windows-2019'
         run: |
           mkdir src-tauri/bins
           cd src-tauri/bins
           curl.exe --output caddy-x86_64-pc-windows-msvc.exe "https://caddyserver.com/api/download?os=windows&arch=amd64&idempotency=22435878078631"
 
       - name: setup binaries (Windows only)
-        if: matrix.platform == 'windows-latest'
+        if: matrix.platform == 'windows-2019'
         run: |
           cargo install lair_keystore --version 0.1.1
           $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
           Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
 
-          cargo install --locked holochain --git https://github.com/holochain/holochain.git --tag holochain-0.0.127
+          cargo install --locked --git https://github.com/holochain/holochain.git --tag holochain-0.0.127 holochain
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.127-x86_64-pc-windows-msvc.exe
 
-          cargo install holochain --version 0.0.132
+          cargo install --version 0.0.132 holochain
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.132-x86_64-pc-windows-msvc.exe
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
       - name: download caddy (MacOS only)
-        if: matrix.platform == 'macos-latest'
+        if: matrix.platform == 'macos-10.15'
         run: |
           mkdir src-tauri/bins
           cd src-tauri/bins
@@ -66,17 +66,17 @@ jobs:
           mv caddy caddy-x86_64-apple-darwin
 
       - name: setup binaries (macos only)
-        if: matrix.platform == 'macos-latest'
+        if: matrix.platform == 'macos-10.15'
         run: |
           cargo install lair_keystore --version 0.1.1
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-apple-darwin
 
-          cargo install --locked holochain --git https://github.com/holochain/holochain.git --tag holochain-0.0.127
+          cargo install --locked --git https://github.com/holochain/holochain.git --tag holochain-0.0.127 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.127-x86_64-apple-darwin
 
-          cargo install holochain --version 0.0.132
+          cargo install --version 0.0.132 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.132-x86_64-apple-darwin
 
@@ -108,11 +108,11 @@ jobs:
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-unknown-linux-gnu
 
-          cargo install --locked holochain --git https://github.com/holochain/holochain.git --tag holochain-0.0.127
+          cargo install --locked --git https://github.com/holochain/holochain.git --tag holochain-0.0.127 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.127-x86_64-unknown-linux-gnu
 
-          cargo install holochain --version 0.0.132
+          cargo install --version 0.0.132 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.132-x86_64-unknown-linux-gnu
 
