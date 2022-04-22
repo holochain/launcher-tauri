@@ -3,7 +3,7 @@ use holochain_web_app_manager::error::LaunchWebAppManagerError;
 use holochain_web_app_manager::installed_web_app_info::InstalledWebAppInfo;
 use lair_keystore_manager::error::LairKeystoreError;
 use lair_keystore_manager::utils::create_dir_if_necessary;
-use lair_keystore_manager::versions::v0_1_0::LairKeystoreManagerV0_1_0;
+use lair_keystore_manager::versions::v0_1_1::LairKeystoreManagerV0_1_1;
 use lair_keystore_manager::LairKeystoreManager;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
