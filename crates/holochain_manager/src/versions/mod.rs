@@ -16,9 +16,11 @@ use version_manager::VersionManager;
 // NEW_VERSION: Import the new VersionManager
 pub mod v0_0_127;
 pub mod v0_0_132;
+pub mod v0_0_136;
 
 use v0_0_127::HolochainV0_0_127;
 use v0_0_132::HolochainV0_0_132;
+use v0_0_136::HolochainV0_0_136;
 
 // NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
@@ -27,6 +29,8 @@ pub enum HdkVersion {
   V0_0_123,
   #[serde(rename = "0.0.127")]
   V0_0_127,
+  #[serde(rename = "0.0.130")]
+  V0_0_130,
 }
 
 // NEW_VERSION: Add the new Holochain version to this enum
@@ -36,6 +40,8 @@ pub enum HolochainVersion {
   V0_0_127,
   #[serde(rename = "0.0.132")]
   V0_0_132,
+  #[serde(rename = "0.0.136")]
+  V0_0_136,
 }
 
 impl Into<String> for HolochainVersion {
@@ -50,9 +56,14 @@ impl HolochainVersion {
     HolochainVersion::V0_0_132
   }
 
+  // Will be the config with the the custom binary is run, when present
+  pub fn latest() -> HolochainVersion {
+    HolochainVersion::V0_0_136
+  }
+
   pub fn supported_versions() -> Vec<HolochainVersion> {
     // NEW_VERSION: Add the new version to this array
-    return vec![HolochainVersion::V0_0_127, HolochainVersion::V0_0_132];
+    return vec![HolochainVersion::V0_0_127, HolochainVersion::V0_0_132, HolochainVersion::V0_0_136];
   }
   
   pub fn manager(&self) -> HolochainVersionManager {
@@ -61,6 +72,7 @@ impl HolochainVersion {
     match self {
       HolochainVersion::V0_0_127 => HolochainVersionManager::HolochainV0_0_127(HolochainV0_0_127),
       HolochainVersion::V0_0_132 => HolochainVersionManager::HolochainV0_0_132(HolochainV0_0_132),
+      HolochainVersion::V0_0_136 => HolochainVersionManager::HolochainV0_0_136(HolochainV0_0_136),
     }
   }
 }
@@ -70,4 +82,5 @@ impl HolochainVersion {
 pub enum HolochainVersionManager {
   HolochainV0_0_127,
   HolochainV0_0_132,
+  HolochainV0_0_136,
 }

@@ -24,9 +24,12 @@ pub type HolochainState = RunningState<HolochainInfo, String>;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LauncherStateInfo {
-  pub state: RunningState<
-    RunningState<HashMap<HolochainVersion, HolochainState>, KeystoreStatus>,
-    LauncherError,
-  >,
+  pub state: RunningState<RunningState<RunningHolochainsStateInfo, KeystoreStatus>, LauncherError>,
   pub config: LauncherConfig,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RunningHolochainsStateInfo {
+  pub versions: HashMap<HolochainVersion, HolochainState>,
+  pub custom_binary: Option<HolochainState>,
 }

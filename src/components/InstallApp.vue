@@ -41,16 +41,16 @@
           :fixedMenuPosition="true"
           required
           style="margin-top: 16px"
-          @selected="
-            holochainVersion = supportedHolochainVersions[$event.detail.index]
-          "
+          @selected="holochainId = supportedHolochains[$event.detail.index]"
           @closing="$event.stopPropagation()"
         >
           <mwc-list-item
-            v-for="holochainVersion of supportedHolochainVersions"
-            :key="holochainVersion"
-            :value="holochainVersion"
-            >{{ holochainVersion }}</mwc-list-item
+            v-for="(holochainId, index) of supportedHolochains"
+            :key="index"
+            :value="holochainId.content || 'Custom Holochain Binary'"
+            >{{
+              holochainId.content || "Custom Holochain Binary"
+            }}</mwc-list-item
           >
         </mwc-select>
 
@@ -135,7 +135,12 @@ import { defineComponent } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import type { TextField } from "@material/mwc-textfield";
 import { InstalledAppInfo, AgentPubKey } from "@holochain/client";
-import { HolochainVersion, InstalledWebAppInfo, WebAppInfo } from "../types";
+import {
+  HolochainId,
+  HolochainVersion,
+  InstalledWebAppInfo,
+  WebAppInfo,
+} from "../types";
 import { toUint8Array } from "js-base64";
 import { flatten, uniq } from "lodash-es";
 import { deserializeHash, serializeHash } from "@holochain-open-dev/utils";
@@ -165,8 +170,8 @@ export default defineComponent({
     appInfo: WebAppInfo | undefined;
     isAppIdValid: boolean;
     reuseAgentPubKey: string | undefined;
-    holochainVersion: HolochainVersion | undefined;
-    supportedHolochainVersions: HolochainVersion[];
+    holochainId: HolochainId | undefined;
+    supportedHolochains: HolochainId[];
     snackbarText: string | undefined;
   } {
     return {
@@ -178,15 +183,15 @@ export default defineComponent({
       appInfo: undefined,
       isAppIdValid: true,
       reuseAgentPubKey: undefined,
-      holochainVersion: undefined,
+      holochainId: undefined,
       snackbarText: undefined,
-      supportedHolochainVersions: [],
+      supportedHolochains: [],
     };
   },
   computed: {
     isAppReadyToInstall() {
       if (!this.appId) return false;
-      if (!this.holochainVersion) return false;
+      if (!this.holochainId) return false;
       if (!this.isAppIdValid) return false;
       return true;
     },
@@ -199,10 +204,10 @@ export default defineComponent({
       return false;
     },
     allPubKeys() {
-      if (!this.holochainVersion) return [];
+      if (!this.holochainId) return [];
 
-      const pubkeys = this.$store.getters["allPublicKeysForVersion"](
-        this.holochainVersion
+      const pubkeys = this.$store.getters["allPublicKeysForHolochainId"](
+        this.holochainId
       );
       return uniq(pubkeys.map(serializeHash));
     },
@@ -212,13 +217,28 @@ export default defineComponent({
 
     const { holochain_versions }: { holochain_versions: HolochainVersion[] } =
       await invoke("get_supported_versions", {});
-    this.supportedHolochainVersions = holochain_versions;
+    this.supportedHolochains = holochain_versions.map((v) => ({
+      type: "HolochainVersion",
+      content: v,
+    }));
+
+    if (
+      this.$store.getters["runningHolochainIds"].find(
+        (id: HolochainId) => id.type === "CustomBinary"
+      )
+    ) {
+      this.supportedHolochains.push({ type: "CustomBinary" });
+    }
 
     if (this.hdkVersionForApp) {
       // Get Holochain Version
-      this.holochainVersion = await invoke("choose_version_for_hdk", {
+      const version: HolochainVersion = await invoke("choose_version_for_hdk", {
         hdkVersion: this.hdkVersionForApp,
       });
+      this.holochainId = {
+        type: "HolochainVersion",
+        content: version,
+      };
     }
 
     this.membraneProofs = {};
@@ -240,16 +260,16 @@ export default defineComponent({
             };
           }
 
-          const holochainVersions: HolochainVersion[] =
-            this.$store.getters["holochainVersions"];
+          const holochainIds: HolochainId[] =
+            this.$store.getters["runningHolochainIds"];
 
-          const appsForVersion = flatten(
-            holochainVersions.map((version) =>
-              this.$store.getters["appsForVersion"](version)
+          const appsForHolochain = flatten(
+            holochainIds.map((holochainId) =>
+              this.$store.getters["appsForHolochain"](holochainId)
             )
           );
 
-          const alreadyExists = appsForVersion.find(
+          const alreadyExists = appsForHolochain.find(
             (appInfo: InstalledWebAppInfo) =>
               appInfo.installed_app_info.installed_app_id === newValue
           );
@@ -299,7 +319,7 @@ export default defineComponent({
           membraneProofs: this.membraneProofs,
           uid: this.uid,
           reuseAgentPubKey: this.reuseAgentPubKey,
-          holochainVersion: this.holochainVersion,
+          holochainId: this.holochainId,
         });
 
         this.installing = false;

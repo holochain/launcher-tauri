@@ -28,6 +28,14 @@ export interface HolochainInfo {
 export type HolochainState = RunningState<HolochainInfo, string>;
 
 export type HolochainVersion = string;
+export type HolochainId =
+  | {
+      type: "HolochainVersion";
+      content: HolochainVersion;
+    }
+  | {
+      type: "CustomBinary";
+    };
 
 export type LaunchTauriSidecarError =
   | {
@@ -71,9 +79,14 @@ export type RunLauncherError =
       content: string;
     };
 
+export interface RunningHolochainsStateInfo {
+  versions: Record<HolochainVersion, HolochainState>;
+  custom_binary: HolochainState | undefined;
+}
+
 export interface LauncherStateInfo {
   state: RunningState<
-    RunningState<Record<HolochainVersion, HolochainState>, KeystoreStatus>,
+    RunningState<RunningHolochainsStateInfo, KeystoreStatus>,
     RunLauncherError
   >;
   config: LauncherConfig;
@@ -85,6 +98,7 @@ export interface LauncherConfig {
   log_level: LogLevel;
   running_versions: HolochainVersion[];
   default_version: HolochainVersion;
+  custom_binary_path: string | undefined;
 }
 
 export type WebUiInfo =

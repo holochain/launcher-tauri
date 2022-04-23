@@ -9,7 +9,7 @@ use tauri::{
   WindowUrl, Wry,
 };
 
-use crate::launcher::state::LauncherState;
+use crate::launcher::{state::LauncherState, manager::HolochainId};
 
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   match event_id.as_str() {
@@ -33,7 +33,7 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
     }
     menu_item_id => {
       let (version, app_id) =
-        expand_version_and_app_id(String::from(menu_item_id)).expect("Bad menu item?");
+        expand_holochain_and_app_id(String::from(menu_item_id)).expect("Bad menu item?");
 
       let launcher_state = app.state::<LauncherState>();
       tauri::async_runtime::block_on(async move {
@@ -72,26 +72,49 @@ pub fn builtin_system_tray() -> Vec<CustomMenuItem> {
   ]
 }
 
+pub struct AllInstalledApps {
+  pub by_version: HashMap<HolochainVersion, Vec<InstalledWebAppInfo>>,
+  pub custom_binary: Option<Vec<InstalledWebAppInfo>>,
+}
+
 pub fn update_system_tray(
   app_handle: &AppHandle<Wry>,
-  installed_apps_by_version: &HashMap<HolochainVersion, Vec<InstalledWebAppInfo>>,
+  all_installed_apps: &AllInstalledApps,
 ) -> () {
   let mut menu = SystemTrayMenu::new();
 
-  for (version, installed_apps) in installed_apps_by_version {
+  for (version, installed_apps) in &all_installed_apps.by_version {
     for app in installed_apps {
       if let InstalledAppInfoStatus::Running = app.installed_app_info.status {
         if let WebUiInfo::WebApp { .. } = app.web_ui_info {
           let app_id = app.installed_app_info.installed_app_id.clone();
 
           menu = menu.add_item(CustomMenuItem::new(
-            collapse_version_and_app_id(version.clone(), app_id.clone()),
+            collapse_holochain_and_app_id(
+              HolochainId::HolochainVersion(version.clone()),
+              app_id.clone(),
+            ),
             app_id.clone(),
           ));
         }
       }
     }
     menu = menu.add_native_item(SystemTrayMenuItem::Separator);
+  }
+
+  if let Some(custom_binary_apps) = &all_installed_apps.custom_binary {
+    for app in custom_binary_apps {
+      if let InstalledAppInfoStatus::Running = app.installed_app_info.status {
+        if let WebUiInfo::WebApp { .. } = app.web_ui_info {
+          let app_id = app.installed_app_info.installed_app_id.clone();
+
+          menu = menu.add_item(CustomMenuItem::new(
+            collapse_holochain_and_app_id(HolochainId::CustomBinary, app_id.clone()),
+            app_id.clone(),
+          ));
+        }
+      }
+    }
   }
 
   for item in builtin_system_tray() {
@@ -102,21 +125,29 @@ pub fn update_system_tray(
   }
 }
 
-pub fn collapse_version_and_app_id(holochain_version: HolochainVersion, app_id: String) -> String {
-  let version_string: String = holochain_version.into();
-  format!("{}:{}", version_string, app_id)
+pub fn collapse_holochain_and_app_id(holochain_id: HolochainId, app_id: String) -> String {
+  match holochain_id {
+    HolochainId::HolochainVersion(holochain_version) => {
+      let version_string: String = holochain_version.into();
+      format!("{}:{}", version_string, app_id)
+    }
+    HolochainId::CustomBinary => format!("custom_binary:{}", app_id),
+  }
 }
 
-pub fn expand_version_and_app_id(
-  menu_item_id: String,
-) -> Result<(HolochainVersion, String), String> {
+pub fn expand_holochain_and_app_id(menu_item_id: String) -> Result<(HolochainId, String), String> {
   let components: Vec<&str> = menu_item_id.split(":").collect();
-
-  let version = String::from(components[0])
-    .parse::<HolochainVersion>()
-    .or(Err(String::from("Invalid version")))?;
 
   let app_id = components[1..].join(":");
 
-  Ok((version, app_id))
+  match components[0] {
+    "custom" => Ok((HolochainId::CustomBinary, app_id)),
+    version_str => {
+      let version = version_str
+        .parse::<HolochainVersion>()
+        .or(Err(String::from("Invalid version")))?;
+
+      Ok((HolochainId::HolochainVersion(version), app_id))
+    }
+  }
 }

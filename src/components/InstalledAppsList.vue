@@ -9,7 +9,7 @@
         justify-content: center;
       "
     >
-      <span style="margin-top: 160px"
+      <span style="margin-top: 24px"
         >You don't have any apps installed yet</span
       >
     </div>

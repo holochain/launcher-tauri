@@ -47,20 +47,24 @@ impl HolochainManager {
       Ok(current_config_str) => version_manager.overwrite_config(
         current_config_str,
         config.admin_port,
-        config.keystore_connection_url,
+        config.keystore_connection_url.clone(),
       ),
       Err(_) => version_manager.initial_config(
         config.admin_port,
-        config.environment_path,
-        config.keystore_connection_url,
+        config.environment_path.clone(),
+        config.keystore_connection_url.clone(),
       ),
     };
 
     fs::write(conductor_config_path.clone(), new_conductor_config)
       .expect("Could not write conductor config");
 
-    let command_child =
-      launch_holochain_process(config.log_level, version, conductor_config_path, password)?;
+    let command_child = launch_holochain_process(
+      config.log_level,
+      config.command,
+      conductor_config_path,
+      password,
+    )?;
 
     std::thread::sleep(Duration::from_millis(1000));
 

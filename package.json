@@ -18,6 +18,7 @@
     "@material/mwc-circular-progress": "0.25.1",
     "@material/mwc-dialog": "^0.25.1",
     "@material/mwc-fab": "^0.25.1",
+    "@material/mwc-formfield": "^0.25.3",
     "@material/mwc-snackbar": "0.25.1",
     "@material/mwc-textarea": "^0.25.1",
     "@material/mwc-textfield": "^0.25.1",

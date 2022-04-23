@@ -125,15 +125,21 @@ export default defineComponent({
   },
 
   async mounted() {
-    const version = this.$store.getters["holochainVersionForDevhub"];
+    const holochainId = this.$store.getters["holochainIdForDevhub"];
 
-    const port = this.$store.getters["appInterfacePort"](version);
+    const port = this.$store.getters["appInterfacePort"](holochainId);
 
     const appWs = await AppWebsocket.connect(`ws://localhost:${port}`);
 
     const devhubInfo = await appWs.appInfo({ installed_app_id: "DevHub" });
 
-    const allApps = await getAllPublishedApps(appWs, devhubInfo);
+    let allApps: Array<AppWithReleases>;
+    try {
+      allApps = await getAllPublishedApps(appWs, devhubInfo);
+    } catch (e) {
+      // Catch other errors than being offline
+      allApps = [];
+    }
 
     const { hdk_versions }: { hdk_versions: HdkVersion[] } = await invoke(
       "get_supported_versions",
@@ -155,9 +161,9 @@ export default defineComponent({
       this.loading = true;
       const release = getLatestRelease(app);
 
-      const version = this.$store.getters["holochainVersionForDevhub"];
+      const holochainId = this.$store.getters["holochainIdForDevhub"];
 
-      const port = this.$store.getters["appInterfacePort"](version);
+      const port = this.$store.getters["appInterfacePort"](holochainId);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       const devhubInfo = await appWs.appInfo({ installed_app_id: "DevHub" });
 

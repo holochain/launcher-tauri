@@ -14,17 +14,22 @@
       <span style="margin: 16px; font-size: 1.5em">Installed Apps</span>
       <div class="column" style="flex: 1; align-items: center">
         <div
-          v-for="version of $store.getters[`holochainVersions`]"
-          :key="version"
+          v-for="(holochainId, index) of $store.getters[`runningHolochainIds`]"
+          :key="index"
           class="column"
-          style="flex: 1; width: 600px; margin-bottom: 16px"
+          style="width: 600px; margin-bottom: 16px"
         >
-          <span style="margin-bottom: 8px">Holochain v{{ version }}</span>
+          <span
+            v-if="holochainId.type === 'HolochainVersion'"
+            style="margin-bottom: 8px"
+            >Holochain v{{ holochainId.content }}</span
+          >
+          <span v-else style="margin-bottom: 8px">Custom Holochain Binary</span>
 
           <InstalledAppsList
-            :installedWebApps="$store.getters[`appsForVersion`](version)"
-            @open-app="openApp(version, $event)"
-            @app-selected="selectApp(version, $event)"
+            :installedWebApps="$store.getters[`appsForHolochain`](holochainId)"
+            @open-app="openApp(holochainId, $event)"
+            @app-selected="selectApp(holochainId, $event)"
           />
         </div>
       </div>
@@ -71,7 +76,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { ActionTypes } from "../store/actions";
-import { HolochainVersion, InstalledWebAppInfo } from "../types";
+import { HolochainId, InstalledWebAppInfo } from "../types";
 import "@material/mwc-snackbar";
 import { invoke } from "@tauri-apps/api/tauri";
 import InstalledAppsList from "../components/InstalledAppsList.vue";
@@ -83,7 +88,7 @@ type View =
     }
   | {
       type: "appDetail";
-      holochainVersion: HolochainVersion;
+      holochainId: HolochainId;
       appId: string;
     };
 
@@ -100,11 +105,11 @@ export default defineComponent({
     selectedAppInfo() {
       const view = this.view as View;
       if (view.type !== "appDetail") return undefined;
-      if (!this.$store.getters[`appsForVersion`]) return undefined;
+      if (!this.$store.getters[`appsForHolochain`]) return undefined;
 
-      const apps: InstalledWebAppInfo[] = this.$store.getters[`appsForVersion`](
-        view.holochainVersion
-      );
+      const apps: InstalledWebAppInfo[] = this.$store.getters[
+        `appsForHolochain`
+      ](view.holochainId);
 
       return apps.find(
         (app) => app.installed_app_info.installed_app_id === view.appId
@@ -118,16 +123,16 @@ export default defineComponent({
     isLoading() {
       return this.$store.state.launcherStateInfo === "loading";
     },
-    selectApp(version: HolochainVersion, appId: string) {
+    selectApp(holochainId: HolochainId, appId: string) {
       this.view = {
         type: "appDetail",
-        holochainVersion: version,
+        holochainId,
         appId,
       };
     },
-    async openApp(holochainVersion: HolochainVersion, appId: string) {
+    async openApp(holochainId: HolochainId, appId: string) {
       try {
-        await invoke("open_app_ui", { appId, holochainVersion });
+        await invoke("open_app_ui", { appId, holochainId });
         this.showMessage(`App ${appId} opened`);
       } catch (e) {
         const error = `Error opening app ${appId}: ${JSON.stringify(e)}`;
@@ -139,10 +144,10 @@ export default defineComponent({
     },
     async disableSelectedApp() {
       if (this.view.type !== "appDetail") return;
-      const { appId, holochainVersion } = this.view;
+      const { appId, holochainId } = this.view;
 
       try {
-        await invoke("disable_app", { appId, holochainVersion });
+        await invoke("disable_app", { appId, holochainId });
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
         this.showMessage(`Disabled ${appId}`);
@@ -156,10 +161,10 @@ export default defineComponent({
     },
     async enableSelectedApp() {
       if (this.view.type !== "appDetail") return;
-      const { appId, holochainVersion } = this.view;
+      const { appId, holochainId } = this.view;
 
       try {
-        await invoke("enable_app", { appId, holochainVersion });
+        await invoke("enable_app", { appId, holochainId });
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
         this.showMessage(`Enabled ${appId}`);
@@ -173,10 +178,10 @@ export default defineComponent({
     },
     async startSelectedApp() {
       if (this.view.type !== "appDetail") return;
-      const { appId, holochainVersion } = this.view;
+      const { appId, holochainId } = this.view;
 
       try {
-        await invoke("start_app", { appId, holochainVersion });
+        await invoke("start_app", { appId, holochainId });
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
@@ -191,10 +196,10 @@ export default defineComponent({
     },
     async uninstallSelectedApp() {
       if (this.view.type !== "appDetail") return;
-      const { appId, holochainVersion } = this.view;
+      const { appId, holochainId } = this.view;
 
       try {
-        await invoke("uninstall_app", { appId, holochainVersion });
+        await invoke("uninstall_app", { appId, holochainId });
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 

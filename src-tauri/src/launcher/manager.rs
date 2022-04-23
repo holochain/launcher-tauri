@@ -1,14 +1,16 @@
 use holochain_manager::config::LaunchHolochainConfig;
+use holochain_manager::error::LaunchHolochainError;
 use holochain_web_app_manager::error::LaunchWebAppManagerError;
-use holochain_web_app_manager::installed_web_app_info::InstalledWebAppInfo;
-use lair_keystore_manager::error::LairKeystoreError;
+use lair_keystore_manager::error::{LairKeystoreError, LaunchChildError};
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use lair_keystore_manager::versions::v0_1_1::LairKeystoreManagerV0_1_1;
 use lair_keystore_manager::LairKeystoreManager;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::path::Path;
 use std::time::Duration;
 use sysinfo::{System, SystemExt};
+use tauri::api::process::Command;
 use tauri::{window::WindowBuilder, AppHandle, Manager, WindowUrl};
 use url::Url;
 
@@ -19,6 +21,7 @@ use crate::file_system::{
   config_environment_path, data_path_for_holochain_version, keystore_data_path, root_config_path,
   root_data_path, root_lair_path,
 };
+use crate::system_tray::AllInstalledApps;
 use crate::{running_state::RunningState, system_tray::update_system_tray, LauncherState};
 
 use super::config::LauncherConfig;
@@ -33,12 +36,20 @@ pub enum KeystoreStatus {
   LaunchKeystoreError(LairKeystoreError),
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(tag = "type", content = "content")]
+pub enum HolochainId {
+  HolochainVersion(HolochainVersion),
+  CustomBinary,
+}
+
 pub struct LauncherManager {
   app_handle: AppHandle,
   config: LauncherConfig,
 
   pub holochain_managers:
     HashMap<HolochainVersion, RunningState<WebAppManager, LaunchWebAppManagerError>>,
+  pub custom_binary_manager: Option<RunningState<WebAppManager, LaunchWebAppManagerError>>,
   pub lair_keystore_manager: RunningState<Box<dyn LairKeystoreManager>, KeystoreStatus>,
 }
 
@@ -63,6 +74,7 @@ impl LauncherManager {
     let manager = LauncherManager {
       app_handle: app_handle.clone(),
       holochain_managers: HashMap::new(),
+      custom_binary_manager: None,
       config,
       lair_keystore_manager: RunningState::Error(keystore_status),
     };
@@ -106,7 +118,16 @@ impl LauncherManager {
     self.lair_keystore_manager = RunningState::Running(Box::new(lair_keystore_manager));
 
     for version in self.config.running_versions.clone() {
-      self.launch_holochain_manager(version).await?;
+      self.launch_holochain_manager(version, None).await?;
+    }
+
+    if let Some(path) = self.config.custom_binary_path.clone() {
+      self
+        .launch_holochain_manager(HolochainVersion::latest(), Some(path))
+        .await?;
+    } else {
+      let _r = std::fs::remove_dir_all(root_config_path().join("custom"));
+      let _r = std::fs::remove_dir_all(root_data_path().join("custom"));
     }
 
     Ok(())
@@ -115,19 +136,48 @@ impl LauncherManager {
   pub async fn launch_holochain_manager(
     &mut self,
     version: HolochainVersion,
+    custom_binary_path: Option<String>,
   ) -> Result<(), String> {
+    // If we are trying to launch Holochain from a custom binary path, but there is nothing in that path, error and exit immediately
+    if let Some(path) = custom_binary_path.clone() {
+      if !Path::new(&path).exists() {
+        self.custom_binary_manager = Some(RunningState::Error(
+          LaunchWebAppManagerError::LaunchHolochainError(LaunchHolochainError::LaunchChildError(
+            LaunchChildError::BinaryNotFound,
+          )),
+        ));
+        return Ok(());
+      }
+    }
+
     let admin_port = portpicker::pick_unused_port().expect("No ports free");
 
-    let conductor_config_path = config_environment_path(version);
-    let environment_path = data_path_for_holochain_version(version);
+    let conductor_config_path = match custom_binary_path.is_some() {
+      true => root_config_path().join("custom"),
+      false => config_environment_path(version),
+    };
+    let environment_path = match custom_binary_path.is_some() {
+      true => root_data_path().join("custom"),
+      false => data_path_for_holochain_version(version),
+    };
 
     let lair_manager = self.get_lair_keystore_manager()?;
 
     let keystore_connection_url = lair_manager.connection_url();
     let password = lair_manager.password();
 
+    let command = match custom_binary_path.clone() {
+      Some(p) => Ok(Command::new(p)),
+      None => {
+        let version_str: String = version.into();
+        Command::new_sidecar(format!("holochain-v{}", version_str))
+          .map_err(|err| format!("{}", err))
+      }
+    }?;
+
     let config = LaunchHolochainConfig {
       log_level: self.config.log_level,
+      command,
       admin_port,
       config_environment_path: conductor_config_path,
       environment_path,
@@ -170,9 +220,13 @@ impl LauncherManager {
         }
       };
 
-    self.holochain_managers.insert(version.clone(), state);
+    if custom_binary_path.is_some() {
+      self.custom_binary_manager = Some(state);
+    } else {
+      self.holochain_managers.insert(version.clone(), state);
+      self.config.running_versions.insert(version);
+    }
 
-    self.config.running_versions.insert(version);
     self
       .config
       .write()
@@ -195,27 +249,45 @@ impl LauncherManager {
 
   pub async fn get_or_launch_holochain(
     &mut self,
-    holochain_version: HolochainVersion,
+    holochain_id: HolochainId,
   ) -> Result<&mut WebAppManager, String> {
-    if let None = self.holochain_managers.get(&holochain_version) {
-      self.launch_holochain_manager(holochain_version).await?;
+    match holochain_id {
+      HolochainId::HolochainVersion(version) => {
+        if let None = self.holochain_managers.get(&version) {
+          self.launch_holochain_manager(version.clone(), None).await?;
+        }
+      }
+      HolochainId::CustomBinary => {
+        let path = self
+          .config
+          .custom_binary_path
+          .clone()
+          .ok_or(String::from("There is no custom binary path specified"))?;
+
+        if let None = self.custom_binary_manager {
+          self
+            .launch_holochain_manager(HolochainVersion::latest(), Some(path))
+            .await?;
+        }
+      }
     }
 
-    self
-      .holochain_managers
-      .get_mut(&holochain_version)
-      .unwrap()
-      .get_running()
+    self.get_web_happ_manager(holochain_id)
   }
 
   pub fn get_web_happ_manager(
     &mut self,
-    holochain_version: HolochainVersion,
+    holochain_id: HolochainId,
   ) -> Result<&mut WebAppManager, String> {
-    let manager_state = self
-      .holochain_managers
-      .get_mut(&holochain_version)
-      .ok_or(String::from("This holochain version is not running"))?;
+    let manager_state = match holochain_id {
+      HolochainId::HolochainVersion(version) => self
+        .holochain_managers
+        .get_mut(&version)
+        .ok_or(String::from("This holochain version is not running")),
+      HolochainId::CustomBinary => self.custom_binary_manager.as_mut().ok_or(String::from(
+        "There is no Holochain running with custom binary",
+      )),
+    }?;
 
     match manager_state {
       RunningState::Running(m) => Ok(m),
@@ -228,34 +300,46 @@ impl LauncherManager {
 
   /// Connects to the conductor, requests the list of running apps, updates the caddyfile and the system tray
   pub async fn on_apps_changed(&mut self) -> Result<(), String> {
-    let mut running_apps_by_version: HashMap<HolochainVersion, Vec<InstalledWebAppInfo>> =
-      HashMap::new();
-
     let versions: Vec<HolochainVersion> = self.holochain_managers.keys().cloned().collect();
 
+    let mut all_installed_apps = AllInstalledApps {
+      by_version: HashMap::new(),
+      custom_binary: None,
+    };
+
     for version in versions {
-      if let Ok(manager) = self.get_web_happ_manager(version.clone()) {
+      if let Ok(manager) = self.get_web_happ_manager(HolochainId::HolochainVersion(version.clone()))
+      {
         let running_apps = manager.list_apps().await?;
 
-        running_apps_by_version.insert(version.clone(), running_apps);
+        all_installed_apps
+          .by_version
+          .insert(version.clone(), running_apps);
       }
     }
 
-    update_system_tray(&self.app_handle, &running_apps_by_version);
+    if let Some(m) = &mut self.custom_binary_manager {
+      match m.get_running() {
+        Ok(manager) => {
+          let running_apps = manager.list_apps().await?;
+
+          all_installed_apps.custom_binary = Some(running_apps);
+        }
+        Err(_) => {}
+      }
+    }
+
+    update_system_tray(&self.app_handle, &all_installed_apps);
 
     // TODO: Iterate over the open windows, close any that has been uninstalled/disabled
 
     Ok(())
   }
 
-  pub fn open_app(
-    &mut self,
-    holochain_version: HolochainVersion,
-    app_id: &String,
-  ) -> Result<(), String> {
+  pub fn open_app(&mut self, holochain_id: HolochainId, app_id: &String) -> Result<(), String> {
     // Iterate over the open windows, focus if the app is already open
 
-    let manager = self.get_web_happ_manager(holochain_version)?;
+    let manager = self.get_web_happ_manager(holochain_id)?;
     let port = manager
       .get_allocated_port(app_id)
       .ok_or(String::from("This app has no port attached"))?;

@@ -17,6 +17,10 @@ holochain_conductor_api_0_0_132 = {package = "holochain_conductor_api", version 
 holochain_p2p_0_0_132 = {package = "holochain_p2p", version = "0.0.32"}
 holochain_types_0_0_132 = {package = "holochain_types", version = "0.0.32"}
 
+holochain_conductor_api_0_0_136 = {package = "holochain_conductor_api", version = "0.0.36"}
+holochain_p2p_0_0_136 = {package = "holochain_p2p", version = "0.0.35"}
+holochain_types_0_0_136 = {package = "holochain_types", version = "0.0.35"}
+
 mr_bundle_0_0_9 = {package = "mr_bundle", version = "0.0.9"}
 
 lair_keystore_manager = {path = "../lair_keystore_manager"}

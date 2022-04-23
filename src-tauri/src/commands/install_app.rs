@@ -3,16 +3,15 @@ use holochain_manager::versions::{
     prelude::{AgentPubKey, AppBundle, SerializedBytes, UnsafeBytes},
     web_app::WebAppBundle,
   },
-  HolochainVersion,
 };
 use std::{collections::HashMap, fs};
 
-use crate::launcher::state::LauncherState;
+use crate::launcher::{state::LauncherState, manager::HolochainId};
 
 #[tauri::command]
 pub async fn install_app(
   state: tauri::State<'_, LauncherState>,
-  holochain_version: HolochainVersion,
+  holochain_id: HolochainId,
   app_id: String,
   app_bundle_path: String,
   uid: Option<String>,
@@ -37,7 +36,7 @@ pub async fn install_app(
   match WebAppBundle::decode(&bytes) {
     Ok(web_app_bundle) => {
       manager
-        .get_or_launch_holochain(holochain_version)
+        .get_or_launch_holochain(holochain_id)
         .await?
         .install_web_app(
           app_id.clone(),
@@ -51,7 +50,7 @@ pub async fn install_app(
     Err(_) => {
       let app_bundle = AppBundle::decode(&bytes).or(Err("Failed to read Web hApp bundle file"))?;
       manager
-        .get_or_launch_holochain(holochain_version)
+        .get_or_launch_holochain(holochain_id)
         .await?
         .install_app(
           app_id.clone(),

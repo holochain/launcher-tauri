@@ -1,18 +1,16 @@
-use holochain_manager::versions::HolochainVersion;
-
-use crate::launcher::state::LauncherState;
+use crate::launcher::{state::LauncherState, manager::HolochainId};
 
 #[tauri::command]
 pub async fn open_app_ui(
   state: tauri::State<'_, LauncherState>,
-  holochain_version: HolochainVersion,
+  holochain_id: HolochainId,
   app_id: String,
 ) -> Result<(), String> {
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
 
   manager
-    .open_app(holochain_version, &app_id)
+    .open_app(holochain_id, &app_id)
     .map_err(|err| format!("Error opening app: {}", err))?;
 
   log::info!("Opening app {}", app_id.clone(),);

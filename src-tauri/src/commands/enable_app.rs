@@ -1,17 +1,16 @@
-use crate::launcher::state::LauncherState;
-use holochain_manager::versions::HolochainVersion;
+use crate::launcher::{state::LauncherState, manager::HolochainId};
 
 #[tauri::command]
 pub async fn enable_app(
   state: tauri::State<'_, LauncherState>,
-  holochain_version: HolochainVersion,
+  holochain_id: HolochainId,
   app_id: String,
 ) -> Result<(), String> {
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
 
   manager
-    .get_web_happ_manager(holochain_version)?
+    .get_web_happ_manager(holochain_id)?
     .enable_app(app_id.clone())
     .await?;
 
@@ -22,14 +21,14 @@ pub async fn enable_app(
 #[tauri::command]
 pub async fn disable_app(
   state: tauri::State<'_, LauncherState>,
-  holochain_version: HolochainVersion,
+  holochain_id: HolochainId,
   app_id: String,
 ) -> Result<(), String> {
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
 
   manager
-    .get_web_happ_manager(holochain_version)?
+    .get_web_happ_manager(holochain_id)?
     .disable_app(app_id.clone())
     .await?;
 

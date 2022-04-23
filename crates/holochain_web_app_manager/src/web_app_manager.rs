@@ -37,7 +37,7 @@ pub struct WebAppManager {
 impl WebAppManager {
   pub async fn launch(
     version: HolochainVersion,
-    config: LaunchHolochainConfig,
+    mut config: LaunchHolochainConfig,
     password: String,
     app_handle: AppHandle,
   ) -> Result<Self, LaunchWebAppManagerError> {
@@ -46,27 +46,23 @@ impl WebAppManager {
     let conductor_data_path = environment_path.join("conductor");
     let ui_data_path = uis_data_path(&environment_path);
 
-    let new_config = LaunchHolochainConfig {
-      environment_path: conductor_data_path.clone(),
-      ..config.clone()
-    };
+    config.environment_path = conductor_data_path.clone();
 
     create_dir_if_necessary(&environment_path)?;
     create_dir_if_necessary(&conductor_data_path)?;
     create_dir_if_necessary(&ui_data_path)?;
 
-    let holochain_manager = HolochainManager::launch(version, new_config, password)
+    let admin_port = config.admin_port;
+
+    let holochain_manager = HolochainManager::launch(version, config, password)
       .await
       .map_err(|err| LaunchWebAppManagerError::LaunchHolochainError(err))?;
 
     let app_interface_port = holochain_manager.app_interface_port();
 
-    let caddy_manager = CaddyManager::launch(
-      environment_path.clone(),
-      config.admin_port,
-      app_interface_port,
-    )
-    .map_err(|err| LaunchWebAppManagerError::LaunchCaddyError(err))?;
+    let caddy_manager =
+      CaddyManager::launch(environment_path.clone(), admin_port, app_interface_port)
+        .map_err(|err| LaunchWebAppManagerError::LaunchCaddyError(err))?;
 
     // Fetch the running apps and update caddyfile to already serve them
     let mut manager = WebAppManager {

@@ -1,4 +1,9 @@
-import { HolochainVersion, LauncherStateInfo } from "@/types";
+import {
+  HolochainId,
+  HolochainState,
+  HolochainVersion,
+  LauncherStateInfo,
+} from "@/types";
 import { invoke } from "@tauri-apps/api/tauri";
 import { createStore } from "vuex";
 import { flatten, uniq } from "lodash-es";
@@ -71,18 +76,24 @@ export const store = createStore<LauncherAdminState>({
         state.launcherStateInfo.state.type === "Running" &&
         state.launcherStateInfo.state.content.type === "Running"
       ) {
-        const error = Object.values(
-          state.launcherStateInfo.state.content.content
-        ).find((v) => v.type === "Error");
+        const c = state.launcherStateInfo.state.content.content;
+
+        const allHolochains = Object.values(c.versions);
+        if (c.custom_binary) allHolochains.push(c.custom_binary);
+
+        const error = allHolochains.find((v) => v.type === "Error");
         if (error) return error.content as string;
       }
     },
-    holochainVersionForDevhub(state) {
+    holochainIdForDevhub(state) {
       const stateInfo = state.launcherStateInfo;
 
       if (stateInfo === "loading") return undefined;
 
-      return stateInfo.config.default_version;
+      return {
+        type: "HolochainVersion",
+        content: stateInfo.config.default_version,
+      };
     },
     setupNeeded(state) {
       if (state.launcherStateInfo === "loading") return undefined;
@@ -103,7 +114,7 @@ export const store = createStore<LauncherAdminState>({
           "PasswordNecessary"
       );
     },
-    holochainVersions(state) {
+    runningHolochainIds(state): Array<HolochainId> {
       const stateInfo = state.launcherStateInfo;
 
       if (
@@ -113,9 +124,24 @@ export const store = createStore<LauncherAdminState>({
       )
         return [];
 
-      return Object.keys(stateInfo.state.content.content);
+      const versions: Array<HolochainId> = Object.keys(
+        stateInfo.state.content.content.versions
+      ).map((v) => ({
+        type: "HolochainVersion",
+        content: v,
+      }));
+      if (
+        stateInfo.state.content.content.custom_binary &&
+        stateInfo.state.content.content.custom_binary.type === "Running"
+      ) {
+        versions.push({
+          type: "CustomBinary",
+        });
+      }
+
+      return versions;
     },
-    appsForVersion: (state) => (holochainVersion: HolochainVersion) => {
+    appsForHolochain: (state) => (holochainId: HolochainId) => {
       const stateInfo = state.launcherStateInfo;
 
       if (
@@ -125,13 +151,19 @@ export const store = createStore<LauncherAdminState>({
       )
         return [];
 
-      const appsByVersion = stateInfo.state.content.content[holochainVersion];
+      let holochainState: HolochainState;
+      if (holochainId.type === "CustomBinary")
+        holochainState = stateInfo.state.content.content
+          .custom_binary as HolochainState;
+      else
+        holochainState =
+          stateInfo.state.content.content.versions[holochainId.content];
 
-      if (appsByVersion.type === "Error") return [];
+      if (holochainState.type === "Error") return [];
 
       // Sort apps alphabetically
 
-      return appsByVersion.content.installed_apps.sort((app1, app2) => {
+      return holochainState.content.installed_apps.sort((app1, app2) => {
         if (
           app1.installed_app_info.installed_app_id <
           app2.installed_app_info.installed_app_id
@@ -147,7 +179,7 @@ export const store = createStore<LauncherAdminState>({
         return 0;
       });
     },
-    allPublicKeysForVersion: (state) => (version: HolochainVersion) => {
+    allPublicKeysForHolochainId: (state) => (holochainId: HolochainId) => {
       const stateInfo = state.launcherStateInfo;
 
       if (
@@ -157,7 +189,13 @@ export const store = createStore<LauncherAdminState>({
       )
         return [];
 
-      const holochainState = stateInfo.state.content.content[version];
+      let holochainState: HolochainState;
+      if (holochainId.type === "CustomBinary")
+        holochainState = stateInfo.state.content.content
+          .custom_binary as HolochainState;
+      else
+        holochainState =
+          stateInfo.state.content.content.versions[holochainId.content];
 
       if (!holochainState || holochainState.type === "Error") return [];
 
@@ -169,7 +207,7 @@ export const store = createStore<LauncherAdminState>({
 
       return uniq(allCells.map((c) => c.cell_id[1]));
     },
-    appInterfacePort: (state) => (version: HolochainVersion) => {
+    appInterfacePort: (state) => (holochainId: HolochainId) => {
       const stateInfo = state.launcherStateInfo;
 
       if (
@@ -179,7 +217,13 @@ export const store = createStore<LauncherAdminState>({
       )
         return undefined;
 
-      const holochainState = stateInfo.state.content.content[version];
+      let holochainState: HolochainState;
+      if (holochainId.type === "CustomBinary")
+        holochainState = stateInfo.state.content.content
+          .custom_binary as HolochainState;
+      else
+        holochainState =
+          stateInfo.state.content.content.versions[holochainId.content];
 
       if (holochainState.type === "Error") return undefined;
 
