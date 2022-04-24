@@ -145,7 +145,6 @@ export default defineComponent({
       "get_supported_versions",
       {}
     );
-
     this.installableApps = filterByHdkVersion(hdk_versions, allApps);
 
     this.loading = false;
