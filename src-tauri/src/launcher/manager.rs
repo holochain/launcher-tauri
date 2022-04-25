@@ -346,7 +346,7 @@ impl LauncherManager {
 
     WindowBuilder::new(
       &self.app_handle,
-      app_id.clone(),
+      app_id.clone().replace("-", "--").replace(" ", "-"),
       WindowUrl::External(Url::parse(format!("http://localhost:{}", port).as_str()).unwrap()),
     )
     .inner_size(1000.0, 700.0)
