@@ -12,6 +12,7 @@ use std::time::Duration;
 use sysinfo::{System, SystemExt};
 use tauri::api::process::Command;
 use tauri::{window::WindowBuilder, AppHandle, Manager, WindowUrl};
+use tauri::{CustomMenuItem, Menu, Submenu};
 use url::Url;
 
 use holochain_manager::versions::HolochainVersion;
@@ -337,22 +338,44 @@ impl LauncherManager {
   }
 
   pub fn open_app(&mut self, holochain_id: HolochainId, app_id: &String) -> Result<(), String> {
+    let window_label = app_id.clone().replace("-", "--").replace(" ", "-");
+
     // Iterate over the open windows, focus if the app is already open
+
+    if let Some(w) = self.app_handle.get_window(window_label.as_str()) {
+      if let Err(err) = w.show() {
+        log::error!("Error showing the window: {:?}", err);
+      }
+
+      return Ok(());
+    }
 
     let manager = self.get_web_happ_manager(holochain_id)?;
     let port = manager
       .get_allocated_port(app_id)
       .ok_or(String::from("This app has no port attached"))?;
 
-    WindowBuilder::new(
+    let window = WindowBuilder::new(
       &self.app_handle,
-      app_id.clone().replace("-", "--").replace(" ", "-"),
+      window_label.clone(),
       WindowUrl::External(Url::parse(format!("http://localhost:{}", port).as_str()).unwrap()),
     )
     .inner_size(1000.0, 700.0)
     .title(app_id)
+    .menu(Menu::new().add_submenu(Submenu::new(
+      "Settings",
+      Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
+    )))
     .build()
     .map_err(|err| format!("Error opening app: {:?}", err))?;
+
+    let a = self.app_handle.clone();
+    let l = window_label.clone();
+    window.on_menu_event(move |_| {
+      if let Some(w) = a.get_window(l.as_str()) {
+        w.open_devtools();
+      }
+    });
 
     Ok(())
   }

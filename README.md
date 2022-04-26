@@ -58,11 +58,13 @@ See [where](https://github.com/lightningrodlabs/where) for a complete working se
 3. Once you have created a new App, click "Upload new bundle".
 4. Select the `.happ` (not the `.webhapp`) and upload it.
 5. Select the HDK appropriate version which your app was compiled for.
+  - Make sure that this is the correct HDK, in the format "0.0.127".
 6. Click "Quick Create" first for each zome, and then for each DNA.
 7. Click "Save".
 8. When you are done, go back to the application detail page and click "Create New Release".
-9. Set the appropriate "Name" (e.g. v0.0.1). This is the version name that the participants will see when downloading your application.
+9.  Set the appropriate "Name" (e.g. v0.0.1). This is the version name that the participants will see when downloading your application.
 10. In the DNA box, search for the DNAs you uploaded earlier.
+  - If the "Add to happ" button doesn't work, then type the full name of the DNA and press Enter.
 11. In the GUI box, upload your `ui.zip`.
 12. Click "Save".
 
