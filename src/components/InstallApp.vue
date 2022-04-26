@@ -25,14 +25,6 @@
           helper="Has to be unique"
           style="flex: 1"
         ></mwc-textfield>
-        <mwc-textfield
-          label="UID"
-          outlined
-          @input="uid = $event.target.value"
-          helper="Change it to create a new network"
-          class="row-item"
-          style="flex: 1"
-        ></mwc-textfield>
 
         <mwc-select
           v-if="!hdkVersionForApp"
@@ -66,6 +58,15 @@
           class="column"
           :style="{ display: showAdvanced ? 'flex' : 'none' }"
         >
+          <mwc-textfield
+            label="UID"
+            outlined
+            @input="uid = $event.target.value"
+            helper="Change it to create a new network"
+            class="row-item"
+            style="flex: 1; margin-top: 8px"
+          ></mwc-textfield>
+
           <mwc-select
             style="margin-top: 8px"
             label="Agent Public Key"
