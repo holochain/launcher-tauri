@@ -55,6 +55,7 @@ See [where](https://github.com/lightningrodlabs/where) for a complete working se
 
 1. Open the `DevHub` app in the Holochain Launcher.
 2. Create a new App, with the appropriate "Name" and "Description". These are the details that the participants will see when downloading your application.
+  - Make the description short, maybe one or two lines.
 3. Once you have created a new App, click "Upload new bundle".
 4. Select the `.happ` (not the `.webhapp`) and upload it.
 5. Select the HDK appropriate version which your app was compiled for.

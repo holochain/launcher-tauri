@@ -47,19 +47,18 @@
         v-for="(app, i) of installableApps"
         :key="i"
         class="column"
-        style="width: 400px; margin-right: 16px; margin-bottom: 16px"
+        style="width: 300px; margin-right: 16px; margin-bottom: 16px"
       >
         <ui5-card style="width: auto">
           <div class="column" style="margin: 8px">
             <span style="font-size: 18px">{{ app.app.content.title }}</span>
-            <span style="margin-top: 8px">{{
+            <span style="margin-top: 8px; height: 80px; overflow: auto">{{
               app.app.content.description
             }}</span>
-            <span style="margin-top: 8px"
-              >Release: {{ getLatestRelease(app).content.name }}</span
-            >
 
             <div class="row center-content" style="flex: 1; margin-top: 8px">
+              <span>Version: {{ getLatestRelease(app).content.name }}</span>
+
               <span style="flex: 1"></span>
 
               <mwc-button

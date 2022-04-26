@@ -1,10 +1,5 @@
 import { HdkVersion } from "@/hdk";
-import {
-  AppWebsocket,
-  EntryHash,
-  InstalledAppInfo,
-  InstalledCell,
-} from "@holochain/client";
+import { AppWebsocket, EntryHash, InstalledAppInfo } from "@holochain/client";
 import { Happ, HappRelease } from "./types";
 
 export interface ContentAddress<C> {
@@ -72,19 +67,20 @@ export async function getAppsReleases(
     provenance: cells.happs.cell_id[1],
   });
 
-  const releases = appReleasesOutput.payload.items;
+  const releases: Array<ContentAddress<HappRelease>> =
+    appReleasesOutput.payload.items;
+  const filteredReleases = releases.filter((r) => !!r.content.gui);
 
   return {
     app,
-    releases,
+    releases: filteredReleases,
   };
 }
 
 export function getLatestRelease(
   apps: AppWithReleases
 ): ContentAddress<HappRelease> {
-  const guiReleases = apps.releases.filter((r) => !!r.content.gui);
-  return guiReleases.sort(
+  return apps.releases.sort(
     (r1, r2) => r1.content.last_updated - r2.content.last_updated
   )[0];
 }
