@@ -22,7 +22,7 @@
       :label="entering ? 'Entering...' : 'Enter Password'"
       :disabled="entering"
       slot="primaryAction"
-      @click="introducePassword()"
+      @click="enterPassword()"
     ></mwc-button>
   </mwc-dialog>
   <mwc-snackbar
@@ -46,7 +46,7 @@ export default defineComponent({
     };
   },
   methods: {
-    async introducePassword() {
+    async enterPassword() {
       this.entering = true;
       const password = (this.$refs["password"] as TextField).value;
       try {

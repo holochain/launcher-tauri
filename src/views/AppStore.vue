@@ -83,6 +83,11 @@
     "
     @closing-dialog="installClosed()"
   ></InstallApp>
+  <mwc-snackbar
+    leading
+    labelText="App download failed. Please try again later."
+    ref="snackbar"
+  ></mwc-snackbar>
 </template>
 
 <script lang="ts">
@@ -90,6 +95,7 @@ import { defineComponent } from "vue";
 import "@material/mwc-dialog";
 import "@material/mwc-circular-progress";
 import "@material/mwc-button";
+import "@material/mwc-snackbar";
 import { AppWebsocket } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
@@ -165,17 +171,23 @@ export default defineComponent({
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       const devhubInfo = await appWs.appInfo({ installed_app_id: "DevHub" });
 
-      const bytes = await fetchWebHapp(
-        appWs,
-        devhubInfo,
-        app.app.content.title,
-        release.address
-      );
+      try {
+        const bytes = await fetchWebHapp(
+          appWs,
+          devhubInfo,
+          app.app.content.title,
+          release.address
+        );
 
-      this.selectedAppBundlePath = await invoke("save_app", {
-        appBundleBytes: bytes,
-      });
-      this.hdkVersionForApp = release.content.hdk_version;
+        this.selectedAppBundlePath = await invoke("save_app", {
+          appBundleBytes: bytes,
+        });
+        this.hdkVersionForApp = release.content.hdk_version;
+      } catch (e) {
+        console.log(e);
+        (this.$refs as any).snackbar.show();
+      }
+
       this.loading = false;
     },
     async selectFromFileSystem() {

@@ -85,11 +85,14 @@ export function getLatestRelease(
   )[0];
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(() => r(null), ms));
+
 export async function fetchWebHapp(
   appWebsocket: AppWebsocket,
   devhubHapp: InstalledAppInfo,
   name: string,
-  happReleaseEntryHash: EntryHash
+  happReleaseEntryHash: EntryHash,
+  retryCount = 3
 ): Promise<Uint8Array> {
   const cells = devhubCells(devhubHapp);
 
@@ -106,6 +109,21 @@ export async function fetchWebHapp(
     },
     provenance: cells.happs.cell_id[1],
   });
+
+  if (result.payload.error) {
+    if (retryCount === 0) {
+      throw new Error(result.payload.error);
+    } else {
+      await sleep(1000);
+      return fetchWebHapp(
+        appWebsocket,
+        devhubHapp,
+        name,
+        happReleaseEntryHash,
+        retryCount - 1
+      );
+    }
+  }
 
   return result.payload;
 }
