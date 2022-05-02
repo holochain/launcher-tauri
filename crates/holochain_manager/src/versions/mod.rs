@@ -1,15 +1,16 @@
 use enum_dispatch::enum_dispatch;
+use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};
 use std::path::PathBuf;
 use url2::Url2;
-use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};
 
 // NEW_VERSION: Upgrade these two crates so that they refer to the latest version of them
 pub use holochain_conductor_api_0_0_132 as holochain_conductor_api_latest;
 pub use holochain_types_0_0_132 as holochain_types_latest;
 
-pub use mr_bundle_0_0_9 as mr_bundle_latest;
 use lair_keystore_manager::versions::LairKeystoreVersion;
+pub use mr_bundle_0_0_9 as mr_bundle_latest;
 
+mod common;
 pub mod version_manager;
 use version_manager::VersionManager;
 
@@ -63,9 +64,13 @@ impl HolochainVersion {
 
   pub fn supported_versions() -> Vec<HolochainVersion> {
     // NEW_VERSION: Add the new version to this array
-    return vec![HolochainVersion::V0_0_127, HolochainVersion::V0_0_132, HolochainVersion::V0_0_136];
+    return vec![
+      HolochainVersion::V0_0_127,
+      HolochainVersion::V0_0_132,
+      HolochainVersion::V0_0_136,
+    ];
   }
-  
+
   pub fn manager(&self) -> HolochainVersionManager {
     // NEW_VERSION: Create a new version manager, duplicating one of the files in this folder
     // Then, import and add the new version manager here

@@ -1,13 +1,20 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::Arc};
 use url2::Url2;
 
 use holochain_conductor_api_0_0_136::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_0_136::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig};
+use holochain_p2p_0_0_136::kitsune_p2p::{
+  dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams,
+  KitsuneP2pConfig, ProxyConfig, TransportConfig,
+};
 
-use super::{version_manager::VersionManager, HdkVersion};
+use super::{
+  common::{boostrap_service, proxy_url},
+  version_manager::VersionManager,
+  HdkVersion,
+};
 
 pub struct HolochainV0_0_136;
 
@@ -23,18 +30,29 @@ impl VersionManager for HolochainV0_0_136 {
     keystore_connection_url: Url2,
   ) -> String {
     let mut network_config = KitsuneP2pConfig::default();
-    network_config.bootstrap_service = Some(url2::url2!("https://bootstrap.holo.host"));
+    network_config.bootstrap_service = Some(boostrap_service());
     network_config.transport_pool.push(TransportConfig::Proxy {
-            sub_transport: Box::new(TransportConfig::Quic {
-                bind_to: None,
-                override_host: None,
-                override_port: None,
-            }),
-            proxy_config: ProxyConfig::RemoteProxyClientFromBootstrap {
-                bootstrap_url: url2::url2!("https://bootstrap.holo.host"),
-                fallback_proxy_url: Some(url2::url2!("kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--")),
-            },
-        });
+      sub_transport: Box::new(TransportConfig::Quic {
+        bind_to: None,
+        override_host: None,
+        override_port: None,
+      }),
+      proxy_config: ProxyConfig::RemoteProxyClient {
+        proxy_url: proxy_url(),
+      },
+    });
+
+    let mut tuning_params = KitsuneP2pTuningParams::default();
+
+    tuning_params.tx2_implicit_timeout_ms = 15000;
+    tuning_params.tx2_quic_max_idle_timeout_ms = 15000;
+    tuning_params.agent_info_expires_after_ms = 300000;
+    tuning_params.gossip_outbound_target_mbps = 20.0;
+    tuning_params.gossip_inbound_target_mbps = 20.0;
+    tuning_params.gossip_historic_inbound_target_mbps = 10.0;
+    tuning_params.gossip_historic_inbound_target_mbps = 10.0;
+
+    network_config.tuning_params = Arc::new(tuning_params);
 
     let config = ConductorConfig {
       environment_path: conductor_environment_path.into(),

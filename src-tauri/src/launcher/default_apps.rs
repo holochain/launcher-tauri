@@ -14,7 +14,7 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager) -> R
       .install_web_app(
         String::from("DevHub"),
         dev_hub_bundle,
-        None,
+        Some(String::from("test1")),
         HashMap::new(),
         None,
       )

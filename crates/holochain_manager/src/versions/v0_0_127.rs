@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::Arc};
 use url2::Url2;
 
 // NEW_VERSION: Import the exact same types but from the new crates
@@ -6,9 +6,9 @@ use holochain_conductor_api_0_0_127::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_0_127::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig};
+use holochain_p2p_0_0_127::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
 
-use super::{version_manager::VersionManager, HdkVersion};
+use super::{version_manager::VersionManager, HdkVersion, common::{proxy_url, boostrap_service}};
 
 pub struct HolochainV0_0_127;
 
@@ -26,17 +26,30 @@ impl VersionManager for HolochainV0_0_127 {
     keystore_connection_url: Url2,
   ) -> String {
     let mut network_config = KitsuneP2pConfig::default();
-    network_config.bootstrap_service = Some(url2::url2!("https://bootstrap.holo.host"));
+    network_config.bootstrap_service = Some(boostrap_service());
+    
+    let mut tuning_params = KitsuneP2pTuningParams::default();
+
+    tuning_params.tx2_implicit_timeout_ms = 15000;
+    tuning_params.tx2_quic_max_idle_timeout_ms = 15000;
+    tuning_params.agent_info_expires_after_ms = 300000;
+    tuning_params.gossip_outbound_target_mbps = 20.0;
+    tuning_params.gossip_inbound_target_mbps = 20.0;
+    tuning_params.gossip_historic_inbound_target_mbps = 10.0;
+    tuning_params.gossip_historic_inbound_target_mbps = 10.0;
+
+    network_config.tuning_params = Arc::new(tuning_params);
+
     network_config.transport_pool.push(TransportConfig::Proxy {
-            sub_transport: Box::new(TransportConfig::Quic {
-                bind_to: None,
-                override_host: None,
-                override_port: None,
-            }),
-            proxy_config: ProxyConfig::RemoteProxyClient { 
-              proxy_url: url2::url2!("kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--") 
-            }
-        });
+      sub_transport: Box::new(TransportConfig::Quic {
+        bind_to: None,
+        override_host: None,
+        override_port: None,
+      }),
+      proxy_config: ProxyConfig::RemoteProxyClient {
+        proxy_url: proxy_url(),
+      },
+    });
 
     let config = ConductorConfig {
       environment_path: conductor_environment_path.into(),
@@ -54,7 +67,7 @@ impl VersionManager for HolochainV0_0_127 {
     serde_yaml::to_string(&config).expect("Could not convert conductor config to string")
   }
 
-  // NEW_VERSION: You shouldn't have to change this function if the shape 
+  // NEW_VERSION: You shouldn't have to change this function if the shape
   // of the configuration concerning the admin port and the keystore connection haven't changed
   fn overwrite_config(
     &self,

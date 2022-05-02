@@ -68,6 +68,9 @@ See [where](https://github.com/lightningrodlabs/where) for a complete working se
   - If the "Add to happ" button doesn't work, then type the full name of the DNA and press Enter.
 11. In the GUI box, upload your `ui.zip`.
 12. Click "Save".
+13. Keep your Launcher open until another Launcher (in another computer) can install the app.
+  - This may take a while (in the order of many minutes). In the future it won't be necessary.
+  - This step is necessary for the happ files to sync with other peers in the DHT.
 
 ## Known issues
 
