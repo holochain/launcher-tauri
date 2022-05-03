@@ -6,10 +6,18 @@ use tauri::api::path::{config_dir, data_dir};
 
 /** Config */
 
+fn component_name(name: &str) -> String {
+  if cfg!(debug_assertions) {
+    format!("{}-dev", name)
+  } else {
+    String::from(name)
+  }
+}
+
 pub fn root_config_path() -> PathBuf {
   config_dir()
     .expect("Could not get config dir")
-    .join("holochain")
+    .join(component_name("holochain"))
 }
 
 pub fn holochain_config_path(holochain_version: HolochainVersion) -> PathBuf {
@@ -35,7 +43,7 @@ pub fn logs_path() -> PathBuf {
 pub fn logs_folder_path() -> PathBuf {
   data_dir()
     .expect("Could not get config dir")
-    .join("holochain-launcher")
+    .join(component_name("holochain-launcher"))
 }
 
 /** Data */
@@ -43,7 +51,7 @@ pub fn logs_folder_path() -> PathBuf {
 pub fn root_data_path() -> PathBuf {
   data_dir()
     .expect("Could not get config dir")
-    .join("holochain")
+    .join(component_name("holochain"))
 }
 
 pub fn data_path_for_holochain_version(holochain_version: HolochainVersion) -> PathBuf {
@@ -53,7 +61,9 @@ pub fn data_path_for_holochain_version(holochain_version: HolochainVersion) -> P
 }
 
 pub fn root_lair_path() -> PathBuf {
-  data_dir().expect("Could not get config dir").join("lair")
+  data_dir()
+    .expect("Could not get config dir")
+    .join(component_name("lair"))
 }
 
 pub fn keystore_data_path(lair_keystore_version: LairKeystoreVersion) -> PathBuf {

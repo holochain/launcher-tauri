@@ -9,8 +9,8 @@
         justify-content: center;
       "
     >
-      <span style="margin-top: 24px"
-        >You don't have any apps installed yet</span
+      <span style="margin: 24px"
+        >There are no apps installed yet in this Holochain version.</span
       >
     </div>
     <div

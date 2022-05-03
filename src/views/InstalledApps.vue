@@ -201,10 +201,10 @@ export default defineComponent({
       try {
         await invoke("uninstall_app", { appId, holochainId });
 
+        this.view = { type: "installedApps" };
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
         this.showMessage(`Uninstalled ${appId}`);
-        this.view = { type: "installedApps" };
       } catch (e) {
         const error = `Uninstall app ${appId} failed: ${JSON.stringify(e)}`;
         this.showMessage(error);
