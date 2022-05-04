@@ -64,6 +64,8 @@ pub async fn install_app(
   }
 
   log::info!("Installed hApp {}", app_id);
+  
+  manager.on_apps_changed().await?;
 
   Ok(())
 }

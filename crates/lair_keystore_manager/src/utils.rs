@@ -1,4 +1,7 @@
-use std::{fs, path::{PathBuf, Path}};
+use std::{
+  fs,
+  path::{Path, PathBuf},
+};
 
 use crate::error::FileSystemError;
 

@@ -41,29 +41,27 @@ pub fn logs_path() -> PathBuf {
 }
 
 pub fn logs_folder_path() -> PathBuf {
-  data_dir()
-    .expect("Could not get config dir")
-    .join(component_name("holochain-launcher"))
+  tauri_data_path().join(component_name("holochain-launcher"))
 }
 
 /** Data */
 
-pub fn root_data_path() -> PathBuf {
-  data_dir()
-    .expect("Could not get config dir")
-    .join(component_name("holochain"))
+fn tauri_data_path() -> PathBuf {
+  data_dir().expect("Could not get config dir")
+}
+
+pub fn root_holochain_data_path() -> PathBuf {
+  tauri_data_path().join(component_name("holochain"))
 }
 
 pub fn data_path_for_holochain_version(holochain_version: HolochainVersion) -> PathBuf {
   let version: String = holochain_version.into();
 
-  root_data_path().join(version)
+  root_holochain_data_path().join(version)
 }
 
 pub fn root_lair_path() -> PathBuf {
-  data_dir()
-    .expect("Could not get config dir")
-    .join(component_name("lair"))
+  tauri_data_path().join(component_name("lair"))
 }
 
 pub fn keystore_data_path(lair_keystore_version: LairKeystoreVersion) -> PathBuf {

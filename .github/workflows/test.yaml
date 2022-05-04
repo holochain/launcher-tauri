@@ -38,22 +38,23 @@ jobs:
       - name: install Holochain
         run: |
           mkdir src-tauri/bins
-          cargo install lair_keystore --version 0.1.1
+
+          cargo install --git https://github.com/holochain/lair lair_keystore --rev 092f33dcc49e62c253c0c746baec0df65c4e2fb5
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-unknown-linux-gnu
 
           CADDY_PATH=$(which caddy)
           cp $CADDY_PATH src-tauri/bins/caddy-x86_64-unknown-linux-gnu
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev e8b4bbb4c27f344e3c1fbc6223c6c2a65e233459 holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 5b5db5a252ab3a4dab4021a299aef77a6685c807 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.127-x86_64-unknown-linux-gnu
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 0333c70ab4a6c43461a50564ba2665ad81985ff2 holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 29b88b418578ba5e86fdb3a89659bb2723d60ada holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.132-x86_64-unknown-linux-gnu
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev dd78d08e51c95523199fe9d18e0b81a3e0231e68 holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev d20bb79395985f2c63e19dd544e24412c1ac2212 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.136-x86_64-unknown-linux-gnu
 

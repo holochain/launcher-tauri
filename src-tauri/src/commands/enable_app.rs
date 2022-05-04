@@ -15,6 +15,9 @@ pub async fn enable_app(
     .await?;
 
   log::info!("Enabled app: app_id = {}", app_id);
+
+  manager.on_apps_changed().await?;
+
   Ok(())
 }
 
@@ -33,5 +36,8 @@ pub async fn disable_app(
     .await?;
 
   log::info!("Disabled app: app_id = {}", app_id);
+
+  manager.on_apps_changed().await?;
+
   Ok(())
 }

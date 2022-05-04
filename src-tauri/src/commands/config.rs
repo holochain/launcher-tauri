@@ -1,4 +1,4 @@
-use tauri::api::process::kill_children;
+use tauri::{api::process::kill_children, Manager};
 
 use crate::{
   launcher::{
@@ -14,6 +14,16 @@ pub async fn write_config(
   config: LauncherConfig,
 ) -> Result<(), LauncherError> {
   config.write()?;
+
+  let windows = app_handle.windows();
+
+  for (label, w) in windows {
+    if !label.eq(&String::from("admin")) {
+      if let Err(err) = w.close() {
+        log::error!("Error closing window {:?}", err);
+      }
+    }
+  }
 
   kill_children();
 

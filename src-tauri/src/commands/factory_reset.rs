@@ -3,8 +3,8 @@ use std::{fs, io, path::PathBuf};
 use tauri::{api::process::kill_children, Manager};
 
 use crate::{
-  file_system::{root_config_path, root_data_path, root_lair_path},
-  launcher::{manager::LauncherManager, state::LauncherState},
+  file_system::{root_config_path, root_holochain_data_path, root_lair_path},
+  launcher::{manager::LauncherManager, state::LauncherState, error::LauncherError},
   running_state::RunningState,
 };
 
@@ -37,18 +37,39 @@ pub async fn execute_factory_reset(
     log::error!("Could not remove lair path: {}", err);
     String::from("Could not remove lair path")
   })?;
-  remove_dir_if_exists(root_data_path())
+  remove_dir_if_exists(root_holochain_data_path())
     .or(Err(String::from("Could not remove holochain data path")))?;
 
-  let manager = LauncherManager::launch(app_handle)
-    .await
-    .map_err(|err| format!("{:?}", err))?;
+  let manager_launch = LauncherManager::launch(app_handle).await;
+
+  let mut maybe_error: Option<LauncherError> = None;
+
+  let manager_state = match manager_launch {
+    Ok(mut launcher_manager) => {
+      log::info!("Launch setup successful");
+      launcher_manager.on_apps_changed().await?;
+
+      RunningState::Running(launcher_manager)
+    }
+    Err(error) => {
+      kill_children();
+
+      maybe_error = Some(error.clone());
+
+      log::error!("There was an error launching holochain: {:?}", error);
+      RunningState::Error(error)
+    }
+  };
 
   let mut m = state.lock().await;
 
-  (*m) = RunningState::Running(manager);
+  (*m) = manager_state;
 
   log::info!("Started children processes again, factory reset completed");
+
+  if let Some(err) = maybe_error {
+    return Err(format!("{:?}", err));
+  }
 
   Ok(())
 }

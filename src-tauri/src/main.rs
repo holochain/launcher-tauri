@@ -2,7 +2,7 @@
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
-use file_system::root_data_path;
+use file_system::root_holochain_data_path;
 use futures::lock::Mutex;
 use launcher::error::LauncherError;
 use running_state::RunningState;
@@ -125,7 +125,7 @@ fn main() {
 }
 
 async fn launch_manager(app_handle: AppHandle) -> RunningState<LauncherManager, LauncherError> {
-  if Path::new(&root_data_path().join("conductor")).exists() {
+  if Path::new(&root_holochain_data_path().join("conductor")).exists() {
     return RunningState::Error(LauncherError::OldFilesExist);
   }
 

@@ -3,7 +3,7 @@ use holochain_manager::error::LaunchHolochainError;
 use holochain_web_app_manager::error::LaunchWebAppManagerError;
 use lair_keystore_manager::error::{LairKeystoreError, LaunchChildError};
 use lair_keystore_manager::utils::create_dir_if_necessary;
-use lair_keystore_manager::versions::v0_1_1::LairKeystoreManagerV0_1_1;
+use lair_keystore_manager::versions::v0_1_2::LairKeystoreManagerV0_1_2;
 use lair_keystore_manager::LairKeystoreManager;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -20,7 +20,7 @@ use holochain_web_app_manager::WebAppManager;
 
 use crate::file_system::{
   config_environment_path, data_path_for_holochain_version, keystore_data_path, root_config_path,
-  root_data_path, root_lair_path,
+  root_holochain_data_path, root_lair_path,
 };
 use crate::system_tray::AllInstalledApps;
 use crate::{running_state::RunningState, system_tray::update_system_tray, LauncherState};
@@ -57,12 +57,12 @@ pub struct LauncherManager {
 impl LauncherManager {
   pub async fn launch(app_handle: AppHandle) -> Result<Self, LauncherError> {
     create_dir_if_necessary(&root_lair_path())?;
-    create_dir_if_necessary(&root_data_path())?;
+    create_dir_if_necessary(&root_holochain_data_path())?;
     create_dir_if_necessary(&root_config_path())?;
 
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_1::lair_keystore_version());
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_2::lair_keystore_version());
 
-    let is_initialized = LairKeystoreManagerV0_1_1::is_initialized(keystore_path);
+    let is_initialized = LairKeystoreManagerV0_1_2::is_initialized(keystore_path);
 
     let keystore_status = match is_initialized {
       true => KeystoreStatus::PasswordNecessary,
@@ -80,6 +80,7 @@ impl LauncherManager {
       lair_keystore_manager: RunningState::Error(keystore_status),
     };
 
+    // This doesn't work... TODO: Fix it
     app_handle.listen_global("running_apps_changed", move |_| {
       let launcher_state: &LauncherState = &app_handle2.state();
       let result = tauri::async_runtime::block_on(async move {
@@ -97,9 +98,9 @@ impl LauncherManager {
   }
 
   pub async fn initialize_and_launch_keystore(&mut self, password: String) -> Result<(), String> {
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_1::lair_keystore_version());
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_2::lair_keystore_version());
 
-    LairKeystoreManagerV0_1_1::initialize(keystore_path, password.clone())
+    LairKeystoreManagerV0_1_2::initialize(keystore_path, password.clone())
       .map_err(|err| format!("Error initializing the keystore: {:?}", err))?;
 
     std::thread::sleep(Duration::from_millis(1000));
@@ -110,9 +111,9 @@ impl LauncherManager {
   }
 
   pub async fn launch_keystore(&mut self, password: String) -> Result<(), String> {
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_1::lair_keystore_version());
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_2::lair_keystore_version());
     let lair_keystore_manager =
-      LairKeystoreManagerV0_1_1::launch(self.config.log_level, keystore_path, password.clone())
+      LairKeystoreManagerV0_1_2::launch(self.config.log_level, keystore_path, password.clone())
         .await
         .map_err(|err| format!("Error launching the keystore: {:?}", err))?;
 
@@ -128,7 +129,7 @@ impl LauncherManager {
         .await?;
     } else {
       let _r = std::fs::remove_dir_all(root_config_path().join("custom"));
-      let _r = std::fs::remove_dir_all(root_data_path().join("custom"));
+      let _r = std::fs::remove_dir_all(root_holochain_data_path().join("custom"));
     }
 
     Ok(())
@@ -158,7 +159,7 @@ impl LauncherManager {
       false => config_environment_path(version),
     };
     let environment_path = match custom_binary_path.is_some() {
-      true => root_data_path().join("custom"),
+      true => root_holochain_data_path().join("custom"),
       false => data_path_for_holochain_version(version),
     };
 
