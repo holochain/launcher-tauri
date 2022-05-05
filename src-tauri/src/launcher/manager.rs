@@ -101,9 +101,8 @@ impl LauncherManager {
     let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_2::lair_keystore_version());
 
     LairKeystoreManagerV0_1_2::initialize(keystore_path, password.clone())
+      .await
       .map_err(|err| format!("Error initializing the keystore: {:?}", err))?;
-
-    std::thread::sleep(Duration::from_millis(1000));
 
     self.launch_keystore(password).await?;
 

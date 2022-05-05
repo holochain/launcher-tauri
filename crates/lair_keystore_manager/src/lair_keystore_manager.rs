@@ -14,7 +14,7 @@ pub trait LairKeystoreManager: Send + Sync {
   where
     Self: Sized;
 
-  fn initialize(keystore_path: PathBuf, password: String) -> Result<(), LairKeystoreError>
+  async fn initialize(keystore_path: PathBuf, password: String) -> Result<(), LairKeystoreError>
   where
     Self: Sized;
 
