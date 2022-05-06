@@ -12,7 +12,7 @@ pub trait VersionManager {
 
   fn lair_keystore_version(&self) -> LairKeystoreVersion {
     // For now all holochain versions run the same lair keystore version
-    LairKeystoreVersion::V0_1_2
+    LairKeystoreVersion::V0_1_3
   }
 
   fn initial_config(

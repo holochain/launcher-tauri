@@ -3,7 +3,7 @@ use holochain_manager::error::LaunchHolochainError;
 use holochain_web_app_manager::error::LaunchWebAppManagerError;
 use lair_keystore_manager::error::{LairKeystoreError, LaunchChildError};
 use lair_keystore_manager::utils::create_dir_if_necessary;
-use lair_keystore_manager::versions::v0_1_2::LairKeystoreManagerV0_1_2;
+use lair_keystore_manager::versions::v0_1_3::LairKeystoreManagerV0_1_3;
 use lair_keystore_manager::LairKeystoreManager;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -60,9 +60,9 @@ impl LauncherManager {
     create_dir_if_necessary(&root_holochain_data_path())?;
     create_dir_if_necessary(&root_config_path())?;
 
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_2::lair_keystore_version());
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_3::lair_keystore_version());
 
-    let is_initialized = LairKeystoreManagerV0_1_2::is_initialized(keystore_path);
+    let is_initialized = LairKeystoreManagerV0_1_3::is_initialized(keystore_path);
 
     let keystore_status = match is_initialized {
       true => KeystoreStatus::PasswordNecessary,
@@ -98,9 +98,9 @@ impl LauncherManager {
   }
 
   pub async fn initialize_and_launch_keystore(&mut self, password: String) -> Result<(), String> {
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_2::lair_keystore_version());
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_3::lair_keystore_version());
 
-    LairKeystoreManagerV0_1_2::initialize(keystore_path, password.clone())
+    LairKeystoreManagerV0_1_3::initialize(keystore_path, password.clone())
       .await
       .map_err(|err| format!("Error initializing the keystore: {:?}", err))?;
 
@@ -110,9 +110,9 @@ impl LauncherManager {
   }
 
   pub async fn launch_keystore(&mut self, password: String) -> Result<(), String> {
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_2::lair_keystore_version());
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_1_3::lair_keystore_version());
     let lair_keystore_manager =
-      LairKeystoreManagerV0_1_2::launch(self.config.log_level, keystore_path, password.clone())
+      LairKeystoreManagerV0_1_3::launch(self.config.log_level, keystore_path, password.clone())
         .await
         .map_err(|err| format!("Error launching the keystore: {:?}", err))?;
 
