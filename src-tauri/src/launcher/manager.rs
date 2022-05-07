@@ -8,7 +8,6 @@ use lair_keystore_manager::LairKeystoreManager;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;
-use std::time::Duration;
 use sysinfo::{System, SystemExt};
 use tauri::api::process::Command;
 use tauri::{window::WindowBuilder, AppHandle, Manager, WindowUrl};
