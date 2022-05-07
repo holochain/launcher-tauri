@@ -5,5 +5,5 @@ pub fn proxy_url() -> Url2 {
 }
 
 pub fn boostrap_service() -> Url2 {
-  url2::url2!("https://bootstrap-staging.holo.host")
+  url2::url2!("https://bootstrap.holo.host")
 }

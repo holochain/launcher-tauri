@@ -4,10 +4,11 @@ use tauri::api::process::{Command, CommandChild, CommandEvent};
 
 use lair_keystore_manager::error::LaunchChildError;
 
-use crate::error::LaunchHolochainError;
+use crate::{error::LaunchHolochainError, versions::HolochainVersion};
 
 pub fn launch_holochain_process(
   log_level: log::Level,
+  version: HolochainVersion,
   command: Command,
   conductor_config_path: PathBuf,
   password: String,
@@ -32,9 +33,9 @@ pub fn launch_holochain_process(
     // read events such as stdout
     while let Some(event) = holochain_rx.recv().await {
       match event.clone() {
-        CommandEvent::Stdout(line) => log::info!("[HOLOCHAIN] {}", line),
-        CommandEvent::Stderr(line) => log::info!("[HOLOCHAIN] {}", line),
-        _ => log::info!("[HOLOCHAIN] {:?}", event),
+        CommandEvent::Stdout(line) => log::info!("[HOLOCHAIN v{}] {}", version, line),
+        CommandEvent::Stderr(line) => log::info!("[HOLOCHAIN v{}] {}", version, line),
+        _ => log::info!("[HOLOCHAIN v{}] {:?}", version, event),
       };
     }
   });

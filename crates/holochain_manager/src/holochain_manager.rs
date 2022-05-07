@@ -61,6 +61,7 @@ impl HolochainManager {
 
     let command_child = launch_holochain_process(
       config.log_level,
+      version,
       config.command,
       conductor_config_path,
       password,

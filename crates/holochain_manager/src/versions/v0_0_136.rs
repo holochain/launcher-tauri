@@ -44,13 +44,10 @@ impl VersionManager for HolochainV0_0_136 {
 
     let mut tuning_params = KitsuneP2pTuningParams::default();
 
-    tuning_params.tx2_implicit_timeout_ms = 15000;
-    tuning_params.tx2_quic_max_idle_timeout_ms = 15000;
-    tuning_params.agent_info_expires_after_ms = 300000;
-    tuning_params.gossip_outbound_target_mbps = 20.0;
-    tuning_params.gossip_inbound_target_mbps = 20.0;
-    tuning_params.gossip_historic_inbound_target_mbps = 10.0;
-    tuning_params.gossip_historic_inbound_target_mbps = 10.0;
+    tuning_params.gossip_outbound_target_mbps = 1.5;
+    tuning_params.gossip_inbound_target_mbps = 1.5;
+    tuning_params.gossip_historic_outbound_target_mbps = 0.4;
+    tuning_params.gossip_historic_inbound_target_mbps = 0.4;
 
     network_config.tuning_params = Arc::new(tuning_params);
 
