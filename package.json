@@ -3,7 +3,7 @@
   "version": "0.4.2",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev:ui\" \"sleep 7 && cargo tauri dev\"",
+    "dev": "concurrently \"npm run dev:ui\" \"sleep 7 && npm tauri dev\"",
     "dev:ui": "vue-cli-service build --watch --mode development --dest src-tauri/target/webpack_dist",
     "build:ui": "vue-cli-service build --dest src-tauri/target/webpack_dist",
     "build": "npm run build:ui && npm run tauri -- build -v",
@@ -23,7 +23,7 @@
     "@material/mwc-textarea": "^0.25.1",
     "@material/mwc-textfield": "^0.25.1",
     "@msgpack/msgpack": "^2.7.1",
-    "@tauri-apps/api": "1.0.0-rc.3",
+    "@tauri-apps/api": "1.0.0-rc.5",
     "@webcomponents/scoped-custom-element-registry": "^0.0.5",
     "array-flat-polyfill": "^1.0.1",
     "blob-polyfill": "^5.0.20210201",
@@ -35,7 +35,7 @@
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "1.0.0-rc.7",
+    "@tauri-apps/cli": "1.0.0-rc.10",
     "@types/jest": "^24.0.19",
     "@types/lodash-es": "^4.17.6",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
