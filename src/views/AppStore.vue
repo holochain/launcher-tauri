@@ -9,7 +9,7 @@
         @click="$emit('go-back')"
       ></mwc-icon-button>
 
-      <span style="flex: 1; font-size: 1.5em">App Store</span>
+      <span style="flex: 1; font-size: 1.5em">App Library</span>
       <mwc-button
         label="How to publish an app"
         @click="howToPublish()"
