@@ -1,10 +1,10 @@
 use std::{fs, io, path::PathBuf};
 
-use tauri::{api::process::kill_children, Manager};
+use tauri::api::process::kill_children;
 
 use crate::{
   file_system::{root_config_path, root_holochain_data_path, root_lair_path},
-  launcher::{manager::LauncherManager, state::LauncherState, error::LauncherError},
+  launcher::{error::LauncherError, manager::LauncherManager, state::LauncherState},
   running_state::RunningState,
 };
 
@@ -14,16 +14,6 @@ pub async fn execute_factory_reset(
   app_handle: tauri::AppHandle,
 ) -> Result<(), String> {
   log::warn!("A factory reset has been requested, initiating...");
-
-  let windows = app_handle.windows();
-
-  for (label, w) in windows {
-    if !label.eq(&String::from("admin")) {
-      if let Err(err) = w.close() {
-        log::error!("Error closing window {:?}", err);
-      }
-    }
-  }
 
   // Kill all the children processes to avoid messing up with the filesystem
   kill_children();

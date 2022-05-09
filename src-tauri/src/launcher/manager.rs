@@ -10,13 +10,12 @@ use std::collections::HashMap;
 use std::path::Path;
 use sysinfo::{System, SystemExt};
 use tauri::api::process::Command;
-use tauri::{window::WindowBuilder, AppHandle, Manager, WindowUrl};
-use tauri::{CustomMenuItem, Menu, Submenu};
-use url::Url;
+use tauri::{AppHandle, Manager};
 
 use holochain_manager::versions::HolochainVersion;
 use holochain_web_app_manager::WebAppManager;
 
+use crate::commands::open_app::open_url;
 use crate::file_system::{
   config_environment_path, data_path_for_holochain_version, keystore_data_path, root_config_path,
   root_holochain_data_path, root_lair_path,
@@ -354,27 +353,7 @@ impl LauncherManager {
       .get_allocated_port(app_id)
       .ok_or(String::from("This app has no port attached"))?;
 
-    let window = WindowBuilder::new(
-      &self.app_handle,
-      window_label.clone(),
-      WindowUrl::External(Url::parse(format!("http://localhost:{}", port).as_str()).unwrap()),
-    )
-    .inner_size(1000.0, 700.0)
-    .title(app_id)
-    .menu(Menu::new().add_submenu(Submenu::new(
-      "Settings",
-      Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
-    )))
-    .build()
-    .map_err(|err| format!("Error opening app: {:?}", err))?;
-
-    let a = self.app_handle.clone();
-    let l = window_label.clone();
-    window.on_menu_event(move |_| {
-      if let Some(w) = a.get_window(l.as_str()) {
-        w.open_devtools();
-      }
-    });
+    open_url(format!("http://localhost:{}", port))?;
 
     Ok(())
   }

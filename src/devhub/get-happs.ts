@@ -81,7 +81,7 @@ export function getLatestRelease(
   apps: AppWithReleases
 ): ContentAddress<HappRelease> {
   return apps.releases.sort(
-    (r1, r2) => r1.content.last_updated - r2.content.last_updated
+    (r1, r2) => r2.content.last_updated - r1.content.last_updated
   )[0];
 }
 
