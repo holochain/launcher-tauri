@@ -3,6 +3,7 @@ import { AppWebsocket, EntryHash, InstalledAppInfo } from "@holochain/client";
 import { Happ, HappRelease } from "./types";
 
 export interface ContentAddress<C> {
+  id: EntryHash;
   address: EntryHash;
   content: C;
 }
@@ -62,10 +63,17 @@ export async function getAppsReleases(
     fn_name: "get_happ_releases",
     zome_name: "happ_library",
     payload: {
-      for_happ: app.address,
+      for_happ: app.id,
     },
     provenance: cells.happs.cell_id[1],
   });
+
+  if (!appReleasesOutput.payload.items) {
+    return {
+      app,
+      releases: [],
+    };
+  }
 
   const releases: Array<ContentAddress<HappRelease>> =
     appReleasesOutput.payload.items;
