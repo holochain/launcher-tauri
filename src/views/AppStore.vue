@@ -142,6 +142,7 @@ export default defineComponent({
     try {
       allApps = await getAllPublishedApps(appWs, devhubInfo);
     } catch (e) {
+      console.log(e);
       // Catch other errors than being offline
       allApps = [];
     }
