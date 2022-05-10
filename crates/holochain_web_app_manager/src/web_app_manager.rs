@@ -17,7 +17,6 @@ use std::{
   fs::{self, File},
   path::{Path, PathBuf},
 };
-use tauri::{AppHandle, Manager};
 
 use crate::{
   caddy::manager::CaddyManager,
@@ -31,7 +30,6 @@ pub struct WebAppManager {
   holochain_manager: HolochainManager,
   caddy_manager: CaddyManager,
   allocated_ports: HashMap<String, u16>,
-  app_handle: AppHandle,
 }
 
 impl WebAppManager {
@@ -39,7 +37,6 @@ impl WebAppManager {
     version: HolochainVersion,
     mut config: LaunchHolochainConfig,
     password: String,
-    app_handle: AppHandle,
   ) -> Result<Self, LaunchWebAppManagerError> {
     let environment_path = config.environment_path.clone();
 
@@ -70,7 +67,6 @@ impl WebAppManager {
       environment_path,
       caddy_manager,
       allocated_ports: HashMap::new(),
-      app_handle,
     };
     manager
       .on_running_apps_changed()
@@ -162,11 +158,6 @@ impl WebAppManager {
       .caddy_manager
       .update_running_apps(&installed_apps)
       .map_err(|err| format!("Error reloading caddy {:?}", err))?;
-
-    self
-      .app_handle
-      .emit_all("running_apps_changed", ())
-      .map_err(|err| format!("Error sending running_apps_changed event {:?}", err))?;
 
     Ok(())
   }

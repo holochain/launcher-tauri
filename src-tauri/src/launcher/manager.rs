@@ -186,7 +186,7 @@ impl LauncherManager {
     let version_str: String = version.into();
 
     let state =
-      match WebAppManager::launch(version, config, password, self.app_handle.clone()).await {
+      match WebAppManager::launch(version, config, password).await {
         Ok(mut manager) => match version.eq(&self.config.default_version) {
           true => match install_default_apps_if_necessary(&mut manager).await {
             Ok(()) => {
