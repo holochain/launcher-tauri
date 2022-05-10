@@ -24,7 +24,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           override: true
-          toolchain: 1.60
+          toolchain: stable
       - name: install app dependencies and info
         run: npm install && npm run tauri info
 

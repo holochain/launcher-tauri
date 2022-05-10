@@ -20,7 +20,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           override: true
-          toolchain: 1.60
+          toolchain: stable
       - name: install webkit2gtk (ubuntu only)
         run: |
           sudo apt-get update
