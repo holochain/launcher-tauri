@@ -15,7 +15,7 @@ log = "0.4.14"
 portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}
 serde_yaml = "0.8"
-tauri = {version = "1.0.0-rc.6", features = ["api-all", "system-tray"]}
+tauri = {git = "https://github.com/guillemcordoba/tauri", rev ="901d44a478b8819be3a80113efebf4ba615a67f2", features = ["api-all", "gtk-tray", "system-tray"] }
 thiserror = "1.0.30"
 url2 = "0.0.6"
 zip = "0.5.0"
