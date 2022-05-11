@@ -16,10 +16,12 @@ use version_manager::VersionManager;
 
 // NEW_VERSION: Import the new VersionManager
 pub mod v0_0_127;
+pub mod v0_0_131;
 pub mod v0_0_132;
 pub mod v0_0_136;
 
 use v0_0_127::HolochainV0_0_127;
+use v0_0_131::HolochainV0_0_131;
 use v0_0_132::HolochainV0_0_132;
 use v0_0_136::HolochainV0_0_136;
 
@@ -28,6 +30,8 @@ use v0_0_136::HolochainV0_0_136;
 pub enum HdkVersion {
   #[serde(rename = "0.0.123")]
   V0_0_123,
+  #[serde(rename = "0.0.126")]
+  V0_0_126,
   #[serde(rename = "0.0.127")]
   V0_0_127,
   #[serde(rename = "0.0.130")]
@@ -39,6 +43,8 @@ pub enum HdkVersion {
 pub enum HolochainVersion {
   #[serde(rename = "0.0.127")]
   V0_0_127,
+  #[serde(rename = "0.0.131")]
+  V0_0_131,
   #[serde(rename = "0.0.132")]
   V0_0_132,
   #[serde(rename = "0.0.136")]
@@ -66,6 +72,7 @@ impl HolochainVersion {
     // NEW_VERSION: Add the new version to this array
     return vec![
       HolochainVersion::V0_0_127,
+      HolochainVersion::V0_0_131,
       HolochainVersion::V0_0_132,
       HolochainVersion::V0_0_136,
     ];
@@ -76,6 +83,7 @@ impl HolochainVersion {
     // Then, import and add the new version manager here
     match self {
       HolochainVersion::V0_0_127 => HolochainVersionManager::HolochainV0_0_127(HolochainV0_0_127),
+      HolochainVersion::V0_0_131 => HolochainVersionManager::HolochainV0_0_131(HolochainV0_0_131),
       HolochainVersion::V0_0_132 => HolochainVersionManager::HolochainV0_0_132(HolochainV0_0_132),
       HolochainVersion::V0_0_136 => HolochainVersionManager::HolochainV0_0_136(HolochainV0_0_136),
     }
@@ -86,6 +94,7 @@ impl HolochainVersion {
 #[enum_dispatch(VersionManager)]
 pub enum HolochainVersionManager {
   HolochainV0_0_127,
+  HolochainV0_0_131,
   HolochainV0_0_132,
   HolochainV0_0_136,
 }
