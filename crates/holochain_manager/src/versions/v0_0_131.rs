@@ -20,7 +20,7 @@ pub struct HolochainV0_0_131;
 
 impl VersionManager for HolochainV0_0_131 {
   fn hdk_version(&self) -> HdkVersion {
-    HdkVersion::V0_0_127
+    HdkVersion::V0_0_126
   }
 
   fn initial_config(
