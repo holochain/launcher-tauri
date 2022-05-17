@@ -124,6 +124,7 @@ fn caddyfile_config_for_app(
               }}
       }}
 
+      header /*.js Content-Type text/javascript
       header Cache-Control no-cache, no-store
 
       handle {{
