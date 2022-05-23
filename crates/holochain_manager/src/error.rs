@@ -1,4 +1,6 @@
-use lair_keystore_manager::error::{LaunchChildError, FileSystemError};
+use std::io;
+
+use lair_keystore_manager::error::{FileSystemError, LaunchChildError};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -8,6 +10,8 @@ pub enum LaunchHolochainError {
   LaunchChildError(#[from] LaunchChildError),
   #[error("Failed to write the password: `{0}`")]
   ErrorWritingPassword(String),
+  #[error("Error with the filesystem: `{0}`")]
+  IoError(String),
   #[error("Could not connect to the conductor: `{0}`")]
   CouldNotConnectToConductor(String),
 }
@@ -15,5 +19,11 @@ pub enum LaunchHolochainError {
 impl From<FileSystemError> for LaunchHolochainError {
   fn from(err: FileSystemError) -> Self {
     LaunchHolochainError::LaunchChildError(LaunchChildError::FileSystemError(err))
+  }
+}
+
+impl From<io::Error> for LaunchHolochainError {
+  fn from(err: io::Error) -> Self {
+    LaunchHolochainError::IoError(format!("{:?}", err))
   }
 }

@@ -64,25 +64,4 @@ impl VersionManager for HolochainV0_0_127 {
     serde_yaml::to_string(&config).expect("Could not convert conductor config to string")
   }
 
-  // NEW_VERSION: You shouldn't have to change this function if the shape
-  // of the configuration concerning the admin port and the keystore connection haven't changed
-  fn overwrite_config(
-    &self,
-    conductor_config_str: String,
-    admin_port: u16,
-    keystore_connection_url: Url2,
-  ) -> String {
-    let mut config = serde_yaml::from_str::<ConductorConfig>(conductor_config_str.as_str())
-      .expect("Couldn't convert string to conductor config");
-
-    config.admin_interfaces = Some(vec![AdminInterfaceConfig {
-      driver: InterfaceDriver::Websocket { port: admin_port },
-    }]);
-
-    config.keystore = KeystoreConfig::LairServer {
-      connection_url: keystore_connection_url,
-    };
-
-    serde_yaml::to_string(&config).expect("Could not convert conductor config to string")
-  }
 }

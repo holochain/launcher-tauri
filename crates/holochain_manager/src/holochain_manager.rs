@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::env::temp_dir;
+use std::path::Path;
 use std::time::SystemTime;
 use std::{fs, time::Duration};
 
@@ -43,13 +44,17 @@ impl HolochainManager {
 
     let version_manager = version.manager();
 
-    let new_conductor_config = match fs::read_to_string(conductor_config_path.clone()) {
-      Ok(current_config_str) => version_manager.overwrite_config(
-        current_config_str,
-        config.admin_port,
-        config.keystore_connection_url.clone(),
-      ),
-      Err(_) => version_manager.initial_config(
+    let new_conductor_config = match Path::new(&conductor_config_path).exists() {
+      true => {
+        let current_config_str = fs::read_to_string(conductor_config_path.clone())?;
+
+        version_manager.overwrite_config(
+          current_config_str,
+          config.admin_port,
+          config.keystore_connection_url.clone(),
+        )
+      }
+      false => version_manager.initial_config(
         config.admin_port,
         config.environment_path.clone(),
         config.keystore_connection_url.clone(),

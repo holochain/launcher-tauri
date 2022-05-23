@@ -8,7 +8,7 @@
     </div>
     <div class="column" style="width: 512px" v-else-if="holochainVersions">
       <div class="column">
-        <span> Holochain Launcher v0.4.6 </span>
+        <span> Holochain Launcher v0.4.7 </span>
         <span
           style="margin-top: 8px"
           v-for="version in holochainVersions"
@@ -16,7 +16,7 @@
         >
           Holochain v{{ version }}
         </span>
-        <span style="margin-top: 8px"> Lair Keystore v0.1.0 </span>
+        <span style="margin-top: 8px"> Lair Keystore v0.1.3 </span>
       </div>
     </div>
   </mwc-dialog>
