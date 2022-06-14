@@ -1,10 +1,10 @@
 use holochain_manager::versions::{
   holochain_types_latest::{
-    prelude::{AgentPubKey, AppBundle, SerializedBytes, UnsafeBytes},
+    prelude::{AgentPubKey, AppBundle, MembraneProof, UnsafeBytes, SerializedBytes},
     web_app::WebAppBundle,
   },
 };
-use std::{collections::HashMap, fs};
+use std::{collections::HashMap, fs, sync::Arc};
 
 use crate::launcher::{state::LauncherState, manager::HolochainId};
 
@@ -20,11 +20,11 @@ pub async fn install_app(
 ) -> Result<(), String> {
   log::info!("Installing: web_app_bundle = {}", app_bundle_path);
 
-  let mut converted_membrane_proofs: HashMap<String, SerializedBytes> = HashMap::new();
+  let mut converted_membrane_proofs: HashMap<String, MembraneProof> = HashMap::new();
   for (dna_slot, proof) in membrane_proofs.iter() {
     converted_membrane_proofs.insert(
       dna_slot.clone(),
-      SerializedBytes::from(UnsafeBytes::from(proof.clone())),
+      Arc::new(SerializedBytes::from(UnsafeBytes::from(proof.clone()))),
     );
   }
 

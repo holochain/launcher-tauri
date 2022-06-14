@@ -112,8 +112,6 @@ export async function fetchWebHapp(
     payload: {
       name,
       id: happReleaseEntryHash,
-      dnarepo_dna_hash: cells.dnarepo.cell_id[0],
-      webassets_dna_hash: cells.webassets.cell_id[0],
     },
     provenance: cells.happs.cell_id[1],
   });

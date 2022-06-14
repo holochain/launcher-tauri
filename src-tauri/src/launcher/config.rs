@@ -13,7 +13,6 @@ pub struct LauncherConfig {
   pub custom_binary_path: Option<String>,
 
   pub running_versions: HashSet<HolochainVersion>,
-  pub default_version: HolochainVersion,
 }
 
 impl Default for LauncherConfig {
@@ -22,7 +21,6 @@ impl Default for LauncherConfig {
       log_level: log::Level::Warn,
       custom_binary_path: None,
       running_versions: HashSet::from([HolochainVersion::default()]),
-      default_version: HolochainVersion::default(),
     }
   }
 }

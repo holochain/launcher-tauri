@@ -136,12 +136,15 @@ export default defineComponent({
 
     const appWs = await AppWebsocket.connect(`ws://localhost:${port}`);
 
-    const devhubInfo = await appWs.appInfo({ installed_app_id: "DevHub" });
+    const devhubInfo = await appWs.appInfo({
+      installed_app_id: `DevHub-${holochainId.content}`,
+    });
 
     let allApps: Array<AppWithReleases>;
     try {
       allApps = await getAllPublishedApps(appWs, devhubInfo);
     } catch (e) {
+      console.error(e);
       // Catch other errors than being offline
       allApps = [];
     }
@@ -169,14 +172,16 @@ export default defineComponent({
 
       const port = this.$store.getters["appInterfacePort"](holochainId);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
-      const devhubInfo = await appWs.appInfo({ installed_app_id: "DevHub" });
+      const devhubInfo = await appWs.appInfo({
+        installed_app_id: `DevHub-${holochainId.content}`,
+      });
 
       try {
         const bytes = await fetchWebHapp(
           appWs,
           devhubInfo,
           app.app.content.title,
-          release.address
+          release.id
         );
 
         this.selectedAppBundlePath = await invoke("save_app", {

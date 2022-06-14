@@ -10,11 +10,19 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager) -> R
     let dev_hub_bundle = WebAppBundle::decode(include_bytes!("../../../DevHub.webhapp"))
       .or(Err("Malformed Web hApp bundle file"))?;
 
+    let version: String = manager.holochain_manager.version.into();
+
+    let uid = if cfg!(debug_assertions) {
+      Some(format!("dev"))
+    } else {
+      None
+    };
+
     manager
       .install_web_app(
-        String::from("DevHub"),
+        format!("DevHub-{}", version),
         dev_hub_bundle,
-        Some(String::from("0001")),
+        uid,
         HashMap::new(),
         None,
       )

@@ -28,10 +28,6 @@ jobs:
       - name: install app dependencies and info
         run: npm install && npm run tauri info
 
-      - name: fetch DevHub
-        run: |
-          curl -L --output DevHub.webhapp https://github.com/holochain/launcher/releases/download/v0.3.9/DevHub.webhapp
-
       - name: download caddy (Windows only)
         if: matrix.platform == 'windows-2019'
         run: |
@@ -64,6 +60,10 @@ jobs:
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev f4873057ac7318fb6897690b78a4d82968253a4d holochain
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.139-x86_64-pc-windows-msvc.exe
+
       - name: download caddy (MacOS only)
         if: matrix.platform == 'macos-10.15'
         run: |
@@ -95,6 +95,10 @@ jobs:
           cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 92f56b77d7914e99e4a2a600b372e960426af119 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.136-x86_64-apple-darwin
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev f4873057ac7318fb6897690b78a4d82968253a4d holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.139-x86_64-apple-darwin
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
@@ -139,6 +143,10 @@ jobs:
           cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 92f56b77d7914e99e4a2a600b372e960426af119 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.136-x86_64-unknown-linux-gnu
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev f4873057ac7318fb6897690b78a4d82968253a4d holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.139-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 

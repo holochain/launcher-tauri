@@ -8,9 +8,7 @@ use holochain_client::{AdminWebsocket, AgentPubKey, InstallAppBundlePayload, Ins
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
 
-use crate::versions::holochain_types_latest::prelude::{
-  AppBundle, AppBundleSource, SerializedBytes,
-};
+use crate::versions::holochain_types_latest::prelude::{AppBundle, AppBundleSource, MembraneProof};
 
 use crate::{
   config::LaunchHolochainConfig,
@@ -20,6 +18,7 @@ use crate::{
 };
 
 pub struct HolochainManager {
+  pub version: HolochainVersion,
   version_manager: HolochainVersionManager,
 
   admin_interface_port: u16,
@@ -96,6 +95,7 @@ impl HolochainManager {
     };
 
     Ok(HolochainManager {
+      version,
       version_manager,
       ws,
       admin_interface_port: config.admin_port,
@@ -127,7 +127,7 @@ impl HolochainManager {
     app_id: String,
     app_bundle: AppBundle,
     uid: Option<String>,
-    membrane_proofs: HashMap<String, SerializedBytes>,
+    membrane_proofs: HashMap<String, MembraneProof>,
     agent_pub_key: Option<AgentPubKey>,
   ) -> Result<(), String> {
     let agent_key = match agent_pub_key {

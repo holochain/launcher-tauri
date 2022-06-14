@@ -116,7 +116,11 @@ impl LauncherManager {
 
     self.lair_keystore_manager = RunningState::Running(Box::new(lair_keystore_manager));
 
-    for version in self.config.running_versions.clone() {
+    let mut holochain_versions_to_run = self.config.running_versions.clone();
+
+    holochain_versions_to_run.insert(HolochainVersion::default());
+
+    for version in holochain_versions_to_run {
       self.launch_holochain_manager(version, None).await?;
     }
 
@@ -185,39 +189,38 @@ impl LauncherManager {
 
     let version_str: String = version.into();
 
-    let state =
-      match WebAppManager::launch(version, config, password).await {
-        Ok(mut manager) => match version.eq(&self.config.default_version) {
-          true => match install_default_apps_if_necessary(&mut manager).await {
-            Ok(()) => {
-              log::info!("Launched Holochain v{}", version_str);
-              RunningState::Running(manager)
-            }
-            Err(err) => {
-              manager.kill()?;
-              log::error!(
-                "Error launching Holochain v{}: Could not install default apps: {}",
-                version_str,
-                err
-              );
-
-              RunningState::Error(LaunchWebAppManagerError::Other(format!(
-                "Could not install default apps: {}",
-                err
-              )))
-            }
-          },
-          false => {
-            let version_str: String = version.into();
+    let state = match WebAppManager::launch(version, config, password).await {
+      Ok(mut manager) => match version.eq(&HolochainVersion::default()) {
+        true => match install_default_apps_if_necessary(&mut manager).await {
+          Ok(()) => {
             log::info!("Launched Holochain v{}", version_str);
             RunningState::Running(manager)
           }
+          Err(err) => {
+            manager.kill()?;
+            log::error!(
+              "Error launching Holochain v{}: Could not install default apps: {}",
+              version_str,
+              err
+            );
+
+            RunningState::Error(LaunchWebAppManagerError::Other(format!(
+              "Could not install default apps: {}",
+              err
+            )))
+          }
         },
-        Err(error) => {
-          log::error!("Error launching Holochain v{}: {}", version_str, error);
-          RunningState::Error(error)
+        false => {
+          let version_str: String = version.into();
+          log::info!("Launched Holochain v{}", version_str);
+          RunningState::Running(manager)
         }
-      };
+      },
+      Err(error) => {
+        log::error!("Error launching Holochain v{}: {}", version_str, error);
+        RunningState::Error(error)
+      }
+    };
 
     if custom_binary_path.is_some() {
       self.custom_binary_manager = Some(state);

@@ -32,9 +32,7 @@ jobs:
           curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
           sudo apt update
           sudo apt install caddy
-      - name: fetch DevHub
-        run: |
-          curl -L --output DevHub.webhapp https://github.com/holochain/launcher/releases/download/v0.3.9/DevHub.webhapp
+
       - name: install Holochain
         run: |
           mkdir src-tauri/bins
@@ -63,6 +61,10 @@ jobs:
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.136-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev f4873057ac7318fb6897690b78a4d82968253a4d holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.139-x86_64-unknown-linux-gnu
 
       - name: install app dependencies and build it
         run: npm install && npm run build

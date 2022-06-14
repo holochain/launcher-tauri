@@ -26,6 +26,7 @@ pub async fn get_state_info(
   Ok(LauncherStateInfo {
     state: state_info,
     config,
+    default_version: HolochainVersion::default()
   })
 }
 

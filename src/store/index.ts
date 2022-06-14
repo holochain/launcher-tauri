@@ -92,7 +92,7 @@ export const store = createStore<LauncherAdminState>({
 
       return {
         type: "HolochainVersion",
-        content: stateInfo.config.default_version,
+        content: stateInfo.default_version,
       };
     },
     setupNeeded(state) {

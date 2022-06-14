@@ -61,14 +61,14 @@
           style="margin-left: 8px"
           label="Uninstall"
           icon="delete"
-          v-if="installedAppInfo.installed_app_id !== 'DevHub'"
+          v-if="isAppUninstallable(installedAppInfo.installed_app_id)"
         >
         </mwc-button>
 
         <mwc-button
           v-if="
             !isAppDisabled(installedAppInfo) &&
-            installedAppInfo.installed_app_id !== 'DevHub'
+            isAppUninstallable(installedAppInfo.installed_app_id)
           "
           @click="disableApp()"
           style="margin-left: 8px"
@@ -144,6 +144,11 @@ export default defineComponent({
     },
   },
   methods: {
+    isAppUninstallable(installedAppId: string) {
+      const holochainId = this.$store.getters["holochainIdForDevhub"];
+
+      return installedAppId !== `DevHub-${holochainId.content}`;
+    },
     deserializeHash,
     serializeHash,
     getReason,

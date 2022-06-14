@@ -90,6 +90,7 @@ export interface LauncherStateInfo {
     RunLauncherError
   >;
   config: LauncherConfig;
+  default_version: HolochainVersion;
 }
 
 export type LogLevel = "Error" | "Warn" | "Info" | "Debug" | "Trace";
@@ -97,7 +98,6 @@ export type LogLevel = "Error" | "Warn" | "Info" | "Debug" | "Trace";
 export interface LauncherConfig {
   log_level: LogLevel;
   running_versions: HolochainVersion[];
-  default_version: HolochainVersion;
   custom_binary_path: string | undefined;
 }
 

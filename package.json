@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run dev:ui\" \"sleep 7 && npm tauri dev\"",
@@ -9,7 +9,8 @@
     "build": "npm run build:ui && npm run tauri -- build -v",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "prepare": "curl -L --output DevHub.webhapp https://github.com/holochain/devhub-gui/releases/download/v0.6.1/DevHub.webhapp"
   },
   "dependencies": {
     "@holochain-open-dev/utils": "^0.0.9",

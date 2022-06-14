@@ -3,7 +3,7 @@ use holochain_manager::{
   versions::{
     holochain_conductor_api_latest::InstalledAppInfo,
     holochain_types_latest::{
-      prelude::{AgentPubKey, AppBundle, SerializedBytes},
+      prelude::{AgentPubKey, AppBundle, MembraneProof},
       web_app::WebAppBundle,
     },
     mr_bundle_latest::ResourceBytes,
@@ -27,7 +27,7 @@ use crate::{
 
 pub struct WebAppManager {
   environment_path: PathBuf,
-  holochain_manager: HolochainManager,
+  pub holochain_manager: HolochainManager,
   caddy_manager: CaddyManager,
   allocated_ports: HashMap<String, u16>,
 }
@@ -81,7 +81,7 @@ impl WebAppManager {
     app_id: String,
     web_app_bundle: WebAppBundle,
     uid: Option<String>,
-    membrane_proofs: HashMap<String, SerializedBytes>,
+    membrane_proofs: HashMap<String, MembraneProof>,
     agent_pub_key: Option<AgentPubKey>,
   ) -> Result<(), String> {
     let app_bundle = web_app_bundle
@@ -191,7 +191,7 @@ impl WebAppManager {
     app_id: String,
     app_bundle: AppBundle,
     uid: Option<String>,
-    membrane_proofs: HashMap<String, SerializedBytes>,
+    membrane_proofs: HashMap<String, MembraneProof>,
     agent_pub_key: Option<AgentPubKey>,
   ) -> Result<(), String> {
     // Install app in conductor manager
