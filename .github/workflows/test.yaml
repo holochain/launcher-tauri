@@ -60,11 +60,15 @@ jobs:
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.136-x86_64-unknown-linux-gnu
 
-          # NEW_VERSION: install new holochain version and copy its binary to the tauri path
-
           cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev f4873057ac7318fb6897690b78a4d82968253a4d holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.139-x86_64-unknown-linux-gnu
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev b9552356818a8876add8ffce29150b9f9dd7cd96 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.141-x86_64-unknown-linux-gnu
+
+          # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
       - name: install app dependencies and build it
         run: npm install && npm run build

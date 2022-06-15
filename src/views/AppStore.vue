@@ -177,6 +177,7 @@ export default defineComponent({
       });
 
       try {
+        console.log(release);
         const bytes = await fetchWebHapp(
           appWs,
           devhubInfo,
