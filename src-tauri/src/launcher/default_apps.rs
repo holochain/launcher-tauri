@@ -13,7 +13,7 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager) -> R
     let version: String = manager.holochain_manager.version.into();
 
     let uid = if cfg!(debug_assertions) {
-      Some(format!("dev"))
+      None
     } else {
       None
     };

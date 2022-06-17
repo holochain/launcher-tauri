@@ -66,6 +66,10 @@ jobs:
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.141-x86_64-pc-windows-msvc.exe
 
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev fbe4de6d9ab7837a27cd63cf88b625b0caa60d23 holochain
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.143-x86_64-pc-windows-msvc.exe
+
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
       - name: download caddy (MacOS only)
@@ -107,6 +111,10 @@ jobs:
           cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev b9552356818a8876add8ffce29150b9f9dd7cd96 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.141-x86_64-apple-darwin
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev fbe4de6d9ab7837a27cd63cf88b625b0caa60d23 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.143-x86_64-apple-darwin
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
@@ -159,6 +167,10 @@ jobs:
           cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev b9552356818a8876add8ffce29150b9f9dd7cd96 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.141-x86_64-unknown-linux-gnu
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev fbe4de6d9ab7837a27cd63cf88b625b0caa60d23 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.143-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 

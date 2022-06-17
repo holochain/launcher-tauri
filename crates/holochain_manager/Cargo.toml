@@ -6,7 +6,7 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-holochain_client = {package = "holochain_client", git = "https://github.com/holochain/holochain-client-rust", rev = "d647cc6c759e404df70cb497950b676e3498ca9b"}
+holochain_client = {package = "holochain_client", git = "https://github.com/holochain/holochain-client-rust", rev = "e60444287e4c52af6ac480055130222057a79853"}
 
 holochain_conductor_api_0_0_127 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "a60f227e75d510a2afc1914fdcedd6ebf754ea29"}
 holochain_p2p_0_0_127 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "a60f227e75d510a2afc1914fdcedd6ebf754ea29"}
@@ -34,7 +34,11 @@ holochain_conductor_api_0_0_141 = {package = "holochain_conductor_api", version 
 holochain_p2p_0_0_141 = {package = "holochain_p2p", version = "0.0.39"}
 holochain_types_0_0_141 = {package = "holochain_types", version = "0.0.39"}
 
-mr_bundle_0_0_9 = {package = "mr_bundle", version = "0.0.9"}
+holochain_conductor_api_0_0_143 = {package = "holochain_conductor_api", version = "0.0.43"}
+holochain_p2p_0_0_143 = {package = "holochain_p2p", version = "0.0.41"}
+holochain_types_0_0_143 = {package = "holochain_types", version = "0.0.41"}
+
+mr_bundle = {package = "mr_bundle", version = "0.0.12"}
 
 lair_keystore_manager = {path = "../lair_keystore_manager"}
 
