@@ -36,7 +36,8 @@ When you are on the `Installed Apps` section, click `Install New App`. This will
 
 Requirements:
 
-- On the zome side, target `hdk v0.0.127`.
+- On the zome side, target one of the HDK versions supported by the launcher. 
+  - Find out which versions are supported in https://github.com/holochain/launcher/releases.
 - On the UI side, target `@holochain/client v0.3.2` (v0.2.x is not going to work).
 
 When your UI is served from the launcher and `AppWebsocket.connect()` or `AdminWebsocket.connect()` are called, the call will be redirected to the actual port in which Holochain is running its interfaces. Also, when the `appWebsocket.appInfo({ installed_app_info: <APP_ID> })` is called, the `APP_ID` parameter is going to be replaced with the actual application ID that is installed in the Launcher.
@@ -53,22 +54,18 @@ See [where](https://github.com/lightningrodlabs/where) for a complete working se
 
 ### Publishing a .webhapp to the DevHub
 
-1. Open the `DevHub` app in the Holochain Launcher.
+1. Open the `DevHub-0.0.x` app in the Holochain Launcher.
+  - In case there are multiple DevHub apps, open the one for the latest version.
 2. Create a new App, with the appropriate "Name" and "Description". These are the details that the participants will see when downloading your application.
   - Make the description short, maybe one or two lines.
 3. Once you have created a new App, click "Upload new bundle".
-4. Select the `.happ` (not the `.webhapp`) and upload it.
-5. Select the HDK appropriate version which your app was compiled for.
+4. Set the appropriate "Name" for your release (e.g. v0.0.1). This is the version name that the participants will see when downloading your application.
+5. Select the `.webhapp` for your app and upload it.
+6. Select the HDK appropriate version which your app was compiled for.
   - Make sure that this is the correct HDK, in the format "0.0.127".
 6. Click "Quick Create" first for each zome, and then for each DNA.
 7. Click "Save".
-8. When you are done, go back to the application detail page and click "Create New Release".
-9.  Set the appropriate "Name" (e.g. v0.0.1). This is the version name that the participants will see when downloading your application.
-10. In the DNA box, search for the DNAs you uploaded earlier.
-  - If the "Add to happ" button doesn't work, then type the full name of the DNA and press Enter.
-11. In the GUI box, upload your `ui.zip`.
-12. Click "Save".
-13. Keep your Launcher open until another Launcher (in another computer) can install the app.
+8.  Keep your Launcher open until another Launcher (in another computer) can install the app.
   - This may take a while (in the order of many minutes). In the future it won't be necessary.
   - This step is necessary for the happ files to sync with other peers in the DHT.
 
