@@ -56,8 +56,8 @@ See [where](https://github.com/lightningrodlabs/where) for a complete working se
 
 1. Open the `DevHub-0.0.x` app in the Holochain Launcher.
   - In case there are multiple DevHub apps, open the one for the latest version.
-2. Create a new App, with the appropriate "Name" and "Description". These are the details that the participants will see when downloading your application.
-  - Make the description short, maybe one or two lines.
+2. Create a new App, **with the tag "app-store-ready"**. Without this tag, the app won't appear in the app library.
+   - Also input the appropriate "Name" and "Description". These are the details that the participants will see when downloading your application. Make the description short, maybe one or two lines.
 3. Once you have created a new App, click "Upload new bundle".
 4. Set the appropriate "Name" for your release (e.g. v0.0.1). This is the version name that the participants will see when downloading your application.
 5. Select the `.webhapp` for your app and upload it.

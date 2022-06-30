@@ -35,13 +35,12 @@ export async function getAllPublishedApps(
   const allAppsOutput = await appWebsocket.callZome({
     cap_secret: null,
     cell_id: cells.happs.cell_id,
-    fn_name: "get_all_happs",
+    fn_name: "get_happs_by_tags",
     zome_name: "happ_library",
-    payload: null,
+    payload: ["app-store-ready"],
     provenance: cells.happs.cell_id[1],
   });
-
-  const allApps: Array<ContentAddress<Happ>> = allAppsOutput.payload.items;
+  const allApps: Array<ContentAddress<Happ>> = allAppsOutput.payload;
 
   const promises = allApps.map((app) =>
     getAppsReleases(appWebsocket, devhubHapp, app)

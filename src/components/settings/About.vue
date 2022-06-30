@@ -8,7 +8,7 @@
     </div>
     <div class="column" style="width: 512px" v-else-if="holochainVersions">
       <div class="column">
-        <span> Holochain Launcher v0.4.8 </span>
+        <span> Holochain Launcher v0.4.9 </span>
         <span
           style="margin-top: 8px"
           v-for="version in holochainVersions"
