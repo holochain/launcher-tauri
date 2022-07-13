@@ -9,6 +9,28 @@ A cross-platform executable that launches a local Holochain conductor, and insta
 1. Go to the [Releases page](https://github.com/holochain/launcher/releases).
 2. Download the appropriate executable for your platform and execute it.
 
+## Updating Launcher
+
+If you already have Launcher installed and would like to update to a new version of the Holochain Launcher, go to the [Releases page](https://github.com/holochain/launcher/releases) and download the appropriate executable for your platform.
+
+### Windows
+
+1. Double click the downloaded `.msi` file
+2. On the Windows SmartScreen pop up, click on Run Anyway
+3. Run through the setup process without changing the Destination Folder
+4. The setup process will request to close applications that are using files that need to be updated. This will include the Old Holochain Launcher as well, if it is currently open
+5. Click Ok at this step, to proceed with the setup
+6. Open Launcher once installation is complete
+
+### MacOS
+
+1. Quit the running Holochain Launcher
+2. Open the downloaded `.dmg` file and drag it to your Applications Folder
+3. A pop-up with the message "An item named Holochain Launcher already exists in this location. Do you want to replace it with the one you're moving?" will appear
+4. Select "Replace"
+5. Go to the Applications folder
+6. Click on Holochain Launcher and select Open
+
 ## Usage
 
 ### Setting Up the Password
