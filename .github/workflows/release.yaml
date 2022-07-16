@@ -38,7 +38,7 @@ jobs:
       - name: setup binaries (Windows only)
         if: matrix.platform == 'windows-2019'
         run: |
-          cargo install --version 0.1.3 lair_keystore
+          cargo install --version 0.2.0 lair_keystore
           $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
           Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
 
@@ -88,7 +88,7 @@ jobs:
       - name: setup binaries (macos only)
         if: matrix.platform == 'macos-10.15'
         run: |
-          cargo install --version 0.1.3 lair_keystore
+          cargo install --version 0.2.0 lair_keystore
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-apple-darwin
 
@@ -148,7 +148,7 @@ jobs:
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
-          cargo install --version 0.1.3 lair_keystore
+          cargo install --version 0.2.0 lair_keystore
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-unknown-linux-gnu
 
