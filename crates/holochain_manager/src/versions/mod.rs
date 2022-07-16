@@ -4,8 +4,8 @@ use std::path::PathBuf;
 use url2::Url2;
 
 // NEW_VERSION: Upgrade these two crates so that they refer to the latest version of them
-pub use holochain_conductor_api_0_0_143 as holochain_conductor_api_latest;
-pub use holochain_types_0_0_143 as holochain_types_latest;
+pub use holochain_conductor_api_0_0_150 as holochain_conductor_api_latest;
+pub use holochain_types_0_0_150 as holochain_types_latest;
 
 use lair_keystore_manager::versions::LairKeystoreVersion;
 pub use mr_bundle as mr_bundle_latest;
@@ -24,6 +24,7 @@ pub mod v0_0_136;
 pub mod v0_0_139;
 pub mod v0_0_141;
 pub mod v0_0_143;
+pub mod v0_0_150;
 
 use v0_0_127::HolochainV0_0_127;
 use v0_0_131::HolochainV0_0_131;
@@ -32,6 +33,7 @@ use v0_0_136::HolochainV0_0_136;
 use v0_0_139::HolochainV0_0_139;
 use v0_0_141::HolochainV0_0_141;
 use v0_0_143::HolochainV0_0_143;
+use v0_0_143::HolochainV0_0_150;
 
 // NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
@@ -50,6 +52,8 @@ pub enum HdkVersion {
   V0_0_134,
   #[serde(rename = "0.0.136")]
   V0_0_136,
+  #[serde(rename = "0.0.142")]
+  V0_0_142,
 }
 
 // NEW_VERSION: Add the new Holochain version to this enum
@@ -69,6 +73,8 @@ pub enum HolochainVersion {
   V0_0_141,
   #[serde(rename = "0.0.143")]
   V0_0_143,
+  #[serde(rename = "0.0.150")]
+  V0_0_150,
 }
 
 impl Into<String> for HolochainVersion {
@@ -86,7 +92,7 @@ impl HolochainVersion {
 
   // Will be the config with the the custom binary is run, when present
   pub fn latest() -> HolochainVersion {
-    HolochainVersion::V0_0_143
+    HolochainVersion::V0_0_150
   }
 
   pub fn supported_versions() -> Vec<HolochainVersion> {
@@ -99,6 +105,7 @@ impl HolochainVersion {
       HolochainVersion::V0_0_139,
       HolochainVersion::V0_0_141,
       HolochainVersion::V0_0_143,
+      HolochainVersion::V0_0_150,
     ];
   }
 
@@ -113,6 +120,7 @@ impl HolochainVersion {
       HolochainVersion::V0_0_139 => HolochainVersionManager::HolochainV0_0_139(HolochainV0_0_139),
       HolochainVersion::V0_0_141 => HolochainVersionManager::HolochainV0_0_141(HolochainV0_0_141),
       HolochainVersion::V0_0_143 => HolochainVersionManager::HolochainV0_0_143(HolochainV0_0_143),
+      HolochainVersion::V0_0_150 => HolochainVersionManager::HolochainV0_0_150(HolochainV0_0_150),
     }
   }
 }
@@ -127,4 +135,5 @@ pub enum HolochainVersionManager {
   HolochainV0_0_139,
   HolochainV0_0_141,
   HolochainV0_0_143,
+  HolochainV0_0_150,
 }
