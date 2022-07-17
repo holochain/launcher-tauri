@@ -27,12 +27,6 @@
       ],
       "resources": [],
       "externalBin": [
-        "bins/holochain-v0.0.127",
-        "bins/holochain-v0.0.131",
-        "bins/holochain-v0.0.132",
-        "bins/holochain-v0.0.136",
-        "bins/holochain-v0.0.139",
-        "bins/holochain-v0.0.141",
         "bins/holochain-v0.0.143",
         "bins/holochain-v0.0.150",
         "bins/lair-keystore",

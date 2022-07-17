@@ -24,7 +24,7 @@
     "@material/mwc-textarea": "^0.25.1",
     "@material/mwc-textfield": "^0.25.1",
     "@msgpack/msgpack": "^2.7.1",
-    "@tauri-apps/api": "1.0.0-rc.5",
+    "@tauri-apps/api": "1.0.2",
     "@webcomponents/scoped-custom-element-registry": "^0.0.5",
     "array-flat-polyfill": "^1.0.1",
     "blob-polyfill": "^5.0.20210201",
@@ -36,7 +36,7 @@
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "1.0.0-rc.10",
+    "@tauri-apps/cli": "1.0.4",
     "@types/jest": "^24.0.19",
     "@types/lodash-es": "^4.17.6",
     "@typescript-eslint/eslint-plugin": "^4.18.0",

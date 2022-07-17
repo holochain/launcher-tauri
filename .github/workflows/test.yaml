@@ -68,7 +68,7 @@ jobs:
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.141-x86_64-unknown-linux-gnu
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev b866040e9c0c1ee29c8795cce9f081398787794f holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 56b7cd516baca007f7d21a61e332aa8ce033a737 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.143-x86_64-unknown-linux-gnu
 
