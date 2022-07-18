@@ -44,30 +44,6 @@ jobs:
           CADDY_PATH=$(which caddy)
           cp $CADDY_PATH src-tauri/bins/caddy-x86_64-unknown-linux-gnu
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 14256caa109673ce707b460c66a75df3287eea50 holochain
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.127-x86_64-unknown-linux-gnu
-
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev f6ce1651226f511c192eb9aa388ce64cb8526ada holochain
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.131-x86_64-unknown-linux-gnu
-
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 3b3978159c97933ec3d6c1003559e546b8893e52 holochain
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.132-x86_64-unknown-linux-gnu
-
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 8231b0f643df58b01e810b003949d31b5ecac683 holochain
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.136-x86_64-unknown-linux-gnu
-
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev bfab4ba91e0078b6bb3cd933817f6eef1ed962f6 holochain
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.139-x86_64-unknown-linux-gnu
-
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 3b09ce8784f037840c3924a18d0a166e68acd8fd holochain
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.141-x86_64-unknown-linux-gnu
-
           cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 56b7cd516baca007f7d21a61e332aa8ce033a737 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.143-x86_64-unknown-linux-gnu
