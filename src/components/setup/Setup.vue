@@ -11,9 +11,9 @@
         live will be initialized.
       </span>
       <span style="margin-top: 16px"
-        >WARNING! If you lose this password, you will also lose access any data
-        from your Holochain applications, as there is no password recovery
-        mechanism.
+        ><b>WARNING!</b> If you lose this password, you will also lose access to
+        any data from your Holochain applications, as there is no password
+        recovery mechanism.
       </span>
 
       <mwc-textfield

@@ -1,12 +1,12 @@
 use log;
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf, sync::Arc, sync::Mutex};
 use tauri::api::process::{Command, CommandChild, CommandEvent};
 
 use lair_keystore_manager::error::LaunchChildError;
 
 use crate::{error::LaunchHolochainError, versions::HolochainVersion};
 
-pub fn launch_holochain_process(
+pub async fn launch_holochain_process(
   log_level: log::Level,
   version: HolochainVersion,
   command: Command,
@@ -29,17 +29,32 @@ pub fn launch_holochain_process(
       LaunchHolochainError::LaunchChildError(LaunchChildError::FailedToExecute(format!("{}", err)))
     })?;
 
-  tauri::async_runtime::spawn(async move {
+
+
+  let db_error = Arc::new(Mutex::new(false));
+  let db_err_clone = Arc::clone(&db_error);
+
+  let cmd_handle = tauri::async_runtime::spawn(async move {
     // read events such as stdout
     while let Some(event) = holochain_rx.recv().await {
       match event.clone() {
         CommandEvent::Stdout(line) => log::info!("[HOLOCHAIN v{}] {}", version, line),
-        CommandEvent::Stderr(line) => log::info!("[HOLOCHAIN v{}] {}", version, line),
+        CommandEvent::Stderr(line) => { match line.contains("DatabaseError(SqliteError(SqliteFailure(Error { code: NotADatabase, extended_code: 26 }, Some(\"file is not a database\"))))") {
+          true => {
+            log::info!("[HOLOCHAIN v{}] {}", version, line);
+            let mut db_err = db_err_clone.lock().unwrap();
+            *db_err = true;
+            // err_tx.send(true).unwrap();
+            },
+          false => log::info!("[HOLOCHAIN v{}] {}", version, line),
+          }
+        },
         _ => log::info!("[HOLOCHAIN v{}] {:?}", version, event),
       };
-    }
+    };
   });
   log::info!("Launched holochain");
+
 
   holochain_child
     .write(password.as_bytes())
@@ -48,5 +63,15 @@ pub fn launch_holochain_process(
     .write("\n".as_bytes())
     .map_err(|err| LaunchHolochainError::ErrorWritingPassword(format!("{:?}", err)))?;
 
-  Ok(holochain_child)
+  cmd_handle.await.unwrap();
+  let db_err = *db_error.lock().unwrap();
+  match db_err {
+    true => {
+      Err(LaunchHolochainError::SqliteError(String::from("Database file is not of the correct type.")))
+    },
+    false => {
+      Ok(holochain_child)
+    }
+  }
+
 }

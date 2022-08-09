@@ -69,7 +69,7 @@ impl HolochainManager {
       config.command,
       conductor_config_path,
       password,
-    )?;
+    ).await?;
 
     std::thread::sleep(Duration::from_millis(1000));
 
