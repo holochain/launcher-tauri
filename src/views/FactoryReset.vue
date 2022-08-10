@@ -110,13 +110,19 @@ export default defineComponent({
         this.showDialog();
       }
 
+      // Doesn't work because when the component is mounted, the database error
+      // is not yet propagated.
+      // if (this.$store.getters["databaseFileTypeError"]) {
+      //   this.dbFileTypeError = true;
+      //   this.showDialog();
+      // }
+
       await getCurrent().listen("request-factory-reset", () =>
         this.showDialog()
       );
     });
 
     listen("WrongDatabaseFileType", (event) => {
-      console.log("GOT A DATABASE ERROR!!!");
       this.heading = "Database File Type Error";
       this.dbFileTypeError = true;
       this.showDialog();

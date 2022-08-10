@@ -26,6 +26,11 @@ export const store = createStore<LauncherAdminState>({
         state.launcherStateInfo.state.content.type === "OldFilesExist"
       );
     },
+    /**
+     * Checks whether there is already another instance of the Holochain Launcher running
+     * @param state
+     * @returns boolean
+     */
     isAlreadyRunning(state) {
       if (state.launcherStateInfo === "loading") return false;
       return (
@@ -34,8 +39,16 @@ export const store = createStore<LauncherAdminState>({
           "AnotherInstanceIsAlreadyRunning"
       );
     },
+    /**
+     * Checks for errors launching the launcher itself, the keystore
+     * or any of the holochain versions
+     * @param state
+     * @returns string | undefined : if undefined, no error was found or the launcherStateInfo is still loading
+     */
     errorLaunching(state) {
       if (state.launcherStateInfo === "loading") return undefined;
+
+      // Errors launching the launcher itself
       if (
         state.launcherStateInfo.state.type === "Error" &&
         state.launcherStateInfo.state.content.type === "ErrorLaunching"
@@ -48,6 +61,7 @@ export const store = createStore<LauncherAdminState>({
       )
         return state.launcherStateInfo.state.content.content;
 
+      // Errors launching the Keystore
       if (
         state.launcherStateInfo.state.type === "Running" &&
         state.launcherStateInfo.state.content.type === "Error" &&
@@ -72,6 +86,7 @@ export const store = createStore<LauncherAdminState>({
         }
       }
 
+      // Errors launching any of the Holochain versions
       if (
         state.launcherStateInfo.state.type === "Running" &&
         state.launcherStateInfo.state.content.type === "Running"
@@ -83,6 +98,29 @@ export const store = createStore<LauncherAdminState>({
 
         const error = allHolochains.find((v) => v.type === "Error");
         if (error) return error.content as string;
+      }
+    },
+    databaseFileTypeError(state) {
+      if (state.launcherStateInfo === "loading") return undefined;
+
+      if (
+        state.launcherStateInfo.state.type === "Running" &&
+        state.launcherStateInfo.state.content.type === "Running"
+      ) {
+        const c = state.launcherStateInfo.state.content.content;
+
+        const allHolochains = Object.values(c.versions);
+        if (c.custom_binary) allHolochains.push(c.custom_binary);
+
+        const error = allHolochains.find((v) => v.type === "Error");
+        if (
+          error &&
+          error.content
+            .toString()
+            .includes("Database file is not of the correct type.")
+        ) {
+          return true;
+        }
       }
     },
     holochainIdForDevhub(state) {

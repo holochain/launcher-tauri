@@ -4,7 +4,7 @@
     <Error
       v-else-if="
         $store.getters[`errorLaunching`] &&
-        !$store.getters[`errorLaunching`].includes($data.dbError)
+        !$store.getters[`databaseFileTypeError`]
       "
       heading="Error Launching Holochain"
     >
@@ -16,8 +16,7 @@
     <EnterPassword v-else-if="$store.getters[`passwordNeeded`]"></EnterPassword>
     <Home
       v-else-if="
-        !$store.getters['oldFiles'] &&
-        $store.getters[`errorLaunching`] != $data.dbError
+        !$store.getters['oldFiles'] && !$store.getters[`databaseFileTypeError`]
       "
       style="display: flex; flex: 1"
     ></Home>
@@ -50,14 +49,6 @@ export default defineComponent({
     Error,
     Config,
     AlreadyRunning,
-  },
-  data(): {
-    dbError: string;
-  } {
-    return {
-      dbError:
-        'LaunchHolochainError(SqliteError("Database file is not of the correct type."))',
-    };
   },
   async created() {
     await this.$store.dispatch(ActionTypes.fetchStateInfo);
