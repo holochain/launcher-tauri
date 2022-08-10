@@ -37,46 +37,7 @@ pub async fn launch_holochain_process(
     })?;
 
 
-  let launch_state = Arc::new(Mutex::new(LaunchHolochainProcessState::Pending));
-  let launch_state_clone = Arc::clone(&launch_state);
-
-
-
-
-  let stdout_handle = tauri::async_runtime::spawn(async move {
-    // read events such as stdout
-    while let Some(event) = holochain_rx.recv().await {
-      match event.clone() {
-        CommandEvent::Stdout(line) => {
-          log::info!("[HOLOCHAIN v{}] {}", version, line);
-          if line == String::from("Conductor ready.") {
-            let mut launch_state_ref = launch_state_clone.lock().unwrap();
-            *launch_state_ref = LaunchHolochainProcessState::Success;
-            break;
-          }
-        },
-        CommandEvent::Stderr(line) => {
-          match line.contains("DatabaseError(SqliteError(SqliteFailure(Error { code: NotADatabase, extended_code: 26 }, Some(\"file is not a database\"))))") {
-            true => {
-              log::info!("[HOLOCHAIN v{}] {}", version, line);
-              let mut launch_state_ref = launch_state_clone.lock().unwrap();
-              *launch_state_ref = LaunchHolochainProcessState::DatabaseFileTypeError;
-              break;
-              },
-            false => {
-              log::info!("[HOLOCHAIN v{}] {}", version, line);
-            },
-          }
-        },
-        _ => {
-          log::info!("[HOLOCHAIN v{}] {:?}", version, event);
-        },
-      };
-
-    };
-  });
-
-  log::info!("Launched holochain");
+  let mut launch_state = LaunchHolochainProcessState::Pending;
 
 
   holochain_child
@@ -87,12 +48,53 @@ pub async fn launch_holochain_process(
     .map_err(|err| LaunchHolochainError::ErrorWritingPassword(format!("{:?}", err)))?;
 
 
-  // await for the stdout_handle to exit either with success or error
-  stdout_handle.await.unwrap();
+  // read events such as stdout
+  while let Some(event) = holochain_rx.recv().await {
 
-  let launch_state_ref = launch_state.lock().unwrap();
+    match event.clone() {
+      CommandEvent::Stdout(line) => {
+        log::info!("[HOLOCHAIN v{}] {}", version, line);
+        if line == String::from("Conductor ready.") {
+          launch_state = LaunchHolochainProcessState::Success;
+          break;
+        }
+      },
+      CommandEvent::Stderr(line) => {
+        match line.contains("DatabaseError(SqliteError(SqliteFailure(Error { code: NotADatabase, extended_code: 26 }, Some(\"file is not a database\"))))") {
+          true => {
+            log::info!("[HOLOCHAIN v{}] {}", version, line);
+            launch_state = LaunchHolochainProcessState::DatabaseFileTypeError;
+            break;
+            },
+          false => {
+            log::info!("[HOLOCHAIN v{}] {}", version, line);
+          },
+        }
+      },
+      _ => {
+        log::info!("[HOLOCHAIN v{}] {:?}", version, event);
+      },
+    };
 
-  match *launch_state_ref {
+  };
+
+  log::info!("Launched holochain");
+
+
+
+  tauri::async_runtime::spawn(async move {
+    // read events such as stdout
+    while let Some(event) = holochain_rx.recv().await {
+      match event.clone() {
+        CommandEvent::Stdout(line) => log::info!("[HOLOCHAIN v{}] {}", version, line),
+        CommandEvent::Stderr(line) => log::info!("[HOLOCHAIN v{}] {}", version, line),
+        _ => log::info!("[HOLOCHAIN v{}] {:?}", version, event),
+      };
+    }
+  });
+
+
+  match launch_state {
     LaunchHolochainProcessState::Success => {
       log::info!("LaunchHolochainProcessState::Success");
       Ok(holochain_child)
