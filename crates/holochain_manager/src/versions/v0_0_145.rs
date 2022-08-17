@@ -19,7 +19,6 @@ impl VersionManager for HolochainV0_0_145 {
   }
 
   // NEW_VERSION: Duplicate and change whatever config is necessary to change
-  // TODO! check that those configs are fine
   fn initial_config(
     &self,
     admin_port: u16,
