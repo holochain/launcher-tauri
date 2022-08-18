@@ -32,6 +32,7 @@
         "bins/holochain-v0.0.150",
         "bins/holochain-v0.0.152",
         "bins/holochain-v0.0.153",
+        "bins/holochain-v0.0.154",
         "bins/lair-keystore",
         "bins/caddy"
       ],
