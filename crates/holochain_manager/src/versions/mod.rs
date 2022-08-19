@@ -22,14 +22,12 @@ pub mod v0_0_143;
 pub mod v0_0_145;
 pub mod v0_0_150;
 pub mod v0_0_152;
-pub mod v0_0_153;
 pub mod v0_0_154;
 
 use v0_0_143::HolochainV0_0_143;
 use v0_0_145::HolochainV0_0_145;
 use v0_0_150::HolochainV0_0_150;
 use v0_0_152::HolochainV0_0_152;
-use v0_0_153::HolochainV0_0_153;
 use v0_0_154::HolochainV0_0_154;
 
 
@@ -44,8 +42,6 @@ pub enum HdkVersion {
   V0_0_142,
   #[serde(rename = "0.0.144")]
   V0_0_144,
-  #[serde(rename = "0.0.145")]
-  V0_0_145,
   #[serde(rename = "0.0.146")]
   V0_0_146,
 }
@@ -61,8 +57,6 @@ pub enum HolochainVersion {
   V0_0_150,
   #[serde(rename = "0.0.152")]
   V0_0_152,
-  #[serde(rename = "0.0.153")]
-  V0_0_153,
   #[serde(rename = "0.0.154")]
   V0_0_154,
 }
@@ -93,7 +87,6 @@ impl HolochainVersion {
       HolochainVersion::V0_0_145,
       HolochainVersion::V0_0_150,
       HolochainVersion::V0_0_152,
-      HolochainVersion::V0_0_153,
       HolochainVersion::V0_0_154,
     ];
   }
@@ -106,7 +99,6 @@ impl HolochainVersion {
       HolochainVersion::V0_0_145 => HolochainVersionManager::HolochainV0_0_145(HolochainV0_0_145),
       HolochainVersion::V0_0_150 => HolochainVersionManager::HolochainV0_0_150(HolochainV0_0_150),
       HolochainVersion::V0_0_152 => HolochainVersionManager::HolochainV0_0_152(HolochainV0_0_152),
-      HolochainVersion::V0_0_153 => HolochainVersionManager::HolochainV0_0_153(HolochainV0_0_153),
       HolochainVersion::V0_0_154 => HolochainVersionManager::HolochainV0_0_154(HolochainV0_0_154),
     }
   }
@@ -119,6 +111,5 @@ pub enum HolochainVersionManager {
   HolochainV0_0_145,
   HolochainV0_0_150,
   HolochainV0_0_152,
-  HolochainV0_0_153,
   HolochainV0_0_154,
 }

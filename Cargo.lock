@@ -1888,22 +1888,6 @@ dependencies = [
 [[package]]
 name = "fixt"
 version = "0.0.14"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "holochain_serialized_bytes",
- "lazy_static",
- "parking_lot 0.10.2",
- "paste",
- "rand 0.8.5",
- "rand_core 0.6.3",
- "serde",
- "strum 0.18.0",
- "strum_macros 0.18.0",
-]
-
-[[package]]
-name = "fixt"
-version = "0.0.14"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "holochain_serialized_bytes",
@@ -2688,27 +2672,6 @@ dependencies = [
 [[package]]
 name = "holo_hash"
 version = "0.0.31"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "arbitrary",
- "base64",
- "blake2b_simd 0.5.11",
- "derive_more",
- "fixt 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "futures",
- "holochain_serialized_bytes",
- "kitsune_p2p_dht_arc 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "must_future",
- "rand 0.8.5",
- "rusqlite",
- "serde",
- "serde_bytes",
- "thiserror",
-]
-
-[[package]]
-name = "holo_hash"
-version = "0.0.31"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "arbitrary",
@@ -2843,40 +2806,17 @@ dependencies = [
 [[package]]
 name = "holochain_conductor_api"
 version = "0.0.52"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "derive_more",
- "directories 2.0.2",
- "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_p2p 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_serialized_bytes",
- "holochain_state 0.0.52 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_types 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p 0.0.40 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "serde",
- "serde_derive",
- "serde_yaml",
- "structopt",
- "thiserror",
- "tracing",
- "url2",
-]
-
-[[package]]
-name = "holochain_conductor_api"
-version = "0.0.52"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "derive_more",
  "directories 2.0.2",
  "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_p2p 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_p2p 0.0.50",
  "holochain_serialized_bytes",
- "holochain_state 0.0.52 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_types 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "kitsune_p2p 0.0.40 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_state 0.0.52",
+ "holochain_types 0.0.50",
+ "holochain_zome_types 0.0.43",
+ "kitsune_p2p 0.0.40",
  "serde",
  "serde_derive",
  "serde_yaml",
@@ -2965,21 +2905,6 @@ dependencies = [
  "holo_hash 0.0.30 (git+https://github.com/guillemcordoba/holochain?rev=55264b3de477e0bd6bad678afa54aaa1236ff220)",
  "holochain_serialized_bytes",
  "kitsune_p2p_timestamp 0.0.11 (git+https://github.com/guillemcordoba/holochain?rev=55264b3de477e0bd6bad678afa54aaa1236ff220)",
- "serde",
- "serde_bytes",
- "subtle",
- "tracing",
-]
-
-[[package]]
-name = "holochain_integrity_types"
-version = "0.0.14"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "arbitrary",
- "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_serialized_bytes",
- "kitsune_p2p_timestamp 0.0.11 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
  "serde",
  "serde_bytes",
  "subtle",
@@ -3113,38 +3038,15 @@ dependencies = [
 [[package]]
 name = "holochain_keystore"
 version = "0.0.49"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "base64",
- "ghost_actor 0.3.0-alpha.4",
- "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_serialized_bytes",
- "holochain_sqlite 0.0.48 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p_types 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "lair_keystore_client",
- "nanoid 0.4.0",
- "one_err",
- "serde",
- "serde_bytes",
- "sodoken",
- "thiserror",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "holochain_keystore"
-version = "0.0.49"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "base64",
  "ghost_actor 0.3.0-alpha.4",
  "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
  "holochain_serialized_bytes",
- "holochain_sqlite 0.0.48 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "kitsune_p2p_types 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_sqlite 0.0.48",
+ "holochain_zome_types 0.0.43",
+ "kitsune_p2p_types 0.0.28",
  "lair_keystore_client",
  "nanoid 0.4.0",
  "one_err",
@@ -3191,21 +3093,18 @@ dependencies = [
  "holochain_conductor_api 0.0.43",
  "holochain_conductor_api 0.0.45",
  "holochain_conductor_api 0.0.50",
- "holochain_conductor_api 0.0.52 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_conductor_api 0.0.52 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_conductor_api 0.0.52",
  "holochain_conductor_api 0.0.53",
  "holochain_p2p 0.0.41",
  "holochain_p2p 0.0.43",
  "holochain_p2p 0.0.48",
- "holochain_p2p 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_p2p 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_p2p 0.0.50",
  "holochain_p2p 0.0.51",
  "holochain_types 0.0.41",
  "holochain_types 0.0.43",
  "holochain_types 0.0.45",
  "holochain_types 0.0.48",
- "holochain_types 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_types 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_types 0.0.50",
  "holochain_types 0.0.51",
  "lair_keystore_manager",
  "log",
@@ -3307,35 +3206,6 @@ dependencies = [
 [[package]]
 name = "holochain_p2p"
 version = "0.0.50"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "async-trait",
- "derive_more",
- "fixt 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "futures",
- "ghost_actor 0.3.0-alpha.4",
- "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_keystore 0.0.49 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_serialized_bytes",
- "holochain_types 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_util 0.0.10 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p 0.0.40 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p_types 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "mockall",
- "observability",
- "rand 0.8.5",
- "serde",
- "serde_bytes",
- "serde_json",
- "thiserror",
- "tokio",
- "tokio-stream",
-]
-
-[[package]]
-name = "holochain_p2p"
-version = "0.0.50"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "async-trait",
@@ -3344,13 +3214,13 @@ dependencies = [
  "futures",
  "ghost_actor 0.3.0-alpha.4",
  "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_keystore 0.0.49 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_keystore 0.0.49",
  "holochain_serialized_bytes",
- "holochain_types 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_types 0.0.50",
  "holochain_util 0.0.10 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "kitsune_p2p 0.0.40 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "kitsune_p2p_types 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_zome_types 0.0.43",
+ "kitsune_p2p 0.0.40",
+ "kitsune_p2p_types 0.0.28",
  "mockall",
  "observability",
  "rand 0.8.5",
@@ -3616,55 +3486,6 @@ dependencies = [
 [[package]]
 name = "holochain_sqlite"
 version = "0.0.48"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "anyhow",
- "async-trait",
- "byteorder",
- "cfg-if 0.1.10",
- "chashmap",
- "chrono",
- "derive_more",
- "either",
- "failure",
- "fallible-iterator",
- "fixt 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "futures",
- "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_serialized_bytes",
- "holochain_util 0.0.10 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p 0.0.40 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "lazy_static",
- "must_future",
- "nanoid 0.3.0",
- "num-traits",
- "num_cpus",
- "once_cell",
- "page_size",
- "parking_lot 0.10.2",
- "pretty_assertions",
- "r2d2",
- "r2d2_sqlite_neonphog",
- "rand 0.8.5",
- "rmp-serde",
- "rusqlite",
- "scheduled-thread-pool",
- "serde",
- "serde_derive",
- "serde_json",
- "shrinkwraprs",
- "sqlformat",
- "tempfile",
- "thiserror",
- "tokio",
- "tracing",
- "tracing-futures",
-]
-
-[[package]]
-name = "holochain_sqlite"
-version = "0.0.48"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "anyhow",
@@ -3682,8 +3503,8 @@ dependencies = [
  "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
  "holochain_serialized_bytes",
  "holochain_util 0.0.10 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "kitsune_p2p 0.0.40 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_zome_types 0.0.43",
+ "kitsune_p2p 0.0.40",
  "lazy_static",
  "must_future",
  "nanoid 0.3.0",
@@ -3878,44 +3699,6 @@ dependencies = [
 [[package]]
 name = "holochain_state"
 version = "0.0.52"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "async-recursion",
- "base64",
- "byteorder",
- "chrono",
- "contrafact",
- "cron",
- "derive_more",
- "either",
- "fallible-iterator",
- "futures",
- "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_keystore 0.0.49 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_p2p 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_serialized_bytes",
- "holochain_sqlite 0.0.48 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_types 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_util 0.0.10 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p 0.0.40 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "mockall",
- "nanoid 0.3.0",
- "one_err",
- "parking_lot 0.10.2",
- "serde",
- "serde_json",
- "shrinkwraprs",
- "tempfile",
- "thiserror",
- "tokio",
- "tracing",
- "tracing-futures",
-]
-
-[[package]]
-name = "holochain_state"
-version = "0.0.52"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "async-recursion",
@@ -3929,14 +3712,14 @@ dependencies = [
  "fallible-iterator",
  "futures",
  "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_keystore 0.0.49 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_p2p 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_keystore 0.0.49",
+ "holochain_p2p 0.0.50",
  "holochain_serialized_bytes",
- "holochain_sqlite 0.0.48 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_types 0.0.50 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_sqlite 0.0.48",
+ "holochain_types 0.0.50",
  "holochain_util 0.0.10 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "kitsune_p2p 0.0.40 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_zome_types 0.0.43",
+ "kitsune_p2p 0.0.40",
  "mockall",
  "nanoid 0.3.0",
  "one_err",
@@ -4199,58 +3982,6 @@ dependencies = [
 [[package]]
 name = "holochain_types"
 version = "0.0.50"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "anyhow",
- "arbitrary",
- "async-trait",
- "automap",
- "backtrace",
- "base64",
- "cfg-if 0.1.10",
- "chrono",
- "contrafact",
- "derive_builder",
- "derive_more",
- "either",
- "fixt 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "flate2",
- "futures",
- "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_keystore 0.0.49 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_serialized_bytes",
- "holochain_sqlite 0.0.48 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_util 0.0.10 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "itertools 0.10.3",
- "kitsune_p2p_dht 0.0.2 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "lazy_static",
- "mockall",
- "mr_bundle 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "must_future",
- "nanoid 0.3.0",
- "observability",
- "parking_lot 0.10.2",
- "rand 0.8.5",
- "regex",
- "rusqlite",
- "serde",
- "serde_bytes",
- "serde_derive",
- "serde_with",
- "serde_yaml",
- "shrinkwraprs",
- "strum 0.18.0",
- "strum_macros 0.18.0",
- "tempfile",
- "thiserror",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "holochain_types"
-version = "0.0.50"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "anyhow",
@@ -4269,16 +4000,16 @@ dependencies = [
  "flate2",
  "futures",
  "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_keystore 0.0.49 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_keystore 0.0.49",
  "holochain_serialized_bytes",
- "holochain_sqlite 0.0.48 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_sqlite 0.0.48",
  "holochain_util 0.0.10 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_zome_types 0.0.43 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_zome_types 0.0.43",
  "itertools 0.10.3",
- "kitsune_p2p_dht 0.0.2 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "kitsune_p2p_dht 0.0.2",
  "lazy_static",
  "mockall",
- "mr_bundle 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "mr_bundle 0.0.14",
  "must_future",
  "nanoid 0.3.0",
  "observability",
@@ -4373,21 +4104,6 @@ name = "holochain_util"
 version = "0.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fec6d5ee8511b99ade8136ffcb280952b17b9ab816f1a0ce5a77e0076ad9f1a8"
-dependencies = [
- "backtrace",
- "cfg-if 0.1.10",
- "derive_more",
- "dunce",
- "futures",
- "num_cpus",
- "once_cell",
- "tokio",
-]
-
-[[package]]
-name = "holochain_util"
-version = "0.0.10"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
 dependencies = [
  "backtrace",
  "cfg-if 0.1.10",
@@ -4673,38 +4389,6 @@ dependencies = [
 [[package]]
 name = "holochain_zome_types"
 version = "0.0.43"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "arbitrary",
- "contrafact",
- "derive_builder",
- "fixt 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_integrity_types 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "holochain_serialized_bytes",
- "holochain_wasmer_common 0.0.80",
- "kitsune_p2p_dht 0.0.2 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p_timestamp 0.0.11 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "nanoid 0.3.0",
- "num_enum",
- "once_cell",
- "paste",
- "rand 0.8.5",
- "rusqlite",
- "serde",
- "serde_bytes",
- "serde_yaml",
- "shrinkwraprs",
- "strum 0.18.0",
- "subtle",
- "subtle-encoding",
- "thiserror",
- "tracing",
-]
-
-[[package]]
-name = "holochain_zome_types"
-version = "0.0.43"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "arbitrary",
@@ -4712,10 +4396,10 @@ dependencies = [
  "derive_builder",
  "fixt 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
  "holo_hash 0.0.31 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "holochain_integrity_types 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "holochain_integrity_types 0.0.14",
  "holochain_serialized_bytes",
  "holochain_wasmer_common 0.0.80",
- "kitsune_p2p_dht 0.0.2 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "kitsune_p2p_dht 0.0.2",
  "kitsune_p2p_timestamp 0.0.11 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
  "nanoid 0.3.0",
  "num_enum",
@@ -5327,43 +5011,6 @@ dependencies = [
 [[package]]
 name = "kitsune_p2p"
 version = "0.0.40"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "arbitrary",
- "arrayref",
- "base64",
- "bloomfilter",
- "derive_more",
- "fixt 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "futures",
- "ghost_actor 0.3.0-alpha.4",
- "governor",
- "itertools 0.10.3",
- "kitsune_p2p_mdns 0.0.3 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p_proxy 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p_timestamp 0.0.11 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p_transport_quic 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p_types 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "must_future",
- "num-traits",
- "observability",
- "once_cell",
- "parking_lot 0.11.2",
- "rand 0.8.5",
- "reqwest",
- "serde",
- "serde_bytes",
- "serde_json",
- "shrinkwraprs",
- "thiserror",
- "tokio",
- "tokio-stream",
- "url2",
-]
-
-[[package]]
-name = "kitsune_p2p"
-version = "0.0.40"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "arbitrary",
@@ -5377,10 +5024,10 @@ dependencies = [
  "governor",
  "itertools 0.10.3",
  "kitsune_p2p_mdns 0.0.3 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "kitsune_p2p_proxy 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "kitsune_p2p_proxy 0.0.28",
  "kitsune_p2p_timestamp 0.0.11 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "kitsune_p2p_transport_quic 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "kitsune_p2p_types 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "kitsune_p2p_transport_quic 0.0.28",
+ "kitsune_p2p_types 0.0.28",
  "must_future",
  "num-traits",
  "observability",
@@ -5473,29 +5120,6 @@ dependencies = [
  "intervallum",
  "kitsune_p2p_dht_arc 0.0.13 (git+https://github.com/guillemcordoba/holochain?rev=55264b3de477e0bd6bad678afa54aaa1236ff220)",
  "kitsune_p2p_timestamp 0.0.11 (git+https://github.com/guillemcordoba/holochain?rev=55264b3de477e0bd6bad678afa54aaa1236ff220)",
- "must_future",
- "num-traits",
- "once_cell",
- "rand 0.8.5",
- "serde",
- "statrs",
- "thiserror",
- "tracing",
-]
-
-[[package]]
-name = "kitsune_p2p_dht"
-version = "0.0.2"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "colored",
- "derivative",
- "derive_more",
- "futures",
- "gcollections",
- "intervallum",
- "kitsune_p2p_dht_arc 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p_timestamp 0.0.11 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
  "must_future",
  "num-traits",
  "once_cell",
@@ -5623,19 +5247,6 @@ dependencies = [
 [[package]]
 name = "kitsune_p2p_dht_arc"
 version = "0.0.14"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "derive_more",
- "gcollections",
- "intervallum",
- "num-traits",
- "rusqlite",
- "serde",
-]
-
-[[package]]
-name = "kitsune_p2p_dht_arc"
-version = "0.0.14"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "derive_more",
@@ -5651,22 +5262,6 @@ name = "kitsune_p2p_mdns"
 version = "0.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "339b667bafdf8b6fb5e5f449fa6c97ee03bd54ed5accb4fcc28d600a2a5ffff0"
-dependencies = [
- "async-stream",
- "base64",
- "err-derive",
- "futures-core",
- "futures-util",
- "libmdns",
- "mdns",
- "tokio",
- "tokio-stream",
-]
-
-[[package]]
-name = "kitsune_p2p_mdns"
-version = "0.0.3"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
 dependencies = [
  "async-stream",
  "base64",
@@ -5843,38 +5438,14 @@ dependencies = [
 [[package]]
 name = "kitsune_p2p_proxy"
 version = "0.0.28"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "base64",
- "blake2b_simd 0.5.11",
- "derive_more",
- "futures",
- "kitsune_p2p_transport_quic 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p_types 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "nanoid 0.3.0",
- "observability",
- "parking_lot 0.11.2",
- "rmp-serde",
- "rustls",
- "serde",
- "serde_bytes",
- "structopt",
- "tokio",
- "tracing-subscriber 0.2.25",
- "webpki 0.21.4",
-]
-
-[[package]]
-name = "kitsune_p2p_proxy"
-version = "0.0.28"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "base64",
  "blake2b_simd 0.5.11",
  "derive_more",
  "futures",
- "kitsune_p2p_transport_quic 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
- "kitsune_p2p_types 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "kitsune_p2p_transport_quic 0.0.28",
+ "kitsune_p2p_types 0.0.28",
  "nanoid 0.3.0",
  "observability",
  "parking_lot 0.11.2",
@@ -5940,18 +5511,6 @@ name = "kitsune_p2p_timestamp"
 version = "0.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c6dac98e0bcb576db4a728937210f9211839a644d7d6843263ceef62a583c47f"
-dependencies = [
- "arbitrary",
- "chrono",
- "derive_more",
- "rusqlite",
- "serde",
-]
-
-[[package]]
-name = "kitsune_p2p_timestamp"
-version = "0.0.11"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
 dependencies = [
  "arbitrary",
  "chrono",
@@ -6077,31 +5636,12 @@ dependencies = [
 [[package]]
 name = "kitsune_p2p_transport_quic"
 version = "0.0.28"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "blake2b_simd 1.0.0",
- "futures",
- "if-addrs 0.7.0",
- "kitsune_p2p_types 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "nanoid 0.4.0",
- "once_cell",
- "quinn",
- "rcgen 0.9.3",
- "rustls",
- "serde",
- "tokio",
- "webpki 0.22.0",
-]
-
-[[package]]
-name = "kitsune_p2p_transport_quic"
-version = "0.0.28"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "blake2b_simd 1.0.0",
  "futures",
  "if-addrs 0.7.0",
- "kitsune_p2p_types 0.0.28 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "kitsune_p2p_types 0.0.28",
  "nanoid 0.4.0",
  "once_cell",
  "quinn",
@@ -6270,47 +5810,13 @@ dependencies = [
 [[package]]
 name = "kitsune_p2p_types"
 version = "0.0.28"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "base64",
- "derive_more",
- "futures",
- "ghost_actor 0.3.0-alpha.4",
- "kitsune_p2p_dht 0.0.2 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "kitsune_p2p_dht_arc 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
- "lair_keystore_api 0.0.11",
- "lair_keystore_api 0.2.0",
- "lru",
- "nanoid 0.3.0",
- "observability",
- "once_cell",
- "parking_lot 0.11.2",
- "paste",
- "rmp-serde",
- "rustls",
- "serde",
- "serde_bytes",
- "serde_json",
- "shrinkwraprs",
- "sysinfo 0.15.9",
- "thiserror",
- "tokio",
- "tokio-stream",
- "url",
- "url2",
- "webpki 0.22.0",
-]
-
-[[package]]
-name = "kitsune_p2p_types"
-version = "0.0.28"
 source = "git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719#24f88aede5ae770be73d3b690ac22b62d7ae7719"
 dependencies = [
  "base64",
  "derive_more",
  "futures",
  "ghost_actor 0.3.0-alpha.4",
- "kitsune_p2p_dht 0.0.2 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
+ "kitsune_p2p_dht 0.0.2",
  "kitsune_p2p_dht_arc 0.0.14 (git+https://github.com/guillemcordoba/holochain?rev=24f88aede5ae770be73d3b690ac22b62d7ae7719)",
  "lair_keystore_api 0.0.11",
  "lair_keystore_api 0.2.0",
@@ -7086,27 +6592,6 @@ dependencies = [
  "flate2",
  "futures",
  "holochain_util 0.0.10 (git+https://github.com/guillemcordoba/holochain?rev=a494fa96f4267f47c6435f9ffb7ff04a1a47a0cb)",
- "reqwest",
- "rmp-serde",
- "serde",
- "serde_bytes",
- "serde_derive",
- "serde_yaml",
- "thiserror",
-]
-
-[[package]]
-name = "mr_bundle"
-version = "0.0.14"
-source = "git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f#06e33aac3e879c13e9e66af48f2a857d3375cd6f"
-dependencies = [
- "arbitrary",
- "bytes",
- "derive_more",
- "either",
- "flate2",
- "futures",
- "holochain_util 0.0.10 (git+https://github.com/guillemcordoba/holochain?rev=06e33aac3e879c13e9e66af48f2a857d3375cd6f)",
  "reqwest",
  "rmp-serde",
  "serde",

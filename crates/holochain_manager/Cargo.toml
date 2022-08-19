@@ -24,10 +24,6 @@ holochain_conductor_api_0_0_152 = {git = "https://github.com/guillemcordoba/holo
 holochain_p2p_0_0_152 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "24f88aede5ae770be73d3b690ac22b62d7ae7719"}
 holochain_types_0_0_152 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "24f88aede5ae770be73d3b690ac22b62d7ae7719"}
 
-holochain_conductor_api_0_0_153 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "06e33aac3e879c13e9e66af48f2a857d3375cd6f"}
-holochain_p2p_0_0_153 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "06e33aac3e879c13e9e66af48f2a857d3375cd6f"}
-holochain_types_0_0_153 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "06e33aac3e879c13e9e66af48f2a857d3375cd6f"}
-
 # NEW_VERSION add corresponding crates of the  new versions here
 
 
