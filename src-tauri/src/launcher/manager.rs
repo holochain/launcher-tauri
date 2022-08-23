@@ -218,9 +218,19 @@ impl LauncherManager {
       },
       Err(error) => {
         log::error!("Error launching Holochain v{}: {}", version_str, error);
+        match error.clone() {
+          LaunchWebAppManagerError::LaunchHolochainError(LaunchHolochainError::SqliteError(e)) => {
+            if e == String::from("Database file is not of the correct type.") {
+              self.app_handle.emit_all("WrongDatabaseFileType", ())
+                .map_err(|e| format!("Failed to send WrongDatabaseFileType error to frontend: {}", e))?;
+            }
+          },
+          _ => (),
+        };
         RunningState::Error(error)
       }
     };
+
 
     if custom_binary_path.is_some() {
       self.custom_binary_manager = Some(state);

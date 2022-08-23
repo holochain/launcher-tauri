@@ -14,6 +14,10 @@ pub enum LaunchHolochainError {
   IoError(String),
   #[error("Could not connect to the conductor: `{0}`")]
   CouldNotConnectToConductor(String),
+  #[error("Could not connect to the database of the conductor: `{0}`")]
+  SqliteError(String),
+  #[error("Impossible error: `{0}`")]
+  ImpossibleError(String),
 }
 
 impl From<FileSystemError> for LaunchHolochainError {

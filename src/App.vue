@@ -2,7 +2,10 @@
   <div style="flex: 1; display: flex">
     <AlreadyRunning v-if="$store.getters[`isAlreadyRunning`]"> </AlreadyRunning>
     <Error
-      v-else-if="$store.getters[`errorLaunching`]"
+      v-else-if="
+        $store.getters[`errorLaunching`] &&
+        !$store.getters[`databaseFileTypeError`]
+      "
       heading="Error Launching Holochain"
     >
       <span style="margin-top: 8px">
@@ -12,7 +15,9 @@
     <Setup v-else-if="$store.getters[`setupNeeded`]"></Setup>
     <EnterPassword v-else-if="$store.getters[`passwordNeeded`]"></EnterPassword>
     <Home
-      v-else-if="!$store.getters['oldFiles']"
+      v-else-if="
+        !$store.getters['oldFiles'] && !$store.getters[`databaseFileTypeError`]
+      "
       style="display: flex; flex: 1"
     ></Home>
     <FactoryReset style="display: flex; flex: 1"></FactoryReset>
