@@ -46,9 +46,21 @@ jobs:
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.143-x86_64-pc-windows-msvc.exe
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 56c7ecda9685f3b8df4fb02307925266748c82db holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev a494fa96f4267f47c6435f9ffb7ff04a1a47a0cb holochain
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.145-x86_64-pc-windows-msvc.exe
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 55264b3de477e0bd6bad678afa54aaa1236ff220 holochain
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.150-x86_64-pc-windows-msvc.exe
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 24f88aede5ae770be73d3b690ac22b62d7ae7719 holochain
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.152-x86_64-pc-windows-msvc.exe
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 38b683d0009ada21a9d79f638ca2dc3986163bd9 holochain
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.154-x86_64-pc-windows-msvc.exe
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
@@ -72,9 +84,21 @@ jobs:
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.143-x86_64-apple-darwin
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 56c7ecda9685f3b8df4fb02307925266748c82db holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev a494fa96f4267f47c6435f9ffb7ff04a1a47a0cb holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.145-x86_64-apple-darwin
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 55264b3de477e0bd6bad678afa54aaa1236ff220 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.150-x86_64-apple-darwin
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 24f88aede5ae770be73d3b690ac22b62d7ae7719 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.152-x86_64-apple-darwin
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 38b683d0009ada21a9d79f638ca2dc3986163bd9 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.154-x86_64-apple-darwin
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
@@ -108,9 +132,21 @@ jobs:
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.143-x86_64-unknown-linux-gnu
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 56c7ecda9685f3b8df4fb02307925266748c82db holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev a494fa96f4267f47c6435f9ffb7ff04a1a47a0cb holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.145-x86_64-unknown-linux-gnu
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 55264b3de477e0bd6bad678afa54aaa1236ff220 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.150-x86_64-unknown-linux-gnu
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 24f88aede5ae770be73d3b690ac22b62d7ae7719 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.152-x86_64-unknown-linux-gnu
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 38b683d0009ada21a9d79f638ca2dc3986163bd9 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.154-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 

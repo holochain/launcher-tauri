@@ -73,9 +73,19 @@ impl HolochainManager {
 
     std::thread::sleep(Duration::from_millis(1000));
 
-    let mut ws = AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
-      .await
-      .map_err(|err| LaunchHolochainError::CouldNotConnectToConductor(format!("{}", err)))?;
+    // Try to connect twice. This fixes the os(111) error for now that occurs when the conducor is not ready yet.
+    let mut ws = match AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
+      .await {
+        Ok(ws) => ws,
+        Err(_) => {
+          log::error!("[HOLOCHAIN v{}] Could not connect to the AdminWebsocket. Starting another attempt in 5 seconds.", version);
+          std::thread::sleep(Duration::from_millis(5000));
+          AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
+            .await
+            .map_err(|err| LaunchHolochainError::CouldNotConnectToConductor(format!("{}", err)))?
+        }
+      };
+
 
     let app_interface_port = {
       let app_interfaces = ws.list_app_interfaces().await.or(Err(
@@ -156,7 +166,7 @@ impl HolochainManager {
       agent_key,
       installed_app_id: Some(app_id.clone().into()),
       membrane_proofs,
-      uid,
+      network_seed: uid, // TODO! rename uid to network_seed consistently everywhere
     };
     self
       .ws

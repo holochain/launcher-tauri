@@ -1,7 +1,7 @@
 {
   "package": {
     "productName": "Holochain Launcher",
-    "version": "0.4.10"
+    "version": "0.4.11"
   },
   "build": {
     "distDir": "target/webpack_dist",
@@ -28,7 +28,10 @@
       "resources": [],
       "externalBin": [
         "bins/holochain-v0.0.143",
+        "bins/holochain-v0.0.145",
         "bins/holochain-v0.0.150",
+        "bins/holochain-v0.0.152",
+        "bins/holochain-v0.0.154",
         "bins/lair-keystore",
         "bins/caddy"
       ],
