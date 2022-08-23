@@ -1,6 +1,26 @@
 import { HdkVersion } from "@/hdk";
-import { AppWebsocket, EntryHash, InstalledAppInfo } from "@holochain/client";
+import {
+  AppWebsocket,
+  EntryHash,
+  HeaderHash as ActionHash,
+  InstalledAppInfo,
+} from "@holochain/client";
 import { Happ, HappRelease } from "./types";
+
+// corresponds to https://docs.rs/hc_crud_ceps/0.55.0/hc_crud/struct.Entity.html
+export interface Entity<T> {
+  id: EntryHash;
+  action: ActionHash;
+  address: EntryHash;
+  ctype: EntityType;
+  content: T;
+}
+
+// corresponds to https://docs.rs/hc_crud_ceps/0.55.0/hc_crud/struct.EntityType.html
+export interface EntityType {
+  name: string;
+  model: string;
+}
 
 export interface ContentAddress<C> {
   id: EntryHash;
@@ -41,7 +61,6 @@ export async function getAllPublishedApps(
     provenance: cells.happs.cell_id[1],
   });
   const allApps: Array<ContentAddress<Happ>> = allAppsOutput.payload;
-
   const promises = allApps.map((app) =>
     getAppsReleases(appWebsocket, devhubHapp, app)
   );
@@ -67,15 +86,18 @@ export async function getAppsReleases(
     provenance: cells.happs.cell_id[1],
   });
 
-  if (!appReleasesOutput.payload.items) {
-    return {
-      app,
-      releases: [],
-    };
-  }
+  const allReleases: Array<Entity<HappRelease>> = appReleasesOutput.payload;
 
-  const releases: Array<ContentAddress<HappRelease>> =
-    appReleasesOutput.payload.items;
+  const releases: Array<ContentAddress<HappRelease>> = allReleases.map(
+    (entity) => {
+      return {
+        id: entity.id,
+        address: entity.address,
+        content: entity.content,
+      };
+    }
+  );
+
   const filteredReleases = releases.filter((r) => !!r.content.gui);
 
   return {
@@ -136,7 +158,9 @@ export async function fetchWebHapp(
 function devhubCells(devhubHapp: InstalledAppInfo) {
   const happs = devhubHapp.cell_data.find((c) => c.role_id === "happs");
   const dnarepo = devhubHapp.cell_data.find((c) => c.role_id === "dnarepo");
-  const webassets = devhubHapp.cell_data.find((c) => c.role_id === "webassets");
+  const webassets = devhubHapp.cell_data.find(
+    (c) => c.role_id === "web_assets"
+  );
 
   if (!happs || !dnarepo || !webassets) throw new Error("Bad app info");
 
