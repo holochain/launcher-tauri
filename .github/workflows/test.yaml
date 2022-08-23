@@ -44,11 +44,11 @@ jobs:
           CADDY_PATH=$(which caddy)
           cp $CADDY_PATH src-tauri/bins/caddy-x86_64-unknown-linux-gnu
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 56b7cd516baca007f7d21a61e332aa8ce033a737 holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 77a306b3d91b9f519e891cca91ba0d27f17f9562 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.143-x86_64-unknown-linux-gnu
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 56c7ecda9685f3b8df4fb02307925266748c82db holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 55264b3de477e0bd6bad678afa54aaa1236ff220 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.150-x86_64-unknown-linux-gnu
 
