@@ -164,10 +164,12 @@ export const store = createStore<LauncherAdminState>({
 
       const versions: Array<HolochainId> = Object.keys(
         stateInfo.state.content.content.versions
-      ).map((v) => ({
-        type: "HolochainVersion",
-        content: v,
-      }));
+      )
+        .sort((a, b) => b.localeCompare(a))
+        .map((v) => ({
+          type: "HolochainVersion",
+          content: v,
+        }));
       if (
         stateInfo.state.content.content.custom_binary &&
         stateInfo.state.content.content.custom_binary.type === "Running"
