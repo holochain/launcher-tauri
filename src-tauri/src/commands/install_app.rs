@@ -14,7 +14,7 @@ pub async fn install_app(
   holochain_id: HolochainId,
   app_id: String,
   app_bundle_path: String,
-  uid: Option<String>,
+  network_seed: Option<String>,
   membrane_proofs: HashMap<String, Vec<u8>>,
   reuse_agent_pub_key: Option<AgentPubKey>,
 ) -> Result<(), String> {
@@ -41,7 +41,7 @@ pub async fn install_app(
         .install_web_app(
           app_id.clone(),
           web_app_bundle,
-          uid,
+          network_seed,
           converted_membrane_proofs,
           reuse_agent_pub_key,
         )
@@ -55,7 +55,7 @@ pub async fn install_app(
         .install_app(
           app_id.clone(),
           app_bundle,
-          uid,
+          network_seed,
           converted_membrane_proofs,
           reuse_agent_pub_key,
         )

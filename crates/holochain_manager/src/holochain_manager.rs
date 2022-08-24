@@ -4,11 +4,11 @@ use std::path::Path;
 use std::time::SystemTime;
 use std::{fs, time::Duration};
 
-use holochain_client::{AdminWebsocket, AgentPubKey, InstallAppBundlePayload, InstalledAppInfo};
+use holochain_client::{AdminWebsocket, AgentPubKey, InstalledAppInfo};
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
 
-use crate::versions::holochain_types_latest::prelude::{AppBundle, AppBundleSource, MembraneProof};
+use crate::versions::holochain_types_latest::prelude::{AppBundle, MembraneProof};
 
 use crate::{
   config::LaunchHolochainConfig,
@@ -69,23 +69,24 @@ impl HolochainManager {
       config.command,
       conductor_config_path,
       password,
-    ).await?;
+    )
+    .await?;
 
     std::thread::sleep(Duration::from_millis(1000));
 
     // Try to connect twice. This fixes the os(111) error for now that occurs when the conducor is not ready yet.
     let mut ws = match AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
-      .await {
-        Ok(ws) => ws,
-        Err(_) => {
-          log::error!("[HOLOCHAIN v{}] Could not connect to the AdminWebsocket. Starting another attempt in 5 seconds.", version);
-          std::thread::sleep(Duration::from_millis(5000));
-          AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
-            .await
-            .map_err(|err| LaunchHolochainError::CouldNotConnectToConductor(format!("{}", err)))?
-        }
-      };
-
+      .await
+    {
+      Ok(ws) => ws,
+      Err(_) => {
+        log::error!("[HOLOCHAIN v{}] Could not connect to the AdminWebsocket. Starting another attempt in 5 seconds.", version);
+        std::thread::sleep(Duration::from_millis(5000));
+        AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
+          .await
+          .map_err(|err| LaunchHolochainError::CouldNotConnectToConductor(format!("{}", err)))?
+      }
+    };
 
     let app_interface_port = {
       let app_interfaces = ws.list_app_interfaces().await.or(Err(
@@ -136,7 +137,7 @@ impl HolochainManager {
     &mut self,
     app_id: String,
     app_bundle: AppBundle,
-    uid: Option<String>,
+    network_seed: Option<String>,
     membrane_proofs: HashMap<String, MembraneProof>,
     agent_pub_key: Option<AgentPubKey>,
   ) -> Result<(), String> {
@@ -161,18 +162,46 @@ impl HolochainManager {
       .await
       .map_err(|err| format!("Could not write app bundle to temp file: {}", err))?;
 
-    let payload = InstallAppBundlePayload {
-      source: AppBundleSource::Path(path),
-      agent_key,
-      installed_app_id: Some(app_id.clone().into()),
-      membrane_proofs,
-      network_seed: uid, // TODO! rename uid to network_seed consistently everywhere
-    };
-    self
-      .ws
-      .install_app_bundle(payload)
-      .await
-      .map_err(|err| format!("Error install hApp bundle: {:?}", err))?;
+    match self.version {
+      HolochainVersion::V0_0_145 | HolochainVersion::V0_0_150 => {
+        let mut ws = holochain_client_old::AdminWebsocket::connect(format!(
+          "ws://localhost:{}",
+          self.admin_interface_port
+        ))
+        .await
+        .map_err(|err| format!("{:?}", err))?;
+
+        let key = holochain_types_0_0_45::prelude::AgentPubKey::from_raw_39(
+          agent_key.get_raw_39().to_vec(),
+        )
+        .map_err(|err| format!("{:?}", err))?;
+
+        let payload = holochain_client_old::InstallAppBundlePayload {
+          source: holochain_types_0_0_45::prelude::AppBundleSource::Path(path),
+          agent_key: key,
+          installed_app_id: Some(app_id.clone().into()),
+          membrane_proofs,
+          uid: network_seed,
+        };
+        ws.install_app_bundle(payload)
+          .await
+          .map_err(|err| format!("Error install hApp bundle: {:?}", err))?;
+      }
+      _ => {
+        let payload = holochain_client::InstallAppBundlePayload {
+          source: crate::versions::holochain_types_latest::prelude::AppBundleSource::Path(path),
+          agent_key,
+          installed_app_id: Some(app_id.clone().into()),
+          membrane_proofs,
+          network_seed,
+        };
+        self
+          .ws
+          .install_app_bundle(payload)
+          .await
+          .map_err(|err| format!("Error install hApp bundle: {:?}", err))?;
+      }
+    }
 
     self
       .ws

@@ -59,9 +59,9 @@
           :style="{ display: showAdvanced ? 'flex' : 'none' }"
         >
           <mwc-textfield
-            label="UID"
+            label="Network Seed"
             outlined
-            @input="uid = $event.target.value"
+            @input="networkSeed = $event.target.value"
             helper="Change it to create a new network"
             class="row-item"
             style="flex: 1; margin-top: 8px"
@@ -166,7 +166,7 @@ export default defineComponent({
     installing: boolean;
     showAdvanced: boolean;
     appId: string | undefined;
-    uid: string | undefined;
+    networkSeed: string | undefined;
     membraneProofs: { [key: string]: string } | undefined;
     appInfo: WebAppInfo | undefined;
     isAppIdValid: boolean;
@@ -179,7 +179,7 @@ export default defineComponent({
       installing: false,
       appId: undefined,
       showAdvanced: false,
-      uid: undefined,
+      networkSeed: undefined,
       membraneProofs: undefined,
       appInfo: undefined,
       isAppIdValid: true,
@@ -218,7 +218,10 @@ export default defineComponent({
 
     const { holochain_versions }: { holochain_versions: HolochainVersion[] } =
       await invoke("get_supported_versions", {});
-    this.supportedHolochains = holochain_versions.map((v) => ({
+    const orderedVersions = holochain_versions.sort((a, b) =>
+      b > a ? 1 : a === b ? 0 : -1
+    );
+    this.supportedHolochains = orderedVersions.map((v) => ({
       type: "HolochainVersion",
       content: v,
     }));
@@ -318,7 +321,7 @@ export default defineComponent({
           appId: this.appId,
           appBundlePath: this.appBundlePath,
           membraneProofs: this.membraneProofs,
-          uid: this.uid,
+          networkSeed: this.networkSeed,
           reuseAgentPubKey: this.reuseAgentPubKey,
           holochainId: this.holochainId,
         });

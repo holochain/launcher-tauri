@@ -80,7 +80,7 @@ impl WebAppManager {
     &mut self,
     app_id: String,
     web_app_bundle: WebAppBundle,
-    uid: Option<String>,
+    network_seed: Option<String>,
     membrane_proofs: HashMap<String, MembraneProof>,
     agent_pub_key: Option<AgentPubKey>,
   ) -> Result<(), String> {
@@ -103,7 +103,7 @@ impl WebAppManager {
       .install_app(
         app_id.clone(),
         app_bundle,
-        uid,
+        network_seed,
         membrane_proofs,
         agent_pub_key,
       )
@@ -190,14 +190,14 @@ impl WebAppManager {
     &mut self,
     app_id: String,
     app_bundle: AppBundle,
-    uid: Option<String>,
+    network_seed: Option<String>,
     membrane_proofs: HashMap<String, MembraneProof>,
     agent_pub_key: Option<AgentPubKey>,
   ) -> Result<(), String> {
     // Install app in conductor manager
     self
       .holochain_manager
-      .install_app(app_id, app_bundle, uid, membrane_proofs, agent_pub_key)
+      .install_app(app_id, app_bundle, network_seed, membrane_proofs, agent_pub_key)
       .await
       .map_err(|err| {
         log::error!("Error installing hApp in the conductor: {}", err);

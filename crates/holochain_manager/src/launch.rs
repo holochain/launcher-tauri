@@ -1,5 +1,5 @@
 use log;
-use std::{collections::HashMap, path::PathBuf, sync::Arc, sync::Mutex};
+use std::{collections::HashMap, path::PathBuf};
 use tauri::api::process::{Command, CommandChild, CommandEvent};
 
 use lair_keystore_manager::error::LaunchChildError;

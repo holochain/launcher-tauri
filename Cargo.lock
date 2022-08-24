@@ -2703,7 +2703,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-launcher"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "async-trait",
  "base64",
@@ -2729,6 +2729,21 @@ dependencies = [
  "thiserror",
  "url",
  "url2",
+]
+
+[[package]]
+name = "holochain_client"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "afc4c8dad8608d7d9a3afd99784ac161ffaba8ca370301e8c7f34c9d426de11f"
+dependencies = [
+ "again",
+ "anyhow",
+ "holochain_conductor_api 0.0.47",
+ "holochain_types 0.0.45",
+ "holochain_websocket",
+ "serde",
+ "url",
 ]
 
 [[package]]
@@ -2759,6 +2774,30 @@ dependencies = [
  "holochain_types 0.0.43",
  "holochain_zome_types 0.0.37",
  "kitsune_p2p 0.0.37",
+ "serde",
+ "serde_derive",
+ "serde_yaml",
+ "structopt",
+ "thiserror",
+ "tracing",
+ "url2",
+]
+
+[[package]]
+name = "holochain_conductor_api"
+version = "0.0.47"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f65f1dd2c98f0a400eab2206e236b472a38b7ab9f4c9b2a595037709901b71f8"
+dependencies = [
+ "derive_more",
+ "directories 2.0.2",
+ "holo_hash 0.0.30 (registry+https://github.com/rust-lang/crates.io-index)",
+ "holochain_p2p 0.0.45",
+ "holochain_serialized_bytes",
+ "holochain_state 0.0.47",
+ "holochain_types 0.0.45",
+ "holochain_zome_types 0.0.39",
+ "kitsune_p2p 0.0.39 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "serde_derive",
  "serde_yaml",
@@ -3099,7 +3138,8 @@ dependencies = [
  "ascii",
  "async-trait",
  "enum_dispatch",
- "holochain_client",
+ "holochain_client 0.1.0",
+ "holochain_client 0.1.1",
  "holochain_conductor_api 0.0.45",
  "holochain_conductor_api 0.0.50",
  "holochain_conductor_api 0.0.52",
@@ -3145,6 +3185,36 @@ dependencies = [
  "holochain_zome_types 0.0.37",
  "kitsune_p2p 0.0.37",
  "kitsune_p2p_types 0.0.25",
+ "mockall",
+ "observability",
+ "rand 0.8.5",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tokio-stream",
+]
+
+[[package]]
+name = "holochain_p2p"
+version = "0.0.45"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "14cf743b374547c2d25b1b17a982d03ec6b1d459bd7e27ed6498f359c42a9761"
+dependencies = [
+ "async-trait",
+ "derive_more",
+ "fixt 0.0.13 (registry+https://github.com/rust-lang/crates.io-index)",
+ "futures",
+ "ghost_actor 0.3.0-alpha.4",
+ "holo_hash 0.0.30 (registry+https://github.com/rust-lang/crates.io-index)",
+ "holochain_keystore 0.0.45",
+ "holochain_serialized_bytes",
+ "holochain_types 0.0.45",
+ "holochain_util 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
+ "holochain_zome_types 0.0.39",
+ "kitsune_p2p 0.0.39 (registry+https://github.com/rust-lang/crates.io-index)",
+ "kitsune_p2p_types 0.0.27 (registry+https://github.com/rust-lang/crates.io-index)",
  "mockall",
  "observability",
  "rand 0.8.5",
@@ -3618,6 +3688,45 @@ dependencies = [
  "holochain_util 0.0.10 (git+https://github.com/guillemcordoba/holochain?rev=b455538b80228410417f372d828d07a7cfa9e4d5)",
  "holochain_zome_types 0.0.37",
  "kitsune_p2p 0.0.37",
+ "mockall",
+ "nanoid 0.3.0",
+ "one_err",
+ "parking_lot 0.10.2",
+ "serde",
+ "serde_json",
+ "shrinkwraprs",
+ "tempfile",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "tracing-futures",
+]
+
+[[package]]
+name = "holochain_state"
+version = "0.0.47"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "492834092459a5940af97c85214679e2cd6a102b4c7b489b3bebd9ba52859946"
+dependencies = [
+ "async-recursion",
+ "base64",
+ "byteorder",
+ "chrono",
+ "contrafact",
+ "cron",
+ "derive_more",
+ "either",
+ "fallible-iterator",
+ "futures",
+ "holo_hash 0.0.30 (registry+https://github.com/rust-lang/crates.io-index)",
+ "holochain_keystore 0.0.45",
+ "holochain_p2p 0.0.45",
+ "holochain_serialized_bytes",
+ "holochain_sqlite 0.0.44",
+ "holochain_types 0.0.45",
+ "holochain_util 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
+ "holochain_zome_types 0.0.39",
+ "kitsune_p2p 0.0.39 (registry+https://github.com/rust-lang/crates.io-index)",
  "mockall",
  "nanoid 0.3.0",
  "one_err",

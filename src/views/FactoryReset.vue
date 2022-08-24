@@ -34,7 +34,7 @@
         <span style="margin-top: 8px">
           If you haven't changed the database files yourself, this is most
           probably because the Holochain Launcher switched to encrypting your
-          database at rest as of version 0.5.0 in order to anticipate the same
+          database at rest as of version 0.5.1 in order to anticipate the same
           upcoming change of the official Holochain repository.
         </span>
         <span style="margin-top: 8px">
