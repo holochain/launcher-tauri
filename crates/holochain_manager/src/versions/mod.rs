@@ -19,26 +19,26 @@ use version_manager::VersionManager;
 // Import the new VersionManager here
 
 
-pub mod v0_0_145;
-pub mod v0_0_150;
-pub mod v0_0_152;
+// pub mod v0_0_145;
+// pub mod v0_0_150;
+// pub mod v0_0_152;
 pub mod v0_0_156;
 
-use v0_0_145::HolochainV0_0_145;
-use v0_0_150::HolochainV0_0_150;
-use v0_0_152::HolochainV0_0_152;
+// use v0_0_145::HolochainV0_0_145;
+// use v0_0_150::HolochainV0_0_150;
+// use v0_0_152::HolochainV0_0_152;
 use v0_0_156::HolochainV0_0_156;
 
 
 // NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HdkVersion {
-  #[serde(rename = "0.0.138")]
-  V0_0_138,
-  #[serde(rename = "0.0.142")]
-  V0_0_142,
-  #[serde(rename = "0.0.144")]
-  V0_0_144,
+  // #[serde(rename = "0.0.138")]
+  // V0_0_138,
+  // #[serde(rename = "0.0.142")]
+  // V0_0_142,
+  // #[serde(rename = "0.0.144")]
+  // V0_0_144,
   #[serde(rename = "0.0.147")]
   V0_0_147,
 }
@@ -46,12 +46,12 @@ pub enum HdkVersion {
 // NEW_VERSION: Add the new Holochain version to this enum
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HolochainVersion {
-  #[serde(rename = "0.0.145")]
-  V0_0_145,
-  #[serde(rename = "0.0.150")]
-  V0_0_150,
-  #[serde(rename = "0.0.152")]
-  V0_0_152,
+  // #[serde(rename = "0.0.145")]
+  // V0_0_145,
+  // #[serde(rename = "0.0.150")]
+  // V0_0_150,
+  // #[serde(rename = "0.0.152")]
+  // V0_0_152,
   #[serde(rename = "0.0.156")]
   V0_0_156,
 }
@@ -78,9 +78,9 @@ impl HolochainVersion {
   pub fn supported_versions() -> Vec<HolochainVersion> {
     // NEW_VERSION: Add the new version to this array
     return vec![
-      HolochainVersion::V0_0_145,
-      HolochainVersion::V0_0_150,
-      HolochainVersion::V0_0_152,
+      // HolochainVersion::V0_0_145,
+      // HolochainVersion::V0_0_150,
+      // HolochainVersion::V0_0_152,
       HolochainVersion::V0_0_156,
     ];
   }
@@ -89,9 +89,9 @@ impl HolochainVersion {
     // NEW_VERSION: Create a new version manager, duplicating one of the files in this folder
     // Then, import and add the new version manager here
     match self {
-      HolochainVersion::V0_0_145 => HolochainVersionManager::HolochainV0_0_145(HolochainV0_0_145),
-      HolochainVersion::V0_0_150 => HolochainVersionManager::HolochainV0_0_150(HolochainV0_0_150),
-      HolochainVersion::V0_0_152 => HolochainVersionManager::HolochainV0_0_152(HolochainV0_0_152),
+      // HolochainVersion::V0_0_145 => HolochainVersionManager::HolochainV0_0_145(HolochainV0_0_145),
+      // HolochainVersion::V0_0_150 => HolochainVersionManager::HolochainV0_0_150(HolochainV0_0_150),
+      // HolochainVersion::V0_0_152 => HolochainVersionManager::HolochainV0_0_152(HolochainV0_0_152),
       HolochainVersion::V0_0_156 => HolochainVersionManager::HolochainV0_0_156(HolochainV0_0_156),
     }
   }
@@ -100,8 +100,8 @@ impl HolochainVersion {
 // NEW_VERSION: Add the new version manager to this enum
 #[enum_dispatch(VersionManager)]
 pub enum HolochainVersionManager {
-  HolochainV0_0_145,
-  HolochainV0_0_150,
-  HolochainV0_0_152,
+  // HolochainV0_0_145,
+  // HolochainV0_0_150,
+  // HolochainV0_0_152,
   HolochainV0_0_156,
 }
