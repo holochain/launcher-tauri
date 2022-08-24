@@ -42,11 +42,23 @@ jobs:
           $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
           Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
 
-          cargo install cargo-tree
-          cargo tree | grep hdi
-          cargo tree | grep holochain_integrity_types
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev b455538b80228410417f372d828d07a7cfa9e4d5 holochain
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.145-x86_64-pc-windows-msvc.exe
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev fe3b8fde13e52b3c37b8d3e451cf5d20d18f0c3a holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 55264b3de477e0bd6bad678afa54aaa1236ff220 holochain
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.150-x86_64-pc-windows-msvc.exe
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 24f88aede5ae770be73d3b690ac22b62d7ae7719 holochain
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.152-x86_64-pc-windows-msvc.exe
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 38b683d0009ada21a9d79f638ca2dc3986163bd9 holochain
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.154-x86_64-pc-windows-msvc.exe
+
+          cargo install --locked holochain
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.156-x86_64-pc-windows-msvc.exe
 
@@ -68,11 +80,23 @@ jobs:
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-apple-darwin
 
-          cargo install cargo-tree
-          cargo tree | grep hdi
-          cargo tree | grep holochain_integrity_types
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev b455538b80228410417f372d828d07a7cfa9e4d5 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.145-x86_64-apple-darwin
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev fe3b8fde13e52b3c37b8d3e451cf5d20d18f0c3a holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 55264b3de477e0bd6bad678afa54aaa1236ff220 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.150-x86_64-apple-darwin
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 24f88aede5ae770be73d3b690ac22b62d7ae7719 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.152-x86_64-apple-darwin
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 38b683d0009ada21a9d79f638ca2dc3986163bd9 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.154-x86_64-apple-darwin
+
+          cargo install --locked holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.156-x86_64-apple-darwin
 
@@ -104,11 +128,23 @@ jobs:
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-unknown-linux-gnu
 
-          cargo install cargo-tree
-          cargo tree | grep hdi
-          cargo tree | grep holochain_integrity_types
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev b455538b80228410417f372d828d07a7cfa9e4d5 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.145-x86_64-unknown-linux-gnu
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev fe3b8fde13e52b3c37b8d3e451cf5d20d18f0c3a holochain
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 55264b3de477e0bd6bad678afa54aaa1236ff220 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.150-x86_64-unknown-linux-gnu
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 24f88aede5ae770be73d3b690ac22b62d7ae7719 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.152-x86_64-unknown-linux-gnu
+
+          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 38b683d0009ada21a9d79f638ca2dc3986163bd9 holochain
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.154-x86_64-unknown-linux-gnu
+
+          cargo install --locked holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.156-x86_64-unknown-linux-gnu
 

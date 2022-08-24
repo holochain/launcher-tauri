@@ -9,17 +9,22 @@ version = "0.1.0"
 # NEW_VERSION update holochain-client-rust to the latest holochain version
 holochain_client = {git = "https://github.com/matthme/holochain-client-rust", rev = "62fa357b60691fb1ee79bb03a6944837dac8b8f9"}
 
-# holochain_conductor_api_0_0_145 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "b455538b80228410417f372d828d07a7cfa9e4d5"}
-# holochain_p2p_0_0_145 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "b455538b80228410417f372d828d07a7cfa9e4d5"}
-# holochain_types_0_0_145 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "b455538b80228410417f372d828d07a7cfa9e4d5"}
+holochain_conductor_api_0_0_145 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "b455538b80228410417f372d828d07a7cfa9e4d5"}
+holochain_p2p_0_0_145 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "b455538b80228410417f372d828d07a7cfa9e4d5"}
+holochain_types_0_0_145 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "b455538b80228410417f372d828d07a7cfa9e4d5"}
 
-# holochain_conductor_api_0_0_150 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "55264b3de477e0bd6bad678afa54aaa1236ff220"}
-# holochain_p2p_0_0_150 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "55264b3de477e0bd6bad678afa54aaa1236ff220"}
-# holochain_types_0_0_150 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "55264b3de477e0bd6bad678afa54aaa1236ff220"}
+holochain_conductor_api_0_0_150 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "55264b3de477e0bd6bad678afa54aaa1236ff220"}
+holochain_p2p_0_0_150 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "55264b3de477e0bd6bad678afa54aaa1236ff220"}
+holochain_types_0_0_150 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "55264b3de477e0bd6bad678afa54aaa1236ff220"}
 
-# holochain_conductor_api_0_0_152 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "24f88aede5ae770be73d3b690ac22b62d7ae7719"}
-# holochain_p2p_0_0_152 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "24f88aede5ae770be73d3b690ac22b62d7ae7719"}
-# holochain_types_0_0_152 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "24f88aede5ae770be73d3b690ac22b62d7ae7719"}
+holochain_conductor_api_0_0_152 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "24f88aede5ae770be73d3b690ac22b62d7ae7719"}
+holochain_p2p_0_0_152 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "24f88aede5ae770be73d3b690ac22b62d7ae7719"}
+holochain_types_0_0_152 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "24f88aede5ae770be73d3b690ac22b62d7ae7719"}
+
+holochain_conductor_api_0_0_154 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "38b683d0009ada21a9d79f638ca2dc3986163bd9"}
+holochain_p2p_0_0_154 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "38b683d0009ada21a9d79f638ca2dc3986163bd9"}
+holochain_types_0_0_154 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "38b683d0009ada21a9d79f638ca2dc3986163bd9"}
+
 
 # NEW_VERSION add corresponding crates of the  new versions here
 
