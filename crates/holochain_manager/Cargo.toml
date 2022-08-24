@@ -7,7 +7,7 @@ version = "0.1.0"
 
 [dependencies]
 # NEW_VERSION update holochain-client-rust to the latest holochain version
-holochain_client = {git = "https://github.com/matthme/holochain-client-rust", rev = "b109ef93a8653bc538183ca87be7a8543213f5fa"}
+holochain_client = {git = "https://github.com/matthme/holochain-client-rust", rev = "62fa357b60691fb1ee79bb03a6944837dac8b8f9"}
 
 # holochain_conductor_api_0_0_145 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "b455538b80228410417f372d828d07a7cfa9e4d5"}
 # holochain_p2p_0_0_145 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "b455538b80228410417f372d828d07a7cfa9e4d5"}
