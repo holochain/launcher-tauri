@@ -1,8 +1,5 @@
 <template>
-  <div v-if="loading" class="column center-content" style="flex: 1">
-    <mwc-circular-progress indeterminate></mwc-circular-progress>
-  </div>
-  <div v-else class="column" style="flex: 1; margin: 8px">
+  <div class="column" style="flex: 1; margin: 8px">
     <div class="row center-content">
       <mwc-icon-button
         icon="arrow_back"
@@ -26,8 +23,12 @@
       </mwc-button>
     </div>
 
+    <div v-if="loading" class="column center-content" style="flex: 1">
+      <mwc-circular-progress indeterminate></mwc-circular-progress>
+    </div>
+
     <div
-      v-if="installableApps.length === 0"
+      v-else-if="installableApps.length === 0"
       class="column center-content"
       style="flex: 1"
     >
