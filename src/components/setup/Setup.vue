@@ -24,6 +24,7 @@
         helper=" "
         style="margin-top: 24px"
         label="Password"
+        dialogInitialFocus
       ></mwc-textfield>
 
       <mwc-textfield
