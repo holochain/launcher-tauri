@@ -15,6 +15,7 @@
         style="margin-top: 16px"
         label="Password"
         outlined
+        dialogInitialFocus
       ></mwc-textfield>
     </div>
 
