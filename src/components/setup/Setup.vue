@@ -24,6 +24,7 @@
         helper=" "
         style="margin-top: 24px"
         label="Password"
+        dialogInitialFocus
       ></mwc-textfield>
 
       <mwc-textfield
@@ -83,12 +84,15 @@ export default defineComponent({
   },
   methods: {
     async initialize() {
-      this.initializing = true;
-      const password = (this.$refs["password"] as TextField).value;
+      if (!this.initializing && this.isPasswordValid) {
+        // condition required to omit ENTER key triggering initialization
+        this.initializing = true;
+        const password = (this.$refs["password"] as TextField).value;
 
-      await invoke("initialize_keystore", { password });
-      await this.$store.dispatch(ActionTypes.fetchStateInfo);
-      this.initializing = false;
+        await invoke("initialize_keystore", { password });
+        await this.$store.dispatch(ActionTypes.fetchStateInfo);
+        this.initializing = false;
+      }
     },
   },
 });
