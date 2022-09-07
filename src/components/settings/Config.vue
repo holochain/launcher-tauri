@@ -36,6 +36,15 @@
         outlined
         @input="this.newConfig.custom_binary_path = $event.target.value"
       ></mwc-textfield>
+
+      <mwc-formfield label="MDNS" style="margin-top: 16px">
+        <mwc-checkbox
+          :checked="newConfig.custom_conductor_config.mdns_mode"
+          @change="
+            newConfig.custom_conductor_config.mdns_mode = $event.target.checked
+          "
+        ></mwc-checkbox>
+      </mwc-formfield>
     </div>
 
     <mwc-button

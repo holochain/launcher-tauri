@@ -1,4 +1,4 @@
-use holochain_manager::versions::HolochainVersion;
+use holochain_manager::{config::CustomConductorConfig, versions::HolochainVersion};
 use log::Level;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, fs};
@@ -11,6 +11,7 @@ use super::error::LauncherError;
 pub struct LauncherConfig {
   pub log_level: Level,
   pub custom_binary_path: Option<String>,
+  pub custom_conductor_config: CustomConductorConfig,
 
   pub running_versions: HashSet<HolochainVersion>,
 }
@@ -20,6 +21,7 @@ impl Default for LauncherConfig {
     LauncherConfig {
       log_level: log::Level::Warn,
       custom_binary_path: None,
+      custom_conductor_config: CustomConductorConfig::default(),
       running_versions: HashSet::from([HolochainVersion::default()]),
     }
   }

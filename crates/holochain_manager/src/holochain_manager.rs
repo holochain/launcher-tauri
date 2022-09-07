@@ -8,6 +8,7 @@ use holochain_client::{AdminWebsocket, AgentPubKey, InstalledAppInfo};
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
 
+use crate::config::CustomConductorConfig;
 use crate::versions::holochain_types_latest::prelude::{AppBundle, MembraneProof};
 
 use crate::{
@@ -34,8 +35,9 @@ pub struct HolochainManager {
 impl HolochainManager {
   pub async fn launch(
     version: HolochainVersion,
-    config: LaunchHolochainConfig,
     password: String,
+    config: LaunchHolochainConfig,
+    custom_conductor_config: CustomConductorConfig
   ) -> Result<Self, LaunchHolochainError> {
     let conductor_config_path = config.config_environment_path.join("conductor-config.yaml");
     create_dir_if_necessary(&config.config_environment_path)?;
@@ -51,12 +53,14 @@ impl HolochainManager {
           current_config_str,
           config.admin_port,
           config.keystore_connection_url.clone(),
+          custom_conductor_config
         )
       }
       false => version_manager.initial_config(
         config.admin_port,
         config.environment_path.clone(),
         config.keystore_connection_url.clone(),
+        custom_conductor_config
       ),
     };
 

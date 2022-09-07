@@ -13,7 +13,7 @@ pub use mr_bundle as mr_bundle_latest;
 mod common;
 pub mod version_manager;
 use version_manager::VersionManager;
-
+use crate::config::CustomConductorConfig;
 // NEW_VERSION: Create a new VersionManager for the new version,
 // by copying one of the version manager files in this folder (eg. v0_0_127)
 // Import the new VersionManager here

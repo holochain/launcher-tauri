@@ -11,3 +11,13 @@ pub struct LaunchHolochainConfig {
   pub environment_path: PathBuf,
   pub keystore_connection_url: Url2,
 }
+
+pub struct CustomConductorConfig {
+  pub mdns_mode: bool,
+}
+
+impl Default for CustomConductorConfig {
+  fn default() -> Self {
+    CustomConductorConfig { mdns_mode: false }
+  }
+}

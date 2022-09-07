@@ -6,9 +6,18 @@ use holochain_conductor_api_0_0_156::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_0_156::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
+use holochain_p2p_0_0_156::kitsune_p2p::{
+  dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams,
+  KitsuneP2pConfig, NetworkType, ProxyConfig, TransportConfig,
+};
 
-use super::{version_manager::VersionManager, HdkVersion, common::{proxy_url, boostrap_service}};
+use crate::config::CustomConductorConfig;
+
+use super::{
+  common::{boostrap_service, proxy_url},
+  version_manager::VersionManager,
+  HdkVersion,
+};
 
 pub struct HolochainV0_0_156;
 
@@ -24,6 +33,7 @@ impl VersionManager for HolochainV0_0_156 {
     admin_port: u16,
     conductor_environment_path: PathBuf,
     keystore_connection_url: Url2,
+    custom_conductor_config: CustomConductorConfig,
   ) -> String {
     let mut network_config = KitsuneP2pConfig::default();
     network_config.bootstrap_service = Some(boostrap_service());
@@ -37,16 +47,25 @@ impl VersionManager for HolochainV0_0_156 {
 
     network_config.tuning_params = Arc::new(tuning_params);
 
-    network_config.transport_pool.push(TransportConfig::Proxy {
-      sub_transport: Box::new(TransportConfig::Quic {
+    if custom_conductor_config.mdns_mode {
+      network_config.transport_pool.push(TransportConfig::Quic {
         bind_to: None,
         override_host: None,
         override_port: None,
-      }),
-      proxy_config: ProxyConfig::RemoteProxyClient {
-        proxy_url: proxy_url(),
-      },
-    });
+      });
+      network_config.network_type = NetworkType::QuicMdns;
+    } else {
+      network_config.transport_pool.push(TransportConfig::Proxy {
+        sub_transport: Box::new(TransportConfig::Quic {
+          bind_to: None,
+          override_host: None,
+          override_port: None,
+        }),
+        proxy_config: ProxyConfig::RemoteProxyClient {
+          proxy_url: proxy_url(),
+        },
+      });
+    }
 
     let config = ConductorConfig {
       environment_path: conductor_environment_path.into(),
@@ -64,4 +83,43 @@ impl VersionManager for HolochainV0_0_156 {
     serde_yaml::to_string(&config).expect("Could not convert conductor config to string")
   }
 
+
+  fn overwrite_config(
+    &self,
+    conductor_config: String,
+    admin_port: u16,
+    keystore_connection_url: Url2,
+    custom_conductor_config: CustomConductorConfig
+  ) -> String {
+    let mut config: ConductorConfig = serde_yaml::from_str(conductor_config.as_str()).expect("Bad config");
+
+    config.admin_interfaces = Some(vec![AdminInterfaceConfig {
+      driver: InterfaceDriver::Websocket { port: admin_port },
+    }]);
+    config.keystore = KeystoreConfig::LairServer {
+      connection_url: keystore_connection_url,
+    };
+
+    if custom_conductor_config.mdns_mode {
+      config.network.expect("Bad config").transport_pool = vec![TransportConfig::Quic {
+        bind_to: None,
+        override_host: None,
+        override_port: None,
+      }];
+      config.network.expect("Bad config").network_type = NetworkType::QuicMdns;
+    } else {
+      config.network.expect("Bad config").transport_pool = vec![TransportConfig::Proxy {
+        sub_transport: Box::new(TransportConfig::Quic {
+          bind_to: None,
+          override_host: None,
+          override_port: None,
+        }),
+        proxy_config: ProxyConfig::RemoteProxyClient {
+          proxy_url: proxy_url(),
+        },
+      }];
+    }
+
+    serde_yaml::to_string(&config).expect("Could not convert conductor config to string")
+  }
 }

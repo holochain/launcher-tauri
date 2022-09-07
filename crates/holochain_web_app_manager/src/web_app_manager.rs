@@ -1,5 +1,5 @@
 use holochain_manager::{
-  config::LaunchHolochainConfig,
+  config::{LaunchHolochainConfig, CustomConductorConfig},
   versions::{
     holochain_conductor_api_latest::InstalledAppInfo,
     holochain_types_latest::{
@@ -35,8 +35,9 @@ pub struct WebAppManager {
 impl WebAppManager {
   pub async fn launch(
     version: HolochainVersion,
-    mut config: LaunchHolochainConfig,
     password: String,
+    mut config: LaunchHolochainConfig,
+    custom_conductor_config: CustomConductorConfig
   ) -> Result<Self, LaunchWebAppManagerError> {
     let environment_path = config.environment_path.clone();
 
@@ -51,7 +52,7 @@ impl WebAppManager {
 
     let admin_port = config.admin_port;
 
-    let holochain_manager = HolochainManager::launch(version, config, password)
+    let holochain_manager = HolochainManager::launch(version, password, config, custom_conductor_config)
       .await
       .map_err(|err| LaunchWebAppManagerError::LaunchHolochainError(err))?;
 

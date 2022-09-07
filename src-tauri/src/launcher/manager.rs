@@ -189,7 +189,14 @@ impl LauncherManager {
 
     let version_str: String = version.into();
 
-    let state = match WebAppManager::launch(version, config, password).await {
+    let state = match WebAppManager::launch(
+      version,
+      password,
+      config,
+      self.config.custom_conductor_config.clone(),
+    )
+    .await
+    {
       Ok(mut manager) => match version.eq(&HolochainVersion::default()) {
         true => match install_default_apps_if_necessary(&mut manager).await {
           Ok(()) => {
@@ -221,16 +228,22 @@ impl LauncherManager {
         match error.clone() {
           LaunchWebAppManagerError::LaunchHolochainError(LaunchHolochainError::SqliteError(e)) => {
             if e == String::from("Database file is not of the correct type.") {
-              self.app_handle.emit_all("WrongDatabaseFileType", ())
-                .map_err(|e| format!("Failed to send WrongDatabaseFileType error to frontend: {}", e))?;
+              self
+                .app_handle
+                .emit_all("WrongDatabaseFileType", ())
+                .map_err(|e| {
+                  format!(
+                    "Failed to send WrongDatabaseFileType error to frontend: {}",
+                    e
+                  )
+                })?;
             }
-          },
+          }
           _ => (),
         };
         RunningState::Error(error)
       }
     };
-
 
     if custom_binary_path.is_some() {
       self.custom_binary_manager = Some(state);
