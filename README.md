@@ -113,11 +113,11 @@ Logs can be found at `$DATA_DIR/holochain-launcher/launcher.log`. When reporting
 
 ## Developer Setup
 
-See [Developer Setup](/dev-setup.md).
+See [Developer Setup](/docs/dev-setup.md).
 
 ## Adding a new Holochain version
 
-See [Adding Holochain Version](/adding-holochain-version.md).
+See [Adding Holochain Version](/docs/adding-holochain-version.md).
 
 ## License
 
