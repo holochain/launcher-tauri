@@ -48,10 +48,6 @@ jobs:
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.145-x86_64-unknown-linux-gnu
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 55264b3de477e0bd6bad678afa54aaa1236ff220 holochain
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.150-x86_64-unknown-linux-gnu
-
           cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 24f88aede5ae770be73d3b690ac22b62d7ae7719 holochain
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.152-x86_64-unknown-linux-gnu
@@ -63,6 +59,10 @@ jobs:
           cargo install --locked holochain --version 0.0.156
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.156-x86_64-unknown-linux-gnu
+
+          cargo install --locked holochain --version 0.0.161
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.161-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 

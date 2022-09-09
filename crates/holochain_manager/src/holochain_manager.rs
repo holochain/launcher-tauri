@@ -163,7 +163,7 @@ impl HolochainManager {
       .map_err(|err| format!("Could not write app bundle to temp file: {}", err))?;
 
     match self.version {
-      HolochainVersion::V0_0_145 | HolochainVersion::V0_0_150 => {
+      HolochainVersion::V0_0_145 => {
         let mut ws = holochain_client_old::AdminWebsocket::connect(format!(
           "ws://localhost:{}",
           self.admin_interface_port

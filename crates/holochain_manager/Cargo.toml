@@ -7,7 +7,7 @@ version = "0.1.0"
 
 [dependencies]
 # NEW_VERSION update holochain-client-rust to the latest holochain version
-holochain_client = {git = "https://github.com/matthme/holochain-client-rust", rev = "62fa357b60691fb1ee79bb03a6944837dac8b8f9"}
+holochain_client = {git = "https://github.com/matthme/holochain-client-rust", rev = "88837b1ca034848c6fe62ed2dcfe0379d2c60e76"}
 
 holochain_client_old = {package = "holochain_client", version = "=0.1.0"}
 
@@ -27,14 +27,18 @@ holochain_conductor_api_0_0_154 = {git = "https://github.com/guillemcordoba/holo
 holochain_p2p_0_0_154 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "38b683d0009ada21a9d79f638ca2dc3986163bd9"}
 holochain_types_0_0_154 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "38b683d0009ada21a9d79f638ca2dc3986163bd9"}
 
+holochain_conductor_api_0_0_156 = {package = "holochain_conductor_api", version = "0.0.54"}
+holochain_p2p_0_0_156 = {package = "holochain_p2p", version = "0.0.52"}
+holochain_types_0_0_156 = {package = "holochain_types", version = "0.0.52"}
+
 # NEW_VERSION add corresponding crates of the  new versions here
 
 holochain_types_0_0_45 = {package = "holochain_types", version = "0.0.45"}
 
 # NEW_VERSION add latest crates here # taken from commit instead this time
-holochain_conductor_api_0_0_156 = {package = "holochain_conductor_api", version = "0.0.54"}
-holochain_p2p_0_0_156 = {package = "holochain_p2p", version = "0.0.52"}
-holochain_types_0_0_156 = {package = "holochain_types", version = "0.0.52"}
+holochain_conductor_api_0_0_161 = {package = "holochain_conductor_api", version = "0.0.58"}
+holochain_p2p_0_0_161 = {package = "holochain_p2p", version = "0.0.55"}
+holochain_types_0_0_161 = {package = "holochain_types", version = "0.0.55"}
 
 mr_bundle = {package = "mr_bundle", version = "0.0.13"}
 
