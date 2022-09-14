@@ -117,7 +117,9 @@ export const store = createStore<LauncherAdminState>({
           error &&
           error.content
             .toString()
-            .includes("Database file is not of the correct type.")
+            .includes(
+              "SqliteFailure(Error { code: NotADatabase, extended_code: 26 }"
+            )
         ) {
           return true;
         }

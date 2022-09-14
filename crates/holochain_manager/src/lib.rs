@@ -1,5 +1,5 @@
 pub mod config;
-pub mod error;
+pub mod errors;
 mod holochain_manager;
 mod launch;
 pub mod versions;

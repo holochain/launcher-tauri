@@ -28,13 +28,13 @@
 
       <div v-else-if="dbFileTypeError" class="column">
         <span>
-          It seems that the database of your conductor is not recognized
+          It seems that the database of one of your conductors is not recognized
           properly.
         </span>
         <span style="margin-top: 8px">
           If you haven't changed the database files yourself, this is most
           probably because the Holochain Launcher switched to encrypting your
-          database at rest as of version 0.5.2 in order to anticipate the same
+          databases at rest as of version 0.6.0 in order to anticipate the same
           upcoming change of the official Holochain repository.
         </span>
         <span style="margin-top: 8px">

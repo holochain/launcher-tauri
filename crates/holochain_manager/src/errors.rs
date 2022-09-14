@@ -14,8 +14,8 @@ pub enum LaunchHolochainError {
   IoError(String),
   #[error("Could not connect to the conductor: `{0}`")]
   CouldNotConnectToConductor(String),
-  #[error("Could not connect to the database of the conductor: `{0}`")]
-  SqliteError(String),
+  #[error("Could not initialize conductor: `{0}`")]
+  CouldNotInitializeConductor(#[from] InitializeConductorError),
   #[error("Impossible error: `{0}`")]
   ImpossibleError(String),
 }
@@ -30,4 +30,16 @@ impl From<io::Error> for LaunchHolochainError {
   fn from(err: io::Error) -> Self {
     LaunchHolochainError::IoError(format!("{:?}", err))
   }
+}
+
+
+
+#[derive(Error, Serialize, Deserialize, Debug, Clone)]
+pub enum InitializeConductorError {
+  #[error("Unknown Fatal Panic: `{0}`")]
+  UnknownFatalPanic(String),
+  #[error("Could not connect to the database of the conductor: `{0}`")]
+  SqliteError(String),
+  #[error("Address already in use: `{0}`")]
+  AddressAlreadyInUse(String),
 }
