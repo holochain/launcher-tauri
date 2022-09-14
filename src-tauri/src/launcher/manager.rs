@@ -1,5 +1,5 @@
 use holochain_manager::config::LaunchHolochainConfig;
-use holochain_manager::error::LaunchHolochainError;
+use holochain_manager::errors::{LaunchHolochainError, InitializeConductorError};
 use holochain_web_app_manager::error::LaunchWebAppManagerError;
 use lair_keystore_manager::error::{LairKeystoreError, LaunchChildError};
 use lair_keystore_manager::utils::create_dir_if_necessary;
@@ -219,10 +219,15 @@ impl LauncherManager {
       Err(error) => {
         log::error!("Error launching Holochain v{}: {}", version_str, error);
         match error.clone() {
-          LaunchWebAppManagerError::LaunchHolochainError(LaunchHolochainError::SqliteError(e)) => {
-            if e == String::from("Database file is not of the correct type.") {
-              self.app_handle.emit_all("WrongDatabaseFileType", ())
-                .map_err(|e| format!("Failed to send WrongDatabaseFileType error to frontend: {}", e))?;
+          LaunchWebAppManagerError::LaunchHolochainError(LaunchHolochainError::CouldNotInitializeConductor(ie)) => {
+            match ie {
+              InitializeConductorError::SqliteError(e) => {
+                if e.contains("DatabaseError(SqliteError(SqliteFailure(Error { code: NotADatabase, extended_code: 26 }") {
+                  self.app_handle.emit_all("WrongDatabaseFileType", ())
+                    .map_err(|e| format!("Failed to send WrongDatabaseFileType error to frontend: {}", e))?;
+                }
+              },
+              _ => (),
             }
           },
           _ => (),

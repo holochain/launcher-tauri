@@ -12,7 +12,7 @@ use crate::versions::holochain_types_latest::prelude::{AppBundle, MembraneProof}
 
 use crate::{
   config::LaunchHolochainConfig,
-  error::LaunchHolochainError,
+  errors::LaunchHolochainError,
   launch::launch_holochain_process,
   versions::{version_manager::VersionManager, HolochainVersion, HolochainVersionManager},
 };

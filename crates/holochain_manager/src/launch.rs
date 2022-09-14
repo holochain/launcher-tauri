@@ -4,12 +4,12 @@ use tauri::api::process::{Command, CommandChild, CommandEvent};
 
 use lair_keystore_manager::error::LaunchChildError;
 
-use crate::{error::LaunchHolochainError, versions::HolochainVersion};
+use crate::{errors::LaunchHolochainError, errors::InitializeConductorError, versions::HolochainVersion};
 
 
 enum LaunchHolochainProcessState {
   Pending,
-  DatabaseFileTypeError,
+  InitializeConductorError(InitializeConductorError),
   Success,
 }
 
@@ -47,7 +47,7 @@ pub async fn launch_holochain_process(
     .write("\n".as_bytes())
     .map_err(|err| LaunchHolochainError::ErrorWritingPassword(format!("{:?}", err)))?;
 
-
+  // this loop will end in still pending when the conductor crashes before being ready
   // read events such as stdout
   while let Some(event) = holochain_rx.recv().await {
 
@@ -60,15 +60,29 @@ pub async fn launch_holochain_process(
         }
       },
       CommandEvent::Stderr(line) => {
-        match line.contains("DatabaseError(SqliteError(SqliteFailure(Error { code: NotADatabase, extended_code: 26 }, Some(\"file is not a database\"))))") {
-          true => {
-            log::info!("[HOLOCHAIN v{}] {}", version, line);
-            launch_state = LaunchHolochainProcessState::DatabaseFileTypeError;
-            break;
-            },
-          false => {
-            log::info!("[HOLOCHAIN v{}] {}", version, line);
-          },
+
+        log::info!("[HOLOCHAIN v{}] {}", version, line);
+
+        if line.contains("FATAL PANIC PanicInfo") {
+          launch_state = LaunchHolochainProcessState::InitializeConductorError(
+            InitializeConductorError::UnknownFatalPanic(
+              String::from("Unknown fatal panic when trying to initialize conductor. See log file for details.")
+            )
+          );
+        }
+        if line.contains("Could not initialize Conductor from configuration: InterfaceError(WebsocketError(Io(Os { code: 98, kind: AddrInUse, message: \"Address already in use\" })))") {
+          launch_state = LaunchHolochainProcessState::InitializeConductorError(
+            InitializeConductorError::AddressAlreadyInUse(
+              String::from("Could not initialize Conductor from configuration: InterfaceError(WebsocketError(Io(Os { code: 98, kind: AddrInUse, message: \"Address already in use\" })))")
+            )
+          );
+        }
+        if line.contains("DatabaseError(SqliteError(SqliteFailure(Error { code: NotADatabase, extended_code: 26 }, Some(\"file is not a database\"))))") {
+          launch_state = LaunchHolochainProcessState::InitializeConductorError(
+            InitializeConductorError::SqliteError(
+              String::from("DatabaseError(SqliteError(SqliteFailure(Error { code: NotADatabase, extended_code: 26 }, Some(\"file is not a database\"))))")
+            )
+          );
         }
       },
       _ => {
@@ -99,9 +113,9 @@ pub async fn launch_holochain_process(
       log::info!("LaunchHolochainProcessState::Success");
       Ok(holochain_child)
     },
-    LaunchHolochainProcessState::DatabaseFileTypeError => {
-      log::info!("LaunchHolochainProcessState::DatabaseFileTypeError");
-      Err(LaunchHolochainError::SqliteError(String::from("Database file is not of the correct type.")))
+    LaunchHolochainProcessState::InitializeConductorError(e) => {
+      log::info!("LaunchHolochainProcessState::InitializeConductorError");
+      Err(LaunchHolochainError::CouldNotInitializeConductor(e))
     },
     LaunchHolochainProcessState::Pending => {
       log::info!("LaunchHolochainProcessState::Pending");
