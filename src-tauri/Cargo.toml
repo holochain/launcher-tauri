@@ -3,7 +3,7 @@ authors = ["guillem.cordoba@gmail.com"]
 build = "build.rs"
 default-run = "holochain-launcher"
 description = "Holochain launcher to run Holochain locally in your desktop"
-edition = "2018"
+edition = "2021"
 license = ""
 name = "holochain-launcher"
 repository = ""
@@ -12,7 +12,7 @@ version = "0.6.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = {version = "=1.0.4", features = [] }
+tauri-build = {git = "https://github.com/tauri-apps/tauri", rev = "447370fa50a82f8086554086ca9038f4a008a456", features = [] }
 
 [dependencies]
 holochain_manager = {path = "../crates/holochain_manager"}
@@ -35,7 +35,7 @@ serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
 sysinfo = "0.23.5"
-tauri = {version = "=1.0.4", features = ["api-all", "system-tray"] }
+tauri = {git = "https://github.com/tauri-apps/tauri", rev = "447370fa50a82f8086554086ca9038f4a008a456", features = ["api-all", "native-tls-vendored", "reqwest-native-tls-vendored", "system-tray"] }
 thiserror = "1.0.30"
 url = "2.2.2"
 url2 = "0.0.6"

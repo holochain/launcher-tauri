@@ -10,16 +10,16 @@ use super::{
 };
 use crate::{error::LairKeystoreError, utils::create_dir_if_necessary, LairKeystoreManager};
 
-pub struct LairKeystoreManagerV0_2_0 {
+pub struct LairKeystoreManagerV0_2_1 {
   _keystore_path: PathBuf,
   connection_url: Url2,
   password: String,
 }
 
 #[async_trait]
-impl LairKeystoreManager for LairKeystoreManagerV0_2_0 {
+impl LairKeystoreManager for LairKeystoreManagerV0_2_1 {
   fn lair_keystore_version() -> LairKeystoreVersion {
-    LairKeystoreVersion::V0_2_0
+    LairKeystoreVersion::V0_2_1
   }
 
   fn is_initialized(keystore_path: PathBuf) -> bool {
@@ -40,7 +40,7 @@ impl LairKeystoreManager for LairKeystoreManagerV0_2_0 {
     let connection_url =
       launch_lair_keystore_process(log_level, keystore_path.clone(), password.clone()).await?;
 
-    Ok(LairKeystoreManagerV0_2_0 {
+    Ok(LairKeystoreManagerV0_2_1 {
       password,
       connection_url,
       _keystore_path: keystore_path,

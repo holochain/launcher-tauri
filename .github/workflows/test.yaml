@@ -37,32 +37,16 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.0 lair_keystore
+          cargo install --version 0.2.1 lair_keystore
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-unknown-linux-gnu
 
           CADDY_PATH=$(which caddy)
           cp $CADDY_PATH src-tauri/bins/caddy-x86_64-unknown-linux-gnu
 
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev b455538b80228410417f372d828d07a7cfa9e4d5 holochain
+          cargo install holochain --version 0.0.162 --locked --features db-encryption
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.145-x86_64-unknown-linux-gnu
-
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 24f88aede5ae770be73d3b690ac22b62d7ae7719 holochain
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.152-x86_64-unknown-linux-gnu
-
-          cargo install --locked --git https://github.com/guillemcordoba/holochain.git --rev 38b683d0009ada21a9d79f638ca2dc3986163bd9 holochain
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.154-x86_64-unknown-linux-gnu
-
-          cargo install --locked holochain --version 0.0.156
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.156-x86_64-unknown-linux-gnu
-
-          cargo install --locked holochain --version 0.0.161
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.161-x86_64-unknown-linux-gnu
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.162-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 

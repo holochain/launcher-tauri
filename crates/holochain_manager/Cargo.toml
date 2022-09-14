@@ -7,38 +7,12 @@ version = "0.1.0"
 
 [dependencies]
 # NEW_VERSION update holochain-client-rust to the latest holochain version
-holochain_client = {git = "https://github.com/matthme/holochain-client-rust", rev = "88837b1ca034848c6fe62ed2dcfe0379d2c60e76"}
-
-holochain_client_old = {package = "holochain_client", version = "=0.1.0"}
-
-holochain_conductor_api_0_0_145 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "b455538b80228410417f372d828d07a7cfa9e4d5"}
-holochain_p2p_0_0_145 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "b455538b80228410417f372d828d07a7cfa9e4d5"}
-holochain_types_0_0_145 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "b455538b80228410417f372d828d07a7cfa9e4d5"}
-
-holochain_conductor_api_0_0_150 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "55264b3de477e0bd6bad678afa54aaa1236ff220"}
-holochain_p2p_0_0_150 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "55264b3de477e0bd6bad678afa54aaa1236ff220"}
-holochain_types_0_0_150 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "55264b3de477e0bd6bad678afa54aaa1236ff220"}
-
-holochain_conductor_api_0_0_152 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "24f88aede5ae770be73d3b690ac22b62d7ae7719"}
-holochain_p2p_0_0_152 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "24f88aede5ae770be73d3b690ac22b62d7ae7719"}
-holochain_types_0_0_152 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "24f88aede5ae770be73d3b690ac22b62d7ae7719"}
-
-holochain_conductor_api_0_0_154 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_conductor_api", rev = "38b683d0009ada21a9d79f638ca2dc3986163bd9"}
-holochain_p2p_0_0_154 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_p2p", rev = "38b683d0009ada21a9d79f638ca2dc3986163bd9"}
-holochain_types_0_0_154 = {git = "https://github.com/guillemcordoba/holochain", package = "holochain_types", rev = "38b683d0009ada21a9d79f638ca2dc3986163bd9"}
-
-holochain_conductor_api_0_0_156 = {package = "holochain_conductor_api", version = "0.0.54"}
-holochain_p2p_0_0_156 = {package = "holochain_p2p", version = "0.0.52"}
-holochain_types_0_0_156 = {package = "holochain_types", version = "0.0.52"}
-
-# NEW_VERSION add corresponding crates of the  new versions here
-
-holochain_types_0_0_45 = {package = "holochain_types", version = "0.0.45"}
+holochain_client = {git = "https://github.com/matthme/holochain-client-rust", rev = "8802433d97a2748fa8587c2215acd5d779e756cf"}
 
 # NEW_VERSION add latest crates here # taken from commit instead this time
-holochain_conductor_api_0_0_161 = {package = "holochain_conductor_api", version = "0.0.58"}
-holochain_p2p_0_0_161 = {package = "holochain_p2p", version = "0.0.55"}
-holochain_types_0_0_161 = {package = "holochain_types", version = "0.0.55"}
+holochain_conductor_api_0_0_162 = {package = "holochain_conductor_api", version = "0.0.59"}
+holochain_p2p_0_0_162 = {package = "holochain_p2p", version = "0.0.56"}
+holochain_types_0_0_162 = {package = "holochain_types", version = "0.0.56"}
 
 mr_bundle = {package = "mr_bundle", version = "0.0.13"}
 
@@ -52,6 +26,6 @@ portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}
 serde-enum-str = "0.2"
 serde_yaml = "0.8"
-tauri = {version = "=1.0.4", features = ["api-all"]}
+tauri = {git = "https://github.com/tauri-apps/tauri", rev = "447370fa50a82f8086554086ca9038f4a008a456", features = ["api-all", "system-tray", "native-tls-vendored", "reqwest-native-tls-vendored"]}
 thiserror = "1.0.30"
 url2 = "0.0.6"

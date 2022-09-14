@@ -4,7 +4,8 @@ use std::path::Path;
 use std::time::SystemTime;
 use std::{fs, time::Duration};
 
-use holochain_client::{AdminWebsocket, AgentPubKey, InstalledAppInfo};
+use holochain_client::{AdminWebsocket, AgentPubKey, InstalledAppInfo, InstallAppBundlePayload};
+use holochain_types_0_0_162::prelude::AppBundleSource;
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
 
@@ -162,46 +163,18 @@ impl HolochainManager {
       .await
       .map_err(|err| format!("Could not write app bundle to temp file: {}", err))?;
 
-    match self.version {
-      HolochainVersion::V0_0_145 => {
-        let mut ws = holochain_client_old::AdminWebsocket::connect(format!(
-          "ws://localhost:{}",
-          self.admin_interface_port
-        ))
-        .await
-        .map_err(|err| format!("{:?}", err))?;
-
-        let key = holochain_types_0_0_45::prelude::AgentPubKey::from_raw_39(
-          agent_key.get_raw_39().to_vec(),
-        )
-        .map_err(|err| format!("{:?}", err))?;
-
-        let payload = holochain_client_old::InstallAppBundlePayload {
-          source: holochain_types_0_0_45::prelude::AppBundleSource::Path(path),
-          agent_key: key,
-          installed_app_id: Some(app_id.clone().into()),
-          membrane_proofs,
-          uid: network_seed,
-        };
-        ws.install_app_bundle(payload)
-          .await
-          .map_err(|err| format!("Error install hApp bundle: {:?}", err))?;
-      }
-      _ => {
-        let payload = holochain_client::InstallAppBundlePayload {
-          source: crate::versions::holochain_types_latest::prelude::AppBundleSource::Path(path),
-          agent_key,
-          installed_app_id: Some(app_id.clone().into()),
-          membrane_proofs,
-          network_seed,
-        };
-        self
-          .ws
-          .install_app_bundle(payload)
-          .await
-          .map_err(|err| format!("Error install hApp bundle: {:?}", err))?;
-      }
-    }
+    let payload = InstallAppBundlePayload {
+      source: AppBundleSource::Path(path),
+      agent_key,
+      installed_app_id: Some(app_id.clone().into()),
+      membrane_proofs,
+      network_seed,
+    };
+    self
+      .ws
+      .install_app_bundle(payload)
+      .await
+      .map_err(|err| format!("Error install hApp bundle: {:?}", err))?;
 
     self
       .ws
