@@ -95,7 +95,6 @@ pub async fn launch_holochain_process(
   log::info!("Launched holochain");
 
 
-
   tauri::async_runtime::spawn(async move {
     // read events such as stdout
     while let Some(event) = holochain_rx.recv().await {

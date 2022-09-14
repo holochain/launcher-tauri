@@ -2,11 +2,11 @@ use std::{path::PathBuf, sync::Arc};
 use url2::Url2;
 
 // NEW_VERSION: Import the exact same types but from the new crates
-use holochain_conductor_api_0_0_161::{
+use holochain_conductor_api_0_0_162::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_0_161::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
+use holochain_p2p_0_0_162::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
 
 use super::{version_manager::VersionManager, HdkVersion, common::{proxy_url, boostrap_service}};
 
@@ -15,7 +15,7 @@ pub struct HolochainV0_0_162;
 impl VersionManager for HolochainV0_0_162 {
   // NEW_VERSION: Careful! Indicate here which HDK version comes bundled with this Holochain version
   fn hdk_version(&self) -> HdkVersion {
-    HdkVersion::V0_0_151
+    HdkVersion::V0_0_152
   }
 
   // NEW_VERSION: Duplicate and change whatever config is necessary to change
@@ -28,7 +28,7 @@ impl VersionManager for HolochainV0_0_162 {
     let mut network_config = KitsuneP2pConfig::default();
     network_config.bootstrap_service = Some(boostrap_service());
 
-    let mut tuning_params = KitsuneP2pTuningParams::default();
+    let tuning_params = KitsuneP2pTuningParams::default();
 
     network_config.tuning_params = Arc::new(tuning_params);
 

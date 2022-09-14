@@ -73,7 +73,7 @@ impl HolochainManager {
     )
     .await?;
 
-    std::thread::sleep(Duration::from_millis(1000));
+    std::thread::sleep(Duration::from_millis(100));
 
     // Try to connect twice. This fixes the os(111) error for now that occurs when the conducor is not ready yet.
     let mut ws = match AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
