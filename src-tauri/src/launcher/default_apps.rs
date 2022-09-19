@@ -14,8 +14,6 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager) -> R
 
     let version: String = manager.holochain_manager.version.manager().hdi_version().into();
 
-    log::info!("%*%*%* HDI VERSION: {:?}", version);
-
     let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { None };
 
     manager
