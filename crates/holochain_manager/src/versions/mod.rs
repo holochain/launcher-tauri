@@ -30,6 +30,25 @@ pub enum HdkVersion {
   V0_0_152,
 }
 
+impl Into<String> for HdkVersion {
+  fn into(self) -> String {
+    self.to_string()
+  }
+}
+
+// NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
+#[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
+pub enum HdiVersion {
+  #[serde(rename = "0.1.2")]
+  V0_1_2,
+}
+
+impl Into<String> for HdiVersion {
+  fn into(self) -> String {
+    self.to_string()
+  }
+}
+
 // NEW_VERSION: Add the new Holochain version to this enum
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HolochainVersion {

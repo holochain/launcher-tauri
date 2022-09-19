@@ -63,10 +63,10 @@ pub async fn launch_holochain_process(
 
         log::info!("[HOLOCHAIN v{}] {}", version, line);
 
-        if line.contains("FATAL PANIC PanicInfo") {
+        if line.contains("this is embarrassing") {
           launch_state = LaunchHolochainProcessState::InitializeConductorError(
-            InitializeConductorError::UnknownFatalPanic(
-              String::from("Unknown fatal panic when trying to initialize conductor. See log file for details.")
+            InitializeConductorError::UnknownError(
+              String::from("Unknown error when trying to initialize conductor. See log file for details.")
             )
           );
         }

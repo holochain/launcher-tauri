@@ -5,11 +5,13 @@ use enum_dispatch::enum_dispatch;
 use lair_keystore_manager::versions::LairKeystoreVersion;
 use url2::Url2;
 
-use super::HdkVersion;
+use super::{HdkVersion, HdiVersion};
 
 #[enum_dispatch]
 pub trait VersionManager {
   fn hdk_version(&self) -> HdkVersion;
+
+  fn hdi_version(&self) -> HdiVersion;
 
   fn lair_keystore_version(&self) -> LairKeystoreVersion {
     // For now all holochain versions run the same lair keystore version
