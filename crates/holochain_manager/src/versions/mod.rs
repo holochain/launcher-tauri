@@ -74,7 +74,7 @@ impl HolochainVersion {
     // NEW_VERSION: Create a new version manager, duplicating one of the files in this folder
     // Then, import and add the new version manager here
     match self {
-      HolochainVersion::CustomBinary => HolochainVersionManager::HolochainV0_0_162(HolochainV0_0_162), // assume the latest version for the custom binary
+      HolochainVersion::CustomBinary => HolochainVersionManager::HolochainV0_0_162(HolochainV0_0_162), // NEW_VERSION assume the latest version for the custom binary
       HolochainVersion::V0_0_162 => HolochainVersionManager::HolochainV0_0_162(HolochainV0_0_162),
     }
   }
