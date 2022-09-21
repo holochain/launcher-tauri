@@ -33,6 +33,8 @@ pub enum HdkVersion {
 // NEW_VERSION: Add the new Holochain version to this enum
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HolochainVersion {
+  #[serde(rename = "Custom Binary")]
+  CustomBinary,
   #[serde(rename = "0.0.162")]
   V0_0_162,
 }
@@ -44,6 +46,11 @@ impl Into<String> for HolochainVersion {
 }
 
 impl HolochainVersion {
+
+  // Will be the config with which the custom binary is run, when present
+  pub fn custom() -> HolochainVersion {
+    HolochainVersion::CustomBinary
+  }
   // Will be run by default when the launcher starts and is the version where the DevHub is installed
   // Not necessarily the newest one
   // NEW_VERSION Switch devhub holochain version in case there is a new version of the devhub
@@ -51,7 +58,7 @@ impl HolochainVersion {
     HolochainVersion::V0_0_162
   }
 
-  // Will be the config with the the custom binary is run, when present
+  // currently unused
   pub fn latest() -> HolochainVersion {
     HolochainVersion::V0_0_162
   }
@@ -67,6 +74,7 @@ impl HolochainVersion {
     // NEW_VERSION: Create a new version manager, duplicating one of the files in this folder
     // Then, import and add the new version manager here
     match self {
+      HolochainVersion::CustomBinary => HolochainVersionManager::HolochainV0_0_162(HolochainV0_0_162), // assume the latest version for the custom binary
       HolochainVersion::V0_0_162 => HolochainVersionManager::HolochainV0_0_162(HolochainV0_0_162),
     }
   }

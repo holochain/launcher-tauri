@@ -126,7 +126,7 @@ impl LauncherManager {
 
     if let Some(path) = self.config.custom_binary_path.clone() {
       self
-        .launch_holochain_manager(HolochainVersion::latest(), Some(path))
+        .launch_holochain_manager(HolochainVersion::custom(), Some(path))
         .await?;
     } else {
       let _r = std::fs::remove_dir_all(root_config_path().join("custom"));
@@ -193,13 +193,13 @@ impl LauncherManager {
       Ok(mut manager) => match version.eq(&HolochainVersion::default()) {
         true => match install_default_apps_if_necessary(&mut manager).await {
           Ok(()) => {
-            log::info!("Launched Holochain v{}", version_str);
+            log::info!("Launched Holochain {}", version_str);
             RunningState::Running(manager)
           }
           Err(err) => {
             manager.kill()?;
             log::error!(
-              "Error launching Holochain v{}: Could not install default apps: {}",
+              "Error launching Holochain {}: Could not install default apps: {}",
               version_str,
               err
             );
@@ -212,12 +212,12 @@ impl LauncherManager {
         },
         false => {
           let version_str: String = version.into();
-          log::info!("Launched Holochain v{}", version_str);
+          log::info!("Launched Holochain {}", version_str);
           RunningState::Running(manager)
         }
       },
       Err(error) => {
-        log::error!("Error launching Holochain v{}: {}", version_str, error);
+        log::error!("Error launching Holochain {}: {}", version_str, error);
         match error.clone() {
           LaunchWebAppManagerError::LaunchHolochainError(LaunchHolochainError::CouldNotInitializeConductor(ie)) => {
             match ie {
@@ -283,7 +283,7 @@ impl LauncherManager {
 
         if let None = self.custom_binary_manager {
           self
-            .launch_holochain_manager(HolochainVersion::latest(), Some(path))
+            .launch_holochain_manager(HolochainVersion::custom(), Some(path))
             .await?;
         }
       }

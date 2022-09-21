@@ -53,7 +53,7 @@ pub async fn launch_holochain_process(
 
     match event.clone() {
       CommandEvent::Stdout(line) => {
-        log::info!("[HOLOCHAIN v{}] {}", version, line);
+        log::info!("[HOLOCHAIN {}] {}", version, line);
         if line == String::from("Conductor ready.") {
           launch_state = LaunchHolochainProcessState::Success;
           break;
@@ -61,12 +61,12 @@ pub async fn launch_holochain_process(
       },
       CommandEvent::Stderr(line) => {
 
-        log::info!("[HOLOCHAIN v{}] {}", version, line);
+        log::info!("[HOLOCHAIN {}] {}", version, line);
 
-        if line.contains("FATAL PANIC PanicInfo") {
+        if line.contains("this is embarrassing") {
           launch_state = LaunchHolochainProcessState::InitializeConductorError(
-            InitializeConductorError::UnknownFatalPanic(
-              String::from("Unknown fatal panic when trying to initialize conductor. See log file for details.")
+            InitializeConductorError::UnknownError(
+              String::from("Unknown error when trying to initialize conductor. See log file for details.")
             )
           );
         }
@@ -86,7 +86,7 @@ pub async fn launch_holochain_process(
         }
       },
       _ => {
-        log::info!("[HOLOCHAIN v{}] {:?}", version, event);
+        log::info!("[HOLOCHAIN {}] {:?}", version, event);
       },
     };
 
@@ -99,9 +99,9 @@ pub async fn launch_holochain_process(
     // read events such as stdout
     while let Some(event) = holochain_rx.recv().await {
       match event.clone() {
-        CommandEvent::Stdout(line) => log::info!("[HOLOCHAIN v{}] {}", version, line),
-        CommandEvent::Stderr(line) => log::info!("[HOLOCHAIN v{}] {}", version, line),
-        _ => log::info!("[HOLOCHAIN v{}] {:?}", version, event),
+        CommandEvent::Stdout(line) => log::info!("[HOLOCHAIN {}] {}", version, line),
+        CommandEvent::Stderr(line) => log::info!("[HOLOCHAIN {}] {}", version, line),
+        _ => log::info!("[HOLOCHAIN {}] {:?}", version, event),
       };
     }
   });

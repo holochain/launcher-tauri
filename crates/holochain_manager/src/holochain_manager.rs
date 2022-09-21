@@ -81,7 +81,7 @@ impl HolochainManager {
     {
       Ok(ws) => ws,
       Err(_) => {
-        log::error!("[HOLOCHAIN v{}] Could not connect to the AdminWebsocket. Starting another attempt in 5 seconds.", version);
+        log::error!("[HOLOCHAIN {}] Could not connect to the AdminWebsocket. Starting another attempt in 5 seconds.", version);
         std::thread::sleep(Duration::from_millis(5000));
         AdminWebsocket::connect(format!("ws://localhost:{}", config.admin_port))
           .await
