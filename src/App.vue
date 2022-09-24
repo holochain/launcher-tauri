@@ -37,6 +37,10 @@ import About from "./components/settings/About.vue";
 import { defineComponent } from "vue";
 import { ActionTypes } from "./store/actions";
 import "@material/mwc-circular-progress";
+import "@fontsource/poppins";
+import "@fontsource/poppins/700.css";
+import "@fontsource/poppins/800.css";
+import "@fontsource/poppins/900.css";
 
 export default defineComponent({
   name: "App",
@@ -63,12 +67,12 @@ body,
   display: flex;
   flex: 1;
   height: 100%;
-  font-family: Mulish, sans-serif;
+  font-family: Poppins, sans-serif;
   background-color: #ededed;
 }
 
 :root {
-  font-family: Mulish, sans-serif;
+  font-family: Poppins, sans-serif;
   --mdc-theme-primary: #4720e3;
   --mdc-theme-secondary: #0dddd3;
 }

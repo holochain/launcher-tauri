@@ -1,5 +1,7 @@
 <template>
   <div style="display: flex; flex: 1; flex-direction: column">
+    <InstalledAppCard style="margin: 5px" />
+    <InstalledAppCard appIcon="/img/dummy_app_icon.png" style="margin: 5px" />
     <div
       v-if="installedWebApps.length === 0"
       style="
@@ -83,10 +85,11 @@ import "@material/mwc-icon-button";
 import { InstalledWebAppInfo } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppStatus from "./InstalledAppStatus.vue";
+import InstalledAppCard from "./InstalledAppCard.vue";
 
 export default defineComponent({
   name: "InstalledAppsList",
-  components: { InstalledAppStatus },
+  components: { InstalledAppStatus, InstalledAppCard },
   props: {
     installedWebApps: {
       type: Object as PropType<Array<InstalledWebAppInfo>>,

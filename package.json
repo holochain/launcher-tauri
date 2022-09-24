@@ -13,6 +13,7 @@
     "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/8xdcHKQmjkmrGGn/download"
   },
   "dependencies": {
+    "@fontsource/poppins": "^4.5.9",
     "@holochain-open-dev/utils": "^0.0.9",
     "@holochain/client": "^0.3.2",
     "@material/mwc-button": "^0.25.1",

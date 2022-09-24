@@ -11,17 +11,19 @@
       v-if="view.type === 'installedApps'"
       style="display: flex; flex: 1; flex-direction: column"
     >
-      <span style="margin: 16px; font-size: 1.5em">Installed Apps</span>
+      <span style="margin: 16px; font-size: 1.5em; font-weight: 700"
+        >Installed Apps</span
+      >
       <div class="column" style="flex: 1; align-items: center">
         <div
           v-for="(holochainId, index) of $store.getters[`runningHolochainIds`]"
           :key="index"
           class="column"
-          style="width: 600px; margin-bottom: 16px"
+          style="width: auto; margin-bottom: 16px"
         >
           <span
             v-if="holochainId.type === 'HolochainVersion'"
-            style="margin-bottom: 8px"
+            style="margin-bottom: 8px; font-weight: 700"
             >Holochain v{{ holochainId.content }}</span
           >
           <span v-else style="margin-bottom: 8px">Custom Holochain Binary</span>
