@@ -36,33 +36,32 @@
               required
               ref="repeatPassword"
               placeholder="Confirm password"
-              style="margin-bottom: 50px"
+              style="margin-bottom: 3px"
               @input="checkPasswordValidity"
             />
 
             <div
-              v-if="passwordsDontMatch"
               style="
-                margin-bottom: 60px;
+                margin-bottom: 50px;
                 color: #ff3131;
                 text-align: left;
                 padding: 0 10px;
                 font-size: 0.9em;
+                height: 22px;
               "
             >
-              Password's don't match.
+              {{ this.passwordsDontMatch ? "Password's don't match." : "" }}
             </div>
 
             <HcButton
               :disabled="initializing || !isPasswordValid"
               @click="initialize()"
               style="width: 128px"
-              >Continue
+              >{{ this.initializing ? "initializing..." : "Continue" }}
             </HcButton>
           </div>
         </form>
       </div>
-      <div></div>
     </div>
   </div>
 </template>
@@ -81,6 +80,7 @@ export default defineComponent({
   data() {
     return {
       isPasswordValid: false,
+      passwordsDontMatch: false,
       initializing: false,
     };
   },
@@ -134,6 +134,8 @@ export default defineComponent({
       ).value;
       this.isPasswordValid =
         passwordValue.length > 0 && passwordValue === repeatPasswordValue;
+      this.passwordsDontMatch =
+        repeatPasswordValue.length > 0 && passwordValue !== repeatPasswordValue;
     },
   },
 });
