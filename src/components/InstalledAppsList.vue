@@ -1,5 +1,7 @@
 <template>
   <div style="display: flex; flex: 1; flex-direction: column">
+    <PasswordField placeholder="Confirm password" />
+    <HcButton style="width: 128px">Continue</HcButton>
     <InstalledAppCard style="margin: 5px" />
     <InstalledAppCard appIcon="/img/dummy_app_icon.png" style="margin: 5px" />
     <div
@@ -21,6 +23,12 @@
       :key="app.installed_app_info.installed_app_id"
       style="display: flex; flex-direction: column; margin-bottom: 16px"
     >
+      <InstalledAppCard
+        style="margin: 5px"
+        :app="app"
+        @openApp="$emit('openApp', $event)"
+      />
+
       <ui5-card style="width: auto">
         <div style="display: flex; flex-direction: column; flex: 1">
           <div style="display: flex; flex-direction: row">
@@ -86,10 +94,12 @@ import { InstalledWebAppInfo } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppStatus from "./InstalledAppStatus.vue";
 import InstalledAppCard from "./InstalledAppCard.vue";
+import PasswordField from "./subcomponents/PasswordField.vue";
+import HcButton from "./subcomponents/HcButton.vue";
 
 export default defineComponent({
   name: "InstalledAppsList",
-  components: { InstalledAppStatus, InstalledAppCard },
+  components: { InstalledAppStatus, InstalledAppCard, PasswordField, HcButton },
   props: {
     installedWebApps: {
       type: Object as PropType<Array<InstalledWebAppInfo>>,

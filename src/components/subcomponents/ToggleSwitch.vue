@@ -1,6 +1,6 @@
 <template>
   <label class="switch">
-    <input type="checkbox" />
+    <input type="checkbox" :checked="sliderOn" />
     <span class="slider round"></span>
   </label>
 </template>
@@ -10,6 +10,12 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "ToggleSwitch",
+  props: {
+    sliderOn: {
+      type: Boolean,
+      required: true,
+    },
+  },
 });
 </script>
 

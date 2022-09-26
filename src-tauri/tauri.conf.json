@@ -57,7 +57,7 @@
         "label": "admin",
         "title": "Holochain Admin",
         "width": 1200,
-        "height": 800,
+        "height": 900,
         "resizable": true,
         "fullscreen": false
       }

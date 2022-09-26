@@ -25,36 +25,49 @@
         margin-left: 40px;
       "
     >
-      Sample App 1
+      {{ app.installed_app_info.installed_app_id }}
     </div>
     <span style="flex: 1"></span>
 
     <div
       :class="{
-        running: appStatus === 'running',
-        stopped: appStatus === 'stopped',
-        paused: appStatus === 'paused',
+        running: isAppRunning(app.installed_app_info),
+        stopped: isAppDisabled(app.installed_app_info),
+        paused: isAppPaused(app.installed_app_info),
       }"
       class="app-status"
       style="margin-right: 18px"
     ></div>
 
-    <ToggleSwitch style="margin-right: 29px" />
+    <ToggleSwitch
+      style="margin-right: 29px"
+      :sliderOn="isAppRunning(app.installed_app_info)"
+    />
 
     <img
+      v-if="isAppRunning(app.installed_app_info) && !isAppHeadless(app)"
       style="margin-right: 29px; width: 24px; cursor: pointer"
       src="/img/Open_App.svg"
+      @click="$emit('openApp', this.app.installed_app_info.installed_app_id)"
     />
-    <img
+    <div
+      style="margin-right: 33px; width: 28px; height: 28px; cursor: pointer"
       @click="this.showMore = !this.showMore"
-      style="margin-right: 33px; width: 28px; cursor: pointer"
-      :src="this.showMore ? `/img/More_selected.svg` : `/img/More.svg`"
-    />
+    >
+      <img
+        style="width: 28px"
+        :class="{ rotated: this.showMore }"
+        src="/img/More.svg"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { InstalledWebAppInfo } from "../types";
+import { isAppRunning, isAppDisabled, isAppPaused } from "../utils";
+
 import ToggleSwitch from "./subcomponents/ToggleSwitch.vue";
 
 export default defineComponent({
@@ -64,15 +77,26 @@ export default defineComponent({
     appIcon: {
       type: String,
     },
+    app: {
+      type: Object as PropType<InstalledWebAppInfo>,
+      required: true,
+    },
   },
   data(): {
     showMore: boolean;
-    appStatus: "running" | "stopped" | "paused";
   } {
     return {
       showMore: false,
-      appStatus: "stopped",
     };
+  },
+  emits: ["openApp"],
+  methods: {
+    isAppRunning,
+    isAppDisabled,
+    isAppPaused,
+    isAppHeadless(app: InstalledWebAppInfo) {
+      return app.web_ui_info.type === "Headless";
+    },
   },
 });
 </script>
@@ -103,5 +127,9 @@ export default defineComponent({
 
 .paused {
   background-color: rgb(175, 175, 175);
+}
+
+.rotated {
+  transform: rotate(90deg);
 }
 </style>
