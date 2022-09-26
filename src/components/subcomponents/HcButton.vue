@@ -1,5 +1,7 @@
 <template>
-  <button class="btn" :disabled="disabled"><slot></slot></button>
+  <button class="btn" :class="{ outlined: this.outlined }" :disabled="disabled">
+    <slot></slot>
+  </button>
 </template>
 
 <script lang="ts">
@@ -9,6 +11,10 @@ export default defineComponent({
   name: "HcButton",
   props: {
     disabled: {
+      type: Boolean,
+      default: false,
+    },
+    outlined: {
       type: Boolean,
       default: false,
     },
@@ -42,7 +48,23 @@ export default defineComponent({
   color: #ffffff;
 }
 
+.outlined {
+  background-color: transparent;
+  color: #482edf;
+  border: 2px solid #482edf;
+}
+
+.outlined:hover {
+  color: #482edf;
+}
+
 .btn:disabled {
   background-color: #d7d7e3;
+}
+
+.outlined:disabled {
+  background-color: transparent;
+  color: #d7d7e3;
+  border: 2px solid #d7d7e3;
 }
 </style>
