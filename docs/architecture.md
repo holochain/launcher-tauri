@@ -49,15 +49,17 @@ end
 sequenceDiagram
 
 happ->>@holochain/client: callZome(cell, zome, fn, payload, cap_secret)
-alt cap_secret is null and this is a launcher environment
-  @holochain/client->>launcher: invoke("signRequest", {cell, zome, fn, payload})
-  launcher->>lair_keystore: signRequest(cell, zome, fn, payload)
+@holochain/client ->> @holochain/client: add nonce & expires_at if not provided?
+alt no signature field and this is a launcher environment
+  @holochain/client->>@holochain/client: encode payload and convert Uint8Arrays to Arrays for tauri
+  @holochain/client->>launcher: invoke("sign_zome_call", ZomeCallUnsigned)
+  launcher->>lair_keystore: sign_by_pub_key(...)
   lair_keystore-->>launcher: signature
-  launcher-->>@holochain/client: signature
-  @holochain/client-->>@holochain/client: add signature as cap_secret
+  launcher-->>@holochain/client: ZomeCall (signed)
+  @holochain/client->>@holochain/client: decode payload or prevent double-encoding
 end
 
-@holochain/client-->>conductor: callZome(cell, zome, fn, payload, cap_secret)
+@holochain/client-->>conductor: callZome({ cell_id, zome_name, fn_name, payload, cap_secret, signature, ... })
 conductor->>@holochain/client: result
 @holochain/client-->>happ: result
 ```

@@ -36,6 +36,7 @@
       <span style="margin-top: 8px"
         ><span
           style="cursor: pointer; text-decoration: underline"
+          title="https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub"
           @click="howToPublish()"
           >Read this</span
         >

@@ -1,9 +1,4 @@
-import {
-  HolochainId,
-  HolochainState,
-  HolochainVersion,
-  LauncherStateInfo,
-} from "@/types";
+import { HolochainId, HolochainState, LauncherStateInfo } from "@/types";
 import { invoke } from "@tauri-apps/api/tauri";
 import { createStore } from "vuex";
 import { flatten, uniq } from "lodash-es";

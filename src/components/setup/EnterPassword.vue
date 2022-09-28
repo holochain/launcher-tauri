@@ -21,24 +21,26 @@
           style="height: 35px; margin-bottom: 10px"
         />
         <div style="font-size: 27px; font-weight: 600; margin-bottom: 25px">
-          Enter password
+          Enter password?
         </div>
 
         <form>
           <div class="column" style="align-items: center">
             <PasswordField
               required
+              initialFocus
+              :disabled="pwInputDisabled"
               ref="password"
               placeholder="Enter password"
               style="margin-bottom: 30px"
             />
 
-            <HcButton
+            <HCButton
               :disabled="entering"
               @click="enterPassword()"
               style="width: 128px"
-              >{{ this.entering ? "Loading..." : "Continue" }}
-            </HcButton>
+              >{{ this.entering ? "Starting..." : "Continue" }}
+            </HCButton>
           </div>
         </form>
       </div>
@@ -57,20 +59,27 @@ import { ActionTypes } from "@/store/actions";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import PasswordField from "../subcomponents/PasswordField.vue";
-import HcButton from "../subcomponents/HcButton.vue";
+import HCButton from "../subcomponents/HCButton.vue";
 
 export default defineComponent({
   name: "EnterPassword",
-  components: { PasswordField, HcButton },
-  data(): { entering: boolean } {
+  components: { PasswordField, HCButton },
+  data(): {
+    entering: boolean;
+    pwInputDisabled: boolean;
+  } {
     return {
       entering: false,
+      pwInputDisabled: false,
     };
   },
   methods: {
     async enterPassword() {
       this.entering = true;
-      const password = (this.$refs["password"] as typeof PasswordField).value;
+      this.pwInputDisabled = true;
+      const passwordField = this.$refs["password"] as typeof PasswordField;
+      passwordField.blur();
+      const password = passwordField.value;
       try {
         await invoke("unlock_and_launch", { password });
         await this.$store.dispatch(ActionTypes.fetchStateInfo);

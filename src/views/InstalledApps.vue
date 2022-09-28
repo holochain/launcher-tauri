@@ -11,7 +11,7 @@
       v-if="view.type === 'installedApps'"
       style="display: flex; flex: 1; flex-direction: column"
     >
-      <span style="margin: 16px; font-size: 1.5em; font-weight: 700"
+      <span style="margin: 16px; font-size: 1.5em; font-weight: 600"
         >Installed Apps</span
       >
       <div class="column" style="flex: 1; align-items: center">
@@ -35,19 +35,22 @@
           />
         </div>
       </div>
-      <mwc-fab
-        extended
-        icon="add"
-        label="Install new app"
+      <HCButton
         @click="$emit('open-app-store')"
+        class="btn-install"
         style="
+          font-family: Poppins;
           margin: 16px;
+          height: 54px;
           position: absolute;
           right: 0;
           bottom: 0;
-          --mdc-theme-secondary: #4720e3;
         "
-      ></mwc-fab>
+        ><div class="row center-content" style="font-size: 18px">
+          <mwc-icon style="margin-right: 10px; font-size: 26px">add</mwc-icon
+          >INSTALL NEW APP
+        </div>
+      </HCButton>
     </div>
 
     <div v-else style="flex: 1">
@@ -80,9 +83,11 @@ import { defineComponent } from "vue";
 import { ActionTypes } from "../store/actions";
 import { HolochainId, InstalledWebAppInfo } from "../types";
 import "@material/mwc-snackbar";
+import "@material/mwc-icon";
 import { invoke } from "@tauri-apps/api/tauri";
 import InstalledAppsList from "../components/InstalledAppsList.vue";
 import InstalledAppDetail from "../components/InstalledAppDetail.vue";
+import HCButton from "../components/subcomponents/HCButton.vue";
 
 type View =
   | {
@@ -96,7 +101,7 @@ type View =
 
 export default defineComponent({
   name: "InstalledApps",
-  components: { InstalledAppsList, InstalledAppDetail },
+  components: { InstalledAppsList, InstalledAppDetail, HCButton },
   data(): {
     snackbarText: string | undefined;
     view: View;
@@ -223,3 +228,10 @@ export default defineComponent({
 });
 </script>
 <!-- We don't have scoped styles with classes because it becomes harder to export a reusable library -->
+
+<style scoped>
+.btn-install:hover {
+  cursor: pointer;
+  --hc-primary-color: #674df9;
+}
+</style>

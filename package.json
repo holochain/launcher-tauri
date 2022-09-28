@@ -3,8 +3,8 @@
   "version": "0.6.1",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev:ui\" \"sleep 7 && npm run tauri dev\"",
-    "dev:ui": "vue-cli-service build --watch --mode development --dest src-tauri/target/webpack_dist",
+    "dev": "concurrently \"npm run dev:ui\" \"sleep 14 && npm run tauri dev\"",
+    "dev:ui": "vue-cli-service serve --watch --mode development --dest src-tauri/target/webpack_dist",
     "build:ui": "vue-cli-service build --dest src-tauri/target/webpack_dist",
     "build": "npm run build:ui && npm run tauri -- build -v",
     "test:unit": "vue-cli-service test:unit",

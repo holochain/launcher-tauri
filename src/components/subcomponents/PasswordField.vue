@@ -10,13 +10,15 @@
       v-model="value"
       :type="this.passwordVisible ? undefined : 'password'"
       :placeholder="placeholder"
+      :autofocus="initialFocus"
+      :disabled="disabled"
     />
     <!-- <img src="eye_icon.svg" style="width: 23px; cursor: pointer;"/> -->
 
     <svg
       v-if="!passwordVisible"
       class="eye-icon"
-      :class="{ eyeIconFocus: this.focus }"
+      :class="{ eyeIconFocus: this.inFocus && !this.disabled }"
       @click="
         this.$refs.passwordInput.focus();
         this.passwordVisible = !this.passwordVisible;
@@ -36,7 +38,7 @@
     <svg
       v-else
       class="eye-icon"
-      :class="{ eyeIconFocus: this.focus }"
+      :class="{ eyeIconFocus: this.inFocus && !this.disabled }"
       @click="
         this.$refs.passwordInput.focus();
         this.passwordVisible = !this.passwordVisible;
@@ -71,17 +73,34 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    initialFocus: {
+      type: Boolean,
+      default: false,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data(): {
     passwordVisible: boolean;
-    focus: boolean;
+    inFocus: boolean;
     value: string;
   } {
     return {
       passwordVisible: false,
-      focus: false,
+      inFocus: false,
       value: "",
     };
+  },
+  methods: {
+    focus() {
+      (this.$refs.passwordInput as HTMLElement).focus();
+    },
+    blur() {
+      (this.$refs.passwordInput as HTMLElement).blur();
+      this.inFocus = false;
+    },
   },
 });
 </script>

@@ -28,6 +28,7 @@
           <div class="column" style="align-items: center">
             <PasswordField
               required
+              initialFocus
               ref="password"
               placeholder="Enter password"
               style="margin-bottom: 12px"
@@ -68,11 +69,10 @@
 
 <script lang="ts">
 import { ActionTypes } from "@/store/actions";
-import { TextField } from "@material/mwc-textfield";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import PasswordField from "../subcomponents/PasswordField.vue";
-import HcButton from "../subcomponents/HcButton.vue";
+import HcButton from "../subcomponents/HCButton.vue";
 
 export default defineComponent({
   name: "Setup",
@@ -111,7 +111,7 @@ export default defineComponent({
       if (!this.initializing && this.isPasswordValid) {
         // condition required to omit ENTER key triggering initialization
         this.initializing = true;
-        const password = (this.$refs["password"] as TextField).value;
+        const password = (this.$refs["password"] as typeof PasswordField).value;
 
         await invoke("initialize_keystore", { password });
         await this.$store.dispatch(ActionTypes.fetchStateInfo);

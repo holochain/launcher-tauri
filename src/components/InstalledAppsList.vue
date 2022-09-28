@@ -1,9 +1,13 @@
 <template>
   <div style="display: flex; flex: 1; flex-direction: column">
-    <PasswordField placeholder="Confirm password" />
-    <HcButton style="width: 128px">Continue</HcButton>
-    <InstalledAppCard style="margin: 5px" />
-    <InstalledAppCard appIcon="/img/dummy_app_icon.png" style="margin: 5px" />
+    <HCButton @click="handleKlick" style="width: 128px">Continue</HCButton>
+    <HCDialog ref="test-dialog">
+      <div style="font-weight: 700">Title</div>
+      <HCTextField placeholder="Field 1" />
+      <HCTextField placeholder="Field 1" />
+    </HCDialog>
+    <!-- <InstalledAppCard style="margin: 5px" />
+    <InstalledAppCard appIcon="/img/dummy_app_icon.png" style="margin: 5px" /> -->
     <div
       v-if="installedWebApps.length === 0"
       style="
@@ -28,7 +32,7 @@
         :app="app"
         @openApp="$emit('openApp', $event)"
       />
-
+      <!--
       <ui5-card style="width: auto">
         <div style="display: flex; flex-direction: column; flex: 1">
           <div style="display: flex; flex-direction: row">
@@ -79,7 +83,7 @@
             </div>
           </div>
         </div>
-      </ui5-card>
+      </ui5-card> -->
     </div>
   </div>
 </template>
@@ -92,14 +96,14 @@ import "@material/mwc-icon-button";
 
 import { InstalledWebAppInfo } from "../types";
 import { isAppRunning } from "../utils";
-import InstalledAppStatus from "./InstalledAppStatus.vue";
 import InstalledAppCard from "./InstalledAppCard.vue";
-import PasswordField from "./subcomponents/PasswordField.vue";
-import HcButton from "./subcomponents/HcButton.vue";
+import HCButton from "./subcomponents/HCButton.vue";
+import HCDialog from "./subcomponents/HCDialog.vue";
+import HCTextField from "./subcomponents/HCTextField.vue";
 
 export default defineComponent({
   name: "InstalledAppsList",
-  components: { InstalledAppStatus, InstalledAppCard, PasswordField, HcButton },
+  components: { InstalledAppCard, HCButton, HCDialog, HCTextField },
   props: {
     installedWebApps: {
       type: Object as PropType<Array<InstalledWebAppInfo>>,
@@ -111,6 +115,10 @@ export default defineComponent({
     isAppRunning,
     isAppHeadless(app: InstalledWebAppInfo) {
       return app.web_ui_info.type === "Headless";
+    },
+    // to be removed:
+    handleKlick() {
+      (this.$refs["test-dialog"] as typeof HCDialog).open();
     },
   },
 });
