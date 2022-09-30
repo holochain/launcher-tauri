@@ -1,21 +1,8 @@
 <template>
   <div style="display: flex; flex: 1; flex-direction: column">
     <HCButton @click="handleKlick" style="width: 128px">Continue</HCButton>
-    <HCDialog ref="test-dialog">
-      <div class="column" style="align-items: center">
-        <div style="font-weight: 700; font-size: 25px; margin-bottom: 20px">
-          Install App
-        </div>
-        <HCTextField placeholder="App Id" style="margin: 5px" label="App Id" />
-        <HCTextField placeholder="Field 1" style="margin: 5px" />
-        <HCTextArea
-          placeholder="Membrane Proof"
-          style="margin: 5px"
-          :cols="90"
-          label="Membrane Proof"
-        />
-      </div>
-    </HCDialog>
+    <InstallAppDialog ref="test-dialog" />
+
     <!-- <InstalledAppCard style="margin: 5px" />
     <InstalledAppCard appIcon="/img/dummy_app_icon.png" style="margin: 5px" /> -->
     <div
@@ -108,13 +95,15 @@ import { HolochainAppInfo } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
 import HCButton from "./subcomponents/HCButton.vue";
-import HCDialog from "./subcomponents/HCDialog.vue";
-import HCTextField from "./subcomponents/HCTextField.vue";
-import HCTextArea from "./subcomponents/HCTextArea.vue";
+import InstallAppDialog from "./InstallAppDialog.vue";
 
 export default defineComponent({
   name: "InstalledAppsList",
-  components: { InstalledAppCard, HCButton, HCDialog, HCTextField, HCTextArea },
+  components: {
+    InstalledAppCard,
+    InstallAppDialog,
+    HCButton,
+  },
   props: {
     installedApps: {
       type: Object as PropType<Array<HolochainAppInfo>>,
@@ -129,7 +118,7 @@ export default defineComponent({
     },
     // to be removed:
     handleKlick() {
-      (this.$refs["test-dialog"] as typeof HCDialog).open();
+      (this.$refs["test-dialog"] as typeof InstallAppDialog).open();
     },
   },
 });

@@ -95,7 +95,8 @@ export default defineComponent({
   },
   methods: {
     focus() {
-      (this.$refs.passwordInput as HTMLElement).focus();
+      (this.$refs.passwordInput as HTMLInputElement).focus();
+      this.inFocus = true;
     },
     blur() {
       (this.$refs.passwordInput as HTMLElement).blur();

@@ -1,6 +1,6 @@
 <template>
   <div
-    style="margin-right: 33px; width: 28px; height: 28px; cursor: pointer"
+    style="width: 28px; height: 28px; cursor: pointer"
     @click="handleClick"
     v-on:keyup.enter="handleClick"
   >

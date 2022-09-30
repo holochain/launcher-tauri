@@ -32,8 +32,22 @@
               :disabled="pwInputDisabled"
               ref="password"
               placeholder="Enter password"
-              style="margin-bottom: 30px"
+              style="margin-bottom: 5px"
+              @input="invalidPassword = false"
             />
+
+            <div
+              style="
+                margin-bottom: 50px;
+                color: #ff3131;
+                text-align: left;
+                padding: 0 10px;
+                font-size: 0.9em;
+                height: 22px;
+              "
+            >
+              {{ invalidPassword ? "Invalid Password." : "" }}
+            </div>
 
             <HCButton
               :disabled="entering"
@@ -67,10 +81,12 @@ export default defineComponent({
   data(): {
     entering: boolean;
     pwInputDisabled: boolean;
+    invalidPassword: boolean;
   } {
     return {
       entering: false,
       pwInputDisabled: false,
+      invalidPassword: false,
     };
   },
   methods: {
@@ -83,9 +99,13 @@ export default defineComponent({
       try {
         await invoke("unlock_and_launch", { password });
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
-      } catch (e) {
+      } catch (e: any) {
         console.error(e);
-        (this.$refs as any).snackbar.show();
+        if (e === "Error launching the keystore: IncorrectPassword") {
+          this.invalidPassword = true;
+        }
+        this.pwInputDisabled = false;
+        passwordField.focus();
       }
       this.entering = false;
     },

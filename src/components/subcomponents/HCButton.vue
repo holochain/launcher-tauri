@@ -1,5 +1,10 @@
 <template>
-  <button class="btn" :class="{ outlined: this.outlined }" :disabled="disabled">
+  <button
+    class="btn"
+    :class="{ outlined: this.outlined }"
+    :disabled="disabled"
+    tabindex="0"
+  >
     <slot></slot>
   </button>
 </template>
@@ -34,6 +39,7 @@ export default defineComponent({
 <style scoped>
 button {
   --hc-primary-color: #482edf;
+  --hc-secondary-color: #674df9;
 }
 .btn {
   all: unset;
@@ -51,6 +57,11 @@ button {
   color: #ffffff;
 }
 
+.btn:focus-visible {
+  background-color: var(--hc-secondary-color);
+  box-shadow: 1px 1px 4px var(--hc-primary-color);
+}
+
 .outlined {
   background-color: transparent;
   color: var(--hc-primary-color);
@@ -58,6 +69,7 @@ button {
 }
 
 .outlined:hover {
+  background-color: transparent;
   color: var(--hc-primary-color);
 }
 
@@ -69,5 +81,10 @@ button {
   background-color: transparent;
   color: #d7d7e3;
   border: 2px solid #d7d7e3;
+}
+
+.outlined:focus-visible {
+  background-color: transparent;
+  box-shadow: 1px 1px 4px var(--hc-secondary-color);
 }
 </style>

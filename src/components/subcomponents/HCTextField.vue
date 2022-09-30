@@ -55,7 +55,7 @@ export default defineComponent({
 
 .textfield {
   all: unset;
-  height: 42px;
+  height: 48px;
   padding: 0 10px;
   width: 300px;
   /* outline: 2px solid rgba(59, 61, 115, 0.15); */

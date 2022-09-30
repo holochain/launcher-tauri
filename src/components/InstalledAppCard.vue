@@ -99,7 +99,11 @@
       </div>
 
       <sl-tooltip class="tooltip" hoist placement="top" content="App Details">
-        <HCMoreToggle @toggle="showMore = !showMore" tabindex="0" />
+        <HCMoreToggle
+          @toggle="showMore = !showMore"
+          style="margin-right: 33px"
+          tabindex="0"
+        />
       </sl-tooltip>
     </div>
 

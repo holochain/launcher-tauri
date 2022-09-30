@@ -46,7 +46,7 @@ export default defineComponent({
 <style scoped>
 .background {
   border: none;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.6);
   width: 100vw;
   height: 100vh;
   z-index: 1;

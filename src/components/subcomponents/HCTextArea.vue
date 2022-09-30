@@ -4,7 +4,7 @@
     <textarea
       :required="required"
       :rows="rows"
-      :cold="cols"
+      :cols="cols"
       class="textarea"
       v-model="value"
       :placeholder="placeholder"
@@ -71,7 +71,7 @@ export default defineComponent({
 }
 .textarea {
   all: unset;
-  resize: vertical;
+  resize: both;
   margin: 10px 10px 0px 10px;
   height: 100%;
 }
