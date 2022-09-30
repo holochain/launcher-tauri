@@ -60,6 +60,7 @@
           }"
           class="app-status"
           style="margin-right: 18px"
+          tabindex="0"
         ></div>
       </sl-tooltip>
 
@@ -88,29 +89,17 @@
       >
         <sl-tooltip class="tooltip" hoist placement="top" content="Open App">
           <img
+            tabindex="0"
             style="margin-right: 29px; width: 24px; cursor: pointer"
             src="/img/Open_App.svg"
-            @click="
-              $emit(
-                'openApp',
-                app.webAppInfo.installed_app_info.installed_app_id
-              )
-            "
+            @click="$emit('openApp', app)"
+            v-on:keyup.enter="$emit('openApp', app)"
           />
         </sl-tooltip>
       </div>
 
       <sl-tooltip class="tooltip" hoist placement="top" content="App Details">
-        <div
-          style="margin-right: 33px; width: 28px; height: 28px; cursor: pointer"
-          @click="showMore = !showMore"
-        >
-          <img
-            style="width: 28px"
-            :class="{ rotated: showMore }"
-            src="/img/More.svg"
-          />
-        </div>
+        <HCMoreToggle @toggle="showMore = !showMore" tabindex="0" />
       </sl-tooltip>
     </div>
 
@@ -236,10 +225,11 @@ import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 
 import ToggleSwitch from "./subcomponents/ToggleSwitch.vue";
 import HCButton from "./subcomponents/HCButton.vue";
+import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 
 export default defineComponent({
   name: "InstalledAppCard",
-  components: { ToggleSwitch, HCButton },
+  components: { ToggleSwitch, HCButton, HCMoreToggle },
   props: {
     appIcon: {
       type: String,
@@ -358,9 +348,5 @@ export default defineComponent({
 
 .paused {
   background-color: rgb(175, 175, 175);
-}
-
-.rotated {
-  transform: rotate(90deg);
 }
 </style>

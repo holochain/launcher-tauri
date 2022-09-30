@@ -12,6 +12,7 @@
           placeholder="Membrane Proof"
           style="margin: 5px"
           :cols="90"
+          label="Membrane Proof"
         />
       </div>
     </HCDialog>

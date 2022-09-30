@@ -21,7 +21,7 @@
           style="height: 35px; margin-bottom: 10px"
         />
         <div style="font-size: 27px; font-weight: 600; margin-bottom: 25px">
-          Enter password?
+          Enter password
         </div>
 
         <form>

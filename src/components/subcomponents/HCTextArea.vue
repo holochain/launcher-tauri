@@ -1,5 +1,6 @@
 <template>
-  <div class="container">
+  <div class="container" style="position: relative">
+    <div class="label">{{ label }}</div>
     <textarea
       :required="required"
       :rows="rows"
@@ -33,6 +34,10 @@ export default defineComponent({
       type: Number,
       default: 50,
     },
+    label: {
+      type: String,
+      default: undefined,
+    },
   },
   data(): {
     focus: boolean;
@@ -48,10 +53,21 @@ export default defineComponent({
 
 <style scoped>
 .container {
+  --hc-primary-color: #482edf;
+  --active-border-color: rgba(59, 61, 115, 0.15);
+  --active-label-color: rgba(59, 61, 115, 0.4);
+}
+
+.container:focus-within {
+  --active-border-color: var(--hc-primary-color);
+  --active-label-color: var(--hc-primary-color);
+}
+
+.container {
   /* outline: 2px solid rgba(59, 61, 115, 0.15); */
   border-radius: 10px;
   /* box-shadow: 0 0 0 2px rgba(59, 61, 115, 0.15); */
-  border: 2px solid rgba(59, 61, 115, 0.15);
+  border: 2px solid var(--active-border-color);
 }
 .textarea {
   all: unset;
@@ -60,7 +76,14 @@ export default defineComponent({
   height: 100%;
 }
 
-.container:focus-within {
-  border: 2px solid #482edf;
+.label {
+  color: var(--active-label-color);
+  padding: 0 4px;
+  font-size: 14px;
+  background: white;
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  margin: 0 10px;
 }
 </style>

@@ -26,6 +26,7 @@
         />
       </div>
       <HCButton
+        tabindex="0"
         @click="$emit('open-app-store')"
         class="btn-install"
         style="
@@ -196,6 +197,9 @@ export default defineComponent({
 <style scoped>
 .btn-install:hover {
   cursor: pointer;
+  --hc-primary-color: #674df9;
+}
+.btn-install:focus-visible {
   --hc-primary-color: #674df9;
 }
 </style>
