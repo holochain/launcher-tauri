@@ -2,14 +2,23 @@
   <div style="display: flex; flex: 1; flex-direction: column">
     <HCButton @click="handleKlick" style="width: 128px">Continue</HCButton>
     <HCDialog ref="test-dialog">
-      <div style="font-weight: 700">Title</div>
-      <HCTextField placeholder="Field 1" />
-      <HCTextField placeholder="Field 1" />
+      <div class="column" style="align-items: center">
+        <div style="font-weight: 700; font-size: 25px; margin-bottom: 20px">
+          Install App
+        </div>
+        <HCTextField placeholder="App Id" style="margin: 5px" label="App Id" />
+        <HCTextField placeholder="Field 1" style="margin: 5px" />
+        <HCTextArea
+          placeholder="Membrane Proof"
+          style="margin: 5px"
+          :cols="90"
+        />
+      </div>
     </HCDialog>
     <!-- <InstalledAppCard style="margin: 5px" />
     <InstalledAppCard appIcon="/img/dummy_app_icon.png" style="margin: 5px" /> -->
     <div
-      v-if="installedWebApps.length === 0"
+      v-if="installedApps.length === 0"
       style="
         flex: 1;
         display: flex;
@@ -23,9 +32,9 @@
     </div>
     <div
       v-else
-      v-for="app in installedWebApps"
-      :key="app.installed_app_info.installed_app_id"
-      style="display: flex; flex-direction: column; margin-bottom: 16px"
+      v-for="app in installedApps"
+      :key="app.webAppInfo.installed_app_info.installed_app_id"
+      style="display: flex; flex-direction: column"
     >
       <InstalledAppCard
         style="margin: 5px"
@@ -94,27 +103,28 @@ import "@ui5/webcomponents/dist/Card.js";
 import "@material/mwc-button";
 import "@material/mwc-icon-button";
 
-import { InstalledWebAppInfo } from "../types";
+import { HolochainAppInfo } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
 import HCButton from "./subcomponents/HCButton.vue";
 import HCDialog from "./subcomponents/HCDialog.vue";
 import HCTextField from "./subcomponents/HCTextField.vue";
+import HCTextArea from "./subcomponents/HCTextArea.vue";
 
 export default defineComponent({
   name: "InstalledAppsList",
-  components: { InstalledAppCard, HCButton, HCDialog, HCTextField },
+  components: { InstalledAppCard, HCButton, HCDialog, HCTextField, HCTextArea },
   props: {
-    installedWebApps: {
-      type: Object as PropType<Array<InstalledWebAppInfo>>,
+    installedApps: {
+      type: Object as PropType<Array<HolochainAppInfo>>,
       required: true,
     },
   },
   emits: ["openApp"],
   methods: {
     isAppRunning,
-    isAppHeadless(app: InstalledWebAppInfo) {
-      return app.web_ui_info.type === "Headless";
+    isAppHeadless(app: HolochainAppInfo) {
+      return app.webAppInfo.web_ui_info.type === "Headless";
     },
     // to be removed:
     handleKlick() {

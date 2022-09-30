@@ -42,7 +42,7 @@
           margin-left: 40px;
         "
       >
-        {{ app.installed_app_info.installed_app_id }}
+        {{ app.webAppInfo.installed_app_info.installed_app_id }}
       </div>
       <span style="flex: 1"></span>
 
@@ -54,9 +54,9 @@
       >
         <div
           :class="{
-            running: isAppRunning(app.installed_app_info),
-            stopped: isAppDisabled(app.installed_app_info),
-            paused: isAppPaused(app.installed_app_info),
+            running: isAppRunning(app.webAppInfo.installed_app_info),
+            stopped: isAppDisabled(app.webAppInfo.installed_app_info),
+            paused: isAppPaused(app.webAppInfo.installed_app_info),
           }"
           class="app-status"
           style="margin-right: 18px"
@@ -68,25 +68,34 @@
         hoist
         placement="top"
         :content="
-          isAppRunning(app.installed_app_info) ? 'Disable App' : 'Start App'
+          isAppRunning(app.webAppInfo.installed_app_info)
+            ? 'Disable App'
+            : 'Start App'
         "
       >
         <ToggleSwitch
           style="margin-right: 29px"
-          :sliderOn="isAppRunning(app.installed_app_info)"
-          @click="handleSlider(app)"
+          :sliderOn="isAppRunning(app.webAppInfo.installed_app_info)"
+          @click="handleSlider(appwebAppInfo)"
         />
       </sl-tooltip>
 
       <div
-        v-if="isAppRunning(app.installed_app_info) && !isAppHeadless(app)"
+        v-if="
+          isAppRunning(app.webAppInfo.installed_app_info) && !isAppHeadless(app)
+        "
         style="display: flex"
       >
         <sl-tooltip class="tooltip" hoist placement="top" content="Open App">
           <img
             style="margin-right: 29px; width: 24px; cursor: pointer"
             src="/img/Open_App.svg"
-            @click="$emit('openApp', app.installed_app_info.installed_app_id)"
+            @click="
+              $emit(
+                'openApp',
+                app.webAppInfo.installed_app_info.installed_app_id
+              )
+            "
           />
         </sl-tooltip>
       </div>
@@ -115,7 +124,20 @@
           >Your Public Key:</span
         >
         <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
-          serializeHash(app.installed_app_info.cell_data[0].cell_id[1])
+          serializeHash(
+            app.webAppInfo.installed_app_info.cell_data[0].cell_id[1]
+          )
+        }}</span>
+      </div>
+
+      <div class="row" style="margin-top: 20px; margin-left: 25px">
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >Holochain Version:</span
+        >
+        <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
+          app.holochainId.type === "CustomBinary"
+            ? "Custom Binary"
+            : app.holochainId.content
         }}</span>
       </div>
 
@@ -127,7 +149,7 @@
 
         <tr
           style=""
-          v-for="cellData in app.installed_app_info.cell_data"
+          v-for="cellData in app.webAppInfo.installed_app_info.cell_data"
           :key="[...cellData.cell_id[0], ...cellData.cell_id[1]]"
         >
           <td>
@@ -146,10 +168,10 @@
       </table>
 
       <span
-        v-if="getReason(app.installed_app_info)"
+        v-if="getReason(app.webAppInfo.installed_app_info)"
         style="margin-top: 16px; margin-left: 25px"
       >
-        {{ getReason(app.installed_app_info) }}
+        {{ getReason(app.webAppInfo.installed_app_info) }}
       </span>
 
       <div
@@ -165,7 +187,11 @@
           class="btn"
           style="--hc-primary-color: #d80d0d"
           @click="$refs['uninstallDialog'].show()"
-          v-if="isAppUninstallable(app.installed_app_info.installed_app_id)"
+          v-if="
+            isAppUninstallable(
+              app.webAppInfo.installed_app_info.installed_app_id
+            )
+          "
           outlined
           >Uninstall
         </HCButton>
@@ -173,8 +199,10 @@
         <HCButton
           style="--hc-primary-color: #dd821a"
           v-if="
-            !isAppDisabled(app.installed_app_info) &&
-            isAppUninstallable(app.installed_app_info.installed_app_id)
+            !isAppDisabled(app.webAppInfo.installed_app_info) &&
+            isAppUninstallable(
+              app.webAppInfo.installed_app_info.installed_app_id
+            )
           "
           outlined
           @click="disableApp(app)"
@@ -182,14 +210,14 @@
         </HCButton>
         <HCButton
           style="--hc-primary-color: #008704"
-          v-if="isAppDisabled(app.installed_app_info)"
+          v-if="isAppDisabled(app.webAppInfo.installed_app_info)"
           @click="enableApp(app)"
           outlined
           >Enable
         </HCButton>
         <HCButton
           style="--hc-primary-color: #008704"
-          v-if="isAppPaused(app.installed_app_info)"
+          v-if="isAppPaused(app.webAppInfo.installed_app_info)"
           @click="startApp(app)"
           outlined
           >Start
@@ -201,7 +229,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { InstalledWebAppInfo } from "../types";
+import { HolochainAppInfo } from "../types";
 import { serializeHash } from "@holochain-open-dev/utils";
 import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
@@ -217,7 +245,7 @@ export default defineComponent({
       type: String,
     },
     app: {
-      type: Object as PropType<InstalledWebAppInfo>,
+      type: Object as PropType<HolochainAppInfo>,
       required: true,
     },
   },
@@ -235,29 +263,29 @@ export default defineComponent({
     isAppRunning,
     isAppDisabled,
     isAppPaused,
-    isAppHeadless(app: InstalledWebAppInfo) {
-      return app.web_ui_info.type === "Headless";
+    isAppHeadless(app: HolochainAppInfo) {
+      return app.webAppInfo.web_ui_info.type === "Headless";
     },
-    async enableApp(app: InstalledWebAppInfo) {
-      this.$emit("enableApp", app.installed_app_info.installed_app_id);
+    async enableApp(app: HolochainAppInfo) {
+      this.$emit("enableApp", app);
     },
-    async disableApp(app: InstalledWebAppInfo) {
-      this.$emit("disableApp", app.installed_app_info.installed_app_id);
+    async disableApp(app: HolochainAppInfo) {
+      this.$emit("disableApp", app);
     },
-    async startApp(app: InstalledWebAppInfo) {
-      this.$emit("startApp", app.installed_app_info.installed_app_id);
+    async startApp(app: HolochainAppInfo) {
+      this.$emit("startApp", app);
     },
-    async uninstallApp(app: InstalledWebAppInfo) {
-      this.$emit("uninstallApp", app.installed_app_info.installed_app_id);
+    async uninstallApp(app: HolochainAppInfo) {
+      this.$emit("uninstallApp", app);
     },
-    getAppStatus(app: InstalledWebAppInfo) {
-      if (isAppRunning(app.installed_app_info)) {
+    getAppStatus(app: HolochainAppInfo) {
+      if (isAppRunning(app.webAppInfo.installed_app_info)) {
         return "Running";
       }
-      if (isAppDisabled(app.installed_app_info)) {
+      if (isAppDisabled(app.webAppInfo.installed_app_info)) {
         return "Disabled";
       }
-      if (isAppPaused(app.installed_app_info)) {
+      if (isAppPaused(app.webAppInfo.installed_app_info)) {
         return "Paused";
       }
       return "Unknown State";
@@ -267,12 +295,12 @@ export default defineComponent({
 
       return installedAppId !== `DevHub-${holochainId.content}`;
     },
-    handleSlider(app: InstalledWebAppInfo) {
-      if (isAppRunning(app.installed_app_info)) {
+    handleSlider(app: HolochainAppInfo) {
+      if (isAppRunning(app.webAppInfo.installed_app_info)) {
         this.disableApp(app);
-      } else if (isAppDisabled(app.installed_app_info)) {
+      } else if (isAppDisabled(app.webAppInfo.installed_app_info)) {
         this.enableApp(app);
-      } else if (isAppPaused(app.installed_app_info)) {
+      } else if (isAppPaused(app.webAppInfo.installed_app_info)) {
         this.startApp(app);
       } else {
         throw new Error("Unknown App state.");

@@ -1,10 +1,13 @@
 <template>
-  <input
-    :required="this.required"
-    class="textfield"
-    v-model="value"
-    :placeholder="placeholder"
-  />
+  <div class="container" style="position: relative">
+    <div class="label">{{ label }}</div>
+    <input
+      :required="required"
+      class="textfield"
+      v-model="value"
+      :placeholder="placeholder"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -19,7 +22,11 @@ export default defineComponent({
     },
     required: {
       type: Boolean,
-      default: true,
+      default: false,
+    },
+    label: {
+      type: String,
+      default: undefined,
     },
   },
   data(): {
@@ -35,6 +42,17 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.container {
+  --hc-primary-color: #482edf;
+  --active-border-color: rgba(59, 61, 115, 0.15);
+  --active-label-color: rgba(59, 61, 115, 0.4);
+}
+
+.container:focus-within {
+  --active-border-color: var(--hc-primary-color);
+  --active-label-color: var(--hc-primary-color);
+}
+
 .textfield {
   all: unset;
   height: 42px;
@@ -43,10 +61,21 @@ export default defineComponent({
   /* outline: 2px solid rgba(59, 61, 115, 0.15); */
   border-radius: 10px;
   /* box-shadow: 0 0 0 2px rgba(59, 61, 115, 0.15); */
-  border: 2px solid rgba(59, 61, 115, 0.15);
+  border: 2px solid var(--active-border-color);
 }
 
 .textfield:focus {
-  border: 2px solid #482edf;
+  border: 2px solid var(--hc-primary-color);
+}
+
+.label {
+  color: var(--active-label-color);
+  padding: 0 4px;
+  font-size: 14px;
+  background: white;
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  margin: 0 10px;
 }
 </style>

@@ -5,10 +5,10 @@
   >
     <input
       ref="passwordInput"
-      :required="this.required"
+      :required="required"
       class="password-input"
       v-model="value"
-      :type="this.passwordVisible ? undefined : 'password'"
+      :type="passwordVisible ? undefined : 'password'"
       :placeholder="placeholder"
       :autofocus="initialFocus"
       :disabled="disabled"
@@ -18,10 +18,10 @@
     <svg
       v-if="!passwordVisible"
       class="eye-icon"
-      :class="{ eyeIconFocus: this.inFocus && !this.disabled }"
+      :class="{ eyeIconFocus: inFocus && !disabled }"
       @click="
         this.$refs.passwordInput.focus();
-        this.passwordVisible = !this.passwordVisible;
+        passwordVisible = !passwordVisible;
       "
       aria-label="show password"
       width="23"
@@ -38,10 +38,10 @@
     <svg
       v-else
       class="eye-icon"
-      :class="{ eyeIconFocus: this.inFocus && !this.disabled }"
+      :class="{ eyeIconFocus: inFocus && !disabled }"
       @click="
         this.$refs.passwordInput.focus();
-        this.passwordVisible = !this.passwordVisible;
+        passwordVisible = !passwordVisible;
       "
       aria-label="hide password"
       width="23"

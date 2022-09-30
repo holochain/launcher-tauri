@@ -15,25 +15,15 @@
         >Installed Apps</span
       >
       <div class="column" style="flex: 1; align-items: center">
-        <div
-          v-for="(holochainId, index) of $store.getters[`runningHolochainIds`]"
-          :key="index"
-          class="column"
-          style="width: auto; margin-bottom: 16px"
-        >
-          <span
-            v-if="holochainId.type === 'HolochainVersion'"
-            style="margin-bottom: 8px; font-weight: 700"
-            >Holochain v{{ holochainId.content }}</span
-          >
-          <span v-else style="margin-bottom: 8px">Custom Holochain Binary</span>
-
-          <InstalledAppsList
-            :installedWebApps="$store.getters[`appsForHolochain`](holochainId)"
-            @open-app="openApp(holochainId, $event)"
-            @app-selected="selectApp(holochainId, $event)"
-          />
-        </div>
+        <InstalledAppsList
+          :installedApps="$store.getters[`allApps`]"
+          @open-app="openApp($event)"
+          @app-selected="selectApp($event)"
+          @disable-app="disableApp($event)"
+          @enable-app="enableApp($event)"
+          @start-app="startApp($event)"
+          @uninstall-app="uninstallApp($event)"
+        />
       </div>
       <HCButton
         @click="$emit('open-app-store')"
@@ -52,27 +42,6 @@
         </div>
       </HCButton>
     </div>
-
-    <div v-else style="flex: 1">
-      <div class="row" style="justify-content: start; align-items: center">
-        <mwc-icon-button
-          icon="arrow_back"
-          @click="view = { type: 'installedApps' }"
-        ></mwc-icon-button>
-        <span style="font-size: 1.5em">App Detail</span>
-      </div>
-
-      <div class="column center-content">
-        <InstalledAppDetail
-          style="width: 800px"
-          :installedWebAppInfo="selectedAppInfo"
-          @disable-app="disableSelectedApp()"
-          @enable-app="enableSelectedApp()"
-          @start-app="startSelectedApp()"
-          @uninstall-app="uninstallSelectedApp()"
-        ></InstalledAppDetail>
-      </div>
-    </div>
   </div>
 
   <mwc-snackbar leading :labelText="snackbarText" ref="snackbar"></mwc-snackbar>
@@ -81,12 +50,11 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { ActionTypes } from "../store/actions";
-import { HolochainId, InstalledWebAppInfo } from "../types";
+import { HolochainAppInfo, HolochainId, InstalledWebAppInfo } from "../types";
 import "@material/mwc-snackbar";
 import "@material/mwc-icon";
 import { invoke } from "@tauri-apps/api/tauri";
 import InstalledAppsList from "../components/InstalledAppsList.vue";
-import InstalledAppDetail from "../components/InstalledAppDetail.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 
 type View =
@@ -101,7 +69,7 @@ type View =
 
 export default defineComponent({
   name: "InstalledApps",
-  components: { InstalledAppsList, InstalledAppDetail, HCButton },
+  components: { InstalledAppsList, HCButton },
   data(): {
     snackbarText: string | undefined;
     view: View;
@@ -137,9 +105,10 @@ export default defineComponent({
         appId,
       };
     },
-    async openApp(holochainId: HolochainId, appId: string) {
+    async openApp(app: HolochainAppInfo) {
+      const appId = app.webAppInfo.installed_app_info.installed_app_id;
       try {
-        await invoke("open_app_ui", { appId, holochainId });
+        await invoke("open_app_ui", { appId, holochainId: app.holochainId });
         this.showMessage(`App ${appId} opened`);
       } catch (e) {
         const error = `Error opening app ${appId}: ${JSON.stringify(e)}`;
@@ -149,12 +118,10 @@ export default defineComponent({
         });
       }
     },
-    async disableSelectedApp() {
-      if (this.view.type !== "appDetail") return;
-      const { appId, holochainId } = this.view;
-
+    async disableApp(app: HolochainAppInfo) {
+      const appId = app.webAppInfo.installed_app_info.installed_app_id;
       try {
-        await invoke("disable_app", { appId, holochainId });
+        await invoke("disable_app", { appId, holochainId: app.holochainId });
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
         this.showMessage(`Disabled ${appId}`);
@@ -166,12 +133,11 @@ export default defineComponent({
         });
       }
     },
-    async enableSelectedApp() {
-      if (this.view.type !== "appDetail") return;
-      const { appId, holochainId } = this.view;
+    async enableApp(app: HolochainAppInfo) {
+      const appId = app.webAppInfo.installed_app_info.installed_app_id;
 
       try {
-        await invoke("enable_app", { appId, holochainId });
+        await invoke("enable_app", { appId, holochainId: app.holochainId });
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
         this.showMessage(`Enabled ${appId}`);
@@ -183,12 +149,11 @@ export default defineComponent({
         });
       }
     },
-    async startSelectedApp() {
-      if (this.view.type !== "appDetail") return;
-      const { appId, holochainId } = this.view;
+    async startApp(app: HolochainAppInfo) {
+      const appId = app.webAppInfo.installed_app_info.installed_app_id;
 
       try {
-        await invoke("start_app", { appId, holochainId });
+        await invoke("start_app", { appId, holochainId: app.holochainId });
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
@@ -201,12 +166,11 @@ export default defineComponent({
         });
       }
     },
-    async uninstallSelectedApp() {
-      if (this.view.type !== "appDetail") return;
-      const { appId, holochainId } = this.view;
+    async uninstallApp(app: HolochainAppInfo) {
+      const appId = app.webAppInfo.installed_app_info.installed_app_id;
 
       try {
-        await invoke("uninstall_app", { appId, holochainId });
+        await invoke("uninstall_app", { appId, holochainId: app.holochainId });
 
         this.view = { type: "installedApps" };
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
