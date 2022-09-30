@@ -75,7 +75,7 @@
     </div>
   </div>
 
-  <InstallApp
+  <!-- <InstallApp
     v-if="selectedAppBundlePath"
     :appBundlePath="selectedAppBundlePath"
     :hdkVersionForApp="hdkVersionForApp"
@@ -84,7 +84,18 @@
       $emit('go-back');
     "
     @closing-dialog="installClosed()"
-  ></InstallApp>
+  ></InstallApp> -->
+  <InstallAppDialog
+    v-if="selectedAppBundlePath"
+    :appBundlePath="selectedAppBundlePath"
+    :hdkVersionForApp="hdkVersionForApp"
+    @app-installed="
+      installClosed();
+      $emit('go-back');
+    "
+    @closing-dialog="installClosed()"
+    ref="install-app-dialog"
+  ></InstallAppDialog>
   <mwc-snackbar
     leading
     labelText="App download failed. Please try again later."
@@ -110,12 +121,12 @@ import {
   fetchWebHapp,
 } from "../devhub/get-happs";
 import { HdkVersion } from "@/hdk";
-import InstallApp from "../components/InstallApp.vue";
+import InstallAppDialog from "../components/InstallAppDialog.vue";
 
 export default defineComponent({
   name: "AppStore",
   components: {
-    InstallApp,
+    InstallAppDialog,
   },
   data(): {
     loading: boolean;
@@ -204,6 +215,11 @@ export default defineComponent({
           { name: "Holochain Application", extensions: ["webhapp", "happ"] },
         ],
       })) as string;
+      console.log("All refs: ", this.$refs);
+
+      this.$nextTick(() => {
+        (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
+      });
     },
     installClosed() {
       this.selectedAppBundlePath = undefined;

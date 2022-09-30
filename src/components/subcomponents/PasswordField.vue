@@ -116,7 +116,7 @@ export default defineComponent({
 .password-field {
   height: 42px;
   width: 300px;
-  box-shadow: 0 0 0 2px rgba(59, 61, 115, 0.15);
+  box-shadow: 0 0 0 2px rgba(59, 61, 115, 0.25);
   border-radius: 10px;
   padding: 0 10px;
   --hc-primary-color: #482edf;

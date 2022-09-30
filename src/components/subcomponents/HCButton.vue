@@ -51,6 +51,7 @@ button {
   text-align: center;
   color: #ffffff;
   border-radius: 70px;
+  cursor: pointer;
 }
 
 .btn:hover {

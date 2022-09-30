@@ -1,7 +1,9 @@
 <template>
-  <div style="display: flex; flex: 1; flex-direction: column">
+  <div
+    style="display: flex; flex: 1; flex-direction: column; margin-bottom: 80px"
+  >
     <HCButton @click="handleKlick" style="width: 128px">Continue</HCButton>
-    <InstallAppDialog ref="test-dialog" />
+    <!-- <InstallAppDialog ref="test-dialog"/> -->
 
     <!-- <InstalledAppCard style="margin: 5px" />
     <InstalledAppCard appIcon="/img/dummy_app_icon.png" style="margin: 5px" /> -->
@@ -28,6 +30,7 @@
         style="margin: 5px"
         :app="app"
         @openApp="$emit('openApp', $event)"
+        @uninstallApp="$emit('uninstall-app', $event)"
       />
       <!--
       <ui5-card style="width: auto">
@@ -95,13 +98,11 @@ import { HolochainAppInfo } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
 import HCButton from "./subcomponents/HCButton.vue";
-import InstallAppDialog from "./InstallAppDialog.vue";
 
 export default defineComponent({
   name: "InstalledAppsList",
   components: {
     InstalledAppCard,
-    InstallAppDialog,
     HCButton,
   },
   props: {
@@ -115,10 +116,6 @@ export default defineComponent({
     isAppRunning,
     isAppHeadless(app: HolochainAppInfo) {
       return app.webAppInfo.web_ui_info.type === "Headless";
-    },
-    // to be removed:
-    handleKlick() {
-      (this.$refs["test-dialog"] as typeof InstallAppDialog).open();
     },
   },
 });

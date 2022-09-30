@@ -1,18 +1,12 @@
 <template>
-  <div
-    style="
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #ffffff;
-      border: 1px solid #e1e1e1;
-      border-radius: 25px;
-      max-width: 900px;
-      min-width: 900px;
-      margin: 10px;
-    "
-  >
+  <HCGenericDialog
+    @confirm="uninstallApp(app)"
+    closeOnSideClick
+    ref="uninstall-app-dialog"
+    text="Are you sure you want to uninstall this App? This will irrevocably delete all data stored in it."
+    primaryButtonLabel="Uninstall"
+  />
+  <div class="container">
     <div
       style="
         position: relative;
@@ -179,7 +173,7 @@
         <HCButton
           class="btn"
           style="--hc-primary-color: #d80d0d"
-          @click="$refs['uninstallDialog'].show()"
+          @click="requestUninstall"
           v-if="
             isAppUninstallable(
               app.webAppInfo.installed_app_info.installed_app_id
@@ -230,10 +224,11 @@ import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import ToggleSwitch from "./subcomponents/ToggleSwitch.vue";
 import HCButton from "./subcomponents/HCButton.vue";
 import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
+import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
 
 export default defineComponent({
   name: "InstalledAppCard",
-  components: { ToggleSwitch, HCButton, HCMoreToggle },
+  components: { ToggleSwitch, HCButton, HCMoreToggle, HCGenericDialog },
   props: {
     appIcon: {
       type: String,
@@ -245,9 +240,11 @@ export default defineComponent({
   },
   data(): {
     showMore: boolean;
+    showUninstallDialog: boolean;
   } {
     return {
       showMore: false,
+      showUninstallDialog: false,
     };
   },
   emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp"],
@@ -260,6 +257,11 @@ export default defineComponent({
     isAppHeadless(app: HolochainAppInfo) {
       return app.webAppInfo.web_ui_info.type === "Headless";
     },
+    requestUninstall() {
+      (this.$refs["uninstall-app-dialog"] as typeof HCGenericDialog).open();
+      console.log("requesting uninstall.");
+      this.showUninstallDialog = true;
+    },
     async enableApp(app: HolochainAppInfo) {
       this.$emit("enableApp", app);
     },
@@ -270,6 +272,7 @@ export default defineComponent({
       this.$emit("startApp", app);
     },
     async uninstallApp(app: HolochainAppInfo) {
+      this.showUninstallDialog = false;
       this.$emit("uninstallApp", app);
     },
     getAppStatus(app: HolochainAppInfo) {
@@ -305,6 +308,19 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 25px;
+  max-width: 900px;
+  min-width: 900px;
+  margin: 10px;
+  box-shadow: 0 0 2px rgb(131, 128, 176);
+}
+
 .btn {
   width: 80px;
   margin: 5px;

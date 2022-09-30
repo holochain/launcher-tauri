@@ -1,13 +1,57 @@
 <template>
-  <HCDialog ref="dialog">
-    <div class="column" style="align-items: center; margin: 10px 15px">
+  <HCDialog ref="dialog" @closing="$emit('closing-dialog')">
+    <div
+      v-if="isLoadingFile"
+      class="column"
+      style="align-items: center; justify-content: center; width: 312px"
+    >
+      <mwc-circular-progress
+        indeterminate
+        style="margin-top: 40px; margin-bottom: 40px"
+      ></mwc-circular-progress>
+      <div style="margin-bottom: 10px">Loading file...</div>
+    </div>
+
+    <div
+      v-else-if="installing"
+      class="column"
+      style="align-items: center; justify-content: center; width: 312px"
+    >
+      <mwc-circular-progress
+        indeterminate
+        style="margin-top: 40px; margin-bottom: 40px"
+      ></mwc-circular-progress>
+      <div style="margin-bottom: 10px">Installing...</div>
+    </div>
+
+    <div
+      v-else-if="appInfo"
+      class="column"
+      style="align-items: center; margin: 10px 15px"
+    >
       <div style="font-weight: 700; font-size: 25px; margin: 20px 0 30px 0">
         Install App
       </div>
-      <HCTextField placeholder="App Id" style="margin: 5px" label="App Id" />
-      <HCTextField placeholder="Field 1" style="margin: 5px" />
+      <HCTextField
+        @input="checkAppIdValidity"
+        placeholder="App Id"
+        style="margin: 5px; margin-bottom: 15px"
+        label="App Id*"
+        :invalid="appIdInvalid"
+        ref="app-id-field"
+      />
+      <HCSelect
+        style="margin: 5px"
+        label="Holochain Version*"
+        :items="supportedHolochains"
+        @item-selected="handleHolochainIdSelected($event)"
+      >
+      </HCSelect>
       <div class="column" style="width: 100%">
-        <div class="row" style="margin-top: 20px; align-items: center">
+        <div
+          class="row"
+          style="margin-top: 20px; margin-left: 10px; align-items: center"
+        >
           <div
             @click="showAdvanced = !showAdvanced"
             style="
@@ -29,40 +73,250 @@
           style="margin: 5px"
           :cols="29"
           label="Membrane Proof"
+          helper="Check with the author if this is required."
         />
       </div>
 
       <div class="row" style="margin-top: 30px">
-        <HCButton style="width: 80px; height: 30px; margin: 4px" outlined
+        <HCButton
+          style="width: 80px; height: 30px; margin: 4px 6px"
+          outlined
+          @click="close"
           >Cancel</HCButton
         >
-        <HCButton style="width: 80px; margin: 4px">Install</HCButton>
+        <HCButton
+          style="width: 80px; margin: 4px 6px"
+          :disabled="!isAppReadyToInstall || installing"
+          @click="installApp()"
+          >Install</HCButton
+        >
       </div>
     </div>
   </HCDialog>
+
+  <mwc-snackbar leading :labelText="snackbarText" ref="snackbar"></mwc-snackbar>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { invoke } from "@tauri-apps/api/tauri";
+import { ActionTypes } from "@/store/actions";
+import { serializeHash } from "@holochain-open-dev/utils";
+import { flatten, uniq } from "lodash-es";
+import { toUint8Array } from "js-base64";
 
 import HCButton from "./subcomponents/HCButton.vue";
 import HCDialog from "./subcomponents/HCDialog.vue";
 import HCTextField from "./subcomponents/HCTextField.vue";
 import HCTextArea from "./subcomponents/HCTextArea.vue";
+import HCSelect from "./subcomponents/HCSelect.vue";
+import {
+  HolochainId,
+  HolochainVersion,
+  InstalledWebAppInfo,
+  WebAppInfo,
+} from "../types";
 
 export default defineComponent({
   name: "InstallAppDialog",
-  components: { HCDialog, HCTextField, HCTextArea, HCButton },
+  components: { HCDialog, HCTextField, HCTextArea, HCButton, HCSelect },
+  props: {
+    appBundlePath: {
+      type: String,
+      required: true,
+    },
+    hdkVersionForApp: {
+      type: String,
+    },
+  },
   data(): {
     showAdvanced: boolean;
+    installing: boolean;
+    appId: string | undefined;
+    networkSeed: string | undefined;
+    membraneProofs: { [key: string]: string } | undefined;
+    appInfo: WebAppInfo | undefined;
+    isAppIdValid: boolean;
+    reuseAgentPubKey: string | undefined;
+    holochainId: HolochainId | undefined;
+    supportedHolochains: Array<[string, string]>; // holochain version string as key
+    snackbarText: string | undefined;
+    appIdInvalid: string | undefined;
   } {
     return {
       showAdvanced: false,
+      installing: false,
+      appId: undefined,
+      networkSeed: undefined,
+      membraneProofs: undefined,
+      appInfo: undefined,
+      isAppIdValid: true,
+      reuseAgentPubKey: undefined,
+      holochainId: undefined,
+      snackbarText: undefined,
+      supportedHolochains: [],
+      appIdInvalid: undefined,
     };
+  },
+  computed: {
+    isAppReadyToInstall() {
+      if (!this.appId) return false;
+      if (!this.holochainId) return false;
+      if (!this.isAppIdValid) return false;
+      return true;
+    },
+    isFileLoaded() {
+      if (this.appInfo) return true;
+      return false;
+    },
+    isLoadingFile() {
+      if (this.appBundlePath && !this.appInfo) return true;
+      return false;
+    },
+    allPubKeys() {
+      if (!this.holochainId) return [];
+
+      const pubkeys = this.$store.getters["allPublicKeysForHolochainId"](
+        this.holochainId
+      );
+      return uniq(pubkeys.map(serializeHash));
+    },
+  },
+  async created() {
+    await this.$store.dispatch(ActionTypes.fetchStateInfo);
+
+    const { holochain_versions }: { holochain_versions: HolochainVersion[] } =
+      await invoke("get_supported_versions", {});
+    const orderedVersions = holochain_versions.sort((a, b) =>
+      b > a ? 1 : a === b ? 0 : -1
+    );
+
+    let supportedHolochains: Array<[string, string]> = [];
+    orderedVersions.forEach((v) => supportedHolochains.push([v, v]));
+
+    if (
+      this.$store.getters["runningHolochainIds"].find(
+        (id: HolochainId) => id.type === "CustomBinary"
+      )
+    ) {
+      supportedHolochains.push(["Custom Binary", "CustomBinary"]);
+    }
+
+    this.supportedHolochains = supportedHolochains;
+
+    if (this.hdkVersionForApp) {
+      // Get Holochain Version
+      const version: HolochainVersion = await invoke("choose_version_for_hdk", {
+        hdkVersion: this.hdkVersionForApp,
+      });
+      this.holochainId = {
+        type: "HolochainVersion",
+        content: version,
+      };
+    }
+
+    this.membraneProofs = {};
+    this.appInfo = (await invoke("get_app_info", {
+      appBundlePath: this.appBundlePath,
+    })) as WebAppInfo;
+    this.appId = this.appInfo.app_name;
+
+    this.$nextTick(() => {
+      const appIdField = this.$refs["app-id-field"] as typeof HCTextField;
+      appIdField.value = this.appId as string;
+      this.checkAppIdValidity();
+    });
   },
   methods: {
     open() {
       (this.$refs.dialog as typeof HCDialog).open();
+    },
+    close() {
+      (this.$refs.dialog as typeof HCDialog).close();
+    },
+    checkAppIdValidity() {
+      const newValue = (this.$refs["app-id-field"] as typeof HCTextField).value;
+
+      const holochainIds: HolochainId[] =
+        this.$store.getters["runningHolochainIds"];
+
+      const appsForHolochain = flatten(
+        holochainIds.map((holochainId) =>
+          this.$store.getters["appsForHolochain"](holochainId)
+        )
+      );
+
+      const alreadyExists = appsForHolochain.find(
+        (appInfo: InstalledWebAppInfo) =>
+          appInfo.installed_app_info.installed_app_id === newValue
+      );
+
+      if (alreadyExists) {
+        this.appIdInvalid = "App Id already exists.";
+        return;
+      }
+
+      this.appIdInvalid = undefined;
+    },
+    handleHolochainIdSelected(version: string) {
+      if (version === "CustomBinary") {
+        this.holochainId = {
+          type: "CustomBinary",
+        };
+      } else {
+        this.holochainId = {
+          type: "HolochainVersion",
+          content: version,
+        };
+      }
+    },
+    serializeHash,
+    pathToFilename(path: string) {
+      const components = path.split("/");
+      return components[components.length - 1];
+    },
+    getEncodedMembraneProofs() {
+      if (!this.membraneProofs) return {};
+
+      const encodedMembraneProofs: Record<string, Array<number>> = {};
+      for (const dnaSlot of Object.keys(this.membraneProofs)) {
+        encodedMembraneProofs[dnaSlot] = Array.from(
+          toUint8Array(this.membraneProofs[dnaSlot])
+        );
+      }
+      return encodedMembraneProofs;
+    },
+    async installApp() {
+      if (!this.isAppReadyToInstall) return;
+
+      const appId = (this.$refs["app-id-field"] as typeof HCTextField).value;
+
+      try {
+        this.installing = true;
+
+        await invoke("install_app", {
+          appId,
+          appBundlePath: this.appBundlePath,
+          membraneProofs: this.membraneProofs,
+          networkSeed: this.networkSeed,
+          reuseAgentPubKey: this.reuseAgentPubKey,
+          holochainId: this.holochainId,
+        });
+
+        this.installing = false;
+        await this.$store.dispatch(ActionTypes.fetchStateInfo);
+
+        this.showMessage(`Installed ${this.appId}`);
+
+        this.$emit("app-installed", this.appId);
+      } catch (e) {
+        this.installing = false;
+        this.showMessage(JSON.stringify(e));
+      }
+    },
+    showMessage(message: string) {
+      this.snackbarText = message;
+      (this.$refs as any).snackbar.show();
     },
   },
 });

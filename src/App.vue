@@ -69,7 +69,8 @@ body,
   flex: 1;
   height: 100%;
   font-family: Poppins, sans-serif;
-  background-color: #ededed;
+  /* background-color: #ededed; */
+  background-color: #e8e8eb;
 }
 
 :root {

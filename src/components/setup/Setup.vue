@@ -1,6 +1,9 @@
 <template>
   <div class="background">
-    <div class="row">
+    <div
+      class="row"
+      style="box-shadow: 0 0 30px rgb(21, 16, 65); border-radius: 15px"
+    >
       <div class="column center-content left-half">
         <div
           style="
@@ -148,11 +151,12 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: rgb(21, 16, 65);
+  /* background-color: rgb(21, 16, 65); */
+  background-color: #e3e4eb;
 }
 
 .left-half {
-  background-color: #482edf;
+  background-color: #331ead;
   height: 695px;
   width: 500px;
   border-radius: 15px 0 0 15px;

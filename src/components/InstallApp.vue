@@ -6,7 +6,7 @@
     scrimClickAction=""
     escapeKeyAction=""
   >
-    <div class="row center" style="width: 512px" v-if="isLoadingFile">
+    <div class="row center-content" v-if="isLoadingFile">
       <mwc-circular-progress
         indeterminate
         style="margin-top: 80px; margin-bottom: 60px"

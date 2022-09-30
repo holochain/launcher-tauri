@@ -1,6 +1,10 @@
 <template>
   <div ref="container" tabindex="0" @keydown.esc="close">
-    <dialog @click="close" class="background" :open="isOpen"></dialog>
+    <dialog
+      @click="closeOnSideClick ? close() : null"
+      class="background"
+      :open="isOpen"
+    ></dialog>
     <dialog class="dialog-element" :open="isOpen">
       <slot></slot>
       <slot name="secondaryAction"></slot>
@@ -23,6 +27,10 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    closeOnSideClick: {
+      type: Boolean,
+      default: false,
+    },
   },
   data(): {
     isOpen: boolean;
@@ -38,6 +46,7 @@ export default defineComponent({
     },
     close() {
       this.isOpen = false;
+      this.$emit("closing");
     },
   },
 });

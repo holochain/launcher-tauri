@@ -7,6 +7,8 @@
       v-model="value"
       :placeholder="placeholder"
     />
+    <div v-if="invalid" class="invalidity-note">{{ invalid }}</div>
+    <div v-if="helper && !invalid" class="helper-note">{{ helper }}</div>
   </div>
 </template>
 
@@ -28,6 +30,14 @@ export default defineComponent({
       type: String,
       default: undefined,
     },
+    invalid: {
+      type: String,
+      default: undefined,
+    },
+    helper: {
+      type: String,
+      default: undefined,
+    },
   },
   data(): {
     focus: boolean;
@@ -44,7 +54,7 @@ export default defineComponent({
 <style scoped>
 .container {
   --hc-primary-color: #482edf;
-  --active-border-color: rgba(59, 61, 115, 0.15);
+  --active-border-color: rgba(59, 61, 115, 0.25);
   --active-label-color: rgba(59, 61, 115, 0.4);
 }
 
@@ -58,9 +68,9 @@ export default defineComponent({
   height: 48px;
   padding: 0 10px;
   width: 300px;
-  /* outline: 2px solid rgba(59, 61, 115, 0.15); */
+  /* outline: 2px solid rgba(59, 61, 115, 0.25); */
   border-radius: 10px;
-  /* box-shadow: 0 0 0 2px rgba(59, 61, 115, 0.15); */
+  /* box-shadow: 0 0 0 2px rgba(59, 61, 115, 0.25); */
   border: 2px solid var(--active-border-color);
 }
 
@@ -77,5 +87,19 @@ export default defineComponent({
   top: -10px;
   left: 12px;
   margin: 0 10px;
+}
+
+.invalidity-note {
+  margin-top: -1px;
+  margin-left: 15px;
+  font-size: 13px;
+  color: #e00000;
+}
+
+.helper-note {
+  margin-left: 15px;
+  margin-top: -1px;
+  font-size: 13px;
+  color: rgba(59, 61, 115, 0.5);
 }
 </style>
