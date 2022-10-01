@@ -1,26 +1,44 @@
 <template>
-  <div class="column" style="flex: 1; margin: 8px">
-    <div class="row center-content">
+  <div class="column" style="flex: 1">
+    <div class="row center-content top-bar">
       <mwc-icon-button
         icon="arrow_back"
         @click="$emit('go-back')"
       ></mwc-icon-button>
 
-      <span style="flex: 1; font-size: 1.5em">App Library</span>
-      <mwc-button
-        label="How to publish an app"
-        @click="howToPublish()"
-        style=""
+      <span
+        style="
+          flex: 1;
+          font-size: 1.5em;
+          margin-left: 4px;
+          position: sticky;
+          top: 0;
+          z-index: 1;
+        "
+        >App Library</span
       >
-      </mwc-button>
-      <mwc-button
+      <HCButton
+        outlined
+        @click="howToPublish()"
+        style="height: 36px; border-radius: 8px; padding: 0 20px"
+        :title="howToPublishUrl"
+        >How to publish an app
+      </HCButton>
+      <HCButton
         icon="folder"
-        raised
-        style="--mdc-theme-primary: #4720e3; margin-left: 8px"
-        label="Select app from FileSystem"
+        style="
+          margin-left: 8px;
+          height: 40px;
+          border-radius: 8px;
+          padding: 0 20px;
+        "
         @click="selectFromFileSystem()"
       >
-      </mwc-button>
+        <div class="row center-content">
+          <mwc-icon>folder</mwc-icon>
+          <span style="margin-left: 5px">Select app from Filesystem</span>
+        </div>
+      </HCButton>
     </div>
 
     <div v-if="loading" class="column center-content" style="flex: 1">
@@ -109,6 +127,7 @@ import "@material/mwc-dialog";
 import "@material/mwc-circular-progress";
 import "@material/mwc-button";
 import "@material/mwc-snackbar";
+import "@material/mwc-icon";
 import { AppWebsocket } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
@@ -122,23 +141,28 @@ import {
 } from "../devhub/get-happs";
 import { HdkVersion } from "@/hdk";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
+import HCButton from "../components/subcomponents/HCButton.vue";
 
 export default defineComponent({
   name: "AppStore",
   components: {
     InstallAppDialog,
+    HCButton,
   },
   data(): {
     loading: boolean;
     installableApps: Array<AppWithReleases>;
     selectedAppBundlePath: string | undefined;
     hdkVersionForApp: HdkVersion | undefined;
+    howToPublishUrl: string;
   } {
     return {
       loading: true,
       installableApps: [],
       selectedAppBundlePath: undefined,
       hdkVersionForApp: undefined,
+      howToPublishUrl:
+        "https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub",
     };
   },
 
@@ -173,7 +197,7 @@ export default defineComponent({
   methods: {
     async howToPublish() {
       await invoke("open_url", {
-        url: "https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub",
+        url: this.howToPublishUrl,
       });
     },
     getLatestRelease,
@@ -228,3 +252,13 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.top-bar {
+  /* background-color: rgb(225, 226, 255); */
+  padding: 8px 8px 8px 6px;
+  /* border-bottom: 1px solid black; */
+  background: white;
+  box-shadow: 0 0px 5px #9b9b9b;
+}
+</style>

@@ -68,7 +68,7 @@
         </div>
       </div>
 
-      <div v-if="showAdvanced" class="column" style="align-items: center">
+      <div v-show="showAdvanced" class="column" style="align-items: center">
         <HCTextField
           placeholder="Network Seed"
           label="Network Seed"

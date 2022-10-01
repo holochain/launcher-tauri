@@ -63,6 +63,7 @@ export default defineComponent({
   --hc-primary-color: #482edf;
   --active-border-color: rgba(59, 61, 115, 0.25);
   --active-label-color: rgba(59, 61, 115, 0.4);
+  --hc-label-background: white;
 }
 
 .container:focus-within {
@@ -87,7 +88,7 @@ export default defineComponent({
   color: var(--active-label-color);
   padding: 0 4px;
   font-size: 14px;
-  background: white;
+  background: var(--hc-label-background);
   position: absolute;
   top: -10px;
   left: 12px;

@@ -53,9 +53,14 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.container {
+  --hc-primary-color: #482edf;
+  --hc-secondary-color: #674df9;
+}
+
 .background {
   border: none;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.4);
   width: 100vw;
   height: 100vh;
   z-index: 1;
@@ -68,12 +73,13 @@ export default defineComponent({
   max-height: 90vh;
   overflow-y: scroll;
   border: none;
-  border-radius: 15px;
+  border-radius: 12px;
   position: absolute;
   left: 50vw;
   top: 50vh;
   transform: translate(-50%, -50%);
   margin: 0; /*reset some browser centering*/
   z-index: 1;
+  border: 4px solid var(--hc-primary-color);
 }
 </style>

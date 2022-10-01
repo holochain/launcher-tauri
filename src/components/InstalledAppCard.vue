@@ -71,7 +71,7 @@
         <ToggleSwitch
           style="margin-right: 29px"
           :sliderOn="isAppRunning(app.webAppInfo.installed_app_info)"
-          @click="handleSlider(appwebAppInfo)"
+          @click="handleSlider(app)"
         />
       </sl-tooltip>
 
@@ -292,13 +292,14 @@ export default defineComponent({
 
       return installedAppId !== `DevHub-${holochainId.content}`;
     },
-    handleSlider(app: HolochainAppInfo) {
+    async handleSlider(app: HolochainAppInfo) {
       if (isAppRunning(app.webAppInfo.installed_app_info)) {
-        this.disableApp(app);
+        console.log("trying to disable app");
+        await this.disableApp(app);
       } else if (isAppDisabled(app.webAppInfo.installed_app_info)) {
-        this.enableApp(app);
+        await this.enableApp(app);
       } else if (isAppPaused(app.webAppInfo.installed_app_info)) {
-        this.startApp(app);
+        await this.startApp(app);
       } else {
         throw new Error("Unknown App state.");
       }
@@ -311,14 +312,17 @@ export default defineComponent({
 .container {
   position: relative;
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
   background: #ffffff;
   border-radius: 25px;
-  max-width: 900px;
+  width: 100%;
+  max-width: 1100px;
   min-width: 900px;
-  margin: 10px;
-  box-shadow: 0 0 2px rgb(131, 128, 176);
+  margin: 8px;
+  /* box-shadow: 0 0 2px rgb(131, 128, 176); */
+  box-shadow: 0 0px 5px #9b9b9b;
 }
 
 .btn {

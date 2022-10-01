@@ -1,5 +1,5 @@
 <template>
-  <div class="container" style="position: relative">
+  <div class="container column" style="position: relative">
     <div class="label">{{ label }}</div>
     <input
       :required="required"
@@ -56,6 +56,8 @@ export default defineComponent({
   --hc-primary-color: #482edf;
   --active-border-color: rgba(59, 61, 115, 0.25);
   --active-label-color: rgba(59, 61, 115, 0.4);
+  --hc-label-background: white;
+  width: 300px;
 }
 
 .container:focus-within {
@@ -67,7 +69,6 @@ export default defineComponent({
   all: unset;
   height: 48px;
   padding: 0 10px;
-  width: 300px;
   /* outline: 2px solid rgba(59, 61, 115, 0.25); */
   border-radius: 10px;
   /* box-shadow: 0 0 0 2px rgba(59, 61, 115, 0.25); */
@@ -82,7 +83,7 @@ export default defineComponent({
   color: var(--active-label-color);
   padding: 0 4px;
   font-size: 14px;
-  background: white;
+  background: var(--hc-label-background);
   position: absolute;
   top: -10px;
   left: 12px;

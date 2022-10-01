@@ -152,7 +152,8 @@ export default defineComponent({
   align-items: center;
   height: 100vh;
   /* background-color: rgb(21, 16, 65); */
-  background-color: #e3e4eb;
+  /* background-color: #e3e4eb; */
+  background-color: #e8e8eb;
 }
 
 .left-half {

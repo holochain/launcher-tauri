@@ -1,6 +1,6 @@
 <template>
   <div
-    class="container"
+    class="container column"
     style="position: relative"
     @click="showSelection = !showSelection"
     tabindex="0"
@@ -11,7 +11,8 @@
         type="text"
         disabled
         class="selected-field"
-        :value="selectedKey ? selectedKey : 'Select...'"
+        :class="{ greyedOut: !selectedKey }"
+        :value="selectedKey ? selectedKey : placeholder"
         :title="selectedKey ? selectedKey : undefined"
       />
       <span style="display: flex; flex: 1"></span>
@@ -44,7 +45,7 @@ export default defineComponent({
   props: {
     placeholder: {
       type: String,
-      default: "Select",
+      default: "Select...",
     },
     required: {
       type: Boolean,
@@ -91,6 +92,9 @@ export default defineComponent({
   --hc-primary-color: #482edf;
   --active-border-color: rgba(59, 61, 115, 0.25);
   --active-label-color: rgba(59, 61, 115, 0.5);
+  --hc-label-background: white;
+  width: 300px;
+  border-radius: 10px;
 }
 
 .container:focus-within {
@@ -102,7 +106,6 @@ export default defineComponent({
   cursor: pointer;
   height: 48px;
   padding: 0 10px;
-  width: 300px;
   /* outline: 2px solid rgba(59, 61, 115, 0.25); */
   border-radius: 10px;
   /* box-shadow: 0 0 0 2px rgba(59, 61, 115, 0.25); */
@@ -112,6 +115,7 @@ export default defineComponent({
 .selected-field {
   all: unset;
   width: 100%;
+  color: black;
 }
 
 .flatBottom {
@@ -146,7 +150,7 @@ export default defineComponent({
 }
 
 .greyedOut {
-  color: var(--active-label-color);
+  color: rgb(75, 75, 75);
 }
 
 .rotated {
@@ -157,7 +161,7 @@ export default defineComponent({
   color: var(--active-label-color);
   padding: 0 4px;
   font-size: 14px;
-  background: white;
+  background: var(--hc-label-background);
   position: absolute;
   top: -10px;
   left: 12px;

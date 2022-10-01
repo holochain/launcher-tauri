@@ -11,10 +11,15 @@
       v-if="view.type === 'installedApps'"
       style="display: flex; flex: 1; flex-direction: column"
     >
-      <span style="margin: 16px; font-size: 1.5em; font-weight: 600"
-        >Installed Apps</span
-      >
-      <div class="column" style="flex: 1; align-items: center">
+      <div class="row top-bar" style="position: sticky; top: 0; z-index: 1">
+        <img
+          src="/img/Square284x284Logo.png"
+          style="height: 42px; margin-left: 8px"
+        />
+        <span style="font-size: 1.5em; margin-left: 14px">Installed Apps</span>
+      </div>
+
+      <div class="column" style="flex: 1; align-items: center; padding: 0 50px">
         <InstalledAppsList
           :installedApps="$store.getters[`allApps`]"
           @open-app="openApp($event)"
@@ -201,5 +206,12 @@ export default defineComponent({
 }
 .btn-install:focus-visible {
   --hc-primary-color: #674df9;
+}
+
+.top-bar {
+  align-items: center;
+  height: 64px;
+  background: white;
+  box-shadow: 0 0px 5px #9b9b9b;
 }
 </style>
