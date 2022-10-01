@@ -97,7 +97,7 @@ export default defineComponent({
 }
 
 .helper-note {
-  margin-left: 15px;
+  margin-left: 10px;
   margin-top: -1px;
   font-size: 13px;
   color: rgba(59, 61, 115, 0.5);

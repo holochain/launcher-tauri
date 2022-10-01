@@ -1,16 +1,18 @@
 <template>
-  <div class="container" style="position: relative">
-    <div class="label">{{ label }}</div>
-    <textarea
-      :required="required"
-      :rows="rows"
-      :cols="cols"
-      class="textarea"
-      v-model="value"
-      :placeholder="placeholder"
-    />
+  <div class="wrapper column">
+    <div class="container" style="position: relative">
+      <div class="label">{{ label }}</div>
+      <textarea
+        :required="required"
+        :rows="rows"
+        :cols="cols"
+        class="textarea"
+        v-model="value"
+        :placeholder="placeholder"
+      />
+    </div>
+    <div v-if="helper" class="helper-note">{{ helper }}</div>
   </div>
-  <div v-if="helper" class="helper-note">{{ helper }}</div>
 </template>
 
 <script lang="ts">
@@ -57,7 +59,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.container {
+.wrapper {
   --hc-primary-color: #482edf;
   --active-border-color: rgba(59, 61, 115, 0.25);
   --active-label-color: rgba(59, 61, 115, 0.4);
@@ -93,7 +95,7 @@ export default defineComponent({
 }
 
 .helper-note {
-  margin-left: 15px;
+  margin-left: 10px;
   margin-top: -1px;
   font-size: 13px;
   color: rgba(59, 61, 115, 0.5);

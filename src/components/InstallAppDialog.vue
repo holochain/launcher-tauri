@@ -15,7 +15,7 @@
     <div
       v-else-if="installing"
       class="column"
-      style="align-items: center; justify-content: center; width: 312px"
+      style="align-items: center; justify-content: center; width: 412px"
     >
       <mwc-circular-progress
         indeterminate
@@ -29,14 +29,18 @@
       class="column"
       style="align-items: center; margin: 10px 15px"
     >
-      <div style="font-weight: 700; font-size: 25px; margin: 20px 0 30px 0">
+      <div style="font-weight: 700; font-size: 25px; margin: 20px 0 10px 0">
         Install App
+      </div>
+      <div style="margin-bottom: 30px; color: #482edf; font-size: 20px">
+        {{ appInfo?.app_name || "" }}
       </div>
       <HCTextField
         @input="checkAppIdValidity"
         placeholder="App Id"
         style="margin: 5px; margin-bottom: 15px"
         label="App Id*"
+        helper="Choose your own name for this app"
         :invalid="appIdInvalid"
         ref="app-id-field"
       />
@@ -48,10 +52,7 @@
       >
       </HCSelect>
       <div class="column" style="width: 100%">
-        <div
-          class="row"
-          style="margin-top: 20px; margin-left: 10px; align-items: center"
-        >
+        <div class="row" style="margin: 20px 0 15px 10px; align-items: center">
           <div
             @click="showAdvanced = !showAdvanced"
             style="
@@ -67,7 +68,7 @@
         </div>
       </div>
 
-      <div v-if="showAdvanced">
+      <div v-if="showAdvanced" class="column" style="align-items: center">
         <HCTextField
           placeholder="Network Seed"
           label="Network Seed"
@@ -77,7 +78,7 @@
         />
 
         <HCSelect
-          style="margin: 5px"
+          style="margin: 5px; margin-bottom: 15px"
           label="Public Key"
           :items="allPubKeys"
           @item-selected="reuseAgentPubKey = $event"
@@ -85,13 +86,38 @@
         >
         </HCSelect>
 
-        <HCTextArea
-          placeholder="Membrane Proof"
-          style="margin: 5px"
-          :cols="29"
-          label="Membrane Proof"
-          helper="Check with the author if this is required."
-        />
+        <div class="row" style="align-items: flex-start; width: 100%">
+          <span
+            style="
+              margin-left: 5px;
+              margin-top: 10px;
+              font-weight: 600;
+              font-size: 18px;
+            "
+            >Dna Roles</span
+          >
+        </div>
+
+        <div
+          v-for="(appRole, index) of appInfo.roles_to_create"
+          :key="appRole.id"
+          class="column"
+          style="flex: 1; margin-top: 8px"
+        >
+          <span>#{{ index + 1 }} {{ appRole.id }}</span>
+
+          <HCTextArea
+            placeholder="Membrane Proof"
+            style="margin-top: 10px; display: flex; flex: 1"
+            :cols="29"
+            label="Membrane Proof"
+            helper="Check with the author if this is required."
+            @input="
+              membraneProofs[appRole.id] = $event.target.value;
+              onChange();
+            "
+          />
+        </div>
       </div>
 
       <div class="row" style="margin-top: 30px">
