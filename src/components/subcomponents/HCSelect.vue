@@ -7,13 +7,17 @@
   >
     <div class="label">{{ label }}</div>
     <div class="input-field row" style="align-items: center">
-      <div :class="{ greyedOut: selectedKey ? false : true }">
-        {{ selectedKey ? selectedKey : "Select..." }}
-      </div>
+      <input
+        type="text"
+        disabled
+        class="selected-field"
+        :value="selectedKey ? selectedKey : 'Select...'"
+        :title="selectedKey ? selectedKey : undefined"
+      />
       <span style="display: flex; flex: 1"></span>
       <img
         src="/img/select_arrow.svg"
-        style="width: 12px; margin-right: 5px"
+        style="width: 12px; margin-right: 5px; margin-left: 5px"
         :class="{ rotated: showSelection }"
       />
     </div>
@@ -22,6 +26,7 @@
       <div
         class="item row"
         v-for="(item, index) of items"
+        :title="item[0]"
         :key="index"
         @click="handleSelect(item)"
       >
@@ -104,6 +109,11 @@ export default defineComponent({
   border: 2px solid var(--active-border-color);
 }
 
+.selected-field {
+  all: unset;
+  width: 100%;
+}
+
 .flatBottom {
   border-radius: 5px 5px 0 0;
 }
@@ -119,6 +129,8 @@ export default defineComponent({
   top: 53px;
   box-shadow: 0 0 2px rgb(131, 128, 176);
   border-radius: 8px 8px 10px 10px;
+  overflow: hidden;
+  z-index: 1;
 }
 
 .item {
@@ -126,6 +138,7 @@ export default defineComponent({
   cursor: pointer;
   padding: 12px;
   border-radius: 10px;
+  overflow: hidden;
 }
 
 .item:hover {

@@ -68,6 +68,23 @@
       </div>
 
       <div v-if="showAdvanced">
+        <HCTextField
+          placeholder="Network Seed"
+          label="Network Seed"
+          style="margin: 5px; margin-bottom: 15px"
+          helper="Change it to create a new network"
+          ref="network-seed-field"
+        />
+
+        <HCSelect
+          style="margin: 5px"
+          label="Public Key"
+          :items="allPubKeys"
+          @item-selected="reuseAgentPubKey = $event"
+          helper="Optionally chose an already existing public key"
+        >
+        </HCSelect>
+
         <HCTextArea
           placeholder="Membrane Proof"
           style="margin: 5px"
@@ -133,7 +150,6 @@ export default defineComponent({
     showAdvanced: boolean;
     installing: boolean;
     appId: string | undefined;
-    networkSeed: string | undefined;
     membraneProofs: { [key: string]: string } | undefined;
     appInfo: WebAppInfo | undefined;
     isAppIdValid: boolean;
@@ -147,7 +163,6 @@ export default defineComponent({
       showAdvanced: false,
       installing: false,
       appId: undefined,
-      networkSeed: undefined,
       membraneProofs: undefined,
       appInfo: undefined,
       isAppIdValid: true,
@@ -176,10 +191,22 @@ export default defineComponent({
     allPubKeys() {
       if (!this.holochainId) return [];
 
-      const pubkeys = this.$store.getters["allPublicKeysForHolochainId"](
-        this.holochainId
-      );
-      return uniq(pubkeys.map(serializeHash));
+      const pubkeys: Uint8Array[] = this.$store.getters[
+        "allPublicKeysForHolochainId"
+      ](this.holochainId);
+
+      console.log("All public keys: ", pubkeys);
+
+      const allPubKeys: [string, string | undefined][] = [
+        ["Generate New Public Key (default)", undefined],
+      ];
+      uniq(pubkeys.map(serializeHash)).forEach((pubKey) => {
+        allPubKeys.push([pubKey, pubKey]);
+      });
+
+      console.log("Nicely arranged public keys: ", allPubKeys);
+
+      return allPubKeys;
     },
   },
   async created() {
@@ -290,6 +317,12 @@ export default defineComponent({
       if (!this.isAppReadyToInstall) return;
 
       const appId = (this.$refs["app-id-field"] as typeof HCTextField).value;
+      const networkSeed = (
+        this.$refs["network-seed-field"] as typeof HCTextField
+      ).value;
+
+      console.log("Network Seed: ", networkSeed);
+      console.log("public key: ", this.reuseAgentPubKey);
 
       try {
         this.installing = true;
@@ -298,7 +331,7 @@ export default defineComponent({
           appId,
           appBundlePath: this.appBundlePath,
           membraneProofs: this.membraneProofs,
-          networkSeed: this.networkSeed,
+          networkSeed,
           reuseAgentPubKey: this.reuseAgentPubKey,
           holochainId: this.holochainId,
         });

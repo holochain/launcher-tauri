@@ -65,6 +65,8 @@ export default defineComponent({
 }
 
 .dialog-element {
+  max-height: 90vh;
+  overflow-y: scroll;
   border: none;
   border-radius: 15px;
   position: absolute;
