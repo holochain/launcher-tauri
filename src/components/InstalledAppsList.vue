@@ -29,12 +29,36 @@
           box-shadow: 0 0px 3px -1px #9b9b9b;
           --hc-label-background: #e8e8eb;
         "
+        placeholder="filter by"
+        :items="holochainVersions"
+        label="Holochain Version"
+        @item-selected="selectedHolochainVersion = $event"
+      ></HCSelect>
+      <img
+        src="/img/Square284x284Logo.png"
+        style="
+          height: 30px;
+          filter: grayscale(50%);
+          margin-right: 20px;
+          margin-left: -2px;
+        "
+      />
+
+      <HCSelect
+        style="
+          width: 200px;
+          margin-right: 5px;
+          box-shadow: 0 0px 3px -1px #9b9b9b;
+          --hc-label-background: #e8e8eb;
+        "
         placeholder="sort by"
         :items="sortOptions"
         label="sort by"
         @item-selected="sortOption = $event"
       ></HCSelect>
-      <mwc-icon style="text-shadow: 0 0px 5px #9b9b9b">sort</mwc-icon>
+      <mwc-icon style="color: #482edf; text-shadow: 0 0px 5px #9b9b9b"
+        >sort</mwc-icon
+      >
     </div>
     <!-- <InstallAppDialog ref="test-dialog"/> -->
 
@@ -136,10 +160,11 @@ import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
 
-import { HolochainAppInfo } from "../types";
+import { HolochainAppInfo, HolochainVersion } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
 import HCSelect from "./subcomponents/HCSelect.vue";
+import { uniq } from "lodash-es";
 
 export default defineComponent({
   name: "InstalledAppsList",
@@ -156,6 +181,7 @@ export default defineComponent({
   data(): {
     sortOptions: [string, string][];
     sortOption: string | undefined;
+    selectedHolochainVersion: string;
   } {
     return {
       sortOptions: [
@@ -164,12 +190,20 @@ export default defineComponent({
         // ["Holochain Version", "Holochain Version"],
       ],
       sortOption: undefined,
+      selectedHolochainVersion: "All Versions",
     };
   },
   emits: ["openApp"],
   computed: {
     sortedApps() {
       let sortedAppList = this.installedApps;
+
+      if (this.selectedHolochainVersion !== "All Versions") {
+        console.log("not all versions!");
+        sortedAppList = sortedAppList.filter(
+          (app) => app.holochainVersion === this.selectedHolochainVersion
+        );
+      }
 
       if (this.sortOption === "name") {
         sortedAppList = sortedAppList.sort((appA, appB) =>
@@ -186,6 +220,14 @@ export default defineComponent({
       }
 
       return sortedAppList;
+    },
+    holochainVersions(): [string, string][] {
+      let allApps = this.installedApps;
+      let hcVersions: [string, string][] = [["All Versions", "All Versions"]];
+      uniq(allApps.map((app) => app.holochainVersion)).forEach((hcVer) => {
+        hcVersions.push([hcVer, hcVer]);
+      });
+      return hcVersions;
     },
   },
   methods: {

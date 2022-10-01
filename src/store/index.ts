@@ -209,6 +209,7 @@ export const store = createStore<LauncherAdminState>({
               holochainId: {
                 type: "CustomBinary",
               },
+              holochainVersion: "Custom Binary",
             });
           }
         );
@@ -225,6 +226,7 @@ export const store = createStore<LauncherAdminState>({
                   type: "HolochainVersion",
                   content: holochainVersion,
                 },
+                holochainVersion,
               });
             });
           }
