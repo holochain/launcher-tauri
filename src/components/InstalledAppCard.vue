@@ -31,14 +31,16 @@
       <div
         style="
           display: flex;
+          flex: 1;
           font-size: 23px;
           font-weight: 700;
           margin-left: 40px;
+          margin-right: 30px;
+          word-break: break-all;
         "
       >
         {{ app.webAppInfo.installed_app_info.installed_app_id }}
       </div>
-      <span style="flex: 1"></span>
 
       <sl-tooltip
         style="--show-delay: 500"
