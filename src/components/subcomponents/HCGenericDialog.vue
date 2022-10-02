@@ -2,23 +2,24 @@
   <HCDialog ref="dialog" :closeOnSideClick="closeOnSideClick">
     <div
       class="column"
-      style="
-        align-items: center;
-        max-width: 500px;
-        padding: 40px 10px 20px 10px;
-      "
+      style="align-items: center; padding: 40px 10px 20px 10px"
     >
-      <div style="text-align: center">{{ text }}</div>
+      <slot></slot>
+
       <div class="row" style="margin-top: 30px">
         <HCButton
+          v-if="!hideCancel"
           style="width: 80px; height: 30px; margin: 4px 6px"
           outlined
           @click="close()"
           >Cancel</HCButton
         >
-        <HCButton style="width: 80px; margin: 4px 6px" @click="handleConfirm">{{
-          primaryButtonLabel
-        }}</HCButton>
+        <HCButton
+          style="min-width: 80px; margin: 4px 6px"
+          @click="handleConfirm"
+          :disabled="primaryButtonDisabled"
+          >{{ primaryButtonLabel }}
+        </HCButton>
       </div>
     </div>
   </HCDialog>
@@ -34,15 +35,23 @@ export default defineComponent({
   name: "HCGenericDialog",
   components: { HCButton, HCDialog },
   props: {
-    text: {
-      type: String,
-      required: true,
-    },
     primaryButtonLabel: {
       type: String,
       default: "Ok",
     },
     closeOnSideClick: {
+      type: Boolean,
+      default: false,
+    },
+    primaryButtonDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    closeOnConfirm: {
+      type: Boolean,
+      default: false,
+    },
+    hideCancel: {
       type: Boolean,
       default: false,
     },
@@ -64,7 +73,9 @@ export default defineComponent({
     },
     handleConfirm() {
       this.$emit("confirm");
-      this.close();
+      if (this.closeOnConfirm) {
+        this.close();
+      }
     },
   },
 });

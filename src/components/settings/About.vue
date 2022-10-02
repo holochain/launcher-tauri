@@ -17,7 +17,7 @@
           font-size: 1.5em;
           width: 100%;
           text-align: center;
-          margin-bottom: 20px;
+          margin-bottom: 25px;
           margin-top: -10px;
         "
         >About</span

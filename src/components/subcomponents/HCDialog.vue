@@ -6,7 +6,9 @@
       :open="isOpen"
     ></dialog>
     <dialog class="dialog-element" :open="isOpen">
-      <slot></slot>
+      <div class="column">
+        <slot></slot>
+      </div>
       <slot name="secondaryAction"></slot>
       <slot name="primaryAction"></slot>
     </dialog>
@@ -73,7 +75,7 @@ export default defineComponent({
 
 .dialog-element {
   max-height: 90vh;
-  overflow-y: scroll;
+  max-width: 90vh;
   border: none;
   border-radius: 12px;
   position: absolute;

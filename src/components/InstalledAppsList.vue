@@ -77,6 +77,7 @@
     >
       <span
         style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.4)"
+        title="Holochain Apps with Graphical User Interface"
         >Web Apps</span
       >
     </div>
@@ -127,6 +128,7 @@
     >
       <span
         style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.4)"
+        title="Holochain Apps without Graphical User Interface"
         >Headless Apps</span
       >
     </div>

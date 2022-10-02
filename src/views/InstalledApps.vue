@@ -14,9 +14,9 @@
       <div class="row top-bar" style="position: sticky; top: 0; z-index: 1">
         <img
           src="/img/Square284x284Logo.png"
-          style="height: 42px; margin-left: 8px"
+          style="height: 42px; margin-left: 11px"
         />
-        <span style="font-size: 1.5em; margin-left: 14px">Installed Apps</span>
+        <span style="font-size: 1.5em; margin-left: 13px">Installed Apps</span>
         <span style="display: flex; flex: 1"></span>
         <HCButton
           style="

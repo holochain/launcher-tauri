@@ -3,9 +3,13 @@
     @confirm="uninstallApp(app)"
     closeOnSideClick
     ref="uninstall-app-dialog"
-    text="Are you sure you want to uninstall this App? This will irrevocably delete all data stored in it."
     primaryButtonLabel="Uninstall"
-  />
+    ><div style="text-align: center">
+      Are you sure you want to uninstall this App? This will irrevocably delete
+      all data stored in it.
+    </div>
+  </HCGenericDialog>
+
   <div class="container">
     <div
       style="

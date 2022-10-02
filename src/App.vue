@@ -8,9 +8,20 @@
       "
       heading="Error Launching Holochain"
     >
-      <span style="margin-top: 8px">
+      <div
+        style="
+          margin-top: 8px;
+          display: flex;
+          flex: 1;
+          background: rgba(255, 0, 0, 0.1);
+          overflow-x: scroll;
+          border-radius: 5px;
+          padding: 10px;
+          max-width: 600px;
+        "
+      >
         {{ $store.getters[`errorLaunching`] }}
-      </span>
+      </div>
     </Error>
     <Setup v-else-if="$store.getters[`setupNeeded`]"></Setup>
     <EnterPassword v-else-if="$store.getters[`passwordNeeded`]"></EnterPassword>
