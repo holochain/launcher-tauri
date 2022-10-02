@@ -60,7 +60,9 @@ export default defineComponent({
 
 .background {
   border: none;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(255, 255, 255, 0.7);
+  background-color: #e8e8eb;
+  opacity: 0.9;
   width: 100vw;
   height: 100vh;
   z-index: 1;
@@ -81,5 +83,6 @@ export default defineComponent({
   margin: 0; /*reset some browser centering*/
   z-index: 1;
   border: 4px solid var(--hc-primary-color);
+  box-shadow: 0 0px 5px #9b9b9b;
 }
 </style>

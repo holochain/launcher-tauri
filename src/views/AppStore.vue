@@ -28,6 +28,7 @@
         icon="folder"
         style="
           margin-left: 8px;
+          margin-right: 1px;
           height: 40px;
           border-radius: 8px;
           padding: 0 20px;
@@ -56,6 +57,8 @@
           style="cursor: pointer; text-decoration: underline"
           title="https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub"
           @click="howToPublish()"
+          @keydown.enter="howToPublish()"
+          tabindex="0"
           >Read this</span
         >
         to learn how to publish a Holochain application to the DevHub.</span

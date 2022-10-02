@@ -108,7 +108,7 @@
       class="column"
       style="align-items: left; width: 100%; margin-bottom: 20px"
     >
-      <div class="row" style="margin-top: 35px; margin-left: 25px">
+      <div class="row" style="margin-top: 45px; margin-left: 140px">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Your Public Key:</span
         >
@@ -119,7 +119,7 @@
         }}</span>
       </div>
 
-      <div class="row" style="margin-top: 20px; margin-left: 25px">
+      <div class="row" style="margin-top: 20px; margin-left: 140px">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Holochain Version:</span
         >
@@ -130,7 +130,7 @@
         }}</span>
       </div>
 
-      <table style="text-align: left; margin-top: 20px; margin-left: 25px">
+      <table style="text-align: left; margin-top: 20px; margin-left: 140px">
         <tr>
           <th>Cell Role</th>
           <th>Dna Hash</th>
@@ -158,7 +158,7 @@
 
       <span
         v-if="getReason(app.webAppInfo.installed_app_info)"
-        style="margin-top: 16px; margin-left: 25px"
+        style="margin-top: 16px; margin-left: 140px"
       >
         {{ getReason(app.webAppInfo.installed_app_info) }}
       </span>
@@ -168,7 +168,7 @@
           display: flex;
           flex-direction: row;
           justify-content: end;
-          margin-top: 16px;
+          margin-top: 40px;
           margin-right: 20px;
         "
       >
@@ -318,7 +318,7 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   background: #ffffff;
-  border-radius: 25px;
+  border-radius: 22px;
   width: 100%;
   max-width: 1100px;
   min-width: 900px;
@@ -345,7 +345,7 @@ export default defineComponent({
   width: 120px;
   height: 120px;
   padding: 0;
-  border-radius: 25px 0 0 25px;
+  border-radius: 22px 0 0 22px;
   object-fit: cover;
 }
 
@@ -354,7 +354,7 @@ export default defineComponent({
   width: 120px;
   height: 120px;
   padding: 0;
-  border-radius: 25px 0 25px 0;
+  border-radius: 22px 0 22px 0;
   object-fit: cover;
 }
 

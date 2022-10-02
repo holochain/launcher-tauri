@@ -3,7 +3,12 @@
     class="container column"
     style="position: relative"
     @click="showSelection = !showSelection"
+    @keydown.enter="handleEnter"
+    @keydown.esc="showSelection = false"
+    @keydown.down.prevent="handleDownKey"
+    @keydown.up.prevent="handleUpKey"
     tabindex="0"
+    @blur="showSelection = false"
   >
     <div class="label">{{ label }}</div>
     <div class="input-field row" style="align-items: center">
@@ -23,13 +28,16 @@
       />
     </div>
     <div v-if="helper" class="helper-note">{{ helper }}</div>
-    <div v-if="showSelection" class="items-list">
+    <div v-if="showSelection" class="items-list" ref="items-list">
       <div
         class="item row"
+        :class="{ selected: selectedIndex === index }"
         v-for="(item, index) of items"
         :title="item[0]"
         :key="index"
         @click="handleSelect(item)"
+        @mouseover="selectedIndex = index"
+        @mouseleave="selectedIndex = undefined"
       >
         {{ item[0] }}
       </div>
@@ -69,12 +77,14 @@ export default defineComponent({
     selectedKey: string | undefined;
     showSelection: boolean;
     value: any;
+    selectedIndex: number | undefined;
   } {
     return {
       focus: false,
       selectedKey: undefined,
       showSelection: false,
       value: undefined,
+      selectedIndex: undefined,
     };
   },
   methods: {
@@ -82,6 +92,40 @@ export default defineComponent({
       this.value = item[1];
       this.selectedKey = item[0];
       this.$emit("item-selected", item[1]);
+      this.selectedIndex = undefined;
+    },
+    handleEnter() {
+      if (this.selectedIndex === undefined) {
+        this.showSelection = !this.showSelection;
+      } else {
+        this.value = this.items[this.selectedIndex][1];
+        this.selectedKey = this.items[this.selectedIndex][0];
+        this.$emit("item-selected", this.items[this.selectedIndex][1]);
+        this.showSelection = false;
+        this.selectedIndex = undefined;
+      }
+    },
+    handleDownKey() {
+      if (this.selectedIndex === undefined) {
+        this.selectedIndex = 0;
+        return;
+      } else if (this.selectedIndex > this.items.length - 2) {
+        this.selectedIndex = 0;
+        return;
+      }
+
+      this.selectedIndex += 1;
+    },
+    handleUpKey() {
+      if (this.selectedIndex === undefined) {
+        this.selectedIndex = this.items.length - 1;
+        return;
+      } else if (this.selectedIndex === 0) {
+        this.selectedIndex = this.items.length - 1;
+        return;
+      }
+
+      this.selectedIndex -= 1;
     },
   },
 });
@@ -145,7 +189,11 @@ export default defineComponent({
   overflow: hidden;
 }
 
-.item:hover {
+/* .item:hover {
+  background: #e8e8eb;
+} */
+
+.selected {
   background: #e8e8eb;
 }
 

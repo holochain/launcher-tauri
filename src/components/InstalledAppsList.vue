@@ -18,7 +18,7 @@
         justify-content: flex-end;
         align-items: center;
         max-width: 1100px;
-        margin-top: 60px;
+        margin-top: 20px;
         margin-bottom: 5px;
       "
     >
@@ -76,7 +76,7 @@
       "
     >
       <span
-        style="margin-left: 10px; font-size: 24px; color: rgba(0, 0, 0, 0.4)"
+        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.4)"
         >Web Apps</span
       >
     </div>
@@ -126,7 +126,7 @@
       "
     >
       <span
-        style="margin-left: 10px; font-size: 24px; color: rgba(0, 0, 0, 0.4)"
+        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.4)"
         >Headless Apps</span
       >
     </div>
@@ -199,7 +199,6 @@ export default defineComponent({
       let sortedAppList = this.installedApps;
 
       if (this.selectedHolochainVersion !== "All Versions") {
-        console.log("not all versions!");
         sortedAppList = sortedAppList.filter(
           (app) => app.holochainVersion === this.selectedHolochainVersion
         );
@@ -215,6 +214,13 @@ export default defineComponent({
         sortedAppList = sortedAppList.sort((appA, appB) =>
           appB.webAppInfo.installed_app_info.installed_app_id.localeCompare(
             appA.webAppInfo.installed_app_info.installed_app_id
+          )
+        );
+      } else {
+        // default is alphabetical by app id
+        sortedAppList = sortedAppList.sort((appA, appB) =>
+          appA.webAppInfo.installed_app_info.installed_app_id.localeCompare(
+            appB.webAppInfo.installed_app_info.installed_app_id
           )
         );
       }

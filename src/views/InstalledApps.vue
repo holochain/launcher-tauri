@@ -17,6 +17,21 @@
           style="height: 42px; margin-left: 8px"
         />
         <span style="font-size: 1.5em; margin-left: 14px">Installed Apps</span>
+        <span style="display: flex; flex: 1"></span>
+        <HCButton
+          style="
+            margin-left: 8px;
+            margin-right: 12px;
+            height: 40px;
+            border-radius: 8px;
+            padding: 0 20px;
+          "
+          @click="reportIssue()"
+        >
+          <div class="row center-content">
+            <span style="margin-left: 5px">Report Issue</span>
+          </div>
+        </HCButton>
       </div>
 
       <div class="column" style="flex: 1; align-items: center; padding: 0 50px">
@@ -79,8 +94,13 @@ export default defineComponent({
   data(): {
     snackbarText: string | undefined;
     view: View;
+    reportIssueUrl: string;
   } {
-    return { snackbarText: undefined, view: { type: "installedApps" } };
+    return {
+      snackbarText: undefined,
+      view: { type: "installedApps" },
+      reportIssueUrl: "https://github.com/holochain/launcher/issues/new",
+    };
   },
   computed: {
     selectedAppInfo() {
@@ -190,6 +210,11 @@ export default defineComponent({
         });
       }
     },
+    async reportIssue() {
+      await invoke("open_url", {
+        url: this.reportIssueUrl,
+      });
+    },
     showMessage(message: string) {
       this.snackbarText = message;
       (this.$refs as any).snackbar.show();
@@ -211,7 +236,8 @@ export default defineComponent({
 .top-bar {
   align-items: center;
   height: 64px;
-  background: white;
-  box-shadow: 0 0px 5px #9b9b9b;
+  background: #e8e8eb;
+  /* background: white; */
+  /* box-shadow: 0 0px 5px #9b9b9b; */
 }
 </style>

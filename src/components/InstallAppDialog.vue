@@ -15,7 +15,7 @@
     <div
       v-else-if="installing"
       class="column"
-      style="align-items: center; justify-content: center; width: 412px"
+      style="align-items: center; justify-content: center; width: 312px"
     >
       <mwc-circular-progress
         indeterminate
@@ -29,7 +29,7 @@
       class="column"
       style="align-items: center; margin: 10px 15px"
     >
-      <div style="font-weight: 700; font-size: 25px; margin: 20px 0 10px 0">
+      <div style="font-weight: 600; font-size: 25px; margin: 20px 0 10px 0">
         Install App
       </div>
       <div style="margin-bottom: 30px; color: #482edf; font-size: 20px">
@@ -38,29 +38,31 @@
       <HCTextField
         @input="checkAppIdValidity"
         placeholder="App Id"
-        style="margin: 5px; margin-bottom: 15px"
+        style="margin: 5px; margin-bottom: 15px; width: 360px"
         label="App Id*"
         helper="Choose your own name for this app"
         :invalid="appIdInvalid"
         ref="app-id-field"
       />
       <HCSelect
-        style="margin: 5px"
+        style="margin: 5px; width: 360px"
         label="Holochain Version*"
         :items="supportedHolochains"
         @item-selected="handleHolochainIdSelected($event)"
       >
       </HCSelect>
       <div class="column" style="width: 100%">
-        <div class="row" style="margin: 20px 0 15px 10px; align-items: center">
+        <div class="row" style="margin: 20px 0 15px 20px; align-items: center">
           <div
             @click="showAdvanced = !showAdvanced"
+            @keydown.enter="showAdvanced = !showAdvanced"
             style="
               text-align: center;
               font-size: 24px;
               width: 20px;
               cursor: pointer;
             "
+            tabindex="0"
           >
             {{ showAdvanced ? "-" : "+" }}
           </div>
@@ -72,13 +74,13 @@
         <HCTextField
           placeholder="Network Seed"
           label="Network Seed"
-          style="margin: 5px; margin-bottom: 15px"
+          style="margin: 5px; margin-bottom: 15px; width: 360px"
           helper="Change it to create a new network"
           ref="network-seed-field"
         />
 
         <HCSelect
-          style="margin: 5px; margin-bottom: 15px"
+          style="margin: 5px; margin-bottom: 15px; width: 360px"
           label="Public Key"
           :items="allPubKeys"
           @item-selected="reuseAgentPubKey = $event"
@@ -109,7 +111,7 @@
           <HCTextArea
             placeholder="Membrane Proof"
             style="margin-top: 10px; display: flex; flex: 1"
-            :cols="29"
+            :cols="33"
             label="Membrane Proof"
             helper="Check with the author if this is required."
             @input="
