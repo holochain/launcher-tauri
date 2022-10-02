@@ -51,6 +51,58 @@
       class="column center-content"
       style="flex: 1"
     >
+      <div
+        class="column"
+        style="
+          width: 340px;
+          height: 220px;
+          background: white;
+          border-radius: 15px;
+          box-shadow: 0 0px 5px #9b9b9b;
+        "
+      >
+        <div class="row" style="align-items: center">
+          <div
+            class="column center-content"
+            style="
+              width: 80px;
+              height: 80px;
+              border-radius: 12px;
+              background: darkblue;
+              margin: 15px;
+            "
+          >
+            <div style="color: white; font-size: 45px; font-weight: 600">
+              ta
+            </div>
+          </div>
+          <div class="column">
+            <div style="font-size: 25px; font-weight: 600">
+              talking-stickies
+            </div>
+            <div style="margin-top: -5px">v0.0.4</div>
+          </div>
+        </div>
+        <div
+          style="
+            display: flex;
+            flex: 1;
+            margin: 0 20px 0 25px;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 17px;
+          "
+        >
+          Some subtitle which should not be too long.
+        </div>
+        <div class="row" style="justify-content: flex-end; align-items: center">
+          <HCMoreToggle style="margin-left: 20px" title="Details" />
+          <span style="display: flex; flex: 1"></span>
+          <HCButton class="install-btn" style="border-radius: 12px; margin: 8px"
+            >Install</HCButton
+          >
+        </div>
+      </div>
+
       <span>There are no apps available yet in the DevHub.</span>
       <span style="margin-top: 8px"
         ><span
@@ -145,12 +197,14 @@ import {
 import { HdkVersion } from "@/hdk";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
+import HCMoreToggle from "../components/subcomponents/HCMoreToggle.vue";
 
 export default defineComponent({
   name: "AppStore",
   components: {
     InstallAppDialog,
     HCButton,
+    HCMoreToggle,
   },
   data(): {
     loading: boolean;
@@ -263,5 +317,9 @@ export default defineComponent({
   /* border-bottom: 1px solid black; */
   background: white;
   box-shadow: 0 0px 5px #9b9b9b;
+}
+
+.install-btn:hover {
+  background-color: #674df9;
 }
 </style>

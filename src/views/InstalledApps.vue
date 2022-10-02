@@ -34,7 +34,10 @@
         </HCButton>
       </div>
 
-      <div class="column" style="flex: 1; align-items: center; padding: 0 50px">
+      <div
+        class="column"
+        style="flex: 1; align-items: center; padding: 0 50px; margin-top: 20px"
+      >
         <InstalledAppsList
           :installedApps="$store.getters[`allApps`]"
           @open-app="openApp($event)"
@@ -237,7 +240,7 @@ export default defineComponent({
   align-items: center;
   height: 64px;
   background: #e8e8eb;
-  /* background: white; */
-  /* box-shadow: 0 0px 5px #9b9b9b; */
+  background: white;
+  box-shadow: 0 0px 5px #9b9b9b;
 }
 </style>

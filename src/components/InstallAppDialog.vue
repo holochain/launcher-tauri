@@ -3,8 +3,15 @@
     <div
       v-if="isLoadingFile"
       class="column"
-      style="align-items: center; justify-content: center; width: 312px"
+      style="
+        align-items: center;
+        justify-content: center;
+        width: 312px;
+        overflow: hidden;
+        position: relative;
+      "
     >
+      <img class="halo" src="/img/Holochain_Halo_no_gradient.svg" />
       <mwc-circular-progress
         indeterminate
         style="margin-top: 40px; margin-bottom: 40px"
@@ -15,8 +22,15 @@
     <div
       v-else-if="installing"
       class="column"
-      style="align-items: center; justify-content: center; width: 312px"
+      style="
+        align-items: center;
+        justify-content: center;
+        width: 312px;
+        overflow: hidden;
+        position: relative;
+      "
     >
+      <img class="halo" src="/img/Holochain_Halo_no_gradient.svg" />
       <mwc-circular-progress
         indeterminate
         style="margin-top: 40px; margin-bottom: 40px"
@@ -27,7 +41,7 @@
     <div
       v-else-if="appInfo"
       class="column"
-      style="align-items: center; margin: 10px 15px"
+      style="align-items: center; margin: 10px 15px; padding: 0 10px"
     >
       <div style="font-weight: 600; font-size: 25px; margin: 20px 0 10px 0">
         Install App
@@ -382,3 +396,12 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.halo {
+  height: 130%;
+  top: -3%;
+  position: absolute;
+  opacity: 50%;
+}
+</style>

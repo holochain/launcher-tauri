@@ -7,7 +7,13 @@
     ></dialog>
     <dialog class="dialog-element" :open="isOpen">
       <div class="column">
-        <slot></slot>
+        <div class="row top-bar">
+          {{ heading }}
+        </div>
+        <div class="slot-container">
+          <img class="halo" src="/img/Holochain_Halo_complete.svg" />
+          <slot></slot>
+        </div>
       </div>
       <slot name="secondaryAction"></slot>
       <slot name="primaryAction"></slot>
@@ -32,6 +38,10 @@ export default defineComponent({
     closeOnSideClick: {
       type: Boolean,
       default: false,
+    },
+    heading: {
+      type: String,
+      default: "",
     },
   },
   data(): {
@@ -78,7 +88,7 @@ export default defineComponent({
   max-height: 90vh;
   max-width: 90vh;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   position: absolute;
   left: 50vw;
   top: 50vh;
@@ -87,6 +97,30 @@ export default defineComponent({
   z-index: 1;
   border: 4px solid var(--hc-primary-color);
   box-shadow: 0 0px 5px #9b9b9b;
-  overflow-y: scroll;
+  background: white;
+}
+
+.top-bar {
+  align-items: center;
+  height: 56px;
+  background: #301e9a;
+  box-shadow: 0 0px 5px #9b9b9b;
+  border-radius: 8px 8px 0 0;
+  padding-left: 30px;
+  font-size: 25px;
+  font-weight: 600;
+  color: white;
+  overflow: hidden;
+}
+
+.halo {
+  height: 150%;
+  position: absolute;
+  opacity: 50%;
+}
+
+.slot-container {
+  position: relative;
+  overflow: hidden;
 }
 </style>

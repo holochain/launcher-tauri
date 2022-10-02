@@ -1,5 +1,5 @@
 <template>
-  <HCDialog heading="About" ref="dialog" closeOnSideClick>
+  <HCDialogHeaded heading="About" ref="dialog" closeOnSideClick>
     <div class="row center" style="width: 512px" v-if="!holochainVersions">
       <mwc-circular-progress
         indeterminate
@@ -11,7 +11,7 @@
       style="width: 312px; margin: 20px 30px"
       v-else-if="holochainVersions"
     >
-      <span
+      <!-- <span
         style="
           font-weight: 600;
           font-size: 1.5em;
@@ -21,7 +21,7 @@
           margin-top: -10px;
         "
         >About</span
-      >
+      > -->
       <div class="column">
         <span> Holochain Launcher v0.6.1 </span>
         <span
@@ -34,21 +34,20 @@
         <span style="margin-top: 8px"> Lair Keystore v0.2.1 </span>
       </div>
     </div>
-  </HCDialog>
+  </HCDialogHeaded>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import { getCurrent } from "@tauri-apps/api/window";
-import type { Dialog } from "@material/mwc-dialog";
 import { HolochainVersion } from "@/types";
 import { invoke } from "@tauri-apps/api/tauri";
-import HCDialog from "../subcomponents/HCDialog.vue";
+import HCDialogHeaded from "../subcomponents/HCDialogHeaded.vue";
 
 export default defineComponent({
   name: "About",
   components: {
-    HCDialog,
+    HCDialogHeaded,
   },
   data(): {
     snackbarText: string | undefined;
@@ -61,7 +60,7 @@ export default defineComponent({
   },
   async mounted() {
     const current = await getCurrent().listen("about", () =>
-      (this.$refs.dialog as typeof HCDialog).open()
+      (this.$refs.dialog as typeof HCDialogHeaded).open()
     );
 
     const { holochain_versions }: { holochain_versions: HolochainVersion[] } =

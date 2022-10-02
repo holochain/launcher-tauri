@@ -19,7 +19,7 @@
         align-items: center;
         max-width: 1100px;
         margin-top: 20px;
-        margin-bottom: 5px;
+        margin-bottom: -5px;
       "
     >
       <HCSelect
@@ -157,16 +157,17 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { uniq } from "lodash-es";
+
 import "@ui5/webcomponents/dist/Card.js";
 import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
 
-import { HolochainAppInfo, HolochainVersion } from "../types";
+import { HolochainAppInfo } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
 import HCSelect from "./subcomponents/HCSelect.vue";
-import { uniq } from "lodash-es";
 
 export default defineComponent({
   name: "InstalledAppsList",
