@@ -22,18 +22,17 @@
         margin-bottom: -5px;
       "
     >
-      <HCSelect
+      <HCSelectCard
         style="
           width: 200px;
           margin-right: 5px;
           box-shadow: 0 0px 3px -1px #9b9b9b;
           --hc-label-background: #e8e8eb;
         "
-        placeholder="filter by"
+        placeholder="Holochain Versions"
         :items="holochainVersions"
-        label="Holochain Version"
         @item-selected="selectedHolochainVersion = $event"
-      ></HCSelect>
+      ></HCSelectCard>
       <img
         src="/img/Square284x284Logo.png"
         style="
@@ -44,7 +43,7 @@
         "
       />
 
-      <HCSelect
+      <HCSelectCard
         style="
           width: 200px;
           margin-right: 5px;
@@ -53,9 +52,8 @@
         "
         placeholder="sort by"
         :items="sortOptions"
-        label="sort by"
         @item-selected="sortOption = $event"
-      ></HCSelect>
+      ></HCSelectCard>
       <mwc-icon style="color: #482edf; text-shadow: 0 0px 5px #9b9b9b"
         >sort</mwc-icon
       >
@@ -67,7 +65,7 @@
 
     <div
       style="
-        border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+        border-bottom: 2px solid rgba(0, 0, 0, 0.4);
         width: 98%;
         margin: 10px;
         margin-top: -18px;
@@ -76,7 +74,7 @@
       "
     >
       <span
-        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.4)"
+        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
         title="Holochain Apps with Graphical User Interface"
         >Web Apps</span
       >
@@ -118,7 +116,7 @@
 
     <div
       style="
-        border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+        border-bottom: 2px solid rgba(0, 0, 0, 0.4);
         width: 98%;
         margin: 10px;
         margin-top: 50px;
@@ -127,7 +125,7 @@
       "
     >
       <span
-        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.4)"
+        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
         title="Holochain Apps without Graphical User Interface"
         >Headless Apps</span
       >
@@ -167,13 +165,13 @@ import "@material/mwc-icon";
 import { HolochainAppInfo } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
-import HCSelect from "./subcomponents/HCSelect.vue";
+import HCSelectCard from "./subcomponents/HCSelectCard.vue";
 
 export default defineComponent({
   name: "InstalledAppsList",
   components: {
     InstalledAppCard,
-    HCSelect,
+    HCSelectCard,
   },
   props: {
     installedApps: {

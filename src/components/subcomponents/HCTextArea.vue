@@ -61,14 +61,15 @@ export default defineComponent({
 <style scoped>
 .wrapper {
   --hc-primary-color: #482edf;
-  --active-border-color: rgba(59, 61, 115, 0.25);
-  --active-label-color: rgba(59, 61, 115, 0.4);
+  --active-border-color: rgba(59, 61, 115, 0.8);
+  --active-label-color: rgba(59, 61, 115, 1);
   --hc-label-background: white;
 }
 
 .container:focus-within {
   --active-border-color: var(--hc-primary-color);
   --active-label-color: var(--hc-primary-color);
+  box-shadow: 0 0 3px var(--hc-primary-color);
 }
 
 .container {

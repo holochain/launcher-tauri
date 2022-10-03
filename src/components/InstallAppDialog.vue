@@ -136,7 +136,7 @@
         </div>
       </div>
 
-      <div class="row" style="margin-top: 30px">
+      <div class="row" style="margin-top: 30px; margin-bottom: 20px">
         <HCButton
           style="width: 80px; height: 30px; margin: 4px 6px"
           outlined
@@ -145,7 +145,7 @@
         >
         <HCButton
           style="width: 80px; margin: 4px 6px"
-          :disabled="!isAppReadyToInstall || installing"
+          :disabled="!isAppReadyToInstall || installing || appIdInvalid"
           @click="installApp()"
           >Install</HCButton
         >
@@ -305,6 +305,11 @@ export default defineComponent({
     },
     checkAppIdValidity() {
       const newValue = (this.$refs["app-id-field"] as typeof HCTextField).value;
+
+      if (newValue === "") {
+        this.appIdInvalid = "App Id must not be empty.";
+        return;
+      }
 
       const holochainIds: HolochainId[] =
         this.$store.getters["runningHolochainIds"];

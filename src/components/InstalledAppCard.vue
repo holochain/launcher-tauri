@@ -21,16 +21,22 @@
         height: 120px;
       "
     >
-      <img
-        v-if="appIcon"
-        :class="{ appIcon: !showMore, appIconMore: showMore }"
-        :src="`${appIcon}`"
-      />
-      <div
-        v-else
-        :class="{ appIcon: !showMore, appIconMore: showMore }"
-        style="background-color: #49209e"
-      ></div>
+      <div style="position: relative">
+        <!-- assumes same agent pub key for all cells (just taking the first one) -->
+        <holo-identicon
+          :hash="app.webAppInfo.installed_app_info.cell_data[0][1]"
+        ></holo-identicon>
+        <img
+          v-if="appIcon"
+          :class="{ appIcon: !showMore, appIconMore: showMore }"
+          :src="`${appIcon}`"
+        />
+        <div
+          v-else
+          :class="{ appIcon: !showMore, appIconMore: showMore }"
+          style="background-color: #49209e"
+        ></div>
+      </div>
 
       <div
         style="
@@ -226,6 +232,7 @@ import { HolochainAppInfo } from "../types";
 import { serializeHash } from "@holochain-open-dev/utils";
 import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
+import "@holochain-open-dev/utils/dist/elements/holo-identicon.js";
 
 import ToggleSwitch from "./subcomponents/ToggleSwitch.vue";
 import HCButton from "./subcomponents/HCButton.vue";

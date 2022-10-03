@@ -49,7 +49,7 @@
 import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
-  name: "HCSelect",
+  name: "HCSelectCard",
   props: {
     placeholder: {
       type: String,
@@ -134,8 +134,9 @@ export default defineComponent({
 <style scoped>
 .container {
   --hc-primary-color: #482edf;
-  --active-border-color: rgba(59, 61, 115, 0.8);
-  --active-label-color: rgba(59, 61, 115, 1);
+  --active-border-color: rgba(59, 61, 115, 0.9);
+  /* --active-label-color: rgba(59, 61, 115, 1); */
+  --active-label-color: rgba(0, 0, 0, 0.7);
   --hc-label-background: white;
   width: 300px;
   border-radius: 10px;
@@ -144,7 +145,6 @@ export default defineComponent({
 .container:focus-within {
   --active-border-color: var(--hc-primary-color);
   --active-label-color: var(--hc-primary-color);
-  box-shadow: 0 0 3px var(--hc-primary-color);
 }
 
 .input-field {
@@ -154,7 +154,9 @@ export default defineComponent({
   /* outline: 2px solid rgba(59, 61, 115, 0.25); */
   border-radius: 10px;
   /* box-shadow: 0 0 0 2px rgba(59, 61, 115, 0.25); */
-  border: 2px solid var(--active-border-color);
+  background: #e8e8eb;
+  /* box-shadow: 0 0 5px rgb(131, 128, 176); */
+  box-shadow: 0 0 3px 1px rgb(0, 0, 0, 0.4);
 }
 
 .selected-field {
@@ -169,13 +171,14 @@ export default defineComponent({
 
 .input-field:focus {
   border: 2px solid var(--hc-primary-color);
+  box-shadow: 0 0 0px 5px var(--hc-primary-color);
 }
 
 .items-list {
   background-color: white;
   width: 100%;
   position: absolute;
-  top: 53px;
+  top: 50px;
   box-shadow: 0 0 2px rgb(131, 128, 176);
   border-radius: 8px 8px 10px 10px;
   overflow: hidden;
@@ -199,7 +202,7 @@ export default defineComponent({
 }
 
 .greyedOut {
-  color: rgb(75, 75, 75);
+  color: rgb(31, 31, 31);
 }
 
 .rotated {
@@ -207,13 +210,12 @@ export default defineComponent({
 }
 
 .label {
-  color: var(--active-label-color);
   padding: 0 4px;
   font-size: 14px;
-  background: var(--hc-label-background);
+  background: transparent;
   position: absolute;
-  top: -10px;
-  left: 12px;
+  top: -18px;
+  left: 0px;
   margin: 0 10px;
 }
 

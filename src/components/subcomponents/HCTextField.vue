@@ -54,8 +54,10 @@ export default defineComponent({
 <style scoped>
 .container {
   --hc-primary-color: #482edf;
-  --active-border-color: rgba(59, 61, 115, 0.25);
-  --active-label-color: rgba(59, 61, 115, 0.4);
+  --active-border-color: rgba(59, 61, 115, 0.8);
+  /* --active-border-color: rgba(0, 0, 0); */
+  /* --active-label-color: rgba(59, 61, 115, 0.4); */
+  --active-label-color: rgba(59, 61, 115, 1);
   --hc-label-background: white;
   width: 300px;
 }
@@ -77,6 +79,7 @@ export default defineComponent({
 
 .textfield:focus {
   border: 2px solid var(--hc-primary-color);
+  box-shadow: 0 0 3px var(--hc-primary-color);
 }
 
 .label {

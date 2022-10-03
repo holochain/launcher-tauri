@@ -17,7 +17,8 @@ module.exports = {
             tag.startsWith("copyable-") ||
             tag.startsWith("mwc-") ||
             tag.startsWith("ui5-") ||
-            tag.startsWith("sl-"),
+            tag.startsWith("sl-") ||
+            tag.startsWith("holo-identicon"),
         },
       }));
   },
