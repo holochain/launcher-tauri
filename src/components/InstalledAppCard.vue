@@ -23,16 +23,16 @@
     >
       <div style="position: relative">
         <!-- assumes same agent pub key for all cells (just taking the first one) -->
-        <sl-tooltip hoist placement="top" content="Copied">
-          <HoloIdenticon
-            title="Your Public Key"
-            :class="{ holoIdenticon: !showMore, holoIdenticonMore: showMore }"
-            style="position: absolute; top: 78px; left: 78px; cursor: pointer"
-            :hash="app.webAppInfo.installed_app_info.cell_data[0].cell_id[1]"
-            :size="42"
-            @click="copyPubKey()"
-          ></HoloIdenticon>
-        </sl-tooltip>
+        <div v-show="showPubKeyTooltip" class="tooltip">Copied!</div>
+        <HoloIdenticon
+          title="Your Public Key"
+          :class="{ holoIdenticon: !showMore, holoIdenticonMore: showMore }"
+          style="position: absolute; top: 78px; left: 78px; cursor: pointer"
+          :hash="app.webAppInfo.installed_app_info.cell_data[0].cell_id[1]"
+          :size="42"
+          @click="copyPubKey()"
+        ></HoloIdenticon>
+
         <img
           v-if="appIcon"
           :class="{ appIcon: !showMore, appIconMore: showMore }"
@@ -349,7 +349,7 @@ export default defineComponent({
       this.showPubKeyTooltip = true;
       setTimeout(() => {
         this.showPubKeyTooltip = false;
-      }, 2000);
+      }, 1200);
 
       // navigator.clipboard.writeText(serializeHash(pubKey));
     },
@@ -429,5 +429,15 @@ export default defineComponent({
 
 .paused {
   background-color: rgb(175, 175, 175);
+}
+
+.tooltip {
+  position: absolute;
+  color: white;
+  bottom: 56px;
+  left: 62px;
+  background: #7480ff;
+  border-radius: 5px;
+  padding: 1px 7px;
 }
 </style>
