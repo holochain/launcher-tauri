@@ -1,4 +1,6 @@
 <template>
+  <HCLoading ref="downloading" :text="loadingText" />
+
   <div class="column" style="flex: 1">
     <div class="row center-content top-bar">
       <mwc-icon-button
@@ -51,7 +53,7 @@
       class="column center-content"
       style="flex: 1"
     >
-      <div
+      <!-- <div
         class="column"
         style="
           width: 340px;
@@ -66,6 +68,7 @@
             class="column center-content"
             style="
               width: 80px;
+              min-width: 80px;
               height: 80px;
               border-radius: 12px;
               background: darkblue;
@@ -77,7 +80,7 @@
             </div>
           </div>
           <div class="column">
-            <div style="font-size: 25px; font-weight: 600">
+            <div style="font-size: 25px; font-weight: 600; margin-right: 15px; margin-bottom: 8px;line-height: 115%; word-break: break-all;">
               talking-stickies
             </div>
             <div style="margin-top: -5px">v0.0.4</div>
@@ -90,9 +93,11 @@
             margin: 0 20px 0 25px;
             color: rgba(0, 0, 0, 0.6);
             font-size: 17px;
+            overflow-y: scroll;
           "
         >
           Some subtitle which should not be too long.
+
         </div>
         <div class="row" style="justify-content: flex-end; align-items: center">
           <HCMoreToggle style="margin-left: 20px" title="Details" />
@@ -101,7 +106,7 @@
             >Install</HCButton
           >
         </div>
-      </div>
+      </div> -->
 
       <span>There are no apps available yet in the DevHub.</span>
       <span style="margin-top: 8px"
@@ -122,9 +127,10 @@
         v-for="(app, i) of installableApps"
         :key="i"
         class="column"
-        style="width: 300px; margin-right: 16px; margin-bottom: 16px"
+        style="margin-right: 16px; margin-bottom: 16px"
       >
-        <ui5-card style="width: auto">
+        <AppPreviewCard :app="app" @installApp="saveApp(app)" />
+        <!-- <ui5-card style="width: auto">
           <div class="column" style="margin: 8px">
             <span style="font-size: 18px">{{ app.app.content.title }}</span>
             <span style="margin-top: 8px; height: 80px; overflow: auto">{{
@@ -143,7 +149,7 @@
               ></mwc-button>
             </div>
           </div>
-        </ui5-card>
+        </ui5-card> -->
       </div>
     </div>
   </div>
@@ -197,16 +203,20 @@ import {
 import { HdkVersion } from "@/hdk";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
-import HCMoreToggle from "../components/subcomponents/HCMoreToggle.vue";
+import AppPreviewCard from "../components/AppPreviewCard.vue";
+import HCLoading from "../components/subcomponents/HCLoading.vue";
 
 export default defineComponent({
   name: "AppStore",
   components: {
     InstallAppDialog,
     HCButton,
-    HCMoreToggle,
+    AppPreviewCard,
+    HCLoading,
   },
   data(): {
+    downloading: boolean;
+    loadingText: string;
     loading: boolean;
     installableApps: Array<AppWithReleases>;
     selectedAppBundlePath: string | undefined;
@@ -214,6 +224,8 @@ export default defineComponent({
     howToPublishUrl: string;
   } {
     return {
+      loadingText: "",
+      downloading: false,
       loading: true,
       installableApps: [],
       selectedAppBundlePath: undefined,
@@ -259,7 +271,9 @@ export default defineComponent({
     },
     getLatestRelease,
     async saveApp(app: AppWithReleases) {
-      this.loading = true;
+      this.loadingText = "Connecting with DevHub";
+      this.downloading = true;
+      (this.$refs.downloading as typeof HCLoading).open();
       const release = getLatestRelease(app);
 
       const holochainId = this.$store.getters["holochainIdForDevhub"];
@@ -270,8 +284,10 @@ export default defineComponent({
         installed_app_id: `DevHub-${holochainId.content}`,
       });
 
+      this.loadingText = "Downloading...";
+
       try {
-        console.log(release);
+        console.log("Release: ", release);
         const bytes = await fetchWebHapp(
           appWs,
           devhubInfo,
@@ -283,12 +299,18 @@ export default defineComponent({
           appBundleBytes: bytes,
         });
         this.hdkVersionForApp = release.content.hdk_version;
+        (this.$refs.downloading as typeof HCLoading).close();
+        this.downloading = false;
+        this.loadingText = "";
+        console.log("Requested closing of dialog.");
+
+        this.$nextTick(() => {
+          (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
+        });
       } catch (e) {
         console.log(e);
         (this.$refs as any).snackbar.show();
       }
-
-      this.loading = false;
     },
     async selectFromFileSystem() {
       this.selectedAppBundlePath = (await open({
@@ -317,9 +339,7 @@ export default defineComponent({
   /* border-bottom: 1px solid black; */
   background: white;
   box-shadow: 0 0px 5px #9b9b9b;
-}
-
-.install-btn:hover {
-  background-color: #674df9;
+  position: sticky;
+  top: 0;
 }
 </style>

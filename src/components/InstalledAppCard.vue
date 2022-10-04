@@ -34,8 +34,13 @@
         <div
           v-else
           :class="{ appIcon: !showMore, appIconMore: showMore }"
+          class="column center-content"
           style="background-color: #49209e"
-        ></div>
+        >
+          <div style="color: white; font-size: 45px; font-weight: 600">
+            {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0, 2) }}
+          </div>
+        </div>
       </div>
 
       <div

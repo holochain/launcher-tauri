@@ -16,7 +16,7 @@
         indeterminate
         style="margin-top: 40px; margin-bottom: 40px"
       ></mwc-circular-progress>
-      <div style="margin-bottom: 10px">Loading file...</div>
+      <div style="margin-bottom: 10px">Processing file...</div>
     </div>
 
     <div
@@ -97,6 +97,7 @@
           style="margin: 5px; margin-bottom: 15px; width: 360px"
           label="Public Key"
           :items="allPubKeys"
+          :invalid="holochainId ? undefined : 'Select Holochain version first'"
           @item-selected="reuseAgentPubKey = $event"
           helper="Optionally chose an already existing public key"
         >
@@ -125,7 +126,7 @@
           <HCTextArea
             placeholder="Membrane Proof"
             style="margin-top: 10px; display: flex; flex: 1"
-            :cols="33"
+            :cols="32"
             label="Membrane Proof"
             helper="Check with the author if this is required."
             @input="

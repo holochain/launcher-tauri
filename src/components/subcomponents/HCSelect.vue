@@ -27,7 +27,8 @@
         :class="{ rotated: showSelection }"
       />
     </div>
-    <div v-if="helper" class="helper-note">{{ helper }}</div>
+    <div v-if="invalid" class="invalidity-note">{{ invalid }}</div>
+    <div v-if="helper && !invalid" class="helper-note">{{ helper }}</div>
     <div v-if="showSelection" class="items-list" ref="items-list">
       <div
         class="item row"
@@ -68,6 +69,10 @@ export default defineComponent({
       required: true,
     },
     helper: {
+      type: String,
+      default: undefined,
+    },
+    invalid: {
       type: String,
       default: undefined,
     },
@@ -136,6 +141,7 @@ export default defineComponent({
   --hc-primary-color: #482edf;
   --active-border-color: rgba(59, 61, 115, 0.8);
   --active-label-color: rgba(59, 61, 115, 1);
+  --active-shadow-color: transparent;
   --hc-label-background: white;
   width: 300px;
   border-radius: 10px;
@@ -144,7 +150,7 @@ export default defineComponent({
 .container:focus-within {
   --active-border-color: var(--hc-primary-color);
   --active-label-color: var(--hc-primary-color);
-  box-shadow: 0 0 3px var(--hc-primary-color);
+  --active-shadow-color: var(--hc-primary-color);
 }
 
 .input-field {
@@ -155,6 +161,7 @@ export default defineComponent({
   border-radius: 10px;
   /* box-shadow: 0 0 0 2px rgba(59, 61, 115, 0.25); */
   border: 2px solid var(--active-border-color);
+  box-shadow: 0 0 3px var(--active-shadow-color);
 }
 
 .selected-field {
@@ -165,10 +172,6 @@ export default defineComponent({
 
 .flatBottom {
   border-radius: 5px 5px 0 0;
-}
-
-.input-field:focus {
-  border: 2px solid var(--hc-primary-color);
 }
 
 .items-list {
@@ -222,5 +225,12 @@ export default defineComponent({
   margin-top: -1px;
   font-size: 13px;
   color: rgba(59, 61, 115, 0.5);
+}
+
+.invalidity-note {
+  margin-top: -1px;
+  margin-left: 15px;
+  font-size: 13px;
+  color: #e00000;
 }
 </style>

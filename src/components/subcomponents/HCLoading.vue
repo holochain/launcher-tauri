@@ -55,6 +55,7 @@ export default defineComponent({
     },
     close() {
       this.isOpen = false;
+      (this.$refs.dialog as typeof HCDialog).close();
       this.$emit("closing");
     },
   },
