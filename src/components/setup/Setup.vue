@@ -21,7 +21,7 @@
       <div class="column center-content right-half">
         <img
           src="/img/lock_icon.svg"
-          style="height: 35px; margin-bottom: 10px"
+          style="height: 35px; margin-bottom: 10px; opacity: 0.95"
         />
         <div style="font-size: 27px; font-weight: 600; margin-bottom: 25px">
           Create password

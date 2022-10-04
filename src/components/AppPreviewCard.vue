@@ -33,7 +33,7 @@
             min-width: 80px;
             height: 80px;
             border-radius: 12px;
-            background: darkblue;
+            background: #372ba5;
             margin: 15px;
           "
         >

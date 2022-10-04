@@ -39,7 +39,7 @@ export default defineComponent({
 <style scoped>
 button {
   --hc-primary-color: #482edf;
-  --hc-secondary-color: #674df9;
+  --hc-secondary-color: #5537fc;
 }
 .btn {
   all: unset;
@@ -60,7 +60,7 @@ button {
 
 .btn:focus-visible {
   background-color: var(--hc-secondary-color);
-  box-shadow: 1px 1px 4px var(--hc-primary-color);
+  box-shadow: 0px 0px 4px var(--hc-primary-color);
 }
 
 .outlined {
@@ -86,6 +86,6 @@ button {
 
 .outlined:focus-visible {
   background-color: transparent;
-  box-shadow: 1px 1px 4px var(--hc-secondary-color);
+  box-shadow: 0px 0px 4px var(--hc-secondary-color);
 }
 </style>

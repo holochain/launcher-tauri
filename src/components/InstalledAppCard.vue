@@ -23,9 +23,16 @@
     >
       <div style="position: relative">
         <!-- assumes same agent pub key for all cells (just taking the first one) -->
-        <holo-identicon
-          :hash="app.webAppInfo.installed_app_info.cell_data[0][1]"
-        ></holo-identicon>
+        <sl-tooltip hoist placement="top" content="Copied">
+          <HoloIdenticon
+            title="Your Public Key"
+            :class="{ holoIdenticon: !showMore, holoIdenticonMore: showMore }"
+            style="position: absolute; top: 78px; left: 78px; cursor: pointer"
+            :hash="app.webAppInfo.installed_app_info.cell_data[0].cell_id[1]"
+            :size="42"
+            @click="copyPubKey()"
+          ></HoloIdenticon>
+        </sl-tooltip>
         <img
           v-if="appIcon"
           :class="{ appIcon: !showMore, appIconMore: showMore }"
@@ -35,7 +42,7 @@
           v-else
           :class="{ appIcon: !showMore, appIconMore: showMore }"
           class="column center-content"
-          style="background-color: #49209e"
+          style="background-color: #372ba5"
         >
           <div style="color: white; font-size: 45px; font-weight: 600">
             {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0, 2) }}
@@ -236,8 +243,12 @@ import { defineComponent, PropType } from "vue";
 import { HolochainAppInfo } from "../types";
 import { serializeHash } from "@holochain-open-dev/utils";
 import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
+import { writeText } from "@tauri-apps/api/clipboard";
+
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
-import "@holochain-open-dev/utils/dist/elements/holo-identicon.js";
+import "@shoelace-style/shoelace/dist/themes/light.css";
+// import "@holochain-open-dev/utils/dist/holo-identicon";
+import HoloIdenticon from "../components/subcomponents/HoloIdenticon.vue";
 
 import ToggleSwitch from "./subcomponents/ToggleSwitch.vue";
 import HCButton from "./subcomponents/HCButton.vue";
@@ -246,7 +257,13 @@ import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
 
 export default defineComponent({
   name: "InstalledAppCard",
-  components: { ToggleSwitch, HCButton, HCMoreToggle, HCGenericDialog },
+  components: {
+    ToggleSwitch,
+    HCButton,
+    HCMoreToggle,
+    HCGenericDialog,
+    HoloIdenticon,
+  },
   props: {
     appIcon: {
       type: String,
@@ -259,10 +276,12 @@ export default defineComponent({
   data(): {
     showMore: boolean;
     showUninstallDialog: boolean;
+    showPubKeyTooltip: boolean;
   } {
     return {
       showMore: false,
       showUninstallDialog: false,
+      showPubKeyTooltip: false,
     };
   },
   emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp"],
@@ -272,6 +291,7 @@ export default defineComponent({
     isAppRunning,
     isAppDisabled,
     isAppPaused,
+    writeText,
     isAppHeadless(app: HolochainAppInfo) {
       return app.webAppInfo.web_ui_info.type === "Headless";
     },
@@ -321,6 +341,17 @@ export default defineComponent({
       } else {
         throw new Error("Unknown App state.");
       }
+    },
+    copyPubKey() {
+      const pubKey =
+        this.app.webAppInfo.installed_app_info.cell_data[0].cell_id[1];
+      this.writeText(serializeHash(pubKey));
+      this.showPubKeyTooltip = true;
+      setTimeout(() => {
+        this.showPubKeyTooltip = false;
+      }, 2000);
+
+      // navigator.clipboard.writeText(serializeHash(pubKey));
     },
   },
 });
@@ -372,6 +403,14 @@ export default defineComponent({
   padding: 0;
   border-radius: 22px 0 22px 0;
   object-fit: cover;
+}
+
+.holoIdenticon {
+  border-radius: 12px 0 0 0;
+}
+
+.holoIdenticonMore {
+  border-radius: 12px 0 22px 0;
 }
 
 .app-status {

@@ -230,10 +230,10 @@ export default defineComponent({
 <style scoped>
 .btn-install:hover {
   cursor: pointer;
-  --hc-primary-color: #674df9;
+  --hc-primary-color: #5537fc;
 }
 .btn-install:focus-visible {
-  --hc-primary-color: #674df9;
+  --hc-primary-color: #5537fc;
 }
 
 .top-bar {
