@@ -2457,20 +2457,6 @@ dependencies = [
 
 [[package]]
 name = "holochain_client"
-version = "0.1.1"
-source = "git+https://github.com/matthme/holochain-client-rust?rev=8802433d97a2748fa8587c2215acd5d779e756cf#8802433d97a2748fa8587c2215acd5d779e756cf"
-dependencies = [
- "again",
- "anyhow",
- "holochain_conductor_api 0.0.59",
- "holochain_types 0.0.56",
- "holochain_websocket",
- "serde",
- "url",
-]
-
-[[package]]
-name = "holochain_client"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3bcd2c2bb96f9a336740d933899f1b077ada25c3e8f66eed1d809ef260538e7d"
@@ -2623,8 +2609,7 @@ dependencies = [
  "ascii",
  "async-trait",
  "enum_dispatch",
- "holochain_client 0.1.1",
- "holochain_client 0.2.0",
+ "holochain_client",
  "holochain_conductor_api 0.0.59",
  "holochain_conductor_api 0.0.62",
  "holochain_p2p 0.0.56",
