@@ -1,5 +1,5 @@
 use futures::lock::Mutex;
-use holochain_manager::versions::HolochainVersion;
+use holochain_manager::versions::{HolochainVersion, HdiVersion, HdkVersion};
 use holochain_web_app_manager::installed_web_app_info::InstalledWebAppInfo;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc};
@@ -18,6 +18,8 @@ pub struct HolochainInfo {
   pub installed_apps: Vec<InstalledWebAppInfo>,
   pub app_interface_port: u16,
   pub admin_interface_port: u16,
+  pub hdi_version: HdiVersion,
+  pub hdk_version: HdkVersion,
 }
 
 pub type HolochainState = RunningState<HolochainInfo, String>;

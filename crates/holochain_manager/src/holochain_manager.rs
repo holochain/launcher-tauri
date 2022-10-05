@@ -15,12 +15,11 @@ use crate::{
   config::LaunchHolochainConfig,
   errors::LaunchHolochainError,
   launch::launch_holochain_process,
-  versions::{version_manager::VersionManager, HolochainVersion, HolochainVersionManager},
+  versions::{version_manager::VersionManager, HolochainVersion},
 };
 
 pub struct HolochainManager {
   pub version: HolochainVersion,
-  version_manager: HolochainVersionManager,
 
   admin_interface_port: u16,
   app_interface_port: u16,
@@ -108,7 +107,6 @@ impl HolochainManager {
 
     Ok(HolochainManager {
       version,
-      version_manager,
       ws,
       admin_interface_port: config.admin_port,
       app_interface_port,

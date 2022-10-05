@@ -135,6 +135,29 @@ export const store = createStore<LauncherAdminState>({
         content: stateInfo.default_version,
       };
     },
+    hdiOfDevhub(state) {
+      const stateInfo = state.launcherStateInfo;
+
+      if (stateInfo === "loading") return undefined;
+
+      const defaultVersion = stateInfo.default_version;
+
+      if (stateInfo.state.content.type === "Running") {
+        const holochainVersions = stateInfo.state.content.content.versions;
+        const devhubHolochainVersion = holochainVersions[defaultVersion];
+        if (devhubHolochainVersion.type === "Running") {
+          return {
+            type: "HdiVersion",
+            content: devhubHolochainVersion.content.hdi_version,
+          };
+        }
+      }
+
+      return {
+        type: "Error",
+        content: "DevHub Holochain version not running.",
+      };
+    },
     setupNeeded(state) {
       if (state.launcherStateInfo === "loading") return undefined;
 
