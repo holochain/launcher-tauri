@@ -46,6 +46,10 @@ jobs:
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.162-x86_64-pc-windows-msvc.exe
 
+          cargo install holochain --version 0.0.165 --locked --features db-encryption
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.165-x86_64-pc-windows-msvc.exe
+
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
       - name: download caddy (MacOS only)
@@ -67,6 +71,10 @@ jobs:
           cargo install holochain --version 0.0.162 --locked --features db-encryption
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.162-x86_64-apple-darwin
+
+          cargo install holochain --version 0.0.165 --locked --features db-encryption
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.165-x86_64-apple-darwin
 
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
@@ -100,6 +108,10 @@ jobs:
           cargo install holochain --version 0.0.162 --locked --features db-encryption
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.162-x86_64-unknown-linux-gnu
+
+          cargo install holochain --version 0.0.165 --locked --features db-encryption
+          HOLOCHAIN_PATH=$(which holochain)
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.165-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
