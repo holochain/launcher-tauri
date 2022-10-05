@@ -10,9 +10,14 @@ use crate::{
 
 #[tauri::command]
 pub async fn execute_factory_reset(
+  window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
   app_handle: tauri::AppHandle,
 ) -> Result<(), String> {
+  if window.label() != "admin" {
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (E)"))
+  }
+
   log::warn!("A factory reset has been requested, initiating...");
 
   let windows = app_handle.windows();

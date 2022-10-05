@@ -14,7 +14,7 @@ use tauri::{AppHandle, Manager};
 use tauri::{window::WindowBuilder, WindowUrl};
 use tauri::{CustomMenuItem, Menu, Submenu};
 
-use std::fs::{read, read_to_string};
+use std::fs::{read};
 
 use holochain_manager::versions::HolochainVersion;
 use holochain_web_app_manager::WebAppManager;
@@ -357,7 +357,8 @@ impl LauncherManager {
   }
 
   pub fn open_app(&mut self, holochain_id: HolochainId, app_id: &String) -> Result<(), String> {
-    let window_label = app_id.clone().replace("-", "--").replace(" ", "-");
+    let mut window_label = app_id.clone().replace("-", "--").replace(" ", "-").replace(".", "_");
+    window_label.push_str("---EXTERNAL"); // !! this line is required for security reasons, to unambiguously differentiate the this window from the admin window
 
     // Iterate over the open windows, focus if the app is already open
 
@@ -370,10 +371,6 @@ impl LauncherManager {
     }
 
     let manager = self.get_web_happ_manager(holochain_id)?;
-    let port = manager
-      .get_allocated_port(app_id)
-      .ok_or(String::from("This app has no port attached"))?;
-
 
     let index_path = manager.get_ui_index_path(app_id);
     let assets_path = manager.get_app_ui_path(app_id);
@@ -398,14 +395,15 @@ impl LauncherManager {
       WindowUrl::App("index.html".into())
     )
     .on_web_resource_request(move |request, response| {
-
       println!("£*£*£*£* REQUEST BEFORE {:?}", request);
       let uri = request.uri();
       match uri {
         "tauri://localhost" => {
           let mutable_response = response.body_mut();
-          let index_html = read(index_path.clone()).unwrap(); // TODO! proper error handling
-          *mutable_response = index_html;
+          match read(index_path.clone()) {
+            Ok(index_html) => *mutable_response = index_html, // TODO! Check if there are better ways of dealing with errors here
+            Err(e) => log::error!("Error reading the path of the UI's index.html: {:?}", e),
+          }
         },
         "tauri://localhost/.launcher-env.json" => {
           let mutable_response = response.body_mut();
@@ -414,7 +412,13 @@ impl LauncherManager {
         },
         _ => {
           if uri.starts_with("tauri://localhost/") {
-            let asset_file = &uri[18..]; // TODO! proper error handling. index may be out of bounds?
+
+            let mut asset_file = &uri[18..]; // TODO! proper error handling. index may be out of bounds?
+
+            // if uri is exactly "tauri://localhost/" redirect to index.html (otherwise it will try to redirect to the admin window's index.html)
+            if asset_file == "" {
+              asset_file = "index.html";
+            }
             let mime_guess = mime_guess::from_path(asset_file);
 
             let mime_type = match mime_guess.first() {
@@ -429,10 +433,14 @@ impl LauncherManager {
             println!("%#%#%# Mime type: {:?}", mime_type);
             let asset_path = assets_path.join(asset_file);
             println!("%#%#%# ASSEETTT PATH: {:?}", asset_path);
-            let asset = read(asset_path.clone()).unwrap();
-            let mutable_response = response.body_mut();
-            *mutable_response = asset;
-            response.set_mimetype(mime_type);
+            match read(asset_path.clone()) {
+              Ok(asset) => {
+                let mutable_response = response.body_mut();
+                *mutable_response = asset;
+                response.set_mimetype(mime_type);
+              },
+              Err(e) => log::error!("Error reading asset file from path '{:?}'. Error: {:?}", asset_path, e),
+            }
           }
         }
       }
@@ -452,6 +460,7 @@ impl LauncherManager {
     })
     .inner_size(1000.0, 700.0)
     .title(app_id)
+    .enable_clipboard_access() // TODO! potentially make this optional
     .menu(Menu::new().add_submenu(Submenu::new(
       "Settings",
       Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),

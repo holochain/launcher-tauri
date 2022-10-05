@@ -2,10 +2,14 @@ use crate::launcher::{state::LauncherState, manager::HolochainId};
 
 #[tauri::command]
 pub async fn open_app_ui(
+  window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
   holochain_id: HolochainId,
   app_id: String,
 ) -> Result<(), String> {
+  if window.label() != "admin" {
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (I)"))
+  }
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
 
@@ -19,12 +23,27 @@ pub async fn open_app_ui(
 }
 
 #[tauri::command]
+pub fn report_issue_cmd(window: tauri::Window) -> Result<(), String> {
+  if window.label() != "admin" {
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command."))
+  }
+  Ok(report_issue())
+}
+
 pub fn report_issue() -> () {
-  open_url("https://github.com/holochain/launcher/issues/new?assignees=&labels=bug&template=bug_report.md&title=".into()).unwrap();
+  open_url("https://github.com/holochain/launcher/issues/new?assignees=&labels=bug&template=bug_report.md&title=".into()).unwrap()
 }
 
 #[tauri::command]
-pub fn open_url(url: String) -> Result<(), String> {
+pub fn open_url_cmd(window: tauri::Window, url: String) -> Result<(), String> {
+  if window.label() != "admin" {
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command."))
+  }
+
+  open_url(url)
+}
+
+pub fn open_url(url: String) -> Result<(), String>  {
   tauri::async_runtime::spawn(async move {
     open::that(url.clone().as_str()).map_err(|err| format!("Could not open url: {}", err))
   });

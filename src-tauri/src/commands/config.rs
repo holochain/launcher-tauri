@@ -9,10 +9,16 @@ use crate::{
 
 #[tauri::command]
 pub async fn write_config(
+  window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
   app_handle: tauri::AppHandle,
   config: LauncherConfig,
 ) -> Result<(), LauncherError> {
+
+  if window.label() != "admin" {
+    return Err(LauncherError::Unauthorized("Unauthorized: Attempted to call an unauthorized tauri command. (C)".into()))
+  }
+
   config.write()?;
 
   let windows = app_handle.windows();

@@ -11,7 +11,11 @@ pub struct WebAppInfo {
 }
 
 #[tauri::command]
-pub async fn get_app_info(app_bundle_path: String) -> Result<WebAppInfo, String> {
+pub async fn get_app_info(window: tauri::Window, app_bundle_path: String) -> Result<WebAppInfo, String> {
+  if window.label() != "admin" {
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (F)"))
+  }
+
   let app_bundle = read_app_bundle(app_bundle_path).await?;
 
   let app_slots = app_bundle.manifest().app_roles();

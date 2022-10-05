@@ -15,4 +15,6 @@ pub enum LauncherError {
   ConfigError(String),
   #[error("Error Launching: `{0}`")]
   ErrorLaunching(String),
+  #[error("Unauthorized: `{0}`")]
+  Unauthorized(String),
 }

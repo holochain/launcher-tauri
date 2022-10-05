@@ -17,8 +17,13 @@ use crate::{
 
 #[tauri::command]
 pub async fn get_state_info(
+  window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
 ) -> Result<LauncherStateInfo, LauncherError> {
+  if window.label() != "admin" {
+    return Err(LauncherError::Unauthorized("Attempted to call an unauthorized tauri command. (G)".into()))
+  }
+
   let state_info = inner_get_state_info(state).await?;
 
   let config = LauncherConfig::read();

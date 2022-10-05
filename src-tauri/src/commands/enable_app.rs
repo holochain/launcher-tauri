@@ -2,10 +2,15 @@ use crate::launcher::{state::LauncherState, manager::HolochainId};
 
 #[tauri::command]
 pub async fn enable_app(
+  window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
   holochain_id: HolochainId,
   app_id: String,
 ) -> Result<(), String> {
+  if window.label() != "admin" {
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (D)"))
+  }
+
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
 
@@ -23,10 +28,15 @@ pub async fn enable_app(
 
 #[tauri::command]
 pub async fn disable_app(
+  window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
   holochain_id: HolochainId,
   app_id: String,
 ) -> Result<(), String> {
+  if window.label() != "admin" {
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command."))
+  }
+
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
 

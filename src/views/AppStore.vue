@@ -53,61 +53,6 @@
       class="column center-content"
       style="flex: 1"
     >
-      <!-- <div
-        class="column"
-        style="
-          width: 340px;
-          height: 220px;
-          background: white;
-          border-radius: 15px;
-          box-shadow: 0 0px 5px #9b9b9b;
-        "
-      >
-        <div class="row" style="align-items: center">
-          <div
-            class="column center-content"
-            style="
-              width: 80px;
-              min-width: 80px;
-              height: 80px;
-              border-radius: 12px;
-              background: darkblue;
-              margin: 15px;
-            "
-          >
-            <div style="color: white; font-size: 45px; font-weight: 600">
-              ta
-            </div>
-          </div>
-          <div class="column">
-            <div style="font-size: 25px; font-weight: 600; margin-right: 15px; margin-bottom: 8px;line-height: 115%; word-break: break-all;">
-              talking-stickies
-            </div>
-            <div style="margin-top: -5px">v0.0.4</div>
-          </div>
-        </div>
-        <div
-          style="
-            display: flex;
-            flex: 1;
-            margin: 0 20px 0 25px;
-            color: rgba(0, 0, 0, 0.6);
-            font-size: 17px;
-            overflow-y: scroll;
-          "
-        >
-          Some subtitle which should not be too long.
-
-        </div>
-        <div class="row" style="justify-content: flex-end; align-items: center">
-          <HCMoreToggle style="margin-left: 20px" title="Details" />
-          <span style="display: flex; flex: 1"></span>
-          <HCButton class="install-btn" style="border-radius: 12px; margin: 8px"
-            >Install</HCButton
-          >
-        </div>
-      </div> -->
-
       <span>There are no apps available yet in the DevHub.</span>
       <span style="margin-top: 8px"
         ><span
@@ -215,7 +160,6 @@ export default defineComponent({
     HCLoading,
   },
   data(): {
-    downloading: boolean;
     loadingText: string;
     loading: boolean;
     installableApps: Array<AppWithReleases>;
@@ -225,7 +169,6 @@ export default defineComponent({
   } {
     return {
       loadingText: "",
-      downloading: false,
       loading: true,
       installableApps: [],
       selectedAppBundlePath: undefined,
@@ -266,14 +209,13 @@ export default defineComponent({
   },
   methods: {
     async howToPublish() {
-      await invoke("open_url", {
+      await invoke("open_url_cmd", {
         url: this.howToPublishUrl,
       });
     },
     getLatestRelease,
     async saveApp(app: AppWithReleases) {
       this.loadingText = "Connecting with DevHub";
-      this.downloading = true;
       (this.$refs.downloading as typeof HCLoading).open();
       const release = getLatestRelease(app);
 
@@ -301,7 +243,6 @@ export default defineComponent({
         });
         this.hdkVersionForApp = release.content.hdk_version;
         (this.$refs.downloading as typeof HCLoading).close();
-        this.downloading = false;
         this.loadingText = "";
         console.log("Requested closing of dialog.");
 
@@ -311,6 +252,7 @@ export default defineComponent({
       } catch (e) {
         console.log(e);
         (this.$refs as any).snackbar.show();
+        (this.$refs.downloading as typeof HCLoading).close();
       }
     },
     async selectFromFileSystem() {

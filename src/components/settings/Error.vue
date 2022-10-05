@@ -40,7 +40,7 @@ export default defineComponent({
   },
   methods: {
     async reportIssue() {
-      await invoke("report_issue", {});
+      await invoke("report_issue_cmd", {});
     },
   },
 });

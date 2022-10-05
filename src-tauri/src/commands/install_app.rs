@@ -10,6 +10,7 @@ use crate::launcher::{state::LauncherState, manager::HolochainId};
 
 #[tauri::command]
 pub async fn install_app(
+  window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
   holochain_id: HolochainId,
   app_id: String,
@@ -18,6 +19,10 @@ pub async fn install_app(
   membrane_proofs: HashMap<String, Vec<u8>>,
   reuse_agent_pub_key: Option<AgentPubKey>,
 ) -> Result<(), String> {
+  if window.label() != "admin" {
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (H)"))
+  }
+
   log::info!("Installing: web_app_bundle = {}", app_bundle_path);
 
   let mut converted_membrane_proofs: HashMap<String, MembraneProof> = HashMap::new();
@@ -64,7 +69,7 @@ pub async fn install_app(
   }
 
   log::info!("Installed hApp {}", app_id);
-  
+
   manager.on_apps_changed().await?;
 
   Ok(())
