@@ -23,11 +23,16 @@ export interface HolochainInfo {
   installed_apps: InstalledWebAppInfo[];
   app_interface_port: number;
   admin_interface_port: number;
+  hdi_version: HdiVersion;
+  hdk_version: HdkVersion;
 }
 
 export type HolochainState = RunningState<HolochainInfo, string>;
 
 export type HolochainVersion = string;
+export type HdkVersion = string;
+export type HdiVersion = string;
+
 export type HolochainId =
   | {
       type: "HolochainVersion";
