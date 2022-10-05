@@ -1,6 +1,7 @@
 <template>
   <div
     class="password-field row"
+    :class="{ disabled: disabled }"
     style="align-items: center; flex-wrap: nowrap"
   >
     <input
@@ -133,5 +134,10 @@ export default defineComponent({
   display: table;
   width: -moz-fit-content;
   padding: 0;
+}
+
+.disabled {
+  box-shadow: 0 0 0 2px rgba(59, 61, 115, 0.3);
+  --eye-color: rgba(59, 61, 115, 0.3);
 }
 </style>

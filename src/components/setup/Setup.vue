@@ -32,12 +32,14 @@
             <PasswordField
               required
               initialFocus
+              :disabled="pwInputDisabled"
               ref="password"
               placeholder="Enter password"
               style="margin-bottom: 12px"
             />
             <PasswordField
               required
+              :disabled="pwInputDisabled"
               ref="repeatPassword"
               placeholder="Confirm password"
               style="margin-bottom: 3px"
@@ -85,6 +87,7 @@ export default defineComponent({
       isPasswordValid: false,
       passwordsDontMatch: false,
       initializing: false,
+      pwInputDisabled: false,
     };
   },
   created() {
@@ -112,6 +115,7 @@ export default defineComponent({
   methods: {
     async initialize() {
       if (!this.initializing && this.isPasswordValid) {
+        this.pwInputDisabled = true;
         // condition required to omit ENTER key triggering initialization
         this.initializing = true;
         const password = (this.$refs["password"] as typeof PasswordField).value;
@@ -119,6 +123,7 @@ export default defineComponent({
         await invoke("initialize_keystore", { password });
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
         this.initializing = false;
+        this.pwInputDisabled = false;
       }
     },
     checkPasswordValidity() {
