@@ -19,7 +19,6 @@ use std::{
 };
 
 use crate::{
-  caddy::manager::CaddyManager,
   error::LaunchWebAppManagerError,
   installed_web_app_info::{InstalledWebAppInfo, WebUiInfo},
   utils::unzip_file,
@@ -28,7 +27,6 @@ use crate::{
 pub struct WebAppManager {
   environment_path: PathBuf,
   pub holochain_manager: HolochainManager,
-  caddy_manager: CaddyManager,
   allocated_ports: HashMap<String, u16>,
 }
 
@@ -49,23 +47,14 @@ impl WebAppManager {
     create_dir_if_necessary(&conductor_data_path)?;
     create_dir_if_necessary(&ui_data_path)?;
 
-    let admin_port = config.admin_port;
-
     let holochain_manager = HolochainManager::launch(version, config, password)
       .await
       .map_err(|err| LaunchWebAppManagerError::LaunchHolochainError(err))?;
 
-    let app_interface_port = holochain_manager.app_interface_port();
-
-    let caddy_manager =
-      CaddyManager::launch(environment_path.clone(), admin_port, app_interface_port)
-        .map_err(|err| LaunchWebAppManagerError::LaunchCaddyError(err))?;
-
-    // Fetch the running apps and update caddyfile to already serve them
+    // Fetch the running apps
     let mut manager = WebAppManager {
       holochain_manager,
       environment_path,
-      caddy_manager,
       allocated_ports: HashMap::new(),
     };
     manager
@@ -152,13 +141,7 @@ impl WebAppManager {
   }
 
   async fn on_running_apps_changed(&mut self) -> Result<(), String> {
-    let installed_apps = self.list_apps().await?;
-
-    self
-      .caddy_manager
-      .update_running_apps(&installed_apps)
-      .map_err(|err| format!("Error reloading caddy {:?}", err))?;
-
+    let _installed_apps = self.list_apps().await?;
     Ok(())
   }
 
@@ -181,9 +164,17 @@ impl WebAppManager {
     }
   }
 
+  pub fn get_ui_index_path(&self, app_id: &String) -> PathBuf {
+    app_ui_path(&self.environment_path, &app_id).join("index.html")
+  }
+
+  pub fn get_app_ui_path(&self, app_id: &String) -> PathBuf {
+    app_ui_path(&self.environment_path, &app_id)
+  }
+
+
   pub fn kill(self) -> Result<(), String> {
-    self.holochain_manager.kill()?;
-    self.caddy_manager.kill()
+    self.holochain_manager.kill()
   }
 
   pub async fn install_app(

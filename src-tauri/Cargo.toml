@@ -37,8 +37,8 @@ serde_yaml = "0.8"
 sysinfo = "0.23.5"
 tauri = {git = "https://github.com/tauri-apps/tauri", rev = "447370fa50a82f8086554086ca9038f4a008a456", features = ["api-all", "native-tls-vendored", "reqwest-native-tls-vendored", "system-tray"] }
 thiserror = "1.0.30"
-url = "2.2.2"
 url2 = "0.0.6"
+mime_guess = "2.0.4"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
