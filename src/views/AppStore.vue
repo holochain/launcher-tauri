@@ -1,26 +1,47 @@
 <template>
-  <div class="column" style="flex: 1; margin: 8px">
-    <div class="row center-content">
+  <HCLoading ref="downloading" :text="loadingText" />
+
+  <div class="column" style="flex: 1">
+    <div class="row center-content top-bar">
       <mwc-icon-button
         icon="arrow_back"
         @click="$emit('go-back')"
       ></mwc-icon-button>
 
-      <span style="flex: 1; font-size: 1.5em">App Library</span>
-      <mwc-button
-        label="How to publish an app"
-        @click="howToPublish()"
-        style=""
+      <span
+        style="
+          flex: 1;
+          font-size: 1.5em;
+          margin-left: 4px;
+          position: sticky;
+          top: 0;
+          z-index: 1;
+        "
+        >App Library</span
       >
-      </mwc-button>
-      <mwc-button
+      <HCButton
+        outlined
+        @click="howToPublish()"
+        style="height: 36px; border-radius: 8px; padding: 0 20px"
+        :title="howToPublishUrl"
+        >How to publish an app
+      </HCButton>
+      <HCButton
         icon="folder"
-        raised
-        style="--mdc-theme-primary: #4720e3; margin-left: 8px"
-        label="Select app from FileSystem"
+        style="
+          margin-left: 8px;
+          margin-right: 1px;
+          height: 40px;
+          border-radius: 8px;
+          padding: 0 20px;
+        "
         @click="selectFromFileSystem()"
       >
-      </mwc-button>
+        <div class="row center-content">
+          <mwc-icon>folder</mwc-icon>
+          <span style="margin-left: 5px">Select app from Filesystem</span>
+        </div>
+      </HCButton>
     </div>
 
     <div v-if="loading" class="column center-content" style="flex: 1">
@@ -32,11 +53,69 @@
       class="column center-content"
       style="flex: 1"
     >
+      <!-- <div
+        class="column"
+        style="
+          width: 340px;
+          height: 220px;
+          background: white;
+          border-radius: 15px;
+          box-shadow: 0 0px 5px #9b9b9b;
+        "
+      >
+        <div class="row" style="align-items: center">
+          <div
+            class="column center-content"
+            style="
+              width: 80px;
+              min-width: 80px;
+              height: 80px;
+              border-radius: 12px;
+              background: darkblue;
+              margin: 15px;
+            "
+          >
+            <div style="color: white; font-size: 45px; font-weight: 600">
+              ta
+            </div>
+          </div>
+          <div class="column">
+            <div style="font-size: 25px; font-weight: 600; margin-right: 15px; margin-bottom: 8px;line-height: 115%; word-break: break-all;">
+              talking-stickies
+            </div>
+            <div style="margin-top: -5px">v0.0.4</div>
+          </div>
+        </div>
+        <div
+          style="
+            display: flex;
+            flex: 1;
+            margin: 0 20px 0 25px;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 17px;
+            overflow-y: scroll;
+          "
+        >
+          Some subtitle which should not be too long.
+
+        </div>
+        <div class="row" style="justify-content: flex-end; align-items: center">
+          <HCMoreToggle style="margin-left: 20px" title="Details" />
+          <span style="display: flex; flex: 1"></span>
+          <HCButton class="install-btn" style="border-radius: 12px; margin: 8px"
+            >Install</HCButton
+          >
+        </div>
+      </div> -->
+
       <span>There are no apps available yet in the DevHub.</span>
       <span style="margin-top: 8px"
         ><span
           style="cursor: pointer; text-decoration: underline"
+          title="https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub"
           @click="howToPublish()"
+          @keydown.enter="howToPublish()"
+          tabindex="0"
           >Read this</span
         >
         to learn how to publish a Holochain application to the DevHub.</span
@@ -48,9 +127,10 @@
         v-for="(app, i) of installableApps"
         :key="i"
         class="column"
-        style="width: 300px; margin-right: 16px; margin-bottom: 16px"
+        style="margin-right: 16px; margin-bottom: 16px"
       >
-        <ui5-card style="width: auto">
+        <AppPreviewCard :app="app" @installApp="saveApp(app)" />
+        <!-- <ui5-card style="width: auto">
           <div class="column" style="margin: 8px">
             <span style="font-size: 18px">{{ app.app.content.title }}</span>
             <span style="margin-top: 8px; height: 80px; overflow: auto">{{
@@ -69,12 +149,12 @@
               ></mwc-button>
             </div>
           </div>
-        </ui5-card>
+        </ui5-card> -->
       </div>
     </div>
   </div>
 
-  <InstallApp
+  <!-- <InstallApp
     v-if="selectedAppBundlePath"
     :appBundlePath="selectedAppBundlePath"
     :hdkVersionForApp="hdkVersionForApp"
@@ -83,7 +163,18 @@
       $emit('go-back');
     "
     @closing-dialog="installClosed()"
-  ></InstallApp>
+  ></InstallApp> -->
+  <InstallAppDialog
+    v-if="selectedAppBundlePath"
+    :appBundlePath="selectedAppBundlePath"
+    :hdkVersionForApp="hdkVersionForApp"
+    @app-installed="
+      installClosed();
+      $emit('go-back');
+    "
+    @closing-dialog="installClosed()"
+    ref="install-app-dialog"
+  ></InstallAppDialog>
   <mwc-snackbar
     leading
     labelText="App download failed. Please try again later."
@@ -97,6 +188,7 @@ import "@material/mwc-dialog";
 import "@material/mwc-circular-progress";
 import "@material/mwc-button";
 import "@material/mwc-snackbar";
+import "@material/mwc-icon";
 import { AppWebsocket } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
@@ -109,24 +201,37 @@ import {
   fetchWebHapp,
 } from "../devhub/get-happs";
 import { HdkVersion } from "@/hdk";
-import InstallApp from "../components/InstallApp.vue";
+import InstallAppDialog from "../components/InstallAppDialog.vue";
+import HCButton from "../components/subcomponents/HCButton.vue";
+import AppPreviewCard from "../components/AppPreviewCard.vue";
+import HCLoading from "../components/subcomponents/HCLoading.vue";
 
 export default defineComponent({
   name: "AppStore",
   components: {
-    InstallApp,
+    InstallAppDialog,
+    HCButton,
+    AppPreviewCard,
+    HCLoading,
   },
   data(): {
+    downloading: boolean;
+    loadingText: string;
     loading: boolean;
     installableApps: Array<AppWithReleases>;
     selectedAppBundlePath: string | undefined;
     hdkVersionForApp: HdkVersion | undefined;
+    howToPublishUrl: string;
   } {
     return {
+      loadingText: "",
+      downloading: false,
       loading: true,
       installableApps: [],
       selectedAppBundlePath: undefined,
       hdkVersionForApp: undefined,
+      howToPublishUrl:
+        "https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub",
     };
   },
 
@@ -162,12 +267,14 @@ export default defineComponent({
   methods: {
     async howToPublish() {
       await invoke("open_url", {
-        url: "https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub",
+        url: this.howToPublishUrl,
       });
     },
     getLatestRelease,
     async saveApp(app: AppWithReleases) {
-      this.loading = true;
+      this.loadingText = "Connecting with DevHub";
+      this.downloading = true;
+      (this.$refs.downloading as typeof HCLoading).open();
       const release = getLatestRelease(app);
 
       const holochainId = this.$store.getters["holochainIdForDevhub"];
@@ -178,8 +285,10 @@ export default defineComponent({
         installed_app_id: `DevHub-${holochainId.content}`,
       });
 
+      this.loadingText = "Downloading...";
+
       try {
-        console.log(release);
+        console.log("Release: ", release);
         const bytes = await fetchWebHapp(
           appWs,
           devhubInfo,
@@ -191,12 +300,18 @@ export default defineComponent({
           appBundleBytes: bytes,
         });
         this.hdkVersionForApp = release.content.hdk_version;
+        (this.$refs.downloading as typeof HCLoading).close();
+        this.downloading = false;
+        this.loadingText = "";
+        console.log("Requested closing of dialog.");
+
+        this.$nextTick(() => {
+          (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
+        });
       } catch (e) {
         console.log(e);
         (this.$refs as any).snackbar.show();
       }
-
-      this.loading = false;
     },
     async selectFromFileSystem() {
       this.selectedAppBundlePath = (await open({
@@ -204,6 +319,11 @@ export default defineComponent({
           { name: "Holochain Application", extensions: ["webhapp", "happ"] },
         ],
       })) as string;
+      console.log("All refs: ", this.$refs);
+
+      this.$nextTick(() => {
+        (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
+      });
     },
     installClosed() {
       this.selectedAppBundlePath = undefined;
@@ -212,3 +332,15 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.top-bar {
+  /* background-color: rgb(225, 226, 255); */
+  padding: 8px 8px 8px 6px;
+  /* border-bottom: 1px solid black; */
+  background: white;
+  box-shadow: 0 0px 5px #9b9b9b;
+  position: sticky;
+  top: 0;
+}
+</style>

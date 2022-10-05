@@ -120,3 +120,9 @@ export interface InstalledWebAppInfo {
   installed_app_info: InstalledAppInfo;
   web_ui_info: WebUiInfo;
 }
+
+export interface HolochainAppInfo {
+  webAppInfo: InstalledWebAppInfo;
+  holochainId: HolochainId;
+  holochainVersion: HolochainVersion;
+}

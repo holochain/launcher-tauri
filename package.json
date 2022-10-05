@@ -3,8 +3,8 @@
   "version": "0.6.1",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev:ui\" \"sleep 7 && npm run tauri dev\"",
-    "dev:ui": "vue-cli-service build --watch --mode development --dest src-tauri/target/webpack_dist",
+    "dev": "concurrently \"npm run dev:ui\" \"sleep 14 && npm run tauri dev\"",
+    "dev:ui": "vue-cli-service serve --watch --mode development --dest src-tauri/target/webpack_dist",
     "build:ui": "vue-cli-service build --dest src-tauri/target/webpack_dist",
     "build": "npm run build:ui && npm run tauri -- build -v",
     "test:unit": "vue-cli-service test:unit",
@@ -13,7 +13,10 @@
     "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/8xdcHKQmjkmrGGn/download"
   },
   "dependencies": {
-    "@holochain-open-dev/utils": "^0.0.9",
+    "@fontsource/poppins": "^4.5.9",
+    "@holochain-open-dev/utils": "^0.2.0",
+    "@holo-host/identicon": "^0.1.0",
+    "@holochain-open-dev/elements": "^0.0.1",
     "@holochain/client": "^0.3.2",
     "@material/mwc-button": "^0.25.1",
     "@material/mwc-circular-progress": "0.25.1",

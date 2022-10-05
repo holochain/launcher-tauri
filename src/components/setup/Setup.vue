@@ -1,99 +1,188 @@
 <template>
-  <mwc-dialog
-    heading="Setup Password"
-    scrimClickAction=""
-    escapeKeyAction=""
-    open
-  >
-    <div class="column">
-      <span
-        >This is the password with which the keystore where your private keys
-        live will be initialized.
-      </span>
-      <span style="margin-top: 16px"
-        ><b>WARNING!</b> If you lose this password, you will also lose access to
-        any data from your Holochain applications, as there is no password
-        recovery mechanism.
-      </span>
+  <div class="background">
+    <div
+      class="row"
+      style="box-shadow: 0 0 30px rgb(21, 16, 65); border-radius: 15px"
+    >
+      <div class="column center-content left-half">
+        <div
+          style="
+            color: #ffffff;
+            text-align: center;
+            font-size: 40px;
+            line-height: 48px;
+            margin: 20px;
+          "
+        >
+          Discover, install and easily manage your Holochain apps
+        </div>
+        <img class="halo" src="/img/Holochain_Halo.svg" />
+      </div>
+      <div class="column center-content right-half">
+        <img
+          src="/img/lock_icon.svg"
+          style="height: 35px; margin-bottom: 10px; opacity: 0.95"
+        />
+        <div style="font-size: 27px; font-weight: 600; margin-bottom: 25px">
+          Create password
+        </div>
 
-      <mwc-textfield
-        outlined
-        type="password"
-        ref="password"
-        autoValidate
-        helper=" "
-        style="margin-top: 24px"
-        label="Password"
-        dialogInitialFocus
-      ></mwc-textfield>
+        <form>
+          <div class="column" style="align-items: center">
+            <PasswordField
+              required
+              initialFocus
+              :disabled="pwInputDisabled"
+              ref="password"
+              placeholder="Enter password"
+              style="margin-bottom: 12px"
+            />
+            <PasswordField
+              required
+              :disabled="pwInputDisabled"
+              ref="repeatPassword"
+              placeholder="Confirm password"
+              style="margin-bottom: 3px"
+              @input="checkPasswordValidity"
+            />
 
-      <mwc-textfield
-        outlined
-        autoValidate
-        ref="repeatPassword"
-        helper=" "
-        style="margin-top: 16px"
-        type="password"
-        label="Repeat Password"
-      ></mwc-textfield>
+            <div
+              style="
+                margin-bottom: 50px;
+                color: #ff3131;
+                text-align: left;
+                padding: 0 10px;
+                font-size: 0.9em;
+                height: 22px;
+              "
+            >
+              {{ this.passwordsDontMatch ? "Password's don't match." : "" }}
+            </div>
+
+            <HcButton
+              :disabled="initializing || !isPasswordValid"
+              @click="initialize()"
+              style="width: 128px"
+              >{{ this.initializing ? "initializing..." : "Continue" }}
+            </HcButton>
+          </div>
+        </form>
+      </div>
     </div>
-
-    <mwc-button
-      :disabled="initializing || !isPasswordValid"
-      :label="initializing ? 'Initializing...' : 'Initialize'"
-      slot="primaryAction"
-      @click="initialize()"
-    ></mwc-button>
-  </mwc-dialog>
+  </div>
 </template>
 
 <script lang="ts">
 import { ActionTypes } from "@/store/actions";
-import { TextField } from "@material/mwc-textfield";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
+import PasswordField from "../subcomponents/PasswordField.vue";
+import HcButton from "../subcomponents/HCButton.vue";
 
 export default defineComponent({
   name: "Setup",
+  components: { PasswordField, HcButton },
   data() {
     return {
       isPasswordValid: false,
+      passwordsDontMatch: false,
       initializing: false,
+      pwInputDisabled: false,
     };
   },
   created() {
     this.$nextTick(() => {
-      const repeatPassword = this.$refs.repeatPassword as TextField;
-      repeatPassword.validityTransform = (newValue: string, nativeValidity) => {
-        const password = (this.$refs.password as TextField).value;
-        if (newValue !== password) {
-          repeatPassword.setCustomValidity("Passwords don't match");
+      const repeatPassword = this.$refs.repeatPassword as typeof PasswordField;
+      console.log("repeatPassword value: ", repeatPassword.value);
+      // repeatPassword.validityTransform = (newValue: string, nativeValidity) => {
+      //   const password = (this.$refs.password as TextField).value;
+      //   if (newValue !== password) {
+      //     repeatPassword.setCustomValidity("Passwords don't match");
 
-          this.isPasswordValid = false;
-          return {
-            valid: false,
-          };
-        } else {
-          this.isPasswordValid = password.length > 0;
-          return {
-            valid: true,
-          };
-        }
-      };
+      //     this.isPasswordValid = false;
+      //     return {
+      //       valid: false,
+      //     };
+      //   } else {
+      //     this.isPasswordValid = password.length > 0;
+      //     return {
+      //       valid: true,
+      //     };
+      //   }
+      // };
     });
   },
   methods: {
     async initialize() {
       if (!this.initializing && this.isPasswordValid) {
+        this.pwInputDisabled = true;
         // condition required to omit ENTER key triggering initialization
         this.initializing = true;
-        const password = (this.$refs["password"] as TextField).value;
+        const password = (this.$refs["password"] as typeof PasswordField).value;
 
         await invoke("initialize_keystore", { password });
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
         this.initializing = false;
+        this.pwInputDisabled = false;
       }
+    },
+    checkPasswordValidity() {
+      console.log("Checking password validity.");
+      console.log(
+        "password value: ",
+        (this.$refs.password as typeof PasswordField).value
+      );
+      console.log(
+        "repeatPassword value: ",
+        (this.$refs.repeatPassword as typeof PasswordField).value
+      );
+      const passwordValue = (this.$refs.password as typeof PasswordField).value;
+      const repeatPasswordValue = (
+        this.$refs.repeatPassword as typeof PasswordField
+      ).value;
+      this.isPasswordValid =
+        passwordValue.length > 0 && passwordValue === repeatPasswordValue;
+      this.passwordsDontMatch =
+        repeatPasswordValue.length > 0 && passwordValue !== repeatPasswordValue;
     },
   },
 });
 </script>
+
+<style scoped>
+.background {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* background-color: rgb(21, 16, 65); */
+  /* background-color: #e3e4eb; */
+  background-color: #e8e8eb;
+}
+
+.left-half {
+  background-color: #331ead;
+  height: 695px;
+  width: 500px;
+  border-radius: 15px 0 0 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.right-half {
+  background-color: #ffffff;
+  height: 695px;
+  width: 500px;
+  border-radius: 0 15px 15px 0;
+}
+
+.halo {
+  height: 700px;
+  position: absolute;
+  left: -10.11%;
+  right: 51.81%;
+  top: 0;
+  bottom: 18.88%;
+}
+</style>

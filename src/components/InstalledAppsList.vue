@@ -1,103 +1,262 @@
 <template>
-  <div style="display: flex; flex: 1; flex-direction: column">
+  <div
+    style="
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      margin-bottom: 80px;
+      padding: 0 30px;
+      width: 70%;
+      align-items: center;
+      min-width: 900px;
+    "
+  >
     <div
-      v-if="installedWebApps.length === 0"
+      class="row"
       style="
-        flex: 1;
-        display: flex;
+        width: 100%;
+        justify-content: flex-end;
         align-items: center;
-        justify-content: center;
+        max-width: 1100px;
+        margin-top: 20px;
+        margin-bottom: -5px;
       "
     >
-      <span style="margin: 24px"
-        >There are no apps installed yet in this Holochain version.</span
+      <HCSelectCard
+        style="
+          width: 200px;
+          margin-right: 5px;
+          box-shadow: 0 0px 3px -1px #9b9b9b;
+          --hc-label-background: #e8e8eb;
+        "
+        placeholder="Holochain Versions"
+        :items="holochainVersions"
+        @item-selected="selectedHolochainVersion = $event"
+      ></HCSelectCard>
+      <img
+        src="/img/Square284x284Logo.png"
+        style="
+          height: 30px;
+          filter: grayscale(50%);
+          margin-right: 20px;
+          margin-left: -2px;
+        "
+      />
+
+      <HCSelectCard
+        style="
+          width: 200px;
+          margin-right: 5px;
+          box-shadow: 0 0px 3px -1px #9b9b9b;
+          --hc-label-background: #e8e8eb;
+        "
+        placeholder="sort by"
+        :items="sortOptions"
+        @item-selected="sortOption = $event"
+      ></HCSelectCard>
+      <mwc-icon style="color: #482edf; text-shadow: 0 0px 5px #9b9b9b"
+        >sort</mwc-icon
+      >
+    </div>
+    <!-- <InstallAppDialog ref="test-dialog"/> -->
+
+    <!-- <InstalledAppCard style="margin: 5px" />
+    <InstalledAppCard appIcon="/img/dummy_app_icon.png" style="margin: 5px" /> -->
+
+    <div
+      style="
+        border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+        width: 98%;
+        margin: 10px;
+        margin-top: -18px;
+        max-width: 1080px;
+        padding-bottom: 3px;
+      "
+    >
+      <span
+        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
+        title="Holochain Apps with Graphical User Interface"
+        >Web Apps</span
+      >
+    </div>
+
+    <div v-if="noWebApps" style="margin-top: 30px; color: rgba(0, 0, 0, 0.6)">
+      There are no Web Apps installed{{
+        selectedHolochainVersion === "All Versions"
+          ? "."
+          : " in this Holochain Version."
+      }}
+    </div>
+
+    <div
+      v-else
+      v-for="app in sortedApps"
+      :key="app.webAppInfo.installed_app_info.installed_app_id"
+      style="
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+      "
+    >
+      <InstalledAppCard
+        v-if="app.webAppInfo.web_ui_info.type !== 'Headless'"
+        style="margin: 5px; display: flex; flex: 1"
+        :app="app"
+        @openApp="$emit('openApp', $event)"
+        @uninstallApp="$emit('uninstall-app', $event)"
+        @disableApp="$emit('disable-app', $event)"
+        @enableApp="$emit('enable-app', $event)"
+      />
+    </div>
+
+    <div
+      style="
+        border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+        width: 98%;
+        margin: 10px;
+        margin-top: 50px;
+        max-width: 1080px;
+        padding-bottom: 3px;
+      "
+    >
+      <span
+        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
+        title="Holochain Apps without Graphical User Interface"
+        >Headless Apps</span
       >
     </div>
     <div
-      v-else
-      v-for="app in installedWebApps"
-      :key="app.installed_app_info.installed_app_id"
-      style="display: flex; flex-direction: column; margin-bottom: 16px"
+      v-if="noHeadlessApps"
+      style="margin-top: 30px; color: rgba(0, 0, 0, 0.6)"
     >
-      <ui5-card style="width: auto">
-        <div style="display: flex; flex-direction: column; flex: 1">
-          <div style="display: flex; flex-direction: row">
-            <span
-              style="
-                font-size: 1.6em;
-                width: 300px;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                margin-top: 8px;
-                margin-left: 8px;
-              "
-              >{{ app.installed_app_info.installed_app_id }}</span
-            >
-            <span style="flex: 1"></span>
-
-            <div
-              style="
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-              "
-            >
-              <mwc-button
-                v-if="
-                  isAppRunning(app.installed_app_info) && !isAppHeadless(app)
-                "
-                @click="
-                  $emit('openApp', app.installed_app_info.installed_app_id)
-                "
-                style="margin-right: 8px"
-                label="Open"
-                icon="launch"
-              >
-              </mwc-button>
-
-              <InstalledAppStatus :installedAppInfo="app.installed_app_info" />
-
-              <mwc-icon-button
-                @click="
-                  $emit('app-selected', app.installed_app_info.installed_app_id)
-                "
-                style="margin-left: 8px"
-                icon="settings"
-              >
-              </mwc-icon-button>
-            </div>
-          </div>
-        </div>
-      </ui5-card>
+      There are no headless apps installed{{
+        selectedHolochainVersion === "All Versions"
+          ? "."
+          : " in this Holochain Version."
+      }}
+    </div>
+    <div
+      v-for="app in sortedApps"
+      :key="app.webAppInfo.installed_app_info.installed_app_id"
+      style="
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+      "
+    >
+      <InstalledAppCard
+        v-if="app.webAppInfo.web_ui_info.type === 'Headless'"
+        style="margin: 5px; display: flex; flex: 1"
+        :app="app"
+        @openApp="$emit('openApp', $event)"
+        @uninstallApp="$emit('uninstall-app', $event)"
+        @disableApp="$emit('disable-app', $event)"
+        @enableApp="$emit('enable-app', $event)"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { uniq } from "lodash-es";
+
 import "@ui5/webcomponents/dist/Card.js";
 import "@material/mwc-button";
 import "@material/mwc-icon-button";
+import "@material/mwc-icon";
 
-import { InstalledWebAppInfo } from "../types";
+import { HolochainAppInfo } from "../types";
 import { isAppRunning } from "../utils";
-import InstalledAppStatus from "./InstalledAppStatus.vue";
+import InstalledAppCard from "./InstalledAppCard.vue";
+import HCSelectCard from "./subcomponents/HCSelectCard.vue";
 
 export default defineComponent({
   name: "InstalledAppsList",
-  components: { InstalledAppStatus },
+  components: {
+    InstalledAppCard,
+    HCSelectCard,
+  },
   props: {
-    installedWebApps: {
-      type: Object as PropType<Array<InstalledWebAppInfo>>,
+    installedApps: {
+      type: Object as PropType<Array<HolochainAppInfo>>,
       required: true,
     },
   },
+  data(): {
+    sortOptions: [string, string][];
+    sortOption: string | undefined;
+    selectedHolochainVersion: string;
+  } {
+    return {
+      sortOptions: [
+        ["name", "name"],
+        ["name descending", "name descending"],
+        // ["Holochain Version", "Holochain Version"],
+      ],
+      sortOption: undefined,
+      selectedHolochainVersion: "All Versions",
+    };
+  },
   emits: ["openApp"],
+  computed: {
+    sortedApps() {
+      let sortedAppList = this.installedApps;
+
+      if (this.selectedHolochainVersion !== "All Versions") {
+        sortedAppList = sortedAppList.filter(
+          (app) => app.holochainVersion === this.selectedHolochainVersion
+        );
+      }
+
+      if (this.sortOption === "name") {
+        sortedAppList = sortedAppList.sort((appA, appB) =>
+          appA.webAppInfo.installed_app_info.installed_app_id.localeCompare(
+            appB.webAppInfo.installed_app_info.installed_app_id
+          )
+        );
+      } else if (this.sortOption === "name descending") {
+        sortedAppList = sortedAppList.sort((appA, appB) =>
+          appB.webAppInfo.installed_app_info.installed_app_id.localeCompare(
+            appA.webAppInfo.installed_app_info.installed_app_id
+          )
+        );
+      } else {
+        // default is alphabetical by app id
+        sortedAppList = sortedAppList.sort((appA, appB) =>
+          appA.webAppInfo.installed_app_info.installed_app_id.localeCompare(
+            appB.webAppInfo.installed_app_info.installed_app_id
+          )
+        );
+      }
+
+      return sortedAppList;
+    },
+    noHeadlessApps(): boolean {
+      return !this.sortedApps.some(
+        (app) => app.webAppInfo.web_ui_info.type === "Headless"
+      );
+    },
+    noWebApps(): boolean {
+      return this.sortedApps.every(
+        (app) => app.webAppInfo.web_ui_info.type === "Headless"
+      );
+    },
+    holochainVersions(): [string, string][] {
+      let allApps = this.installedApps;
+      let hcVersions: [string, string][] = [["All Versions", "All Versions"]];
+      uniq(allApps.map((app) => app.holochainVersion)).forEach((hcVer) => {
+        hcVersions.push([hcVer, hcVer]);
+      });
+      return hcVersions;
+    },
+  },
   methods: {
     isAppRunning,
-    isAppHeadless(app: InstalledWebAppInfo) {
-      return app.web_ui_info.type === "Headless";
+    isAppHeadless(app: HolochainAppInfo) {
+      return app.webAppInfo.web_ui_info.type === "Headless";
     },
   },
 });

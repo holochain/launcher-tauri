@@ -1,11 +1,24 @@
 <template>
-  <mwc-dialog
-    :heading="$data.heading"
+  <HCGenericDialog
     ref="dialog"
-    scrimClickAction=""
-    escapeKeyAction=""
+    @confirm="executeFactoryReset()"
+    closeOnSideClick
+    :primaryButtonDisabled="executing"
+    :primaryButtonLabel="executing ? 'Executing...' : 'Execute Factory Reset'"
   >
-    <div class="column">
+    <div class="column" style="margin: 0 20px; max-width: 500px">
+      <span
+        style="
+          font-weight: 600;
+          font-size: 1.5em;
+          width: 100%;
+          text-align: center;
+          margin-bottom: 25px;
+          margin-top: -10px;
+        "
+        >{{ $data.heading }}</span
+      >
+
       <div v-if="oldFiles" class="column">
         <span>
           It seems you have old files from older installations of the launcher.
@@ -50,29 +63,13 @@
       </div>
 
       <span v-else style="margin-top: 8px">
-        <b>If you don't mind losing old Holochain data</b>, you can execute a
-        factory reset.
-        <b>
-          This will uninstall all the Holochain apps that were installed on this
-          computer as well as remove all their previously stored data.
-        </b>
+        This will <b>uninstall all Holochain apps</b> on your computer of
+        Holochain versions supported by this version of the Holochain
+        Launcher.<br /><br />
+        It will also <b>delete all data stored in those apps.</b>
       </span>
     </div>
-
-    <mwc-button
-      v-if="!oldFiles"
-      slot="secondaryAction"
-      :disabled="executing"
-      dialogAction="close"
-      label="Cancel"
-    ></mwc-button>
-    <mwc-button
-      slot="primaryAction"
-      @click="executeFactoryReset()"
-      :disabled="executing"
-      :label="executing ? 'Executing...' : 'Execute Factory Reset'"
-    ></mwc-button>
-  </mwc-dialog>
+  </HCGenericDialog>
   <mwc-snackbar leading :labelText="snackbarText" ref="snackbar"></mwc-snackbar>
 </template>
 
@@ -84,8 +81,11 @@ import type { Dialog } from "@material/mwc-dialog";
 import { ActionTypes } from "@/store/actions";
 import { listen } from "@tauri-apps/api/event";
 
+import HCGenericDialog from "../components/subcomponents/HCGenericDialog.vue";
+
 export default defineComponent({
   name: "FactoryReset",
+  components: { HCGenericDialog },
   data(): {
     snackbarText: string | undefined;
     executing: boolean;
@@ -130,7 +130,7 @@ export default defineComponent({
   },
   methods: {
     showDialog() {
-      (this.$refs.dialog as Dialog).show();
+      (this.$refs.dialog as typeof HCGenericDialog).open();
     },
     async executeFactoryReset() {
       try {

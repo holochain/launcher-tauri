@@ -11,62 +11,60 @@
       v-if="view.type === 'installedApps'"
       style="display: flex; flex: 1; flex-direction: column"
     >
-      <span style="margin: 16px; font-size: 1.5em">Installed Apps</span>
-      <div class="column" style="flex: 1; align-items: center">
-        <div
-          v-for="(holochainId, index) of $store.getters[`runningHolochainIds`]"
-          :key="index"
-          class="column"
-          style="width: 600px; margin-bottom: 16px"
+      <div class="row top-bar" style="position: sticky; top: 0; z-index: 1">
+        <img
+          src="/img/Square284x284Logo.png"
+          style="height: 42px; margin-left: 11px"
+        />
+        <span style="font-size: 1.5em; margin-left: 13px">Installed Apps</span>
+        <span style="display: flex; flex: 1"></span>
+        <HCButton
+          style="
+            margin-left: 8px;
+            margin-right: 12px;
+            height: 40px;
+            border-radius: 8px;
+            padding: 0 20px;
+          "
+          @click="reportIssue()"
         >
-          <span
-            v-if="holochainId.type === 'HolochainVersion'"
-            style="margin-bottom: 8px"
-            >Holochain v{{ holochainId.content }}</span
-          >
-          <span v-else style="margin-bottom: 8px">Custom Holochain Binary</span>
-
-          <InstalledAppsList
-            :installedWebApps="$store.getters[`appsForHolochain`](holochainId)"
-            @open-app="openApp(holochainId, $event)"
-            @app-selected="selectApp(holochainId, $event)"
-          />
-        </div>
+          <div class="row center-content">
+            <span style="margin-left: 5px">Report Issue</span>
+          </div>
+        </HCButton>
       </div>
-      <mwc-fab
-        extended
-        icon="add"
-        label="Install new app"
+
+      <div
+        class="column"
+        style="flex: 1; align-items: center; padding: 0 50px; margin-top: 20px"
+      >
+        <InstalledAppsList
+          :installedApps="$store.getters[`allApps`]"
+          @open-app="openApp($event)"
+          @app-selected="selectApp($event)"
+          @disable-app="disableApp($event)"
+          @enable-app="enableApp($event)"
+          @start-app="startApp($event)"
+          @uninstall-app="uninstallApp($event)"
+        />
+      </div>
+      <HCButton
+        tabindex="0"
         @click="$emit('open-app-store')"
+        class="btn-install"
         style="
+          font-family: Poppins;
           margin: 16px;
+          height: 54px;
           position: absolute;
           right: 0;
           bottom: 0;
-          --mdc-theme-secondary: #4720e3;
         "
-      ></mwc-fab>
-    </div>
-
-    <div v-else style="flex: 1">
-      <div class="row" style="justify-content: start; align-items: center">
-        <mwc-icon-button
-          icon="arrow_back"
-          @click="view = { type: 'installedApps' }"
-        ></mwc-icon-button>
-        <span style="font-size: 1.5em">App Detail</span>
-      </div>
-
-      <div class="column center-content">
-        <InstalledAppDetail
-          style="width: 800px"
-          :installedWebAppInfo="selectedAppInfo"
-          @disable-app="disableSelectedApp()"
-          @enable-app="enableSelectedApp()"
-          @start-app="startSelectedApp()"
-          @uninstall-app="uninstallSelectedApp()"
-        ></InstalledAppDetail>
-      </div>
+        ><div class="row center-content" style="font-size: 18px">
+          <mwc-icon style="margin-right: 10px; font-size: 26px">add</mwc-icon
+          >INSTALL NEW APP
+        </div>
+      </HCButton>
     </div>
   </div>
 
@@ -76,11 +74,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { ActionTypes } from "../store/actions";
-import { HolochainId, InstalledWebAppInfo } from "../types";
+import { HolochainAppInfo, HolochainId, InstalledWebAppInfo } from "../types";
 import "@material/mwc-snackbar";
+import "@material/mwc-icon";
 import { invoke } from "@tauri-apps/api/tauri";
 import InstalledAppsList from "../components/InstalledAppsList.vue";
-import InstalledAppDetail from "../components/InstalledAppDetail.vue";
+import HCButton from "../components/subcomponents/HCButton.vue";
 
 type View =
   | {
@@ -94,12 +93,17 @@ type View =
 
 export default defineComponent({
   name: "InstalledApps",
-  components: { InstalledAppsList, InstalledAppDetail },
+  components: { InstalledAppsList, HCButton },
   data(): {
     snackbarText: string | undefined;
     view: View;
+    reportIssueUrl: string;
   } {
-    return { snackbarText: undefined, view: { type: "installedApps" } };
+    return {
+      snackbarText: undefined,
+      view: { type: "installedApps" },
+      reportIssueUrl: "https://github.com/holochain/launcher/issues/new",
+    };
   },
   computed: {
     selectedAppInfo() {
@@ -130,9 +134,10 @@ export default defineComponent({
         appId,
       };
     },
-    async openApp(holochainId: HolochainId, appId: string) {
+    async openApp(app: HolochainAppInfo) {
+      const appId = app.webAppInfo.installed_app_info.installed_app_id;
       try {
-        await invoke("open_app_ui", { appId, holochainId });
+        await invoke("open_app_ui", { appId, holochainId: app.holochainId });
         this.showMessage(`App ${appId} opened`);
       } catch (e) {
         const error = `Error opening app ${appId}: ${JSON.stringify(e)}`;
@@ -142,12 +147,10 @@ export default defineComponent({
         });
       }
     },
-    async disableSelectedApp() {
-      if (this.view.type !== "appDetail") return;
-      const { appId, holochainId } = this.view;
-
+    async disableApp(app: HolochainAppInfo) {
+      const appId = app.webAppInfo.installed_app_info.installed_app_id;
       try {
-        await invoke("disable_app", { appId, holochainId });
+        await invoke("disable_app", { appId, holochainId: app.holochainId });
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
         this.showMessage(`Disabled ${appId}`);
@@ -159,12 +162,11 @@ export default defineComponent({
         });
       }
     },
-    async enableSelectedApp() {
-      if (this.view.type !== "appDetail") return;
-      const { appId, holochainId } = this.view;
+    async enableApp(app: HolochainAppInfo) {
+      const appId = app.webAppInfo.installed_app_info.installed_app_id;
 
       try {
-        await invoke("enable_app", { appId, holochainId });
+        await invoke("enable_app", { appId, holochainId: app.holochainId });
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
         this.showMessage(`Enabled ${appId}`);
@@ -176,12 +178,11 @@ export default defineComponent({
         });
       }
     },
-    async startSelectedApp() {
-      if (this.view.type !== "appDetail") return;
-      const { appId, holochainId } = this.view;
+    async startApp(app: HolochainAppInfo) {
+      const appId = app.webAppInfo.installed_app_info.installed_app_id;
 
       try {
-        await invoke("start_app", { appId, holochainId });
+        await invoke("start_app", { appId, holochainId: app.holochainId });
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
@@ -194,12 +195,11 @@ export default defineComponent({
         });
       }
     },
-    async uninstallSelectedApp() {
-      if (this.view.type !== "appDetail") return;
-      const { appId, holochainId } = this.view;
+    async uninstallApp(app: HolochainAppInfo) {
+      const appId = app.webAppInfo.installed_app_info.installed_app_id;
 
       try {
-        await invoke("uninstall_app", { appId, holochainId });
+        await invoke("uninstall_app", { appId, holochainId: app.holochainId });
 
         this.view = { type: "installedApps" };
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
@@ -213,6 +213,11 @@ export default defineComponent({
         });
       }
     },
+    async reportIssue() {
+      await invoke("open_url", {
+        url: this.reportIssueUrl,
+      });
+    },
     showMessage(message: string) {
       this.snackbarText = message;
       (this.$refs as any).snackbar.show();
@@ -221,3 +226,21 @@ export default defineComponent({
 });
 </script>
 <!-- We don't have scoped styles with classes because it becomes harder to export a reusable library -->
+
+<style scoped>
+.btn-install:hover {
+  cursor: pointer;
+  --hc-primary-color: #5537fc;
+}
+.btn-install:focus-visible {
+  --hc-primary-color: #5537fc;
+}
+
+.top-bar {
+  align-items: center;
+  height: 64px;
+  background: #e8e8eb;
+  background: white;
+  box-shadow: 0 0px 5px #9b9b9b;
+}
+</style>

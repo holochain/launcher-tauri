@@ -8,9 +8,20 @@
       "
       heading="Error Launching Holochain"
     >
-      <span style="margin-top: 8px">
+      <div
+        style="
+          margin-top: 8px;
+          display: flex;
+          flex: 1;
+          background: rgba(255, 0, 0, 0.1);
+          overflow-x: scroll;
+          border-radius: 5px;
+          padding: 10px;
+          max-width: 600px;
+        "
+      >
         {{ $store.getters[`errorLaunching`] }}
-      </span>
+      </div>
     </Error>
     <Setup v-else-if="$store.getters[`setupNeeded`]"></Setup>
     <EnterPassword v-else-if="$store.getters[`passwordNeeded`]"></EnterPassword>
@@ -37,6 +48,11 @@ import About from "./components/settings/About.vue";
 import { defineComponent } from "vue";
 import { ActionTypes } from "./store/actions";
 import "@material/mwc-circular-progress";
+import "@fontsource/poppins";
+import "@fontsource/poppins/600.css";
+import "@fontsource/poppins/700.css";
+import "@fontsource/poppins/800.css";
+import "@fontsource/poppins/900.css";
 
 export default defineComponent({
   name: "App",
@@ -63,12 +79,13 @@ body,
   display: flex;
   flex: 1;
   height: 100%;
-  font-family: Mulish, sans-serif;
-  background-color: #ededed;
+  font-family: Poppins, sans-serif;
+  /* background-color: #ededed; */
+  background-color: #e8e8eb;
 }
 
 :root {
-  font-family: Mulish, sans-serif;
+  font-family: Poppins, sans-serif;
   --mdc-theme-primary: #4720e3;
   --mdc-theme-secondary: #0dddd3;
 }

@@ -5,7 +5,7 @@
   },
   "build": {
     "distDir": "target/webpack_dist",
-    "devPath": "target/webpack_dist",
+    "devPath": "http://localhost:8080",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
   },
@@ -27,6 +27,7 @@
       ],
       "resources": [],
       "externalBin": [
+        "bins/holochain-v0.0.165",
         "bins/holochain-v0.0.162",
         "bins/lair-keystore",
         "bins/caddy"
@@ -56,14 +57,16 @@
       {
         "label": "admin",
         "title": "Holochain Admin",
-        "width": 1000,
-        "height": 700,
+        "width": 1200,
+        "height": 900,
         "resizable": true,
         "fullscreen": false
       }
     ],
     "security": {
-      "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self'"
+      "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self'",
+      "devCsp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self'",
+      "dangerousDisableAssetCspModification": true
     }
   }
 }

@@ -1,7 +1,7 @@
 import {
+  HolochainAppInfo,
   HolochainId,
   HolochainState,
-  HolochainVersion,
   LauncherStateInfo,
 } from "@/types";
 import { invoke } from "@tauri-apps/api/tauri";
@@ -205,6 +205,58 @@ export const store = createStore<LauncherAdminState>({
       }
 
       return versions;
+    },
+    allApps(state): Array<HolochainAppInfo> {
+      const stateInfo = state.launcherStateInfo;
+
+      if (
+        stateInfo === "loading" ||
+        stateInfo.state.type === "Error" ||
+        stateInfo.state.content.type === "Error"
+      )
+        return [];
+
+      const allInstalledApps: Array<HolochainAppInfo> = [];
+
+      const holochainsStateInfo = stateInfo.state.content.content;
+
+      // add all apps of the custom binary if present
+      if (
+        holochainsStateInfo.custom_binary &&
+        holochainsStateInfo.custom_binary.type === "Running"
+      ) {
+        holochainsStateInfo.custom_binary.content.installed_apps.forEach(
+          (app) => {
+            allInstalledApps.push({
+              webAppInfo: app,
+              holochainId: {
+                type: "CustomBinary",
+              },
+              holochainVersion: "Custom Binary",
+            });
+          }
+        );
+      }
+
+      // add all other apps
+      Object.entries(holochainsStateInfo.versions).forEach(
+        ([holochainVersion, holochainState]) => {
+          if (holochainState.type === "Running") {
+            holochainState.content.installed_apps.forEach((app) => {
+              allInstalledApps.push({
+                webAppInfo: app,
+                holochainId: {
+                  type: "HolochainVersion",
+                  content: holochainVersion,
+                },
+                holochainVersion,
+              });
+            });
+          }
+        }
+      );
+
+      return allInstalledApps;
     },
     appsForHolochain: (state) => (holochainId: HolochainId) => {
       const stateInfo = state.launcherStateInfo;
