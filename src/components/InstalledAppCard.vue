@@ -154,13 +154,43 @@
 
       <table style="text-align: left; margin-top: 20px; margin-left: 140px">
         <tr>
-          <th>Cell Role</th>
+          <th></th>
           <th>Dna Hash</th>
+        </tr>
+
+        <tr>
+          <th>Main Cells</th>
+          <th></th>
         </tr>
 
         <tr
           style=""
-          v-for="cellData in app.webAppInfo.installed_app_info.cell_data"
+          v-for="cellData in mainCells"
+          :key="[...cellData.cell_id[0], ...cellData.cell_id[1]]"
+        >
+          <td>
+            <span
+              >{{ cellData.role_id.slice(0, 20)
+              }}{{ cellData.role_id.length > 20 ? "..." : "" }}</span
+            >
+          </td>
+          <td>
+            <span
+              style="opacity: 0.7; font-family: monospace; font-size: 14px"
+              >{{ serializeHash(cellData.cell_id[0]) }}</span
+            >
+          </td>
+        </tr>
+
+        <br />
+        <tr v-if="clonedCells.length > 0">
+          <th>Cloned Cells</th>
+          <th></th>
+        </tr>
+
+        <tr
+          style=""
+          v-for="cellData in clonedCells"
           :key="[...cellData.cell_id[0], ...cellData.cell_id[1]]"
         >
           <td>
@@ -285,6 +315,16 @@ export default defineComponent({
     };
   },
   emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp"],
+  computed: {
+    mainCells() {
+      const allCells = this.app.webAppInfo.installed_app_info.cell_data;
+      return allCells.filter((cell) => !cell.role_id.includes("."));
+    },
+    clonedCells() {
+      const allCells = this.app.webAppInfo.installed_app_info.cell_data;
+      return allCells.filter((cell) => cell.role_id.includes("."));
+    },
+  },
   methods: {
     serializeHash,
     getReason,
@@ -326,9 +366,8 @@ export default defineComponent({
       return "Unknown State";
     },
     isAppUninstallable(installedAppId: string) {
-      const holochainId = this.$store.getters["holochainIdForDevhub"];
-
-      return installedAppId !== `DevHub-${holochainId.content}`;
+      const hdiOfDevhub = this.$store.getters["hdiOfDevhub"];
+      return installedAppId !== `DevHub-${hdiOfDevhub.content}`;
     },
     async handleSlider(app: HolochainAppInfo) {
       if (isAppRunning(app.webAppInfo.installed_app_info)) {
@@ -350,8 +389,6 @@ export default defineComponent({
       setTimeout(() => {
         this.showPubKeyTooltip = false;
       }, 1200);
-
-      // navigator.clipboard.writeText(serializeHash(pubKey));
     },
   },
 });

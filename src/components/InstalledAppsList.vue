@@ -79,19 +79,15 @@
         >Web Apps</span
       >
     </div>
-    <div
-      v-if="installedApps.length === 0"
-      style="
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      "
-    >
-      <span style="margin: 24px"
-        >There are no apps installed yet in this Holochain version.</span
-      >
+
+    <div v-if="noWebApps" style="margin-top: 30px; color: rgba(0, 0, 0, 0.6)">
+      There are no Web Apps installed{{
+        selectedHolochainVersion === "All Versions"
+          ? "."
+          : " in this Holochain Version."
+      }}
     </div>
+
     <div
       v-else
       v-for="app in sortedApps"
@@ -129,6 +125,16 @@
         title="Holochain Apps without Graphical User Interface"
         >Headless Apps</span
       >
+    </div>
+    <div
+      v-if="noHeadlessApps"
+      style="margin-top: 30px; color: rgba(0, 0, 0, 0.6)"
+    >
+      There are no headless apps installed{{
+        selectedHolochainVersion === "All Versions"
+          ? "."
+          : " in this Holochain Version."
+      }}
     </div>
     <div
       v-for="app in sortedApps"
@@ -227,6 +233,16 @@ export default defineComponent({
       }
 
       return sortedAppList;
+    },
+    noHeadlessApps(): boolean {
+      return !this.sortedApps.some(
+        (app) => app.webAppInfo.web_ui_info.type === "Headless"
+      );
+    },
+    noWebApps(): boolean {
+      return this.sortedApps.every(
+        (app) => app.webAppInfo.web_ui_info.type === "Headless"
+      );
     },
     holochainVersions(): [string, string][] {
       let allApps = this.installedApps;
