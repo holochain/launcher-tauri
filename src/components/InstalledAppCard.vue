@@ -433,11 +433,13 @@ export default defineComponent({
 
 .tooltip {
   position: absolute;
+  /* color: #482edf; */
   color: white;
   bottom: 56px;
   left: 62px;
-  background: #7480ff;
+  background: #5537fc;
   border-radius: 5px;
+  /* border: 2px solid #482edf; */
   padding: 1px 7px;
 }
 </style>
