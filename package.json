@@ -14,9 +14,8 @@
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",
-    "@holochain-open-dev/utils": "^0.2.0",
+    "@holochain-open-dev/utils": "^0.0.9",
     "@holo-host/identicon": "^0.1.0",
-    "@holochain-open-dev/elements": "^0.0.1",
     "@holochain/client": "^0.3.2",
     "@material/mwc-button": "^0.25.1",
     "@material/mwc-circular-progress": "0.25.1",
