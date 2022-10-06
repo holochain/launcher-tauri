@@ -5,7 +5,7 @@
   },
   "build": {
     "distDir": "target/webpack_dist",
-    "devPath": "http://localhost:8080",
+    "devPath": "target/webpack_dist",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
   },
@@ -63,9 +63,7 @@
       }
     ],
     "security": {
-      "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self'",
-      "devCsp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self'",
-      "dangerousDisableAssetCspModification": true
+      "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self'"
     }
   }
 }
