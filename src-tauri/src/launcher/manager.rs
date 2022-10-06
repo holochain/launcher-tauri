@@ -376,7 +376,7 @@ impl LauncherManager {
     let assets_path = manager.get_app_ui_path(app_id);
 
 
-    println!("%*%*%*% INDEX PATH: {:?}", index_path);
+    // println!("%*%*%*% INDEX PATH: {:?}", index_path);
 
 
     let launcher_env = format!(r#"{{
@@ -395,7 +395,7 @@ impl LauncherManager {
       WindowUrl::App("index.html".into())
     )
     .on_web_resource_request(move |request, response| {
-      println!("£*£*£*£* REQUEST BEFORE {:?}", request);
+      // println!("£*£*£*£* REQUEST BEFORE {:?}", request);
       let uri = request.uri();
       match uri {
         "tauri://localhost" => {
@@ -430,10 +430,10 @@ impl LauncherManager {
               }
             };
 
-            println!("%#%#%# ASSEETTT: {:?}", asset_file);
-            println!("%#%#%# Mime type: {:?}", mime_type);
+            // println!("%#%#%# ASSEETTT: {:?}", asset_file);
+            // println!("%#%#%# Mime type: {:?}", mime_type);
             let asset_path = assets_path.join(asset_file);
-            println!("%#%#%# ASSEETTT PATH: {:?}", asset_path);
+            // println!("%#%#%# ASSEETTT PATH: {:?}", asset_path);
             match read(asset_path.clone()) {
               Ok(asset) => {
                 let mutable_response = response.body_mut();
@@ -446,18 +446,7 @@ impl LauncherManager {
         }
       }
 
-      // let serve_index = request.uri() == "tauri://localhost";
-      // if serve_index {
-      //   let mutable_response = response.body_mut();
-      //   let index_html = read(index_path.clone()).unwrap();
-      //   *mutable_response = index_html;
-      // }
-      // println!("serve index: {:?}", serve_index);
-      println!("£*£*£*£* REQUEST AFTER {:?}", request);
 
-      // println!("asfd {:?} {:?}", request, response);
-      // let mut v = response.body_mut();
-      // *v = Vec::new();
     })
     .inner_size(1000.0, 700.0)
     .title(app_id)

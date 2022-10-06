@@ -10,3 +10,4 @@ pub mod open_app;
 pub mod start_app;
 pub mod password;
 pub mod uninstall_app;
+pub mod restart;

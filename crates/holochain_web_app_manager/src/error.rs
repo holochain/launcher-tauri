@@ -1,5 +1,5 @@
 use holochain_manager::errors::LaunchHolochainError;
-use lair_keystore_manager::error::{LaunchChildError, FileSystemError};
+use lair_keystore_manager::error::FileSystemError;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

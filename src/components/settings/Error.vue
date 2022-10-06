@@ -33,7 +33,6 @@ export default defineComponent({
     heading: String,
   },
   created() {
-    console.log("ERROR DIALOG CREATED!");
     this.$nextTick(() => {
       (this.$refs.dialog as typeof HCGenericDialog).open();
     });

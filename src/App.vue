@@ -1,5 +1,16 @@
 <template>
   <div style="flex: 1; display: flex">
+    <HCGenericDialog
+      @confirm="restartLauncher"
+      ref="restartDialog"
+      primaryButtonLabel="Restart"
+      :closeOnSideClick="true"
+    >
+      <div style="margin: 0 30px; max-width: 500px; text-align: center">
+        Do you want to clean up all holochain processes and restart the
+        Holochain Launcher?
+      </div>
+    </HCGenericDialog>
     <AlreadyRunning v-if="$store.getters[`isAlreadyRunning`]"> </AlreadyRunning>
     <Error
       v-else-if="
@@ -45,6 +56,8 @@ import AlreadyRunning from "./components/settings/AlreadyRunning.vue";
 import EnterPassword from "./components/setup/EnterPassword.vue";
 import Setup from "./components/setup/Setup.vue";
 import About from "./components/settings/About.vue";
+import HCGenericDialog from "./components/subcomponents/HCGenericDialog.vue";
+
 import { defineComponent } from "vue";
 import { ActionTypes } from "./store/actions";
 import "@material/mwc-circular-progress";
@@ -53,6 +66,8 @@ import "@fontsource/poppins/600.css";
 import "@fontsource/poppins/700.css";
 import "@fontsource/poppins/800.css";
 import "@fontsource/poppins/900.css";
+import { listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/tauri";
 
 export default defineComponent({
   name: "App",
@@ -65,9 +80,23 @@ export default defineComponent({
     Error,
     Config,
     AlreadyRunning,
+    HCGenericDialog,
+  },
+  mounted() {
+    this.$nextTick(async () => {
+      const restartDialog = this.$refs.restartDialog as typeof HCGenericDialog;
+      await listen("request-restart", () => {
+        restartDialog.open();
+      });
+    });
   },
   async created() {
     await this.$store.dispatch(ActionTypes.fetchStateInfo);
+  },
+  methods: {
+    async restartLauncher() {
+      await invoke("restart");
+    },
   },
 });
 </script>
