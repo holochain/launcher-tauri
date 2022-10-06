@@ -318,7 +318,7 @@ impl LauncherManager {
     }
   }
 
-  /// Connects to the conductor, requests the list of running apps, updates the caddyfile and the system tray
+  /// Connects to the conductor, requests the list of running apps and updates the system tray
   pub async fn on_apps_changed(&mut self) -> Result<(), String> {
     let versions: Vec<HolochainVersion> = self.holochain_managers.keys().cloned().collect();
 
@@ -419,6 +419,7 @@ impl LauncherManager {
             if asset_file == "" {
               asset_file = "index.html";
             }
+
             let mime_guess = mime_guess::from_path(asset_file);
 
             let mime_type = match mime_guess.first() {

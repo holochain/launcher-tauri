@@ -7,8 +7,6 @@ use thiserror::Error;
 pub enum LaunchWebAppManagerError {
   #[error("Error launching Holochain: `{0}`")]
   LaunchHolochainError(#[from] LaunchHolochainError),
-  #[error("Error launching Caddy: `{0}`")]
-  LaunchCaddyError(#[from] LaunchChildError),
   #[error("Failed to read or write from the filesystem: `{0}`")]
   FileSystemError(#[from] FileSystemError),
   #[error("Error launching the WebAppManager: `{0}`")]

@@ -5,9 +5,6 @@ Go through the [tauri developer setup](https://tauri.studio/en/docs/getting-star
 > Note: for now in Linux you will need to install `patchelf` and `librsvg2-dev`:
 > `sudo apt-get install patchelf librsvg2-dev`
 
-## Install Caddy
-
-Go to [the Caddy website](https://caddyserver.com/) and install it for your distribution.
 
 ## Install Holochain and lair-keystore globally
 
@@ -20,7 +17,7 @@ cargo install lair_keystore --git https://github.com/guillemcordoba/lair --rev 8
 
 ## Project setup
 
-This assumes that you have the `holochain`, `lair-keystore` and `caddy` binaries installed and available in your PATH.
+This assumes that you have the `holochain` and `lair-keystore` binaries installed and available in your PATH.
 
 ```bash
 yarn

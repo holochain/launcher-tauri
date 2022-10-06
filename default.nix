@@ -9,7 +9,6 @@ in nixpkgs.mkShell {
   packages = with nixpkgs; [
     # Additional packages go here
     nodejs-16_x
-    caddy
     glib
     cairo
     gtksourceview3
