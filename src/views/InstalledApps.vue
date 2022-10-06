@@ -214,7 +214,7 @@ export default defineComponent({
       }
     },
     async reportIssue() {
-      await invoke("open_url", {
+      await invoke("open_url_cmd", {
         url: this.reportIssueUrl,
       });
     },

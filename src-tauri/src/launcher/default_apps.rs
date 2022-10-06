@@ -12,7 +12,8 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager) -> R
     let dev_hub_bundle = WebAppBundle::decode(include_bytes!("../../../DevHub.webhapp"))
       .or(Err("Malformed Web hApp bundle file"))?;
 
-    let version: String = manager.holochain_manager.version.manager().hdi_version().into();
+    // let version: String = manager.holochain_manager.version.manager().hdi_version().into();
+    let version: String = manager.holochain_manager.version.into();
 
     let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { None };
 

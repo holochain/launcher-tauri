@@ -180,14 +180,14 @@ export default defineComponent({
 
   async mounted() {
     const holochainId = this.$store.getters["holochainIdForDevhub"];
-    const hdiOfDevhub = this.$store.getters["hdiOfDevhub"];
+    const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
 
     const port = this.$store.getters["appInterfacePort"](holochainId);
 
     const appWs = await AppWebsocket.connect(`ws://localhost:${port}`);
 
     const devhubInfo = await appWs.appInfo({
-      installed_app_id: `DevHub-${hdiOfDevhub.content}`,
+      installed_app_id: `DevHub-${holochainId.content}`,
     });
 
     let allApps: Array<AppWithReleases>;

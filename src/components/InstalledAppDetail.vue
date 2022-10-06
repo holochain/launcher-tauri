@@ -145,9 +145,10 @@ export default defineComponent({
   },
   methods: {
     isAppUninstallable(installedAppId: string) {
-      const hdiVersion = this.$store.getters["hdiOfDevhub"];
+      const _hdiVersion = this.$store.getters["hdiOfDevhub"];
+      const holochainId = this.$store.getters["holochainIdForDevhub"];
 
-      return installedAppId !== `DevHub-${hdiVersion.content}`;
+      return installedAppId !== `DevHub-${holochainId.content}`;
     },
     deserializeHash,
     serializeHash,

@@ -10,6 +10,3 @@ cp $HOLOCHAIN_PATH src-tauri/bins/holochain-$TARGET_TRIPLE
 
 LAIR_PATH=$(which lair-keystore)
 cp $LAIR_PATH src-tauri/bins/lair-keystore-$TARGET_TRIPLE
-
-CADDY_PATH=$(which caddy)
-cp $CADDY_PATH src-tauri/bins/caddy-$TARGET_TRIPLE

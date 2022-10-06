@@ -366,8 +366,10 @@ export default defineComponent({
       return "Unknown State";
     },
     isAppUninstallable(installedAppId: string) {
-      const hdiOfDevhub = this.$store.getters["hdiOfDevhub"];
-      return installedAppId !== `DevHub-${hdiOfDevhub.content}`;
+      const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"];
+      const holochainId = this.$store.getters["holochainIdForDevhub"];
+
+      return installedAppId !== `DevHub-${holochainId.content}`;
     },
     async handleSlider(app: HolochainAppInfo) {
       if (isAppRunning(app.webAppInfo.installed_app_info)) {
