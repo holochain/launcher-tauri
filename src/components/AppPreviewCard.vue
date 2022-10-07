@@ -3,7 +3,7 @@
     <div
       v-if="showDescription"
       class="column"
-      style="flex: 1; overflow-y: scroll; padding: 20px"
+      style="flex: 1; overflow-y: auto; padding: 20px"
     >
       {{ app.app.content.description }}
     </div>
@@ -67,7 +67,7 @@
           margin: 0 20px 0 25px;
           color: rgba(0, 0, 0, 0.6);
           font-size: 17px;
-          overflow-y: scroll;
+          overflow-y: auto;
         "
       >
         {{ app.app.content.subtitle }}

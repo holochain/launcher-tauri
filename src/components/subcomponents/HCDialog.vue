@@ -87,6 +87,6 @@ export default defineComponent({
   z-index: 1;
   border: 4px solid var(--hc-primary-color);
   box-shadow: 0 0px 5px #9b9b9b;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 </style>
