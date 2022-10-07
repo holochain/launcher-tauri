@@ -77,26 +77,9 @@
             paused: isAppPaused(app.webAppInfo.installed_app_info),
           }"
           class="app-status"
-          style="margin-right: 18px"
+          style="margin-right: 29px"
           tabindex="0"
         ></div>
-      </sl-tooltip>
-
-      <sl-tooltip
-        class="tooltip"
-        hoist
-        placement="top"
-        :content="
-          isAppRunning(app.webAppInfo.installed_app_info)
-            ? 'Disable App'
-            : 'Start App'
-        "
-      >
-        <ToggleSwitch
-          style="margin-right: 29px"
-          :sliderOn="isAppRunning(app.webAppInfo.installed_app_info)"
-          @click="handleSlider(app)"
-        />
       </sl-tooltip>
 
       <div
@@ -115,6 +98,23 @@
           />
         </sl-tooltip>
       </div>
+
+      <sl-tooltip
+        class="tooltip"
+        hoist
+        placement="top"
+        :content="
+          isAppRunning(app.webAppInfo.installed_app_info)
+            ? 'Disable App'
+            : 'Start App'
+        "
+      >
+        <ToggleSwitch
+          style="margin-right: 29px"
+          :sliderOn="isAppRunning(app.webAppInfo.installed_app_info)"
+          @click="handleSlider(app)"
+        />
+      </sl-tooltip>
 
       <sl-tooltip class="tooltip" hoist placement="top" content="App Details">
         <HCMoreToggle
