@@ -219,7 +219,7 @@
         style="
           display: flex;
           flex-direction: row;
-          justify-content: end;
+          justify-content: flex-end;
           margin-top: 40px;
           margin-right: 20px;
         "
