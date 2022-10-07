@@ -127,15 +127,6 @@ export default defineComponent({
       }
     },
     checkPasswordValidity() {
-      console.log("Checking password validity.");
-      console.log(
-        "password value: ",
-        (this.$refs.password as typeof PasswordField).value
-      );
-      console.log(
-        "repeatPassword value: ",
-        (this.$refs.repeatPassword as typeof PasswordField).value
-      );
       const passwordValue = (this.$refs.password as typeof PasswordField).value;
       const repeatPasswordValue = (
         this.$refs.repeatPassword as typeof PasswordField

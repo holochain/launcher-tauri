@@ -114,6 +114,11 @@ export default defineComponent({
   flex: 1;
 }
 
+/* remove MS Edge's own eye icon */
+input.password-input::-ms-reveal {
+  display: none;
+}
+
 .password-field {
   height: 42px;
   width: 300px;
