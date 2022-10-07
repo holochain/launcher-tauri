@@ -110,6 +110,11 @@
         "
       >
         <ToggleSwitch
+          v-if="
+            isAppUninstallable(
+              app.webAppInfo.installed_app_info.installed_app_id
+            )
+          "
           style="margin-right: 29px"
           :sliderOn="isAppRunning(app.webAppInfo.installed_app_info)"
           @click="handleSlider(app)"
@@ -131,17 +136,6 @@
       style="align-items: left; width: 100%; margin-bottom: 20px"
     >
       <div class="row" style="margin-top: 45px; margin-left: 140px">
-        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
-          >Your Public Key:</span
-        >
-        <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
-          serializeHash(
-            app.webAppInfo.installed_app_info.cell_data[0].cell_id[1]
-          )
-        }}</span>
-      </div>
-
-      <div class="row" style="margin-top: 20px; margin-left: 140px">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Holochain Version:</span
         >
