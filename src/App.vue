@@ -11,6 +11,8 @@
         Holochain Launcher?
       </div>
     </HCGenericDialog>
+    <About></About>
+    <FactoryReset></FactoryReset>
     <AlreadyRunning v-if="$store.getters[`isAlreadyRunning`]"> </AlreadyRunning>
     <Error
       v-else-if="
@@ -42,8 +44,6 @@
       "
       style="display: flex; flex: 1"
     ></Home>
-    <FactoryReset style="display: flex; flex: 1"></FactoryReset>
-    <About></About>
     <Config></Config>
   </div>
 </template>

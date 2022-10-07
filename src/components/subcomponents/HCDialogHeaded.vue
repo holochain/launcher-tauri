@@ -1,11 +1,13 @@
 <template>
-  <div ref="container" tabindex="0" @keydown.esc="close">
-    <dialog
-      @click="closeOnSideClick ? close() : null"
-      class="background"
-      :open="isOpen"
-    ></dialog>
-    <dialog class="dialog-element" :open="isOpen">
+  <div
+    v-show="isOpen"
+    role="dialog"
+    ref="container"
+    tabindex="0"
+    @keydown.esc="close"
+  >
+    <div @click="closeOnSideClick ? close() : null" class="background"></div>
+    <div class="dialog-element">
       <div class="column">
         <div class="row top-bar">
           {{ heading }}
@@ -17,7 +19,7 @@
       </div>
       <slot name="secondaryAction"></slot>
       <slot name="primaryAction"></slot>
-    </dialog>
+    </div>
   </div>
 </template>
 
@@ -72,15 +74,14 @@ export default defineComponent({
 
 .background {
   border: none;
-  background-color: rgba(255, 255, 255, 0.7);
   background-color: #e8e8eb;
   opacity: 0.9;
   width: 100vw;
   height: 100vh;
-  z-index: 1;
   padding: 0;
-  position: absolute;
+  position: fixed;
   top: 0;
+  z-index: 9998;
 }
 
 .dialog-element {
@@ -94,7 +95,7 @@ export default defineComponent({
   top: 50vh;
   transform: translate(-50%, -50%);
   margin: 0; /*reset some browser centering*/
-  z-index: 1;
+  z-index: 9999;
   border: 4px solid var(--hc-primary-color);
   box-shadow: 0 0px 5px #9b9b9b;
   background: white;
@@ -116,6 +117,7 @@ export default defineComponent({
 .halo {
   height: 150%;
   position: absolute;
+  top: -3%;
   opacity: 50%;
 }
 

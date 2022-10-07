@@ -62,7 +62,7 @@
         </span>
       </div>
 
-      <span v-else style="margin-top: 8px">
+      <span v-else style="margin-top: 8px; text-align: center">
         This will <b>uninstall all Holochain apps</b> on your computer of
         Holochain versions supported by this version of the Holochain
         Launcher.<br /><br />
@@ -77,7 +77,6 @@
 import { defineComponent } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import { getCurrent } from "@tauri-apps/api/window";
-import type { Dialog } from "@material/mwc-dialog";
 import { ActionTypes } from "@/store/actions";
 import { listen } from "@tauri-apps/api/event";
 
