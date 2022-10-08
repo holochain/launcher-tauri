@@ -378,7 +378,7 @@ export default defineComponent({
         await invoke("install_app", {
           appId,
           appBundlePath: this.appBundlePath,
-          membraneProofs: this.membraneProofs,
+          membraneProofs: this.getEncodedMembraneProofs(),
           networkSeed,
           reuseAgentPubKey: this.reuseAgentPubKey,
           holochainId: this.holochainId,
