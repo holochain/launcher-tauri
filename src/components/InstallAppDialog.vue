@@ -238,16 +238,12 @@ export default defineComponent({
         "allPublicKeysForHolochainId"
       ](this.holochainId);
 
-      console.log("All public keys: ", pubkeys);
-
       const allPubKeys: [string, string | undefined][] = [
         ["Generate New Public Key (default)", undefined],
       ];
       uniq(pubkeys.map(serializeHash)).forEach((pubKey) => {
         allPubKeys.push([pubKey, pubKey]);
       });
-
-      console.log("Nicely arranged public keys: ", allPubKeys);
 
       return allPubKeys;
     },
@@ -375,9 +371,6 @@ export default defineComponent({
       const networkSeed = (
         this.$refs["network-seed-field"] as typeof HCTextField
       ).value;
-
-      console.log("Network Seed: ", networkSeed);
-      console.log("public key: ", this.reuseAgentPubKey);
 
       try {
         this.installing = true;

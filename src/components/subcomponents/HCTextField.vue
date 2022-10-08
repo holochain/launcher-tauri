@@ -38,6 +38,10 @@ export default defineComponent({
       type: String,
       default: undefined,
     },
+    default: {
+      type: String,
+      default: undefined,
+    },
   },
   data(): {
     focus: boolean;
@@ -47,6 +51,11 @@ export default defineComponent({
       focus: false,
       value: "",
     };
+  },
+  mounted() {
+    if (this.default) {
+      this.value = this.default;
+    }
   },
 });
 </script>

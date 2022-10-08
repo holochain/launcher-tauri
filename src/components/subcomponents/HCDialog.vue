@@ -4,7 +4,7 @@
     role="dialog"
     ref="container"
     tabindex="0"
-    @keydown.esc="close"
+    @keydown.esc="handleEscape"
   >
     <div @click="closeOnSideClick ? close() : null" class="background"></div>
     <div class="dialog-element">
@@ -35,6 +35,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    prohibitEscape: {
+      type: Boolean,
+      default: false,
+    },
   },
   data(): {
     isOpen: boolean;
@@ -51,6 +55,12 @@ export default defineComponent({
     close() {
       this.isOpen = false;
       this.$emit("closing");
+    },
+    handleEscape() {
+      if (this.prohibitEscape) {
+        return;
+      }
+      this.close();
     },
   },
 });
@@ -72,7 +82,7 @@ export default defineComponent({
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 9998;
+  z-index: 9999;
 }
 
 .dialog-element {

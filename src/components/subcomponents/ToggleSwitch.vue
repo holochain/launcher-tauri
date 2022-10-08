@@ -1,7 +1,7 @@
 <template>
   <label class="switch">
     <input type="checkbox" :checked="sliderOn" />
-    <span class="slider round" @click="handleSlide"></span>
+    <span class="slider round" @click.stop="handleSlide"></span>
   </label>
 </template>
 
@@ -16,12 +16,13 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["turn-on", "turn-off"],
   methods: {
     handleSlide() {
       if (this.sliderOn) {
-        this.$emit("slider-on");
+        this.$emit("turn-off");
       } else {
-        this.$emit("slider-off");
+        this.$emit("turn-on");
       }
     },
   },

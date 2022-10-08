@@ -244,7 +244,6 @@ export default defineComponent({
         this.hdkVersionForApp = release.content.hdk_version;
         (this.$refs.downloading as typeof HCLoading).close();
         this.loadingText = "";
-        console.log("Requested closing of dialog.");
 
         this.$nextTick(() => {
           (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
@@ -261,7 +260,6 @@ export default defineComponent({
           { name: "Holochain Application", extensions: ["webhapp", "happ"] },
         ],
       })) as string;
-      console.log("All refs: ", this.$refs);
 
       this.$nextTick(() => {
         (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();

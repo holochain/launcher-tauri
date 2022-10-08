@@ -331,7 +331,6 @@ export default defineComponent({
     },
     requestUninstall() {
       (this.$refs["uninstall-app-dialog"] as typeof HCGenericDialog).open();
-      console.log("requesting uninstall.");
       this.showUninstallDialog = true;
     },
     async enableApp(app: HolochainAppInfo) {
@@ -367,7 +366,6 @@ export default defineComponent({
     },
     async handleSlider(app: HolochainAppInfo) {
       if (isAppRunning(app.webAppInfo.installed_app_info)) {
-        console.log("trying to disable app");
         await this.disableApp(app);
       } else if (isAppDisabled(app.webAppInfo.installed_app_info)) {
         await this.enableApp(app);

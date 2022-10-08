@@ -7,7 +7,7 @@
     @keydown.esc="close"
   >
     <div @click="closeOnSideClick ? close() : null" class="background"></div>
-    <div class="dialog-element">
+    <div class="dialog-element" ref="dialogElement">
       <div class="column">
         <div class="row top-bar">
           {{ heading }}
@@ -81,7 +81,8 @@ export default defineComponent({
   padding: 0;
   position: fixed;
   top: 0;
-  z-index: 9998;
+  left: 0;
+  z-index: 9999;
 }
 
 .dialog-element {

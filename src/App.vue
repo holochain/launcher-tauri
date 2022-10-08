@@ -1,18 +1,5 @@
 <template>
   <div style="flex: 1; display: flex">
-    <HCGenericDialog
-      @confirm="restartLauncher"
-      ref="restartDialog"
-      primaryButtonLabel="Restart"
-      :closeOnSideClick="true"
-    >
-      <div style="margin: 0 30px; max-width: 500px; text-align: center">
-        Do you want to clean up all holochain processes and restart the
-        Holochain Launcher?
-      </div>
-    </HCGenericDialog>
-    <About></About>
-    <FactoryReset></FactoryReset>
     <AlreadyRunning v-if="$store.getters[`isAlreadyRunning`]"> </AlreadyRunning>
     <Error
       v-else-if="
@@ -44,7 +31,20 @@
       "
       style="display: flex; flex: 1"
     ></Home>
+    <About></About>
     <Config></Config>
+    <HCGenericDialog
+      @confirm="restartLauncher"
+      ref="restartDialog"
+      primaryButtonLabel="Restart"
+      :closeOnSideClick="true"
+    >
+      <div style="margin: 0 30px; max-width: 500px; text-align: center">
+        Do you want to clean up all holochain processes and restart the
+        Holochain Launcher?
+      </div>
+    </HCGenericDialog>
+    <FactoryReset></FactoryReset>
   </div>
 </template>
 <script lang="ts">

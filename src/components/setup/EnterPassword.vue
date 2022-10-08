@@ -108,7 +108,7 @@ export default defineComponent({
           this.invalidPassword = true;
         }
         this.pwInputDisabled = false;
-        passwordField.focus();
+        this.$nextTick(() => passwordField.setFocus());
       }
       this.entering = false;
     },

@@ -93,23 +93,6 @@ export default defineComponent({
   created() {
     this.$nextTick(() => {
       const repeatPassword = this.$refs.repeatPassword as typeof PasswordField;
-      console.log("repeatPassword value: ", repeatPassword.value);
-      // repeatPassword.validityTransform = (newValue: string, nativeValidity) => {
-      //   const password = (this.$refs.password as TextField).value;
-      //   if (newValue !== password) {
-      //     repeatPassword.setCustomValidity("Passwords don't match");
-
-      //     this.isPasswordValid = false;
-      //     return {
-      //       valid: false,
-      //     };
-      //   } else {
-      //     this.isPasswordValid = password.length > 0;
-      //     return {
-      //       valid: true,
-      //     };
-      //   }
-      // };
     });
   },
   methods: {

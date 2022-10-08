@@ -132,6 +132,9 @@ export default defineComponent({
 
       this.selectedIndex -= 1;
     },
+    select(value: [string, any]) {
+      this.handleSelect(value);
+    },
   },
 });
 </script>

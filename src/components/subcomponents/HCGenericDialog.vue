@@ -65,7 +65,7 @@ export default defineComponent({
   },
   methods: {
     open() {
-      (this.$refs["dialog"] as typeof HCDialog).open();
+      this.$nextTick(() => (this.$refs["dialog"] as typeof HCDialog).open());
     },
     close() {
       (this.$refs["dialog"] as typeof HCDialog).close();
