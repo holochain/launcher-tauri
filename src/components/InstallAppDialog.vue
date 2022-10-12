@@ -154,7 +154,11 @@
     </div>
   </HCDialog>
 
-  <mwc-snackbar leading :labelText="snackbarText" ref="snackbar"></mwc-snackbar>
+  <HCSnackbar
+    :timeoutMs="10000"
+    :labelText="snackbarText"
+    ref="snackbar"
+  ></HCSnackbar>
 </template>
 
 <script lang="ts">
@@ -170,6 +174,7 @@ import HCDialog from "./subcomponents/HCDialog.vue";
 import HCTextField from "./subcomponents/HCTextField.vue";
 import HCTextArea from "./subcomponents/HCTextArea.vue";
 import HCSelect from "./subcomponents/HCSelect.vue";
+import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 import {
   HolochainId,
   HolochainVersion,
@@ -179,7 +184,14 @@ import {
 
 export default defineComponent({
   name: "InstallAppDialog",
-  components: { HCDialog, HCTextField, HCTextArea, HCButton, HCSelect },
+  components: {
+    HCDialog,
+    HCTextField,
+    HCTextArea,
+    HCButton,
+    HCSelect,
+    HCSnackbar,
+  },
   props: {
     appBundlePath: {
       type: String,
@@ -391,8 +403,13 @@ export default defineComponent({
 
         this.$emit("app-installed", this.appId);
       } catch (e) {
-        this.installing = false;
+        console.log("Error installing the app: ", e);
         this.showMessage(JSON.stringify(e));
+        this.installing = false;
+        this.$nextTick(() => {
+          (this.$refs["app-id-field"] as typeof HCTextField).value = this.appId;
+          this.checkAppIdValidity();
+        });
       }
     },
     showMessage(message: string) {

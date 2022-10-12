@@ -88,7 +88,7 @@ export default defineComponent({
 .dialog-element {
   padding: 0;
   max-height: 90vh;
-  max-width: 90vh;
+  max-width: 90vw;
   border: none;
   border-radius: 12px;
   background-color: white;

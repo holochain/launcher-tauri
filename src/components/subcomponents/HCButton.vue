@@ -13,7 +13,7 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "HcButton",
+  name: "HCButton",
   props: {
     disabled: {
       type: Boolean,

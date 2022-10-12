@@ -75,40 +75,10 @@
         style="margin-right: 16px; margin-bottom: 16px"
       >
         <AppPreviewCard :app="app" @installApp="saveApp(app)" />
-        <!-- <ui5-card style="width: auto">
-          <div class="column" style="margin: 8px">
-            <span style="font-size: 18px">{{ app.app.content.title }}</span>
-            <span style="margin-top: 8px; height: 80px; overflow: auto">{{
-              app.app.content.description
-            }}</span>
-
-            <div class="row center-content" style="flex: 1; margin-top: 8px">
-              <span>Version: {{ getLatestRelease(app).content.name }}</span>
-
-              <span style="flex: 1"></span>
-
-              <mwc-button
-                icon="add"
-                label="Install App"
-                @click="saveApp(app)"
-              ></mwc-button>
-            </div>
-          </div>
-        </ui5-card> -->
       </div>
     </div>
   </div>
 
-  <!-- <InstallApp
-    v-if="selectedAppBundlePath"
-    :appBundlePath="selectedAppBundlePath"
-    :hdkVersionForApp="hdkVersionForApp"
-    @app-installed="
-      installClosed();
-      $emit('go-back');
-    "
-    @closing-dialog="installClosed()"
-  ></InstallApp> -->
   <InstallAppDialog
     v-if="selectedAppBundlePath"
     :appBundlePath="selectedAppBundlePath"
@@ -120,23 +90,22 @@
     @closing-dialog="installClosed()"
     ref="install-app-dialog"
   ></InstallAppDialog>
-  <mwc-snackbar
-    leading
+  <HCSnackbar
     labelText="App download failed. Please try again later."
     ref="snackbar"
-  ></mwc-snackbar>
+  ></HCSnackbar>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import "@material/mwc-dialog";
 import "@material/mwc-circular-progress";
-import "@material/mwc-button";
-import "@material/mwc-snackbar";
 import "@material/mwc-icon";
+import "@material/mwc-icon-button";
 import { AppWebsocket } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
+
+import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 
 import {
   AppWithReleases,
@@ -158,6 +127,7 @@ export default defineComponent({
     HCButton,
     AppPreviewCard,
     HCLoading,
+    HCSnackbar,
   },
   data(): {
     loadingText: string;

@@ -70,7 +70,7 @@
       </span>
     </div>
   </HCGenericDialog>
-  <mwc-snackbar leading :labelText="snackbarText" ref="snackbar"></mwc-snackbar>
+  <HCSnackbar :labelText="snackbarText" ref="snackbar"></HCSnackbar>
 </template>
 
 <script lang="ts">
@@ -81,10 +81,11 @@ import { ActionTypes } from "@/store/actions";
 import { listen } from "@tauri-apps/api/event";
 
 import HCGenericDialog from "../components/subcomponents/HCGenericDialog.vue";
+import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 
 export default defineComponent({
   name: "FactoryReset",
-  components: { HCGenericDialog },
+  components: { HCGenericDialog, HCSnackbar },
   data(): {
     snackbarText: string | undefined;
     executing: boolean;

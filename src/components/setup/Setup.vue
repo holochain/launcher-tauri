@@ -59,12 +59,12 @@
               {{ this.passwordsDontMatch ? "Password's don't match." : "" }}
             </div>
 
-            <HcButton
+            <HCButton
               :disabled="initializing || !isPasswordValid"
               @click="initialize()"
               style="width: 128px"
               >{{ this.initializing ? "initializing..." : "Continue" }}
-            </HcButton>
+            </HCButton>
           </div>
         </form>
       </div>
@@ -77,11 +77,11 @@ import { ActionTypes } from "@/store/actions";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import PasswordField from "../subcomponents/PasswordField.vue";
-import HcButton from "../subcomponents/HCButton.vue";
+import HCButton from "../subcomponents/HCButton.vue";
 
 export default defineComponent({
   name: "Setup",
-  components: { PasswordField, HcButton },
+  components: { PasswordField, HCButton },
   data() {
     return {
       isPasswordValid: false,

@@ -63,12 +63,6 @@
       </div>
     </div>
   </div>
-
-  <mwc-snackbar
-    leading
-    labelText="Incorrect Password"
-    ref="snackbar"
-  ></mwc-snackbar>
 </template>
 
 <script lang="ts">

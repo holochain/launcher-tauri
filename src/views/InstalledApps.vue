@@ -68,18 +68,18 @@
     </div>
   </div>
 
-  <mwc-snackbar leading :labelText="snackbarText" ref="snackbar"></mwc-snackbar>
+  <HCSnackbar leading :labelText="snackbarText" ref="snackbar"></HCSnackbar>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import { ActionTypes } from "../store/actions";
 import { HolochainAppInfo, HolochainId, InstalledWebAppInfo } from "../types";
-import "@material/mwc-snackbar";
 import "@material/mwc-icon";
 import { invoke } from "@tauri-apps/api/tauri";
 import InstalledAppsList from "../components/InstalledAppsList.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
+import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 
 type View =
   | {
@@ -93,7 +93,7 @@ type View =
 
 export default defineComponent({
   name: "InstalledApps",
-  components: { InstalledAppsList, HCButton },
+  components: { InstalledAppsList, HCButton, HCSnackbar },
   data(): {
     snackbarText: string | undefined;
     view: View;
