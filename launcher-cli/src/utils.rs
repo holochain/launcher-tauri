@@ -63,39 +63,31 @@ pub fn spawn_agent_app_instance(
 }
 
 
-pub async fn read_and_prepare_webhapp(web_happ_path: PathBuf) -> () {
+pub async fn read_and_prepare_webhapp(web_happ_path: PathBuf) -> Result<(), String> {
 
   // 1. read the .webhapp file
   println!("Reading .webhapp file");
-  let bytes = match fs::read(web_happ_path) {
-    Ok(bytes) => bytes,
-    Err(e) => panic!("Failed to read .webhapp file: {:?}", e),
-  };
+  let bytes = fs::read(web_happ_path)
+    .map_err(|e| format!("Failed to read .webhapp file: {}", e))?;
 
   println!("decoding .webhapp file");
-  let web_app_bundle = match WebAppBundle::decode(&bytes) {
-    Ok(bundle) => bundle,
-    Err(e) => panic!("Failed to read webhapp bundle file: {:?}", e)
-  };
+  let web_app_bundle = WebAppBundle::decode(&bytes)
+    .map_err(|e| format!("Failed to read webhapp bundle file: {}", e))?;
 
   println!("extracting happ bundle");
-  let app_bundle = match web_app_bundle.happ_bundle().await {
-    Ok(bundle) => bundle,
-    Err(e) => panic!("Failed to extract app bundle from file: {:?}", e),
-  };
+  let app_bundle = web_app_bundle.happ_bundle().await
+    .map_err(|e| format!("Failed to extract app bundle from file: {:?}", e))?;
 
   println!("extracting ui.zip bytes");
-  let web_ui_zip_bytes = match web_app_bundle.web_ui_zip_bytes().await {
-    Ok(bytes) => bytes,
-    Err(e) => panic!("Failed to extract ui zip bytes: {:?}", e)
-  };
+  let web_ui_zip_bytes = web_app_bundle.web_ui_zip_bytes().await
+    .map_err(|e| format!("Failed to extract ui zip bytes: {:?}", e))?;
+
 
   println!("creating .launcher-cli directory if necessary");
   // 2. store the .happ and the unzipped UI assets in respective folders
-  match create_dir_if_necessary(&PathBuf::from(".launcher-cli")) {
-    Ok(()) => (),
-    Err(e) => panic!("Failed to create temporary directory .launcher-cli: {:?}", e),
-  }
+  create_dir_if_necessary(&PathBuf::from(".launcher-cli"))
+    .map_err(|e| format!("Failed to create temporary directory .launcher-cli: {:?}", e))?;
+
 
   println!("removing existing assets");
   let ui_folder_path = PathBuf::from(".launcher-cli").join("ui");
@@ -104,42 +96,35 @@ pub async fn read_and_prepare_webhapp(web_happ_path: PathBuf) -> () {
     fs::remove_dir_all(ui_folder_path.clone()).unwrap();
   }
 
-  match fs::create_dir(ui_folder_path.clone()) {
-    Ok(()) => (),
-    Err(e) => panic!("Failed to create ui directory: {:?}", e),
-  }
+  fs::create_dir(ui_folder_path.clone())
+    .map_err(|e| format!("Failed to create ui directory: {:?}", e))?;
+
 
   println!("writing ui.zip");
   let ui_zip_path = ui_folder_path.join("ui.zip");
-  match fs::write(ui_zip_path.clone(), web_ui_zip_bytes.to_vec()) {
-    Ok(()) => (),
-    Err(e) => panic!("Error writing ui.zip: {:?}", e),
-  }
+  fs::write(ui_zip_path.clone(), web_ui_zip_bytes.to_vec())
+    .map_err(|e| format!("Error writing ui.zip: {:?}", e))?;
 
   println!("opening ui.zip");
-  let file = match fs::File::open(ui_zip_path.clone()) {
-    Ok(file) => file,
-    Err(e) => panic!("Error opening ui.zip: {:?}", e),
-  };
+  let file = fs::File::open(ui_zip_path.clone())
+    .map_err(|e| format!("Error opening ui.zip: {:?}", e))?;
 
   println!("Unzipping ui.zip");
-  match unzip_file(file, ui_folder_path) {
-    Ok(()) => (),
-    Err(e) => panic!("Could not unzip ui.zip: {:?}", e),
-  }
+  unzip_file(file, ui_folder_path)
+    .map_err(|e| format!("Could not unzip ui.zip: {:?}", e))?;
+
 
   println!("Removing ui.zip");
   // remove ui.zip after extraction
-  match fs::remove_file(ui_zip_path) {
-    Ok(()) => (),
-    Err(e) => panic!("Failed to remove ui.zip: {:?}", e),
-  }
+  fs::remove_file(ui_zip_path)
+    .map_err(|e| format!("Failed to remove ui.zip: {:?}", e))?;
 
   println!("Writing .happ file");
-  match app_bundle.write_to_file(&PathBuf::from(".launcher-cli").join("happ.happ")).await {
-    Ok(()) => (),
-    Err(e) => panic!("Failed to write .happ file: {:?}", e),
-  }
+  app_bundle.write_to_file(&PathBuf::from(".launcher-cli").join("happ.happ")).await
+    .map_err(|e| format!("Failed to write .happ file: {:?}", e))?;
+
+
+  Ok(())
 
 }
 

@@ -7,7 +7,7 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "launcher-cli",
+    "productName": "hc-launch-tauri",
     "version": "0.0.1"
   },
   "tauri": {
@@ -29,7 +29,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "org.holochain.launch",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

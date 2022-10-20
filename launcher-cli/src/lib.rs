@@ -1,22 +1,16 @@
 use std::env;
-use std::fs;
 use std::path::PathBuf;
 
 use std::process::Command;
 use std::thread::JoinHandle;
-use std::process::Stdio;
 use std::time::Duration;
-
-// // use lair_keystore_manager::versions::v0_2::LairKeystoreManagerV0_2;
-// // use lair_keystore_manager::LairKeystoreManager;
-// use lair_keystore_manager::utils::{path_exists, create_dir_if_necessary};
 
 mod utils;
 pub mod cli;
 
 pub use cli::HcLaunch;
 
-async fn launch_webhapp(web_happ_path: PathBuf, agents: u32) {
+async fn launch_webhapp(web_happ_path: PathBuf, agents: u32) -> anyhow::Result<()> {
 
   println!("web_happ_path: {:?}", web_happ_path);
 
@@ -74,10 +68,7 @@ async fn launch_webhapp(web_happ_path: PathBuf, agents: u32) {
     Err(e) => panic!("Failed at getting the current working directory: {:?}", e),
   };
 
-  match env::set_current_dir(new_dir) {
-    Ok(()) => (),
-    Err(e) => panic!("Failed to change current working directory: {:?}", e),
-  }
+  env::set_current_dir(new_dir)?;
 
   println!("Getting new pwd");
   let output_pwd = Command::new("pwd")
@@ -101,7 +92,6 @@ async fn launch_webhapp(web_happ_path: PathBuf, agents: u32) {
     std::thread::sleep(Duration::from_millis(15000));
 
     // make sure that happ is actually installed
-    println!("listing happs...");
     let _output4 = Command::new("echo")
       .args(["pass", "|"])
       .output()
@@ -128,64 +118,11 @@ async fn launch_webhapp(web_happ_path: PathBuf, agents: u32) {
   tauri_dev_handle.join().unwrap();
   println!("exited sandbox!");
 
+  Ok(())
 
-  // println!("output: {:?}", String::from_utf8(output.stdout));
-
-  // let output = if cfg!(target_os = "windows") {
-  //   Command::new("cmd")
-  //     .args(["/C", "echo hello"])
-  //     .output()
-  //     .expect("failed to execute process")
-  //   } else {
-  //     Command::new("sh")
-  //       .arg("-c")
-  //       .arg("echo hello")
-  //       .output()
-  //       .expect("failed to execute process")
-  //   };
-
-  // let hello = output.stdout;
-  // println!("Output: {:?}", String::from_utf8(hello));
-
-  // let _output2 = Command::new("hc")
-  //   .args(["s", "call", "-r=$ADMIN_PORT", "install-app-bundle", "--app-id", "test"])
-  //   .output()
-  //   .expect("failed to execute process");
-
-  // let _output2 = Command::new("hc")
-  //   .args(["s", "--piped", "-f=$ADMIN_PORT", "generate", ".launcher-cli/happ.happ", "--run=$HC_PORT", "-a", "test", "network", "mdns"])
-  //   .output()
-  //   .expect("failed to execute process");
+}
 
 
-  // extract keystore path from generated .hc files
-
-
-
-
-  // let keystore_path = PathBuf::from(".keystore-tmp");
-
-  // if !path_exists(&keystore_path) {
-  //   println!("Initializing keystore.");
-  //   match LairKeystoreManagerV0_2::initialize(keystore_path.clone(), String::from("dummypass"))
-  //     .await {
-  //       Ok(()) => (),
-  //       Err(e) => panic!("Error initializing the keystore: {:?}", e),
-  //   }
-  // } else {
-  //   println!("Keystore already initialized. To create a keystore from scratch, delete the .keystore-tmp file.")
-  // }
-
-  // println!("Launching keystore...");
-  // let lair_keystore_manager =  match LairKeystoreManagerV0_2::launch(log::Level::Warn, keystore_path, String::from("dummypass"))
-  //   .await {
-  //     Ok(manager) => manager,
-  //     Err(e) => panic!("Error launching the keystore: {:?}", e),
-  // };
-
-
-
-  // println!("Successfully launched the keystore!");
 
 
   // receives .webhapp file
@@ -201,40 +138,6 @@ async fn launch_webhapp(web_happ_path: PathBuf, agents: u32) {
   // store admin and app websocket ports somewhere
 
   // pick up app and admin websocket ports and create tauri window that serves from temporary UI folder
-
-
-
-
-  // hc launch xyz.webhapp
-  // hc launch --ui-port 8080 yxz.happ  // for hot reloading
-
-
-
-
-
-  // boot up lair-keystore with dummy password
-
-  // boot up holochain
-
-  // install webhapp
-
-  // create temporary folder for UI assets?
-
-  // spawns window with WindowBuilder
-
-  //
-
-
-
-
-
-
-
-
-}
-
-
-
 
 
 

@@ -38,13 +38,6 @@ pub enum HcLaunchSubcommand {
     /// Port of the UI
     port: u16,
   }
-
-  // TODO! add option for hot reloading by serving from localhost
-  // Localhost {
-  // // Specify a port from which the UI is being served to allow hot-reloading.
-  // #[structopt(short, long)]
-  // port: u32,
-  // }
 }
 
 
@@ -58,8 +51,8 @@ impl HcLaunch {
           // extract webhapp and run it in tauri window(s)
           // println!("This would run the webhapp at path {} for {} agent(s).", path, self.agents);
           match path {
-            Some(p) => crate::launch_webhapp(p, self.agents).await,
-            None => println!("No .webhapp path provided and auto-detection is not implemented yet.")
+            Some(p) => crate::launch_webhapp(p, self.agents).await?,
+            None => println!("You need to provide a .webhapp path. Auto-detection is not implemented yet.")
           }
         },
       HcLaunchSubcommand::Localhost {
