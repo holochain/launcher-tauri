@@ -3,6 +3,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use std::process::Command;
+use std::thread::JoinHandle;
 use std::process::Stdio;
 use std::time::Duration;
 
@@ -11,16 +12,13 @@ use std::time::Duration;
 // use lair_keystore_manager::utils::{path_exists, create_dir_if_necessary};
 
 mod utils;
+pub mod cli;
 
-#[tokio::main]
-async fn main() {
-  let args: Vec<String> = env::args().collect();
-  // for arg in args {
-  //   println!("argument received: {}", arg);
-  // }
-  let web_happ_path = &args[1];
+pub use cli::HcLaunch;
 
-  println!("web_happ_path: {}", web_happ_path);
+async fn launch_webhapp(web_happ_path: PathBuf, agents: u32) {
+
+  println!("web_happ_path: {:?}", web_happ_path);
 
   utils::read_and_prepare_webhapp(web_happ_path).await;
 
@@ -37,48 +35,30 @@ async fn main() {
     .output()
     .expect("failed to execute process");
 
-  println!("Querying hc version...");
-  let output = Command::new("hc")
-    .args(["--version"])
-    .output()
-    .expect("failed to execute process");
+  // create a new random id to identify the sandboxes and be able to retrieve the directory to the lair-keystores
+  let sandbox_identifier = nanoid::nanoid!();
 
-  println!("output: {:?}", String::from_utf8(output.stdout));
+  // remove existing .hc_launch file if present
+  let _ = std::fs::remove_file(".hc_launch");
 
-  println!("Installing happ...");
-  let _output2 = Command::new("echo")
+
+  // pass dummy lair password
+  Command::new("echo")
     .args(["pass", "|"])
     .output()
     .expect("failed to execute process");
 
-  // extract lair-keystore-path from output to set up client later...
+  let mut app_handles: Vec<JoinHandle<()>> = vec![];
 
-  // remove existing .hc_launcher file
-  std::fs::remove_file(".hc_launcher").unwrap();
+  for agent in 0..agents {
+    // let app_handle = utils::spawn_agent_app_instance(format!("Agent-{}", agent), Some(sandbox_identifier.clone()), false);
+    // set sandbox_identifier to None for now since conductors seem to not communicate with each other otherwise
+    let app_handle = utils::spawn_agent_app_instance(format!("Agent-{}", agent), None, false);
 
-  let app_handle1 = utils::spawn_app_instance(String::from("Agent-1"));
-  std::thread::sleep(Duration::from_millis(100));
-  let app_handle2 = utils::spawn_app_instance(String::from("Agent-2"));
-  std::thread::sleep(Duration::from_millis(100));
-  let app_handle3 = utils::spawn_app_instance(String::from("Agent-3"));
+    app_handles.push(app_handle);
+    std::thread::sleep(Duration::from_millis(100));
+  }
 
-
-  // println!("Installing happ...");
-  // let output2 = Command::new("hc")
-  //   .args(["s", "call", "install-app-bundle", "--app-id", "test", ".launcher-cli/happ.happ"])
-  //   .output()
-  //   .expect("failed to execute process");
-
-  // println!("output of install-app-bundle: {:?}", String::from_utf8(output2.stdout));
-
-
-
-  // let output5 = Command::new("hc")
-  //   .args(["s", "--piped", "call", "list-apps"])
-  //   .output()
-  //   .expect("failed to execute process");
-
-  // println!("output of list-apps: {:?}", String::from_utf8(output5.stdout));
 
 
   println!("Current path");
@@ -141,9 +121,10 @@ async fn main() {
 
   println!("done!");
 
-  app_handle1.join().unwrap();
-  app_handle2.join().unwrap();
-  app_handle3.join().unwrap();
+  for handle in app_handles {
+    handle.join().unwrap();
+  }
+
   tauri_dev_handle.join().unwrap();
   println!("exited sandbox!");
 

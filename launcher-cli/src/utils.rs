@@ -9,50 +9,65 @@ use std::io::prelude::*;
 use holochain_types::web_app::WebAppBundle;
 use lair_keystore_manager::utils::{path_exists, create_dir_if_necessary};
 
+/// Spawns an app instance in a new conductor, i.e. for a new agent.
+pub fn spawn_agent_app_instance(
+  app_id: String, // app id
+  sandbox_identifier: Option<String>, // if provided, the sandbox gets the name [sandbox_identifier]_[app_id]
+  log_app_id: bool, // whether to append the app id to a .hc_launch file
+) -> JoinHandle<()> {
 
-pub fn spawn_app_instance(app_id: String) -> JoinHandle<()> {
+  if log_app_id == true {
+    // write app_id to .hc_launch file
+    let maybe_file = OpenOptions::new()
+      .write(true)
+      .append(true)
+      .open(".hc_launch");
 
-  // write app_id to .hc_launcher file
-  let maybe_file = OpenOptions::new()
-    .write(true)
-    .append(true)
-    .open(".hc_launcher");
-
-  match maybe_file {
-    Ok(mut file) => {
-      if let Err(e) = writeln!(file, "{}", app_id) {
-        eprintln!("Couldn't write to file: {}", e);
+    match maybe_file {
+      Ok(mut file) => {
+        if let Err(e) = writeln!(file, "{}", app_id) {
+          eprintln!("Couldn't write to file: {}", e);
+        }
+      },
+      Err(_) => {
+        println!("Creating new .hc_launcher file.");
+        std::fs::write(".hc_launch", format!("{}\n", app_id)).unwrap();
       }
-    },
-    Err(_) => {
-      println!("Creating new .hc_launcher file.");
-      std::fs::write(".hc_launcher", format!("{}\n", app_id)).unwrap();
     }
   }
 
 
 
   // spawn hc sandbox thread
-  std::thread::spawn(move ||  {
-    let mut _sandbox_handle = Command::new("hc")
-      .args(["s", "--piped", "generate", ".launcher-cli/happ.happ", "--run", "-a", app_id.as_str(), "network", "mdns"])
-      .stdout(Stdio::inherit())
-      .output()
-      .expect("failed to execute process");
+  match sandbox_identifier {
+    Some(id) => {
+      std::thread::spawn(move ||  {
+        let mut _sandbox_handle = Command::new("hc")
+          .args(["s", "--piped", "generate", ".launcher-cli/happ.happ", "--run", "-a", app_id.as_str(), "-d", format!("{}_{}", id, app_id).as_str(),"network", "mdns"])
+          .stdout(Stdio::inherit())
+          .output()
+          .expect("failed to execute process");
+      })
+    },
+    None => {
+      std::thread::spawn(move ||  {
+        let mut _sandbox_handle = Command::new("hc")
+          .args(["s", "--piped", "generate", ".launcher-cli/happ.happ", "--run", "-a", app_id.as_str(),"network", "mdns"])
+          .stdout(Stdio::inherit())
+          .output()
+          .expect("failed to execute process");
+      })
+    }
+  }
 
-    // waiting for child (only when using .spawn())
-    // sandbox_handle.wait().expect("failed to wait on sandbox child.");
-
-    println!("sandbox_handle finished.");
-  })
 }
 
 
-pub async fn read_and_prepare_webhapp(web_happ_path: &String) -> () {
+pub async fn read_and_prepare_webhapp(web_happ_path: PathBuf) -> () {
 
   // 1. read the .webhapp file
   println!("Reading .webhapp file");
-  let bytes = match fs::read(&web_happ_path) {
+  let bytes = match fs::read(web_happ_path) {
     Ok(bytes) => bytes,
     Err(e) => panic!("Failed to read .webhapp file: {:?}", e),
   };

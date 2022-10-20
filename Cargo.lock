@@ -2500,6 +2500,7 @@ dependencies = [
  "lair_keystore_api",
  "lair_keystore_manager",
  "log",
+ "nanoid 0.3.0",
  "observability",
  "structopt",
  "tauri",

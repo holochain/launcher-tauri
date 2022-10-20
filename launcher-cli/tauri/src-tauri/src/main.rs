@@ -26,15 +26,16 @@ fn main() {
 				println!("path to assets: {:?}", assets_path);
 
 				// read the .hc file to get the number of apps
-				let dot_hc_launcher_path = pwd.parent().unwrap().parent().unwrap().join(".hc_launcher");
-				let dot_hc_launcher_content = std::fs::read_to_string(dot_hc_launcher_path).unwrap();
+				let dot_hc_path = pwd.parent().unwrap().parent().unwrap().join(".hc");
+				let dot_hc_content = std::fs::read_to_string(dot_hc_path).unwrap();
 
 
 				// open a tauri window for each app instance
 				let mut windows: Vec<Window> = vec![];
 				let mut app_counter = 0;
-				for app_id in dot_hc_launcher_content.lines() {
-					println!("%ç%ç LINE: {:?}", app_id);
+				for _ in dot_hc_content.lines() {
+
+					let app_id = format!("Agent-{}", app_counter);
 
 					let dot_hc_live_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(format!(".hc_live_{}", app_counter)).into();
 
@@ -69,15 +70,15 @@ fn main() {
 					}}"#,
 					app_port,
 					admin_port,
-					app_id
+					app_id.clone(),
 					);
 
 					println!("Starting to build window.");
 
 					let window = match utils::generate_window(
 						&app.handle(),
-						&String::from(app_id),
-						String::from(app_id),
+						&app_id,
+						app_id.clone(),
 						assets_path.clone().join("index.html"),
 						assets_path.clone(),
 						launcher_env,
