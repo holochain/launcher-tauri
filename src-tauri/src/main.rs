@@ -58,6 +58,8 @@ fn main() {
 
   let already_running = LauncherManager::is_launcher_already_running();
 
+  println!("**//** already_running: {}", already_running);
+
   // If holochain is already running, only display a small notice window
   if already_running {
     let state: LauncherState = Arc::new(Mutex::new(RunningState::Error(

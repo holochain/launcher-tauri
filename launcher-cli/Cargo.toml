@@ -1,0 +1,26 @@
+[package]
+name = "holochain_cli_launch"
+version = "0.0.1"
+edition = "2021"
+license = "Apache-2.0"
+description = "A library and CLI to launch holochain apps in a holochain-launcher environment for testing and development purposes."
+
+
+[[bin]]
+name = "hc-launch"
+path = "src/bin/hc-launch.rs"
+
+[dependencies]
+anyhow = "1.0"
+log = "0.4.14"
+observability = "0.1.3"
+tauri = {version = "1.1.1", features = ["api-all", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored", "system-tray"] }
+tokio = "1.21.2"
+zip = "0.5.0"
+
+
+lair_keystore_api = "0.2.1"
+holochain_types = "0.0.61"
+structopt = "0.3"
+
+lair_keystore_manager = {path = "../crates/lair_keystore_manager"}

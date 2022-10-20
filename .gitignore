@@ -4,6 +4,9 @@ node_modules
 .cargo
 /target
 
+# temporary files
+.hc*
+
 
 # local env files
 .env.local

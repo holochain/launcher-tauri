@@ -34,6 +34,6 @@ portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}
 serde-enum-str = "0.2"
 serde_yaml = "0.8"
-tauri = {git = "https://github.com/tauri-apps/tauri", rev = "447370fa50a82f8086554086ca9038f4a008a456", features = ["api-all", "system-tray", "native-tls-vendored", "reqwest-native-tls-vendored"]}
+tauri = {version="1.1.1", features = ["api-all", "system-tray", "native-tls-vendored", "reqwest-native-tls-vendored"]}
 thiserror = "1.0.30"
 url2 = "0.0.6"
