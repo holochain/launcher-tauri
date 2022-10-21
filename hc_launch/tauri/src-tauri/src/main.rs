@@ -21,7 +21,7 @@ fn main() {
 		.setup(|app| {
 
 				let pwd = std::env::current_dir().unwrap();
-				let assets_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(".launcher-cli").join("ui").into();
+				let assets_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(".hc_launch").join("ui").into();
 
 				println!("path to assets: {:?}", assets_path);
 

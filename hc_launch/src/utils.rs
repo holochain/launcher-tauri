@@ -43,7 +43,7 @@ pub fn spawn_agent_app_instance(
     Some(id) => {
       std::thread::spawn(move ||  {
         let mut _sandbox_handle = Command::new("hc")
-          .args(["s", "--piped", "generate", ".launcher-cli/happ.happ", "--run", "-a", app_id.as_str(), "-d", format!("{}_{}", id, app_id).as_str(),"network", "mdns"])
+          .args(["s", "--piped", "generate", ".hc_launch/happ.happ", "--run", "-a", app_id.as_str(), "-d", format!("{}_{}", id, app_id).as_str(),"network", "mdns"])
           .stdout(Stdio::inherit())
           .output()
           .expect("failed to execute process");
@@ -52,7 +52,7 @@ pub fn spawn_agent_app_instance(
     None => {
       std::thread::spawn(move ||  {
         let mut _sandbox_handle = Command::new("hc")
-          .args(["s", "--piped", "generate", ".launcher-cli/happ.happ", "--run", "-a", app_id.as_str(),"network", "mdns"])
+          .args(["s", "--piped", "generate", ".hc_launch/happ.happ", "--run", "-a", app_id.as_str(),"network", "mdns"])
           .stdout(Stdio::inherit())
           .output()
           .expect("failed to execute process");
@@ -83,14 +83,14 @@ pub async fn read_and_prepare_webhapp(web_happ_path: PathBuf) -> Result<(), Stri
     .map_err(|e| format!("Failed to extract ui zip bytes: {:?}", e))?;
 
 
-  println!("creating .launcher-cli directory if necessary");
+  println!("creating .hc_launch directory if necessary");
   // 2. store the .happ and the unzipped UI assets in respective folders
-  create_dir_if_necessary(&PathBuf::from(".launcher-cli"))
-    .map_err(|e| format!("Failed to create temporary directory .launcher-cli: {:?}", e))?;
+  create_dir_if_necessary(&PathBuf::from(".hc_launch"))
+    .map_err(|e| format!("Failed to create temporary directory .hc_launch: {:?}", e))?;
 
 
   println!("removing existing assets");
-  let ui_folder_path = PathBuf::from(".launcher-cli").join("ui");
+  let ui_folder_path = PathBuf::from(".hc_launch").join("ui");
   // remove existing assets first
   if path_exists(&ui_folder_path) {
     fs::remove_dir_all(ui_folder_path.clone()).unwrap();
@@ -120,7 +120,7 @@ pub async fn read_and_prepare_webhapp(web_happ_path: PathBuf) -> Result<(), Stri
     .map_err(|e| format!("Failed to remove ui.zip: {:?}", e))?;
 
   println!("Writing .happ file");
-  app_bundle.write_to_file(&PathBuf::from(".launcher-cli").join("happ.happ")).await
+  app_bundle.write_to_file(&PathBuf::from(".hc_launch").join("happ.happ")).await
     .map_err(|e| format!("Failed to write .happ file: {:?}", e))?;
 
 

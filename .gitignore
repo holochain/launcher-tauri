@@ -6,7 +6,7 @@ node_modules
 
 # temporary files
 .hc*
-.launcher-cli
+.hc_launch
 
 
 # local env files

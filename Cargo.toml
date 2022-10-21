@@ -2,7 +2,7 @@
 members = [
   "crates/*",
   "src-tauri",
-  "launcher-cli",
-  "launcher-cli/tauri/src-tauri",
+  "hc_launch",
+  "hc_launch/tauri/src-tauri",
 ]
 resolver = "2"
