@@ -303,7 +303,7 @@ impl LauncherManager {
       HolochainId::HolochainVersion(version) => self
         .holochain_managers
         .get_mut(&version)
-        .ok_or(String::from("This holochain version is not running")),
+        .ok_or(format!("Holochain version {} is not running.", version.to_string())),
       HolochainId::CustomBinary => self.custom_binary_manager.as_mut().ok_or(String::from(
         "There is no Holochain running with custom binary",
       )),
@@ -311,10 +311,17 @@ impl LauncherManager {
 
     match manager_state {
       RunningState::Running(m) => Ok(m),
-      RunningState::Error(error) => Err(format!(
-        "This holochain version is not running: {:?}",
-        error
-      )),
+      RunningState::Error(error) => {
+        match holochain_id {
+          HolochainId::HolochainVersion(version) =>
+            Err(format!(
+            "Holochain Version {} threw an exception: {:?}",
+            version.to_string(),
+            error
+          )),
+          HolochainId::CustomBinary => Err(format!("Custom holochain binary threw an exception: {:?}", error))
+        }
+      }
     }
   }
 
