@@ -4,8 +4,8 @@ use std::path::PathBuf;
 use url2::Url2;
 
 // NEW_VERSION: Upgrade these two crates so that they refer to the latest version of them
-pub use holochain_conductor_api_0_0_169 as holochain_conductor_api_latest;
-pub use holochain_types_0_0_169 as holochain_types_latest;
+pub use holochain_conductor_api_0_0_165 as holochain_conductor_api_latest;
+pub use holochain_types_0_0_165 as holochain_types_latest;
 
 use lair_keystore_manager::versions::LairKeystoreVersion;
 pub use mr_bundle as mr_bundle_latest;
