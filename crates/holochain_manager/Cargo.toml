@@ -20,6 +20,9 @@ holochain_conductor_api_0_0_165 = {package = "holochain_conductor_api", version 
 holochain_p2p_0_0_165 = {package = "holochain_p2p", version = "0.0.59"}
 holochain_types_0_0_165 = {package = "holochain_types", version = "0.0.59"}
 
+holochain_conductor_api_0_0_169 = {package = "holochain_conductor_api", version = "0.0.66"}
+holochain_p2p_0_0_169 = {package = "holochain_p2p", version = "0.0.63"}
+holochain_types_0_0_169 = {package = "holochain_types", version = "0.0.63"}
 
 
 mr_bundle = {package = "mr_bundle", version = "0.0.13"}
