@@ -24,7 +24,7 @@ pub struct HcLaunch {
 pub enum HcLaunchSubcommand {
   ///
   /// Launch a .webhapp file in a launcher testing environment.
-  Webhapp {
+  WebApp {
     /// Path to .webhapp file to launch.
     path: Option<PathBuf>,
   },
@@ -45,7 +45,7 @@ impl HcLaunch {
   /// Run this command
   pub async fn run(self) -> anyhow::Result<()> {
     match self.command {
-      HcLaunchSubcommand::Webhapp {
+      HcLaunchSubcommand::WebApp {
           path
         } => {
           // extract webhapp and run it in tauri window(s)
