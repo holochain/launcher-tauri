@@ -20,6 +20,16 @@ fn main() {
 		.invoke_handler(tauri::generate_handler![greet])
 		.setup(|app| {
 
+				match app.get_cli_matches() {
+					// `matches` here is a Struct with { args, subcommand }.
+					// `args` is `HashMap<String, ArgData>` where `ArgData` is a struct with { value, occurances }.
+					// `subcommand` is `Option<Box<SubcommandMatches>>` where `SubcommandMatches` is a struct with { name, matches }.
+					Ok(matches) => {
+						println!("{:?}", matches)
+					}
+					Err(_) => {}
+				}
+
 				let pwd = std::env::current_dir().unwrap();
 				// let assets_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(".hc_launch").join("ui").into();
 				let assets_path: PathBuf = pwd.join(".hc_launch").join("ui").into();
