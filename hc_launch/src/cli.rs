@@ -36,6 +36,8 @@ pub enum HcLaunchSubcommand {
     #[structopt(long)]
     /// path to the UI
     ui_path: Option<PathBuf>,
+
+    // todo! add network command
   },
 }
 
@@ -48,13 +50,6 @@ impl HcLaunch {
           path,
           ui_path,
         } => {
-
-          if utils::has_extension(&path, "happ") {
-            match ui_path {
-              None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch web-app --help` for help."),
-              _ => (),
-            }
-          }
 
           match path {
             Some(p) => {
@@ -70,15 +65,27 @@ impl HcLaunch {
                       let app_handle = crate::generate_agents(happ_path, self.agents, Some(String::from("mdns")));
 
                       // launch tauri windows via hc-launch-tauri
-                      let tauri_handle = crate::launch_tauri();
+                      let tauri_handle = crate::launch_tauri(None);
 
                       app_handle.join().unwrap();
                       tauri_handle.join().unwrap();
-
-                      // crate::launch_webhapp(p, self.agents).await?
-
                     }
-                    "happ" => println!("launching .happ files not yet supported."),
+                    "happ" => {
+                      match ui_path {
+                        Some(ui_p) => {
+                          // generate agents
+                          let app_handle = crate::generate_agents(p.clone(), self.agents, Some(String::from("mdns")));
+
+                          // launch tauri windows via hc-launch-tauri
+                          let tauri_handle = crate::launch_tauri(Some(ui_p));
+
+                          app_handle.join().unwrap();
+                          tauri_handle.join().unwrap();
+
+                        },
+                        None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch web-app --help` for help."),
+                      }
+                    },
                     _ => eprintln!("Error: You need to provide a path that points to either a .webhapp a .happ file."),
                   }
                 },

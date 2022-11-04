@@ -5,7 +5,13 @@
       "longDescription": "launch holochain web-apps in tauri windows in an hc-launch context",
       "beforeHelp": "",
       "afterHelp": "",
-      "args": [],
+      "args": [
+        {
+          "name": "ui_path",
+          "takesValue": true,
+          "multiple": false
+        }
+      ],
       "subcommands": {
         "subcommand-name": {
         }
