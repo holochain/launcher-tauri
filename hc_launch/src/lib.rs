@@ -8,6 +8,7 @@ use std::process::{Stdio};
 
 mod utils;
 pub mod cli;
+pub mod error;
 
 pub use cli::HcLaunch;
 
@@ -29,12 +30,14 @@ pub fn launch_tauri(ui_path: Option<PathBuf>) -> JoinHandle<()> {
     let output = match ui_path {
         Some(path) => {
           Command::new("hc-launch-tauri")
-            .arg(path.to_str().unwrap())
+            .args(["--ui-path", path.to_str().unwrap()])
+            .stdout(Stdio::inherit())
             .output()
             .expect("failed to execute process")
         },
         None => {
           Command::new("hc-launch-tauri")
+            .stdout(Stdio::inherit())
             .output()
             .expect("failed to execute process")
         }

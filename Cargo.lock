@@ -2538,6 +2538,7 @@ dependencies = [
  "observability",
  "structopt",
  "tauri",
+ "thiserror",
  "tokio",
  "zip 0.5.13",
 ]

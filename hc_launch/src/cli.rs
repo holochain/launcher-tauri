@@ -4,7 +4,9 @@
 // use std::path::Path;
 use std::path::PathBuf;
 use structopt::StructOpt;
+
 use crate::utils;
+use crate::error::HcLaunchError;
 
 // const DEFAULT_APP_ID: &str = "test-app";
 
@@ -73,6 +75,13 @@ impl HcLaunch {
                     "happ" => {
                       match ui_path {
                         Some(ui_p) => {
+
+                          // check whether path exists
+                          if !ui_p.exists() {
+                            return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
+                          }
+
+
                           // generate agents
                           let app_handle = crate::generate_agents(p.clone(), self.agents, Some(String::from("mdns")));
 

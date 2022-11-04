@@ -7,7 +7,7 @@
       "afterHelp": "",
       "args": [
         {
-          "name": "ui_path",
+          "name": "ui-path",
           "takesValue": true,
           "multiple": false
         }

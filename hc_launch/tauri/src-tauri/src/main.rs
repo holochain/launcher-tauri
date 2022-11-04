@@ -6,6 +6,7 @@
 use std::path::PathBuf;
 use holochain_client::AdminWebsocket;
 use tauri::Window;
+use serde_json::value::Value;
 mod utils;
 
 
@@ -20,19 +21,31 @@ fn main() {
 		.invoke_handler(tauri::generate_handler![greet])
 		.setup(|app| {
 
-				match app.get_cli_matches() {
-					// `matches` here is a Struct with { args, subcommand }.
-					// `args` is `HashMap<String, ArgData>` where `ArgData` is a struct with { value, occurances }.
-					// `subcommand` is `Option<Box<SubcommandMatches>>` where `SubcommandMatches` is a struct with { name, matches }.
-					Ok(matches) => {
-						println!("{:?}", matches)
-					}
-					Err(_) => {}
-				}
+				let cli_matches = app.get_cli_matches()?;
 
 				let pwd = std::env::current_dir().unwrap();
 				// let assets_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(".hc_launch").join("ui").into();
-				let assets_path: PathBuf = pwd.join(".hc_launch").join("ui").into();
+				let assets_path: PathBuf = match cli_matches.args.get("ui-path") {
+					Some(data) => {
+						match data.value.clone() {
+						Value::String(path) => path.into(),
+						_ => {
+							println!("ERROR: Value passed to --ui-path option could not be interpreted as string.");
+							panic!("Value passed to --ui-path option could not be interpreted as string.")
+						}
+					}
+
+				},
+					None => pwd.join(".hc_launch").join("ui").into()
+				};
+
+
+				println!("Does path exist? {}", assets_path.exists());
+				if !assets_path.exists() {
+					println!("ERROR: Specified UI path does not exist.");
+					panic!("Specified UI path does not exist.");
+				}
+
 
 				println!("current working directory: {:?}", pwd);
 
