@@ -63,7 +63,7 @@ pub fn spawn_agent_app_instance(
 }
 
 
-pub async fn read_and_prepare_webhapp(web_happ_path: PathBuf) -> Result<(), String> {
+pub async fn read_and_prepare_webhapp(web_happ_path: &PathBuf) -> Result<(), String> {
 
   // 1. read the .webhapp file
   println!("Reading .webhapp file");
@@ -154,4 +154,18 @@ pub fn unzip_file(reader: fs::File, outpath: PathBuf) -> Result<(), String> {
   }
 
   Ok(())
+}
+
+
+
+pub fn has_extension(path: &Option<PathBuf>, extension: &str) -> bool {
+  let mut result = false;
+  if let Some(p) = path {
+    if let Some(ext) = p.extension() {
+      if ext.to_str().unwrap() == extension {
+        result = true;
+      }
+    }
+  }
+  result
 }

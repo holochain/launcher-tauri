@@ -4,13 +4,112 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::thread::JoinHandle;
 use std::time::Duration;
+use std::process::{Stdio};
 
 mod utils;
 pub mod cli;
 
 pub use cli::HcLaunch;
 
-async fn launch_webhapp(web_happ_path: PathBuf, agents: u32) -> anyhow::Result<()> {
+
+
+pub fn launch_tauri() -> JoinHandle<()> {
+
+  // todo! implement subcommand to hc-launch-tauri to specify the ui folder
+
+  std::thread::spawn(|| {
+
+    // todo! instead listen for `hc-sandbox: Connected successfully to a running holochain` n times where n is the number of agents
+    // and then start the launch process
+
+    println!("Wait for 15 seconds before launching the tauri windows to make sure the conductors are ready.");
+    std::thread::sleep(Duration::from_millis(15000));
+
+    println!("#*#*# hc-launch-tauri #*#*#");
+    let output = Command::new("hc-launch-tauri")
+      .output()
+      .expect("failed to execute process");
+
+    println!("hc-launch-tauri output: {:?}", String::from_utf8(output.stdout));
+  })
+
+}
+
+pub fn generate_agents(happ_path: PathBuf, agents: u32, network: Option<String>) -> JoinHandle<()> {
+
+  println!("cleaning sandboxes...");
+  let _output = Command::new("hc")
+    .args(["s", "clean"])
+    .output()
+    .expect("failed to execute process");
+
+  // create a new random id to identify the sandboxes and be able to retrieve the directory to the lair-keystores
+  let sandbox_identifier = nanoid::nanoid!();
+
+  // pass dummy lair password
+  Command::new("echo")
+    .args(["pass", "|"])
+    .output()
+    .expect("failed to execute process");
+
+  println!("launching happ...");
+
+  launch_happ(
+    &happ_path,
+    Some(String::from("test-app")),
+    agents,
+    Some(sandbox_identifier),
+    network,
+  )
+
+}
+
+
+
+
+pub fn launch_happ(
+  happ_path: &PathBuf,
+  app_id: Option<String>,
+  n_sandboxes: u32,
+  sandbox_identifier: Option<String>, // if provided, the sandbox gets the name [sandbox_identifier]_[app_id]_[agent_number]
+  network: Option<String>,
+)-> JoinHandle<()> {
+
+  let mut command = Command::new("hc");
+
+  command.args(["s", "--piped", "generate", happ_path.to_str().unwrap(), "--run"]);
+
+  if let Some(a) = app_id {
+    command.args(["-a", a.as_str()]);
+  }
+
+  // sanbox_identifier's are used to deduce the path to the lair-keystore of each sandbox
+  if let Some(id) = sandbox_identifier {
+    command.arg("-d");
+    for i in 0..n_sandboxes {
+      command.arg(format!("{}_Agent-{}",id, i).as_str());
+    }
+  }
+
+  command.args(["-n", format!("{}", n_sandboxes).as_str(), "network"]);
+
+  if let Some(nw) = network {
+    command.arg(nw.as_str());
+  }
+
+  println!("spawning thread...");
+
+
+  std::thread::spawn(move ||  {
+    command
+      .stdout(Stdio::inherit())
+      .output()
+      .expect("failed to execute process");
+  })
+}
+
+
+async fn launch_webhapp(web_happ_path: &PathBuf, agents: u32) -> anyhow::Result<()> {
 
   println!("web_happ_path: {:?}", web_happ_path);
 
@@ -55,29 +154,26 @@ async fn launch_webhapp(web_happ_path: PathBuf, agents: u32) -> anyhow::Result<(
 
 
 
-  println!("Current path");
-  let output_pwd = Command::new("pwd")
-    .output()
-    .expect("failed to execute process");
-  println!("output pwd: {:?}", String::from_utf8(output_pwd.stdout));
+  // println!("Current path");
+  // let output_pwd = Command::new("pwd")
+  //   .output()
+  //   .expect("failed to execute process");
+  // println!("output pwd: {:?}", String::from_utf8(output_pwd.stdout));
 
-  // current working directory:
-  let current_dir = env::current_dir();
-  let new_dir = match current_dir {
-    Ok(dir) => dir.join("tauri").join("src-tauri"),
-    Err(e) => panic!("Failed at getting the current working directory: {:?}", e),
-  };
+  // // current working directory:
+  // let current_dir = env::current_dir();
+  // let new_dir = match current_dir {
+  //   Ok(dir) => dir.join("tauri").join("src-tauri"),
+  //   Err(e) => panic!("Failed at getting the current working directory: {:?}", e),
+  // };
 
-  env::set_current_dir(new_dir)?;
+  // env::set_current_dir(new_dir)?;
 
-  println!("Getting new pwd");
-  let output_pwd = Command::new("pwd")
-    .output()
-    .expect("failed to execute process");
-  println!("new pwd: {:?}", String::from_utf8(output_pwd.stdout));
-
-
-
+  // println!("Getting new pwd");
+  // let output_pwd = Command::new("pwd")
+  //   .output()
+  //   .expect("failed to execute process");
+  // println!("new pwd: {:?}", String::from_utf8(output_pwd.stdout));
 
 
   // println!("launching tauri application");
@@ -87,8 +183,11 @@ async fn launch_webhapp(web_happ_path: PathBuf, agents: u32) -> anyhow::Result<(
   //   .expect("failed to execute process");
 
   let tauri_dev_handle = std::thread::spawn(|| {
-    println!("cargo tauri dev sleeps for 15 seconds.");
 
+    // todo! instead listen for `hc-sandbox: Connected successfully to a running holochain` n times where n is the number of agents
+    // and then start the launch process
+
+    println!("Wait for 15 seconds before launching the tauri windows to make sure the conductors are ready.");
     std::thread::sleep(Duration::from_millis(15000));
 
     // make sure that happ is actually installed
@@ -98,13 +197,18 @@ async fn launch_webhapp(web_happ_path: PathBuf, agents: u32) -> anyhow::Result<(
       .expect("failed to execute process");
 
 
-    println!("#*#*# cargo tauri dev #*#*#");
-    let output7 = Command::new("cargo")
-      .args(["tauri", "dev"])
+    println!("#*#*# hc-launch-tauri #*#*#");
+    let output7 = Command::new("hc-launch-tauri")
       .output()
       .expect("failed to execute process");
 
-    println!("cargo tauri dev output: {:?}", String::from_utf8(output7.stdout));
+    // println!("#*#*# cargo tauri dev #*#*#");
+    // let output7 = Command::new("cargo")
+    //   .args(["tauri", "dev"])
+    //   .output()
+    //   .expect("failed to execute process");
+
+    println!("hc-launch-tauri output: {:?}", String::from_utf8(output7.stdout));
   });
 
 

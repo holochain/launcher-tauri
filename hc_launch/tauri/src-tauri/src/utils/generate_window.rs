@@ -16,7 +16,7 @@ pub fn generate_window(
 
     WindowBuilder::new(
       app_handle,
-      label,
+      label.clone(),
       WindowUrl::App("index.html".into())
     )
     .on_web_resource_request(move |request, response| {
@@ -74,7 +74,7 @@ pub fn generate_window(
 
     })
     .inner_size(1000.0, 700.0)
-    .title(app_id)
+    .title(label)
     .menu(Menu::new().add_submenu(Submenu::new(
       "Settings",
       Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),

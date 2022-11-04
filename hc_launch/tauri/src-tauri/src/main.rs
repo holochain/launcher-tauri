@@ -21,13 +21,22 @@ fn main() {
 		.setup(|app| {
 
 				let pwd = std::env::current_dir().unwrap();
-				let assets_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(".hc_launch").join("ui").into();
+				// let assets_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(".hc_launch").join("ui").into();
+				let assets_path: PathBuf = pwd.join(".hc_launch").join("ui").into();
+
+				println!("current working directory: {:?}", pwd);
 
 				println!("path to assets: {:?}", assets_path);
 
 				// read the .hc file to get the number of apps
-				let dot_hc_path = pwd.parent().unwrap().parent().unwrap().join(".hc");
+				// let dot_hc_path = pwd.parent().unwrap().parent().unwrap().join(".hc");
+				let dot_hc_path = pwd.join(".hc");
+
+				println!("path to .hc: {:?}", dot_hc_path);
+
 				let dot_hc_content = std::fs::read_to_string(dot_hc_path).unwrap();
+
+				println!("content of .hc: {:?}", dot_hc_content);
 
 
 				// open a tauri window for each app instance
@@ -35,9 +44,12 @@ fn main() {
 				let mut app_counter = 0;
 				for _ in dot_hc_content.lines() {
 
-					let app_id = format!("Agent-{}", app_counter);
+					// let app_id = format!("Agent-{}", app_counter);
+					let app_id = String::from("test-app");
 
-					let dot_hc_live_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(format!(".hc_live_{}", app_counter)).into();
+					// let dot_hc_live_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(format!(".hc_live_{}", app_counter)).into();
+					let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
+
 
 					println!("path to .hc_live_{} file: {:?}", app_counter, dot_hc_live_path);
 
@@ -78,7 +90,7 @@ fn main() {
 					let window = match utils::generate_window(
 						&app.handle(),
 						&app_id,
-						app_id.clone(),
+						format!("Agent-{}", app_counter),
 						assets_path.clone().join("index.html"),
 						assets_path.clone(),
 						launcher_env,

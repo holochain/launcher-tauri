@@ -12,6 +12,7 @@ path = "src/bin/hc-launch.rs"
 
 [dependencies]
 anyhow = "1.0"
+holochain_cli_sandbox = "0.0.61"
 log = "0.4.14"
 nanoid = "0.3"
 observability = "0.1.3"

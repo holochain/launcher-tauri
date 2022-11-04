@@ -4,6 +4,7 @@
 // use std::path::Path;
 use std::path::PathBuf;
 use structopt::StructOpt;
+use crate::utils;
 
 // const DEFAULT_APP_ID: &str = "test-app";
 
@@ -27,17 +28,15 @@ pub enum HcLaunchSubcommand {
   WebApp {
     /// Path to .webhapp file to launch.
     path: Option<PathBuf>,
-  },
-  /// Launch a .happ file in a launcher testing environment while pointing to a UI running on localhost.
-  Localhost {
-    #[structopt(short, long)]
-    /// Path to the .happ file to launch.
-    path: String,
+
+    // #[structopt(long)]
+    // /// Port of the UI
+    // ui_port: Option<u16>,
 
     #[structopt(long)]
-    /// Port of the UI
-    port: u16,
-  }
+    /// path to the UI
+    ui_path: Option<PathBuf>,
+  },
 }
 
 
@@ -46,21 +45,48 @@ impl HcLaunch {
   pub async fn run(self) -> anyhow::Result<()> {
     match self.command {
       HcLaunchSubcommand::WebApp {
-          path
-        } => {
-          // extract webhapp and run it in tauri window(s)
-          // println!("This would run the webhapp at path {} for {} agent(s).", path, self.agents);
-          match path {
-            Some(p) => crate::launch_webhapp(p, self.agents).await?,
-            None => println!("You need to provide a .webhapp path. Auto-detection is not implemented yet.")
-          }
-        },
-      HcLaunchSubcommand::Localhost {
           path,
-          port
+          ui_path,
         } => {
-          // extract webhapp and run it in tauri window(s)
-          println!("Not implemented yet. But this would run a .happ file at path {} and the corresponding UI at port {} for {} agent(s).", path, port, self.agents);
+
+          if utils::has_extension(&path, "happ") {
+            match ui_path {
+              None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch web-app --help` for help."),
+              _ => (),
+            }
+          }
+
+          match path {
+            Some(p) => {
+              match p.extension() {
+                Some(extension) => {
+                  match extension.to_str().unwrap() {
+                    "webhapp" => {
+                      // unzip the webhapp, prepare UI etc.
+                      utils::read_and_prepare_webhapp(&p).await;
+
+                      // generate agents
+                      let happ_path = PathBuf::from(".hc_launch/happ.happ");
+                      let app_handle = crate::generate_agents(happ_path, self.agents, Some(String::from("mdns")));
+
+                      // launch tauri windows via hc-launch-tauri
+                      let tauri_handle = crate::launch_tauri();
+
+                      app_handle.join().unwrap();
+                      tauri_handle.join().unwrap();
+
+                      // crate::launch_webhapp(p, self.agents).await?
+
+                    }
+                    "happ" => println!("launching .happ files not yet supported."),
+                    _ => eprintln!("Error: You need to provide a path that points to either a .webhapp a .happ file."),
+                  }
+                },
+                None => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file.")
+              }
+            },
+            None => println!("You need to provide a path that points to either a .webhapp a .happ file. Auto-detection is not implemented yet.")
+          }
         },
     }
 
