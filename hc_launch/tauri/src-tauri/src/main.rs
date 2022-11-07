@@ -5,6 +5,7 @@
 
 use std::path::PathBuf;
 use std::thread::JoinHandle;
+use std::sync::mpsc;
 use holochain_client::AdminWebsocket;
 use tauri::Window;
 use serde_json::value::Value;
@@ -133,6 +134,10 @@ fn main() {
 
 				}
 
+
+				// channel for message passing from the ui folder watcher to the main application
+				let (tx, rx) = mpsc::channel();
+
 				// watch for file changes in the UI folder if requested
 				let maybe_handle: Option<JoinHandle<()>> = match cli_matches.args.get("watch") {
 					Some(data) => {
@@ -143,9 +148,13 @@ fn main() {
 
 								let watch_handle = std::thread::spawn(move || {
 
-									let mut watcher = match notify::recommended_watcher(|res| {
+
+									let mut watcher = match notify::recommended_watcher(move |res| {
 											match res {
-												Ok(event) => println!("event: {:?}", event),
+												Ok(event) => {
+													println!("event: {:?}", event);
+													tx.send(String::from("Reload")).unwrap();
+												},
 												Err(e) => println!("watch error: {:?}", e),
 											}
 										}) {
@@ -179,6 +188,20 @@ fn main() {
 					},
 					_ => None,
 				};
+
+				// Reload windows if file has changed in ui folder
+				match rx.recv() {
+					Ok(_) => {
+						println!("File change detected. Reloading tauri windows...");
+						for window in windows {
+							match window.eval("location.reload()") {
+								Ok(()) => (),
+								Err(e) => println!("Failed to reload window: {:?}", e),
+							};
+						}
+					},
+					Err(_) => (),
+				}
 
 
 				match maybe_handle {
