@@ -39,6 +39,9 @@ pub enum HcLaunchSubcommand {
     /// path to the UI
     ui_path: Option<PathBuf>,
 
+    #[structopt(long, short)]
+    watch: bool,
+
     // todo! add network command
   },
 }
@@ -51,6 +54,7 @@ impl HcLaunch {
       HcLaunchSubcommand::WebApp {
           path,
           ui_path,
+          watch,
         } => {
 
           match path {
@@ -67,7 +71,7 @@ impl HcLaunch {
                       let app_handle = crate::generate_agents(happ_path, self.agents, Some(String::from("mdns")));
 
                       // launch tauri windows via hc-launch-tauri
-                      let tauri_handle = crate::launch_tauri(None);
+                      let tauri_handle = crate::launch_tauri(None, watch);
 
                       app_handle.join().unwrap();
                       tauri_handle.join().unwrap();
@@ -86,7 +90,7 @@ impl HcLaunch {
                           let app_handle = crate::generate_agents(p.clone(), self.agents, Some(String::from("mdns")));
 
                           // launch tauri windows via hc-launch-tauri
-                          let tauri_handle = crate::launch_tauri(Some(ui_p));
+                          let tauri_handle = crate::launch_tauri(Some(ui_p), watch);
 
                           app_handle.join().unwrap();
                           tauri_handle.join().unwrap();

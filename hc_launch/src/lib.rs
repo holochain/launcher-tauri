@@ -14,11 +14,12 @@ pub use cli::HcLaunch;
 
 
 
-pub fn launch_tauri(ui_path: Option<PathBuf>) -> JoinHandle<()> {
+
+pub fn launch_tauri(ui_path: Option<PathBuf>, watch: bool) -> JoinHandle<()> {
 
   // todo! implement subcommand to hc-launch-tauri to specify the ui folder
 
-  std::thread::spawn(|| {
+  std::thread::spawn(move || {
 
     // todo! instead listen for `hc-sandbox: Connected successfully to a running holochain` n times where n is the number of agents
     // and then start the launch process
@@ -26,22 +27,37 @@ pub fn launch_tauri(ui_path: Option<PathBuf>) -> JoinHandle<()> {
     println!("Wait for 15 seconds before launching the tauri windows to make sure the conductors are ready.");
     std::thread::sleep(Duration::from_millis(15000));
 
+    let mut command = Command::new("hc-launch-tauri");
+
+    if let Some(path) = ui_path {
+      command.args(["--ui-path", path.to_str().unwrap()]);
+    }
+
+    if watch {
+      command.arg("--watch");
+    }
+
     println!("#*#*# hc-launch-tauri #*#*#");
-    let output = match ui_path {
-        Some(path) => {
-          Command::new("hc-launch-tauri")
-            .args(["--ui-path", path.to_str().unwrap()])
-            .stdout(Stdio::inherit())
-            .output()
-            .expect("failed to execute process")
-        },
-        None => {
-          Command::new("hc-launch-tauri")
-            .stdout(Stdio::inherit())
-            .output()
-            .expect("failed to execute process")
-        }
-    };
+    let output = command
+      .stdout(Stdio::inherit())
+      .output()
+      .expect("failed to execute process");
+
+    // let output = match ui_path {
+    //     Some(path) => {
+    //       Command::new("hc-launch-tauri")
+    //         .args(["--ui-path", path.to_str().unwrap()])
+    //         .stdout(Stdio::inherit())
+    //         .output()
+    //         .expect("failed to execute process")
+    //     },
+    //     None => {
+    //       Command::new("hc-launch-tauri")
+    //         .stdout(Stdio::inherit())
+    //         .output()
+    //         .expect("failed to execute process")
+    //     }
+    // };
 
     println!("hc-launch-tauri output: {:?}", String::from_utf8(output.stdout));
   })

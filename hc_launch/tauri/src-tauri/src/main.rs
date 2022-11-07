@@ -4,11 +4,13 @@
 )]
 
 use std::path::PathBuf;
+use std::thread::JoinHandle;
 use holochain_client::AdminWebsocket;
 use tauri::Window;
 use serde_json::value::Value;
 mod utils;
 
+use notify::{Watcher, RecursiveMode};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -131,7 +133,46 @@ fn main() {
 
 				}
 
+				// watch for file changes in the UI folder if requested
+				let maybe_handle: Option<JoinHandle<()>> = match cli_matches.args.get("watch") {
+					Some(data) => {
 
+						match data.value.clone() {
+							Value::Bool(true) => {
+								println!("Watching file changes in folder {:?}", assets_path.as_path());
+
+								let watch_handle = std::thread::spawn(move || {
+
+									let mut watcher = notify::recommended_watcher(|res| {
+										match res {
+											Ok(event) => println!("event: {:?}", event),
+											Err(e) => println!("watch error: {:?}", e),
+										}
+									}).unwrap();
+
+									// Add a path to be watched. All files and directories at that path and
+									// below will be monitored for changes.
+									watcher.watch(assets_path.as_path(), RecursiveMode::Recursive).unwrap();
+
+								});
+
+								Some(watch_handle)
+							},
+							_ => None,
+						}
+
+					},
+					_ => None,
+				};
+
+
+				match maybe_handle {
+					Some(handle)=> {
+						println!("Got a handle!");
+						handle.join().unwrap();
+					},
+					_ => println!("No handle...")
+				}
 
 
 			Ok(())

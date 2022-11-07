@@ -10,6 +10,11 @@
           "name": "ui-path",
           "takesValue": true,
           "multiple": false
+        },
+        {
+          "name": "watch",
+          "short": "w",
+          "takesValue": false
         }
       ],
       "subcommands": {
