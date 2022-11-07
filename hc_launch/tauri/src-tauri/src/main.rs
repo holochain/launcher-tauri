@@ -166,6 +166,9 @@ fn main() {
 										}
 									};
 
+									// For keeping the thread and thus the watcher alive
+									loop {}
+
 								});
 
 								Some(watch_handle)
