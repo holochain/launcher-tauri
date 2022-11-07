@@ -143,16 +143,28 @@ fn main() {
 
 								let watch_handle = std::thread::spawn(move || {
 
-									let mut watcher = notify::recommended_watcher(|res| {
-										match res {
-											Ok(event) => println!("event: {:?}", event),
-											Err(e) => println!("watch error: {:?}", e),
-										}
-									}).unwrap();
+									let mut watcher = match notify::recommended_watcher(|res| {
+											match res {
+												Ok(event) => println!("event: {:?}", event),
+												Err(e) => println!("watch error: {:?}", e),
+											}
+										}) {
+											Ok(w) => w,
+											Err(e) => {
+												println!("Got a watcher error: {:?}", e);
+												panic!("Got a watcher error.");
+											}
+										};
 
 									// Add a path to be watched. All files and directories at that path and
 									// below will be monitored for changes.
-									watcher.watch(assets_path.as_path(), RecursiveMode::Recursive).unwrap();
+									match watcher.watch(assets_path.as_path(), RecursiveMode::Recursive) {
+										Ok(()) => (),
+										Err(e) => {
+											println!("Failed to watch: {:?}", e);
+											panic!("Failed to watch.");
+										}
+									};
 
 								});
 
@@ -170,6 +182,7 @@ fn main() {
 					Some(handle)=> {
 						println!("Got a handle!");
 						handle.join().unwrap();
+						println!("Handle joined...");
 					},
 					_ => println!("No handle...")
 				}
