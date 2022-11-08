@@ -113,7 +113,7 @@ fn main() {
         let window = match utils::generate_window(
           &app.handle(),
           &app_id,
-          window_label,
+          window_label.clone(),
           assets_path.clone().join("index.html"),
           assets_path.clone(),
           launcher_env,
@@ -125,11 +125,13 @@ fn main() {
           }
         };
 
-				// window.on_menu_event(move |_| {
-				// 	if let Some(w) = app.handle().get_window(window_label.as_str()) {
-				// 		w.open_devtools();
-				// 	}
-				// });
+				let a = app.handle().clone();
+
+				window.on_menu_event(move |_| {
+					if let Some(w) = a.get_window(window_label.as_str()) {
+						w.open_devtools();
+					}
+				});
 
         println!("App window created.");
         windows.push(window);
