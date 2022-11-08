@@ -7,8 +7,8 @@ use holochain_client::AdminWebsocket;
 use serde_json::value::Value;
 use std::path::PathBuf;
 use std::sync::mpsc;
-use std::thread::JoinHandle;
 use tauri::Window;
+use tauri::{AppHandle, Manager};
 mod utils;
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
@@ -108,10 +108,12 @@ fn main() {
 
         println!("Starting to build window.");
 
+				let window_label = format!("Agent-{}", app_counter);
+
         let window = match utils::generate_window(
           &app.handle(),
           &app_id,
-          format!("Agent-{}", app_counter),
+          window_label,
           assets_path.clone().join("index.html"),
           assets_path.clone(),
           launcher_env,
@@ -123,16 +125,21 @@ fn main() {
           }
         };
 
+				// window.on_menu_event(move |_| {
+				// 	if let Some(w) = app.handle().get_window(window_label.as_str()) {
+				// 		w.open_devtools();
+				// 	}
+				// });
+
         println!("App window created.");
         windows.push(window);
         app_counter += 1;
       }
 
-      // channel for message passing from the ui folder watcher to the main application
-      let (tx, rx) = mpsc::channel();
+
 
       // watch for file changes in the UI folder if requested
-      let maybe_handle = match cli_matches.args.get("watch") {
+      match cli_matches.args.get("watch") {
         Some(data) => {
           match data.value.clone() {
             Value::Bool(true) => {
@@ -161,7 +168,9 @@ fn main() {
                   match res {
                     Ok(event) => {
                       println!("event: {:?}", event);
-                      tx.send(String::from("Reload")).unwrap();
+											for window in &windows {
+												window.eval("location.reload()").unwrap();
+											}
                     }
                     Err(e) => println!("watch error: {:?}", e),
                   }
@@ -175,30 +184,6 @@ fn main() {
         }
         _ => None,
       };
-
-      println!("reaching recv");
-      // Reload windows if file has changed in ui folder
-      match rx.recv() {
-        Ok(_) => {
-          println!("File change detected. Reloading tauri windows...");
-          for window in windows {
-            match window.eval("location.reload()") {
-              Ok(()) => (),
-              Err(e) => println!("Failed to reload window: {:?}", e),
-            };
-          }
-        }
-        Err(_) => (),
-      }
-
-      match maybe_handle {
-        Some(handle) => {
-          println!("Got a handle!");
-          handle.join().unwrap();
-          println!("Handle joined...");
-        }
-        _ => println!("No handle..."),
-      }
 
       Ok(())
     })
