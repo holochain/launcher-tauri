@@ -71,7 +71,7 @@ fn main() {
 
       let mut app_counter = 0;
 
-      tauri::async_runtime::block_on( async move {
+      let (windows, assets_path) = tauri::async_runtime::block_on( async move {
 
         for tmp_directory_path in dot_hc_content.lines() {
           // let app_id = format!("Agent-{}", app_counter);
@@ -139,8 +139,10 @@ fn main() {
 
           let a = app.handle().clone();
 
+          let window_label_clone = window_label.clone();
+
           window.on_menu_event(move |_| {
-            if let Some(w) = a.get_window(window_label.as_str()) {
+            if let Some(w) = a.get_window(window_label_clone.as_str()) {
               w.open_devtools();
             }
           });
@@ -156,7 +158,7 @@ fn main() {
               .expect("Failed to convert OsString to &str")
           ).expect("Failed to parse lair url");
 
-          let client =   ipc_keystore_connect(connection_url, String::from("pass").into_bytes())
+          let client =   ipc_keystore_connect(connection_url.clone(), String::from("pass").into_bytes())
             .await
             .expect(format!("Failed to connect to lair client at url: {:?}", connection_url).as_str());
 
@@ -164,6 +166,8 @@ fn main() {
 
           app_counter += 1;
         }
+
+        (windows, assets_path)
       });
 
 
