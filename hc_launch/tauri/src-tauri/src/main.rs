@@ -17,7 +17,7 @@ mod commands;
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
-use commands::sign_zome_call::sign_zome_call;
+// use commands::sign_zome_call::sign_zome_call;
 
 fn main() {
   tauri::Builder::default()
