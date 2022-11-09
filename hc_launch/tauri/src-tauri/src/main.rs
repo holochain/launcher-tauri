@@ -6,22 +6,22 @@
 use holochain_client::AdminWebsocket;
 use serde_json::value::Value;
 use std::path::PathBuf;
+use std::collections::HashMap;
 use std::sync::mpsc;
 use tauri::Window;
 use tauri::{AppHandle, Manager};
+use lair_keystore_api::{LairClient, ipc_keystore_connect};
+use url::Url;
 mod utils;
+mod commands;
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-  format!("Hello, {}! You've been greeted from Rust!", name)
-}
+use commands::sign_zome_call::sign_zome_call;
 
 fn main() {
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![greet])
+    // .invoke_handler(tauri::generate_handler![sign_zome_call]) // uncomment when testing with right version
     .setup(|app| {
       let cli_matches = app.get_cli_matches()?;
 
@@ -58,86 +58,113 @@ fn main() {
 
       println!("content of .hc: {:?}", dot_hc_content);
 
-      // open a tauri window for each app instance
+      // need to get lair client for each of the windows
+      // window calls tauri command sign_zome_call() --> I need to identify which window did the call (can get this from window label)
+      // need a hashmap of lair clients with window labels as keys
+
+
+
+
+      // open a tauri window for each app instance and create a lair client instance for each window
       let mut windows: Vec<Window> = vec![];
+      let mut lair_clients: HashMap<String, LairClient> = HashMap::new();
+
       let mut app_counter = 0;
-      for _ in dot_hc_content.lines() {
-        // let app_id = format!("Agent-{}", app_counter);
-        let app_id = String::from("test-app");
 
-        // let dot_hc_live_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(format!(".hc_live_{}", app_counter)).into();
-        let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
+      tauri::async_runtime::block_on( async move {
 
-        println!(
-          "path to .hc_live_{} file: {:?}",
-          app_counter, dot_hc_live_path
-        );
+        for tmp_directory_path in dot_hc_content.lines() {
+          // let app_id = format!("Agent-{}", app_counter);
+          let app_id = String::from("test-app");
 
-        let admin_port = std::fs::read_to_string(dot_hc_live_path).unwrap();
+          // let dot_hc_live_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(format!(".hc_live_{}", app_counter)).into();
+          let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
 
-        println!("admin port: {:?}", admin_port);
+          println!(
+            "path to .hc_live_{} file: {:?}",
+            app_counter, dot_hc_live_path
+          );
 
-        let admin_port_clone = admin_port.clone();
+          let admin_port = std::fs::read_to_string(dot_hc_live_path).unwrap();
 
-        println!("trying to get app port");
-        let app_port = tauri::async_runtime::block_on(async move {
-          match get_app_websocket(admin_port_clone).await {
-            Ok(ws) => ws,
-            Err(e) => {
-              println!("ERROR! Error getting app websocket port: {}", e);
-              panic!("Failed to get app websocket port.");
+          println!("admin port: {:?}", admin_port);
+
+          let admin_port_clone = admin_port.clone();
+
+          println!("trying to get app port");
+          let app_port = tauri::async_runtime::block_on(async move {
+            match get_app_websocket(admin_port_clone).await {
+              Ok(ws) => ws,
+              Err(e) => {
+                println!("ERROR! Error getting app websocket port: {}", e);
+                panic!("Failed to get app websocket port.");
+              }
             }
-          }
-        });
+          });
 
-        println!("app port: {:?}", app_port);
+          println!("app port: {:?}", app_port);
 
-        // extract the number of lines of the .hc file to know the number of sandboxes
-        // read all the hc_live_X files to retrieve the admin ports
+          // extract the number of lines of the .hc file to know the number of sandboxes
+          // read all the hc_live_X files to retrieve the admin ports
 
-        let launcher_env = format!(
-          r#"{{
-						"APP_INTERFACE_PORT": {},
-						"ADMIN_INTERFACE_PORT": {},
-						"INSTALLED_APP_ID": "{}"
-					}}"#,
-          app_port,
-          admin_port,
-          app_id.clone(),
-        );
+          let launcher_env = format!(
+            r#"{{
+              "APP_INTERFACE_PORT": {},
+              "ADMIN_INTERFACE_PORT": {},
+              "INSTALLED_APP_ID": "{}"
+            }}"#,
+            app_port,
+            admin_port,
+            app_id.clone(),
+          );
 
-        println!("Starting to build window.");
+          println!("Starting to build window.");
 
-				let window_label = format!("Agent-{}", app_counter);
+          let window_label = format!("Agent-{}", app_counter);
 
-        let window = match utils::generate_window(
-          &app.handle(),
-          &app_id,
-          window_label.clone(),
-          assets_path.clone().join("index.html"),
-          assets_path.clone(),
-          launcher_env,
-        ) {
-          Ok(window) => window,
-          Err(e) => {
-            println!("ERROR! Failed to build window: {}", e);
-            panic!("Failed to build Window: {:?}", e);
-          }
-        };
+          let window = match utils::generate_window(
+            &app.handle(),
+            &app_id,
+            window_label.clone(),
+            assets_path.clone().join("index.html"),
+            assets_path.clone(),
+            launcher_env,
+          ) {
+            Ok(window) => window,
+            Err(e) => {
+              println!("ERROR! Failed to build window: {}", e);
+              panic!("Failed to build Window: {:?}", e);
+            }
+          };
 
-				let a = app.handle().clone();
+          let a = app.handle().clone();
 
-				window.on_menu_event(move |_| {
-					if let Some(w) = a.get_window(window_label.as_str()) {
-						w.open_devtools();
-					}
-				});
+          window.on_menu_event(move |_| {
+            if let Some(w) = a.get_window(window_label.as_str()) {
+              w.open_devtools();
+            }
+          });
 
-        println!("App window created.");
-        windows.push(window);
-        app_counter += 1;
-      }
+          println!("App window created.");
+          windows.push(window);
 
+          // create lair client and add it to hashmap
+          let connection_url = Url::parse(
+            PathBuf::from(tmp_directory_path).join("keystore")
+              .as_os_str()
+              .to_str()
+              .expect("Failed to convert OsString to &str")
+          ).expect("Failed to parse lair url");
+
+          let client =   ipc_keystore_connect(connection_url, String::from("pass").into_bytes())
+            .await
+            .expect(format!("Failed to connect to lair client at url: {:?}", connection_url).as_str());
+
+          lair_clients.insert(window_label.to_string(), client);
+
+          app_counter += 1;
+        }
+      });
 
 
       // watch for file changes in the UI folder if requested

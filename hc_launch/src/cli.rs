@@ -4,7 +4,7 @@
 // use std::path::Path;
 use std::path::PathBuf;
 use structopt::StructOpt;
-
+use std::io::Read;
 use crate::utils;
 use crate::error::HcLaunchError;
 
@@ -92,8 +92,24 @@ impl HcLaunch {
                           // launch tauri windows via hc-launch-tauri
                           let tauri_handle = crate::launch_tauri(Some(ui_p), watch);
 
+                          // println!("Child stdout: {:?}", app_handle.stdout);
+                          // // linereader::LineReader::new(app_handle.stdout.unwrap()).for_each(|line| {
+                          // //   println!("line: {:?}", std::str::from_utf8(line));
+                          // //   Ok(true)
+                          // // });
+                          // let mut s = [0u8; 500];
+                          // let mut stdout = app_handle.stdout.take().expect("Failed to take stdout");
+
+                          // loop {
+                          //   stdout.read(&mut s);
+                          //   let vec: Vec<u8> = Vec::from(&s as &[u8]);
+                          //   println!("Got: {}", String::from_utf8(vec).unwrap());
+                          // }
+
                           app_handle.join().unwrap();
+                          // println!("joined app handle");
                           tauri_handle.join().unwrap();
+                          println!("joined tauri handle");
 
                         },
                         None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch web-app --help` for help."),

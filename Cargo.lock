@@ -2367,6 +2367,8 @@ name = "hc-launch-tauri"
 version = "0.0.0"
 dependencies = [
  "holochain_client",
+ "holochain_types 0.0.61",
+ "lair_keystore_api",
  "log",
  "mime_guess",
  "notify",
@@ -2375,6 +2377,7 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "url",
 ]
 
 [[package]]
@@ -2541,7 +2544,6 @@ dependencies = [
  "anyhow",
  "holochain_cli_sandbox",
  "holochain_types 0.0.61",
- "lair_keystore_api",
  "lair_keystore_manager",
  "log",
  "nanoid 0.3.0",

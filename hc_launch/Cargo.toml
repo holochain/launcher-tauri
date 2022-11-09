@@ -22,7 +22,6 @@ tokio = "1.21.2"
 zip = "0.5.0"
 
 
-lair_keystore_api = "0.2.1"
 holochain_types = "0.0.61"
 structopt = "0.3"
 

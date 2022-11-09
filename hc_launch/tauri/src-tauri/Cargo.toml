@@ -22,7 +22,11 @@ tauri = { version = "1.1", features = ["api-all", "cli",  "devtools"] }
 mime_guess = "2.0.4"
 log = "0.4.14"
 holochain_client = {package="holochain_client", version="0.2.0"}
+holochain_types = "0.0.61"
+
+lair_keystore_api = "0.2.1"
 portpicker = "0.1.1"
+url = "2.3.1"
 
 
 [features]
