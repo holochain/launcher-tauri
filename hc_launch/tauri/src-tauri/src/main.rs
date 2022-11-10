@@ -71,7 +71,7 @@ fn main() {
 
       let mut app_counter = 0;
 
-      let (windows, assets_path) = tauri::async_runtime::block_on( async move {
+      let (windows, assets_path, lair_clients) = tauri::async_runtime::block_on( async move {
 
         for tmp_directory_path in dot_hc_content.lines() {
           // let app_id = format!("Agent-{}", app_counter);
@@ -103,9 +103,6 @@ fn main() {
           });
 
           println!("app port: {:?}", app_port);
-
-          // extract the number of lines of the .hc file to know the number of sandboxes
-          // read all the hc_live_X files to retrieve the admin ports
 
           let launcher_env = format!(
             r#"{{
@@ -167,9 +164,14 @@ fn main() {
           app_counter += 1;
         }
 
-        (windows, assets_path)
+        (windows, assets_path, lair_clients)
       });
 
+      //
+
+      for (dir, _lair) in lair_clients.iter() {
+        println!("client label: {}", dir);
+      }
 
       // watch for file changes in the UI folder if requested
       match cli_matches.args.get("watch") {
