@@ -59,6 +59,7 @@
         ref="app-id-field"
       />
       <HCSelect
+        v-if="!hdkVersionForApp"
         style="margin: 5px; width: 360px"
         label="Holochain Version*"
         :items="supportedHolochains"
