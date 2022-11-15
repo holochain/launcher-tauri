@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run dev:ui\" \"sleep 14 && npm run tauri dev\"",
@@ -10,7 +10,7 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "tauri": "tauri",
-    "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/8xdcHKQmjkmrGGn/download"
+    "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/LBntYzLvzjh680s/download"
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",
