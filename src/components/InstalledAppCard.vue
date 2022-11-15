@@ -146,6 +146,9 @@
         }}</span>
       </div>
 
+      <!-- Add Gossip state here if holochain version is not 0.0.169 or lower -->
+      <!-- calls a tauri command to get the gossip state -->
+
       <table style="text-align: left; margin-top: 20px; margin-left: 140px">
         <tr>
           <th></th>
@@ -268,6 +271,7 @@ import { HolochainAppInfo } from "../types";
 import { serializeHash } from "@holochain-open-dev/utils";
 import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
+// import { AppWebsocket, DnaHash, DnaGossipInfo } from "@holochain/client";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
@@ -384,6 +388,20 @@ export default defineComponent({
         this.showPubKeyTooltip = false;
       }, 1200);
     },
+    // async getGossipInfo(app: HolochainAppInfo): [string[], DnaGossipInfo[]] {
+    //   const port = this.$store.getters["appInterfacePort"](app.holochainId);
+    //   const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+    //   let dnas: DnaHash[] = app.webAppInfo.installed_app_info.cell_data.map(
+    //     (cell) => cell.cell_id[0]
+    //   );
+    //   let roleIds: string[] = app.webAppInfo.installed_app_info.cell_data.map(
+    //     (cell) => cell.role_id
+    //   );
+    //   const gossipInfo: DnaGossipInfo[] = await appWs.gossipInfo({
+    //     dnas: app.webAppInfo.installed_app_info.cell_data,
+    //   });
+    //   return [roleIds, gossipInfo];
+    // },
   },
 });
 </script>
