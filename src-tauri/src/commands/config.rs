@@ -13,6 +13,7 @@ pub async fn write_config(
   state: tauri::State<'_, LauncherState>,
   app_handle: tauri::AppHandle,
   config: LauncherConfig,
+  custom_path: Option<String>,
 ) -> Result<(), LauncherError> {
 
   if window.label() != "admin" {
@@ -33,7 +34,7 @@ pub async fn write_config(
 
   kill_children();
 
-  let manager = LauncherManager::launch(app_handle).await?;
+  let manager = LauncherManager::launch(app_handle, custom_path).await?;
 
   let mut m = state.lock().await;
 

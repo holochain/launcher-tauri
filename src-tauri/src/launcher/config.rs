@@ -13,6 +13,7 @@ pub struct LauncherConfig {
   pub custom_binary_path: Option<String>,
 
   pub running_versions: HashSet<HolochainVersion>,
+  custom_path: Option<String>,
 }
 
 impl Default for LauncherConfig {
@@ -21,18 +22,31 @@ impl Default for LauncherConfig {
       log_level: log::Level::Warn,
       custom_binary_path: None,
       running_versions: HashSet::from([HolochainVersion::default()]),
+      custom_path: None,
     }
   }
+
 }
 
+
+
 impl LauncherConfig {
-  pub fn read() -> LauncherConfig {
-    match fs::read_to_string(launcher_config_path()) {
+  pub fn new(custom_path: Option<String>) -> Self {
+    LauncherConfig {
+      log_level: log::Level::Warn,
+      custom_binary_path: None,
+      running_versions: HashSet::from([HolochainVersion::default()]),
+      custom_path: custom_path,
+    }
+  }
+
+  pub fn read(custom_path: Option<String>) -> LauncherConfig {
+    match fs::read_to_string(launcher_config_path(custom_path.clone())) {
       Ok(str) => {
-        serde_yaml::from_str::<LauncherConfig>(str.as_str()).unwrap_or(LauncherConfig::default())
+        serde_yaml::from_str::<LauncherConfig>(str.as_str()).unwrap_or(LauncherConfig::new(custom_path))
       }
       Err(_) => {
-        let config = LauncherConfig::default();
+        let config = LauncherConfig::new(custom_path);
         config.write().expect("Could not write launcher config");
         config
       }
@@ -42,7 +56,7 @@ impl LauncherConfig {
   pub fn write(&self) -> Result<(), LauncherError> {
     let serde_config = serde_yaml::to_string(&self).expect("Could not serialize launcher config");
 
-    fs::write(launcher_config_path(), serde_config)
+    fs::write(launcher_config_path(self.custom_path.clone()), serde_config)
       .map_err(|err| LauncherError::ConfigError(format!("{}", err)))
   }
 }

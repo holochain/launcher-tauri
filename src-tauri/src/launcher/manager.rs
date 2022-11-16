@@ -53,15 +53,17 @@ pub struct LauncherManager {
     HashMap<HolochainVersion, RunningState<WebAppManager, LaunchWebAppManagerError>>,
   pub custom_binary_manager: Option<RunningState<WebAppManager, LaunchWebAppManagerError>>,
   pub lair_keystore_manager: RunningState<Box<dyn LairKeystoreManager>, KeystoreStatus>,
+  pub custom_path: Option<String>,
 }
 
 impl LauncherManager {
-  pub async fn launch(app_handle: AppHandle) -> Result<Self, LauncherError> {
-    create_dir_if_necessary(&root_lair_path())?;
-    create_dir_if_necessary(&root_holochain_data_path())?;
-    create_dir_if_necessary(&root_config_path())?;
+  pub async fn launch(app_handle: AppHandle, custom_path: Option<String>) -> Result<Self, LauncherError> {
 
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_2::lair_keystore_version());
+    create_dir_if_necessary(&root_lair_path(custom_path.clone()))?;
+    create_dir_if_necessary(&root_holochain_data_path(custom_path.clone()))?;
+    create_dir_if_necessary(&root_config_path(custom_path.clone()))?;
+
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_2::lair_keystore_version(), custom_path.clone());
 
     let is_initialized = LairKeystoreManagerV0_2::is_initialized(keystore_path);
 
@@ -70,7 +72,7 @@ impl LauncherManager {
       false => KeystoreStatus::InitNecessary,
     };
 
-    let config = LauncherConfig::read();
+    let config = LauncherConfig::read(custom_path.clone());
 
     let app_handle2 = app_handle.clone();
     let manager = LauncherManager {
@@ -79,6 +81,7 @@ impl LauncherManager {
       custom_binary_manager: None,
       config,
       lair_keystore_manager: RunningState::Error(keystore_status),
+      custom_path,
     };
 
     // This doesn't work... TODO: Fix it
@@ -98,20 +101,20 @@ impl LauncherManager {
     Ok(manager)
   }
 
-  pub async fn initialize_and_launch_keystore(&mut self, password: String) -> Result<(), String> {
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_2::lair_keystore_version());
+  pub async fn initialize_and_launch_keystore(&mut self, password: String, custom_path: Option<String>) -> Result<(), String> {
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_2::lair_keystore_version(), custom_path.clone());
 
     LairKeystoreManagerV0_2::initialize(keystore_path, password.clone())
       .await
       .map_err(|err| format!("Error initializing the keystore: {:?}", err))?;
 
-    self.launch_keystore(password).await?;
+    self.launch_keystore(password, custom_path).await?;
 
     Ok(())
   }
 
-  pub async fn launch_keystore(&mut self, password: String) -> Result<(), String> {
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_2::lair_keystore_version());
+  pub async fn launch_keystore(&mut self, password: String, custom_path: Option<String>) -> Result<(), String> {
+    let keystore_path = keystore_data_path(LairKeystoreManagerV0_2::lair_keystore_version(), custom_path.clone());
     let lair_keystore_manager =
       LairKeystoreManagerV0_2::launch(self.config.log_level, keystore_path, password.clone())
         .await
@@ -124,16 +127,16 @@ impl LauncherManager {
     holochain_versions_to_run.insert(HolochainVersion::default());
 
     for version in holochain_versions_to_run {
-      self.launch_holochain_manager(version, None).await?;
+      self.launch_holochain_manager(version, None, custom_path.clone()).await?;
     }
 
     if let Some(path) = self.config.custom_binary_path.clone() {
       self
-        .launch_holochain_manager(HolochainVersion::custom(), Some(path))
+        .launch_holochain_manager(HolochainVersion::custom(), Some(path), custom_path.clone())
         .await?;
     } else {
-      let _r = std::fs::remove_dir_all(root_config_path().join("custom"));
-      let _r = std::fs::remove_dir_all(root_holochain_data_path().join("custom"));
+      let _r = std::fs::remove_dir_all(root_config_path(custom_path.clone()).join("custom"));
+      let _r = std::fs::remove_dir_all(root_holochain_data_path(custom_path).join("custom"));
     }
 
     Ok(())
@@ -143,6 +146,7 @@ impl LauncherManager {
     &mut self,
     version: HolochainVersion,
     custom_binary_path: Option<String>,
+    custom_path: Option<String>, // custom root path for config files etc.
   ) -> Result<(), String> {
     // If we are trying to launch Holochain from a custom binary path, but there is nothing in that path, error and exit immediately
     if let Some(path) = custom_binary_path.clone() {
@@ -159,12 +163,12 @@ impl LauncherManager {
     let admin_port = portpicker::pick_unused_port().expect("No ports free");
 
     let conductor_config_path = match custom_binary_path.is_some() {
-      true => root_config_path().join("custom"),
-      false => config_environment_path(version),
+      true => root_config_path(custom_path.clone()).join("custom"),
+      false => config_environment_path(version, custom_path.clone()),
     };
     let environment_path = match custom_binary_path.is_some() {
-      true => root_holochain_data_path().join("custom"),
-      false => data_path_for_holochain_version(version),
+      true => root_holochain_data_path(custom_path.clone()).join("custom"),
+      false => data_path_for_holochain_version(version, custom_path.clone()),
     };
 
     let lair_manager = self.get_lair_keystore_manager()?;
@@ -270,11 +274,12 @@ impl LauncherManager {
   pub async fn get_or_launch_holochain(
     &mut self,
     holochain_id: HolochainId,
+    custom_path: Option<String>,
   ) -> Result<&mut WebAppManager, String> {
     match holochain_id {
       HolochainId::HolochainVersion(version) => {
         if let None = self.holochain_managers.get(&version) {
-          self.launch_holochain_manager(version.clone(), None).await?;
+          self.launch_holochain_manager(version.clone(), None, custom_path).await?;
         }
       }
       HolochainId::CustomBinary => {
@@ -286,7 +291,7 @@ impl LauncherManager {
 
         if let None = self.custom_binary_manager {
           self
-            .launch_holochain_manager(HolochainVersion::custom(), Some(path))
+            .launch_holochain_manager(HolochainVersion::custom(), Some(path), custom_path)
             .await?;
         }
       }
@@ -476,11 +481,4 @@ impl LauncherManager {
     Ok(())
   }
 
-  pub fn is_launcher_already_running() -> bool {
-    let s = System::new_all();
-    for _ in s.processes_by_name("holochain-launcher") {
-      return true;
-    }
-    return false;
-  }
 }
