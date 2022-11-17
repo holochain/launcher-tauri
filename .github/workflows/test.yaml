@@ -35,17 +35,9 @@ jobs:
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-unknown-linux-gnu
 
 
-          cargo install holochain --version 0.0.162 --locked --features db-encryption
+          cargo install holochain --version 0.0.173 --locked --features db-encryption
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.162-x86_64-unknown-linux-gnu
-
-          cargo install holochain --version 0.0.165 --locked --features db-encryption
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.165-x86_64-unknown-linux-gnu
-
-          cargo install holochain --version 0.0.169 --locked --features db-encryption
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.169-x86_64-unknown-linux-gnu
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.173-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
