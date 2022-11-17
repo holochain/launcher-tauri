@@ -11,7 +11,9 @@ pub enum LairKeystoreError {
   #[error("Failed to write the password: `{0}`")]
   ErrorWritingPassword(String),
   #[error("Incorrect password")]
-  IncorrectPassword
+  IncorrectPassword,
+  #[error("Failed to sign zome call: `{0}`")]
+  SignZomeCallError(String),
 }
 
 #[derive(Error, Debug, Serialize, Deserialize, Clone)]

@@ -28,5 +28,7 @@ pub trait LairKeystoreManager: Send + Sync {
 
   fn connection_url(&self) -> Url2;
 
+  async fn sign_zome_call(&self, zome_call: ZomeCallUnsigned) -> Result<ZomeCall, LairKeystoreError>;
+
   fn password(&self) -> String;
 }
