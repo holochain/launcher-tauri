@@ -75,13 +75,6 @@ pub fn generate_agents(happ_path: PathBuf, agents: u32, network: Option<String>)
   // create a new random id to identify the sandboxes and be able to retrieve the directory to the lair-keystores
   let sandbox_identifier = nanoid::nanoid!();
 
-  // pass dummy lair password
-  Command::new("echo")
-    .args(["pass", "|"])
-    .output()
-    .expect("failed to execute process");
-
-  println!("launching happ...");
 
   launch_happ(
     &happ_path,
@@ -103,6 +96,14 @@ pub fn launch_happ(
   sandbox_identifier: Option<String>, // if provided, the sandbox gets the name [sandbox_identifier]_[app_id]_[agent_number]
   network: Option<String>,
 )-> JoinHandle<()> {
+
+  println!("Starting echo pass...");
+  // pass dummy lair password
+  let echo_child = Command::new("echo")
+    .arg("pass")
+    .stdout(Stdio::piped())
+    .spawn()
+    .expect("failed to execute echo");
 
   let mut command = Command::new("hc");
 
@@ -126,11 +127,11 @@ pub fn launch_happ(
     command.arg(nw.as_str());
   }
 
-  println!("spawning thread...");
 
 
   std::thread::spawn(move ||  {
     command
+      .stdin(Stdio::from(echo_child.stdout.unwrap()))
       .stdout(Stdio::inherit())
       .output()
       .expect("failed to execute process");
@@ -218,13 +219,6 @@ async fn launch_webhapp(web_happ_path: &PathBuf, agents: u32) -> anyhow::Result<
 
     println!("Wait for 15 seconds before launching the tauri windows to make sure the conductors are ready.");
     std::thread::sleep(Duration::from_millis(15000));
-
-    // make sure that happ is actually installed
-    let _output4 = Command::new("echo")
-      .args(["pass", "|"])
-      .output()
-      .expect("failed to execute process");
-
 
     println!("#*#*# hc-launch-tauri #*#*#");
     let output7 = Command::new("hc-launch-tauri")

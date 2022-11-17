@@ -21,12 +21,17 @@ tauri = { version = "1.1", features = ["api-all", "cli",  "devtools"] }
 
 mime_guess = "2.0.4"
 log = "0.4.14"
-holochain_client = {package="holochain_client", version="0.2.0"}
-holochain_types = "0.0.61"
+
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch="sign-zome-call-testing-launcher"}
+holochain_types = {package = "holochain_types", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
+holochain_zome_types = {package = "holochain_zome_types", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
+holochain_conductor_api = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
 
 lair_keystore_api = "0.2.1"
 portpicker = "0.1.1"
+thiserror = "1.0.22"
 url = "2.3.1"
+url2 = "0.0.6"
 
 
 [features]

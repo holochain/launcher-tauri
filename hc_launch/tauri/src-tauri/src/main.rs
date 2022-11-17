@@ -14,14 +14,15 @@ use lair_keystore_api::{LairClient, ipc_keystore_connect};
 use url::Url;
 mod utils;
 mod commands;
+mod error;
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
-// use commands::sign_zome_call::sign_zome_call;
+use commands::sign_zome_call::sign_zome_call;
 
 fn main() {
   tauri::Builder::default()
-    // .invoke_handler(tauri::generate_handler![sign_zome_call]) // uncomment when testing with right version
+    .invoke_handler(tauri::generate_handler![sign_zome_call]) // uncomment when testing with right version
     .setup(|app| {
       let cli_matches = app.get_cli_matches()?;
 
@@ -30,8 +31,13 @@ fn main() {
       let assets_path: PathBuf = match cli_matches.args.get("ui-path") {
         Some(data) => match data.value.clone() {
           Value::String(path) => path.into(),
+          Value::Bool(false) => pwd.join(".hc_launch").join("ui").into(),
+          Value::Bool(true) => {
+            println!("ERROR: --ui-path option must be accompanied by a value.");
+            panic!("--ui-path option must be accompanied by a value.")
+          },
           _ => {
-            println!("ERROR: Value passed to --ui-path option could not be interpreted as string.");
+            println!("ERROR: Value passed to --ui-path option could not be interpreted as string or boolean: {:?}", data);
             panic!("Value passed to --ui-path option could not be interpreted as string.")
           }
         },
@@ -71,7 +77,7 @@ fn main() {
 
       let mut app_counter = 0;
 
-      let (windows, assets_path, lair_clients) = tauri::async_runtime::block_on( async move {
+      let (windows, assets_path, lair_clients, app) = tauri::async_runtime::block_on( async move {
 
         for tmp_directory_path in dot_hc_content.lines() {
           // let app_id = format!("Agent-{}", app_counter);
@@ -92,18 +98,41 @@ fn main() {
           let admin_port_clone = admin_port.clone();
 
           println!("trying to get app port");
-          let app_port = tauri::async_runtime::block_on(async move {
-            match get_app_websocket(admin_port_clone).await {
-              Ok(ws) => ws,
-              Err(e) => {
-                println!("ERROR! Error getting app websocket port: {}", e);
-                panic!("Failed to get app websocket port.");
-              }
+          // let app_port = tauri::async_runtime::block_on(async move {
+          //   println!("inside block_on");
+          //   match get_app_websocket(admin_port_clone).await {
+          //     Ok(ws) => ws,
+          //     Err(e) => {
+          //       println!("ERROR! Error getting app websocket port: {}", e);
+          //       panic!("Failed to get app websocket port.");
+          //     }
+          //   }
+          // });
+
+          // let app_port_handle = tokio::spawn(async move {
+          //   println!("inside block_on");
+          //   match get_app_websocket(admin_port_clone).await {
+          //     Ok(ws) => ws,
+          //     Err(e) => {
+          //       println!("ERROR! Error getting app websocket port: {}", e);
+          //       panic!("Failed to get app websocket port.");
+          //     }
+          //   }
+          // });
+
+          // let app_port = app_port_handle.await?;
+
+          let app_port = match get_app_websocket(admin_port_clone).await {
+            Ok(ws) => ws,
+            Err(e) => {
+              println!("ERROR! Error getting app websocket port: {}", e);
+              panic!("Failed to get app websocket port.");
             }
-          });
+          };
 
           println!("app port: {:?}", app_port);
 
+          // TODO! implement writing it to window object instead
           let launcher_env = format!(
             r#"{{
               "APP_INTERFACE_PORT": {},
@@ -147,31 +176,47 @@ fn main() {
           println!("App window created.");
           windows.push(window);
 
-          // create lair client and add it to hashmap
-          let connection_url = Url::parse(
-            PathBuf::from(tmp_directory_path).join("keystore")
-              .as_os_str()
-              .to_str()
-              .expect("Failed to convert OsString to &str")
-          ).expect("Failed to parse lair url");
+          println!("Trying to create connection to lair keystore.");
 
-          let client =   ipc_keystore_connect(connection_url.clone(), String::from("pass").into_bytes())
-            .await
-            .expect(format!("Failed to connect to lair client at url: {:?}", connection_url).as_str());
+          // read yaml file
+          let connection_url = match read_lair_yaml(PathBuf::from(tmp_directory_path)) {
+            Some(url) => url,
+            None => {
+              println!("ERROR: No connectionUrl found in lair-keystore-config.yaml");
+              panic!("No connectionUrl found in lair-keystore-config.yaml")
+            }
+          };
+
+          println!("Connection url: {:?}", connection_url);
+
+          let connection_url = Url::parse(connection_url.as_str()).unwrap();
+
+
+          // create lair client and add it to hashmap
+          println!("Connection url after Url::parse: {:?}", connection_url);
+
+          let client = match ipc_keystore_connect(connection_url.clone(), "pass".as_bytes()).await {
+            Ok(client) => client,
+            Err(e) => {
+              println!("Failed to connect to lair client: {:?}", e);
+              panic!("Failed to connect to lair client");
+            }
+          };
 
           lair_clients.insert(window_label.to_string(), client);
 
           app_counter += 1;
         }
 
-        (windows, assets_path, lair_clients)
+        (windows, assets_path, lair_clients, app)
       });
 
-      //
 
       for (dir, _lair) in lair_clients.iter() {
         println!("client label: {}", dir);
       }
+
+      app.manage(lair_clients);
 
       // watch for file changes in the UI folder if requested
       match cli_matches.args.get("watch") {
@@ -252,4 +297,30 @@ async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
   };
 
   Ok(app_interface_port)
+}
+
+
+
+
+
+
+fn read_lair_yaml(path: PathBuf) -> Option<String> {
+
+  let yaml_content = match std::fs::read_to_string(
+    PathBuf::from(path).join("keystore").join("lair-keystore-config.yaml")) {
+      Ok(content) => content,
+      Err(e) => {
+        println!("Failed to read lair-keystore-config.yaml: {:?}", e);
+        panic!("Failed to read lair-keystore-config.yaml");
+      }
+    };
+
+    for line in yaml_content.lines() {
+      match line.contains("connectionUrl") {
+        true => return Some(line[15..].to_string()),
+        false => ()
+      }
+    }
+
+    None
 }

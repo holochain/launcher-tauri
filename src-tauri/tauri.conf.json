@@ -27,8 +27,7 @@
       ],
       "resources": [],
       "externalBin": [
-        "bins/holochain-v0.0.165",
-        "bins/holochain-v0.0.162",
+        "bins/holochain-v0.0.173",
         "bins/lair-keystore"
       ],
       "copyright": "",
