@@ -2490,7 +2490,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-launcher"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "base64",
@@ -3626,6 +3626,7 @@ dependencies = [
  "serde-enum-str",
  "tauri",
  "thiserror",
+ "url",
  "url2",
 ]
 

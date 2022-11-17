@@ -1,7 +1,13 @@
 use std::path::PathBuf;
+use lair_keystore_api::prelude::*;
+use lair_keystore_api::ipc_keystore::*;
+use holochain_types::prelude::ZomeCallUnsigned;
+use holochain_conductor_api::ZomeCall;
+use holochain_zome_types::Signature;
 
 use async_trait::async_trait;
 use url2::Url2;
+use url::Url;
 
 use super::{
   init::{initialize, is_initialized},
@@ -14,6 +20,7 @@ pub struct LairKeystoreManagerV0_2 {
   _keystore_path: PathBuf,
   connection_url: Url2,
   password: String,
+  client: LairClient,
 }
 
 #[async_trait]
@@ -40,10 +47,16 @@ impl LairKeystoreManager for LairKeystoreManagerV0_2 {
     let connection_url =
       launch_lair_keystore_process(log_level, keystore_path.clone(), password.clone()).await?;
 
+    let client = ipc_keystore_connect(Url::from(connection_url.clone()), password.clone().into_bytes())
+      .await
+      .map_err(|_e| LairKeystoreError::ErrorCreatingLairClient(String::from("Failed to create LairClient.")))?;
+
+
     Ok(LairKeystoreManagerV0_2 {
       password,
       connection_url,
       _keystore_path: keystore_path,
+      client,
     })
   }
 

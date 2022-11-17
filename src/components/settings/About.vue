@@ -23,7 +23,7 @@
         >About</span
       > -->
       <div class="column">
-        <span> Holochain Launcher v0.7.1 </span>
+        <span> Holochain Launcher v0.8.0 </span>
         <span
           style="margin-top: 8px"
           v-for="version in holochainVersions"
@@ -31,7 +31,7 @@
         >
           Holochain v{{ version }}
         </span>
-        <span style="margin-top: 8px"> Lair Keystore v0.2.1 </span>
+        <span style="margin-top: 8px"> Lair Keystore v0.2.2 </span>
       </div>
     </div>
   </HCDialogHeaded>

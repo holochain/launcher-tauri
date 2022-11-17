@@ -12,6 +12,8 @@ pub enum LairKeystoreError {
   ErrorWritingPassword(String),
   #[error("Incorrect password")]
   IncorrectPassword,
+  #[error("Failed to create LairClient: `{0}`")]
+  ErrorCreatingLairClient(String),
   #[error("Failed to sign zome call: `{0}`")]
   SignZomeCallError(String),
 }

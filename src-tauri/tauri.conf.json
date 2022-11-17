@@ -1,7 +1,7 @@
 {
   "package": {
     "productName": "Holochain Launcher",
-    "version": "X"
+    "version": "0.8.0"
   },
   "build": {
     "distDir": "target/webpack_dist",
@@ -27,7 +27,7 @@
       ],
       "resources": [],
       "externalBin": [
-        "bins/holochain-v0.0.173-sign-zome-call",
+        "bins/holochain-v0.0.173",
         "bins/lair-keystore"
       ],
       "copyright": "",
