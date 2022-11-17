@@ -24,6 +24,7 @@ fn main() {
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![sign_zome_call]) // uncomment when testing with right version
     .setup(|app| {
+
       let cli_matches = app.get_cli_matches()?;
 
       let pwd = std::env::current_dir().unwrap();
@@ -44,32 +45,15 @@ fn main() {
         None => pwd.join(".hc_launch").join("ui").into(),
       };
 
-      println!("Does path exist? {}", assets_path.exists());
       if !assets_path.exists() {
         println!("ERROR: Specified UI path does not exist.");
         panic!("Specified UI path does not exist.");
       }
 
-      println!("current working directory: {:?}", pwd);
-
-      println!("path to assets: {:?}", assets_path);
-
       // read the .hc file to get the number of apps
-      // let dot_hc_path = pwd.parent().unwrap().parent().unwrap().join(".hc");
       let dot_hc_path = pwd.join(".hc");
 
-      println!("path to .hc: {:?}", dot_hc_path);
-
       let dot_hc_content = std::fs::read_to_string(dot_hc_path).unwrap();
-
-      println!("content of .hc: {:?}", dot_hc_content);
-
-      // need to get lair client for each of the windows
-      // window calls tauri command sign_zome_call() --> I need to identify which window did the call (can get this from window label)
-      // need a hashmap of lair clients with window labels as keys
-
-
-
 
       // open a tauri window for each app instance and create a lair client instance for each window
       let mut windows: Vec<Window> = vec![];
@@ -80,47 +64,11 @@ fn main() {
       let (windows, assets_path, lair_clients, app) = tauri::async_runtime::block_on( async move {
 
         for tmp_directory_path in dot_hc_content.lines() {
-          // let app_id = format!("Agent-{}", app_counter);
+
           let app_id = String::from("test-app");
-
-          // let dot_hc_live_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(format!(".hc_live_{}", app_counter)).into();
           let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
-
-          println!(
-            "path to .hc_live_{} file: {:?}",
-            app_counter, dot_hc_live_path
-          );
-
           let admin_port = std::fs::read_to_string(dot_hc_live_path).unwrap();
-
-          println!("admin port: {:?}", admin_port);
-
           let admin_port_clone = admin_port.clone();
-
-          println!("trying to get app port");
-          // let app_port = tauri::async_runtime::block_on(async move {
-          //   println!("inside block_on");
-          //   match get_app_websocket(admin_port_clone).await {
-          //     Ok(ws) => ws,
-          //     Err(e) => {
-          //       println!("ERROR! Error getting app websocket port: {}", e);
-          //       panic!("Failed to get app websocket port.");
-          //     }
-          //   }
-          // });
-
-          // let app_port_handle = tokio::spawn(async move {
-          //   println!("inside block_on");
-          //   match get_app_websocket(admin_port_clone).await {
-          //     Ok(ws) => ws,
-          //     Err(e) => {
-          //       println!("ERROR! Error getting app websocket port: {}", e);
-          //       panic!("Failed to get app websocket port.");
-          //     }
-          //   }
-          // });
-
-          // let app_port = app_port_handle.await?;
 
           let app_port = match get_app_websocket(admin_port_clone).await {
             Ok(ws) => ws,
@@ -129,8 +77,6 @@ fn main() {
               panic!("Failed to get app websocket port.");
             }
           };
-
-          println!("app port: {:?}", app_port);
 
           // TODO! implement writing it to window object instead
           let launcher_env = format!(
@@ -143,8 +89,6 @@ fn main() {
             admin_port,
             app_id.clone(),
           );
-
-          println!("Starting to build window.");
 
           let window_label = format!("Agent-{}", app_counter);
 
@@ -173,12 +117,9 @@ fn main() {
             }
           });
 
-          println!("App window created.");
           windows.push(window);
 
-          println!("Trying to create connection to lair keystore.");
-
-          // read yaml file
+          // read lair-keystore-config.yaml file
           let connection_url = match read_lair_yaml(PathBuf::from(tmp_directory_path)) {
             Some(url) => url,
             None => {
@@ -187,14 +128,9 @@ fn main() {
             }
           };
 
-          println!("Connection url: {:?}", connection_url);
-
           let connection_url = Url::parse(connection_url.as_str()).unwrap();
 
-
           // create lair client and add it to hashmap
-          println!("Connection url after Url::parse: {:?}", connection_url);
-
           let client = match ipc_keystore_connect(connection_url.clone(), "pass".as_bytes()).await {
             Ok(client) => client,
             Err(e) => {
@@ -210,11 +146,6 @@ fn main() {
 
         (windows, assets_path, lair_clients, app)
       });
-
-
-      for (dir, _lair) in lair_clients.iter() {
-        println!("client label: {}", dir);
-      }
 
       app.manage(lair_clients);
 
@@ -298,10 +229,6 @@ async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
 
   Ok(app_interface_port)
 }
-
-
-
-
 
 
 fn read_lair_yaml(path: PathBuf) -> Option<String> {

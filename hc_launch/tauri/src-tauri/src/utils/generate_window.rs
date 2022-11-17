@@ -20,7 +20,7 @@ pub fn generate_window(
       WindowUrl::App("index.html".into())
     )
     .on_web_resource_request(move |request, response| {
-      // println!("£*£*£*£* REQUEST BEFORE {:?}", request);
+
       let uri = request.uri();
       match uri {
         "tauri://localhost" => {
@@ -40,7 +40,8 @@ pub fn generate_window(
 
             let mut asset_file = &uri[18..]; // TODO! proper error handling. index may be out of bounds?
 
-            // if uri is exactly "tauri://localhost/" redirect to index.html (otherwise it will try to redirect to the admin window's index.html)
+            // if uri is exactly "tauri://localhost/" redirect to index.html
+            // (otherwise it will try to redirect to the admin window's index.html)
             if asset_file == "" {
               asset_file = "index.html";
             }
@@ -55,10 +56,7 @@ pub fn generate_window(
               }
             };
 
-            // println!("%#%#%# ASSEETTT: {:?}", asset_file);
-            // println!("%#%#%# Mime type: {:?}", mime_type);
             let asset_path = assets_path.join(asset_file);
-            // println!("%#%#%# ASSEETTT PATH: {:?}", asset_path);
             match read(asset_path.clone()) {
               Ok(asset) => {
                 let mutable_response = response.body_mut();
