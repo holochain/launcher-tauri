@@ -43,6 +43,7 @@ use crate::commands::{
   open_app::open_app_ui,
   password::{initialize_keystore, unlock_and_launch},
   uninstall_app::uninstall_app,
+  sign_zome_call::sign_zome_call,
 };
 use crate::launcher::manager::LauncherManager;
 use crate::launcher::state::LauncherState;
@@ -101,6 +102,7 @@ fn main() {
       execute_factory_reset,
       restart,
       write_config,
+      sign_zome_call,
       setup::logs::log,
     ])
     .setup(|app| {
