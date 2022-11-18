@@ -71,16 +71,12 @@ pub async fn generate_agents_sb(holochain_path: PathBuf, happ: PathBuf, create_i
 
   let app_id = String::from("test-app");
 
-  // holochain_util::pw::pw_set_piped(true);
+  holochain_util::pw::pw_set_piped(true);
 
-  // pass dummy lair password
-  // let mut echo_child = Command::new("echo")
-  //   .arg("pass")
-  //   .stdout(Stdio::piped())
-  //   .spawn()
-  //   .expect("failed to execute echo");
-
-  // println!("pass");
+  std::thread::spawn( || {
+    std::thread::sleep(Duration::from_millis(10));
+    println!("\n***Press ENTER to continue***");
+  });
 
   let paths = holochain_cli_sandbox::sandbox::default_n(
     &holochain_path,
@@ -88,6 +84,7 @@ pub async fn generate_agents_sb(holochain_path: PathBuf, happ: PathBuf, create_i
     happ,
     app_id
   ).await?;
+
 
 
   holochain_cli_sandbox::save::save(std::env::current_dir()?, paths.clone())?;

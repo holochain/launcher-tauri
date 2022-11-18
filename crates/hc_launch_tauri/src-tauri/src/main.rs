@@ -132,7 +132,7 @@ fn main() {
           let connection_url = Url::parse(connection_url.as_str()).unwrap();
 
           // create lair client and add it to hashmap
-          let client = match ipc_keystore_connect(connection_url.clone(), "pass".as_bytes()).await {
+          let client = match ipc_keystore_connect(connection_url.clone(), "".as_bytes()).await {
             Ok(client) => client,
             Err(e) => {
               println!("Failed to connect to lair client: {:?}", e);
