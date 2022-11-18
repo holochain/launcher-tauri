@@ -1,7 +1,7 @@
 [package]
 name = "hc-launch-tauri"
-version = "0.0.0"
-description = "A Tauri App"
+version = "0.0.1"
+description = "Launching tauri windows that connect to sandboxed Holochain applications for development purposes"
 authors = ["you"]
 license = ""
 repository = ""

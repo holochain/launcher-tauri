@@ -3,7 +3,7 @@ name = "holochain_cli_launch"
 version = "0.0.1"
 edition = "2021"
 license = "Apache-2.0"
-description = "A library and CLI to launch holochain apps in a holochain-launcher environment for testing and development purposes."
+description = "A library and CLI to launch holochain apps in a Holochain Launcher environment for testing and development purposes."
 
 
 [[bin]]

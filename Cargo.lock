@@ -2371,7 +2371,7 @@ dependencies = [
 
 [[package]]
 name = "hc-launch-tauri"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "holochain_client",
  "holochain_conductor_api 0.0.70 (git+https://github.com/holochain/holochain?rev=8f76e9204014e4f2ce35851780957bc144c34357)",

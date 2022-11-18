@@ -1,8 +1,7 @@
 {
   "tauri": {
     "cli": {
-      "description": "launch holochain web-apps in tauri windows",
-      "longDescription": "launch holochain web-apps in tauri windows in an hc-launch context",
+      "description": "Launching tauri windows that connect to sandboxed Holochain applications for development purposes",
       "beforeHelp": "",
       "afterHelp": "",
       "args": [
