@@ -25,4 +25,4 @@ holochain_cli_sandbox = "0.0.64"
 holochain_types = "0.0.67"
 structopt = "0.3"
 
-lair_keystore_manager = {path = "../crates/lair_keystore_manager"}
+lair_keystore_manager = {path = "../lair_keystore_manager"}

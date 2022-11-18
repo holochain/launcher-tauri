@@ -1,8 +1,9 @@
 [workspace]
 members = [
-  "crates/*",
+  "crates/holochain*",
+  "crates/lair_keystore_manager",
+  "crates/hc_launch",
+  "crates/hc_launch_tauri/src-tauri",
   "src-tauri",
-  "hc_launch",
-  "hc_launch/tauri/src-tauri",
 ]
 resolver = "2"

@@ -64,7 +64,13 @@ impl HcLaunch {
                   match extension.to_str().unwrap() {
                     "webhapp" => {
                       // unzip the webhapp, prepare UI etc.
-                      utils::read_and_prepare_webhapp(&p).await;
+                      match utils::read_and_prepare_webhapp(&p).await {
+                        Ok(()) => (),
+                        Err(e) => {
+                          println!("Failed to read and prepare webhapp: {:?}", e);
+                          panic!("Failed to read and prepare webhapp");
+                        }
+                      };
 
                       // generate agents
                       let happ_path = PathBuf::from(".hc_launch/happ.happ");
@@ -84,7 +90,6 @@ impl HcLaunch {
                           if !ui_p.exists() {
                             return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
                           }
-
 
                           // generate agents
                           let app_handle = crate::generate_agents(p.clone(), self.agents, Some(String::from("mdns")));
@@ -107,10 +112,7 @@ impl HcLaunch {
                           // }
 
                           app_handle.join().unwrap();
-                          // println!("joined app handle");
                           tauri_handle.join().unwrap();
-                          println!("joined tauri handle");
-
                         },
                         None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch web-app --help` for help."),
                       }
