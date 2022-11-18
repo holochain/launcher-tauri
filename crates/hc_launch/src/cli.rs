@@ -86,6 +86,7 @@ impl HcLaunch {
                         happ_path,
                         create_input,
                       ).await?;
+
                       // launch tauri windows via hc-launch-tauri
                       let tauri_handle = crate::launch_tauri(None, watch);
 

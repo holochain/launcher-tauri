@@ -26,8 +26,6 @@ fn main() {
 
       let cli_matches = app.get_cli_matches()?;
 
-      println!("cli matches: {:?}", cli_matches);
-
       let pwd = std::env::current_dir().unwrap();
       // let assets_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(".hc_launch").join("ui").into();
       let assets_path: PathBuf = match cli_matches.args.get("ui-path") {
