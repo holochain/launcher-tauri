@@ -7,9 +7,8 @@ use holochain_client::AdminWebsocket;
 use serde_json::value::Value;
 use std::path::PathBuf;
 use std::collections::HashMap;
-use std::sync::mpsc;
 use tauri::Window;
-use tauri::{AppHandle, Manager};
+use tauri::Manager;
 use lair_keystore_api::{LairClient, ipc_keystore_connect};
 use url::Url;
 mod utils;
@@ -26,6 +25,8 @@ fn main() {
     .setup(|app| {
 
       let cli_matches = app.get_cli_matches()?;
+
+      println!("cli matches: {:?}", cli_matches);
 
       let pwd = std::env::current_dir().unwrap();
       // let assets_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(".hc_launch").join("ui").into();

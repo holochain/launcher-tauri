@@ -4,7 +4,8 @@
 // use std::path::Path;
 use std::path::PathBuf;
 use structopt::StructOpt;
-use std::io::Read;
+
+use crate::cmds::CreateInput;
 use crate::utils;
 use crate::error::HcLaunchError;
 
@@ -16,9 +17,10 @@ use crate::error::HcLaunchError;
 pub struct HcLaunch {
     #[structopt(subcommand)]
     command: HcLaunchSubcommand,
-    /// How many agents to run in parallel.
-    #[structopt(long, default_value = "1")]
-    agents: u32,
+
+    /// Set the path to the holochain binary.
+    #[structopt(short, long, env = "HC_HOLOCHAIN_PATH", default_value = "holochain")]
+    holochain_path: PathBuf,
 }
 
 /// The list of subcommands for `hc launch`
@@ -39,10 +41,13 @@ pub enum HcLaunchSubcommand {
     /// path to the UI
     ui_path: Option<PathBuf>,
 
+    /// Watch for file changes in the UI folder. Requires --ui-path to be specified.
     #[structopt(long, short)]
     watch: bool,
 
-    // todo! add network command
+    /// (flattened)
+    #[structopt(flatten)]
+    create_input: CreateInput,
   },
 }
 
@@ -55,6 +60,7 @@ impl HcLaunch {
           path,
           ui_path,
           watch,
+          create_input,
         } => {
 
           match path {
@@ -74,13 +80,20 @@ impl HcLaunch {
 
                       // generate agents
                       let happ_path = PathBuf::from(".hc_launch/happ.happ");
-                      let app_handle = crate::generate_agents(happ_path, self.agents, Some(String::from("mdns")));
-
+                      // let app_handle = crate::generate_agents(happ_path, self.agents, Some(String::from("mdns")));
+                      let _sandbox_paths = crate::generate_agents_sb(
+                        self.holochain_path,
+                        happ_path,
+                        create_input,
+                      ).await?;
                       // launch tauri windows via hc-launch-tauri
                       let tauri_handle = crate::launch_tauri(None, watch);
 
-                      app_handle.join().unwrap();
+                      // app_handle.join().unwrap();
                       tauri_handle.join().unwrap();
+
+                      // release app ports
+                      holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
                     }
                     "happ" => {
                       match ui_path {
@@ -92,7 +105,12 @@ impl HcLaunch {
                           }
 
                           // generate agents
-                          let app_handle = crate::generate_agents(p.clone(), self.agents, Some(String::from("mdns")));
+                          // let app_handle = crate::generate_agents(p.clone(), self.agents, Some(String::from("mdns")));
+                          let _sandbox_paths = crate::generate_agents_sb(
+                            self.holochain_path,
+                            p,
+                            create_input,
+                          ).await?;
 
                           // launch tauri windows via hc-launch-tauri
                           let tauri_handle = crate::launch_tauri(Some(ui_p), watch);
@@ -111,7 +129,7 @@ impl HcLaunch {
                           //   println!("Got: {}", String::from_utf8(vec).unwrap());
                           // }
 
-                          app_handle.join().unwrap();
+                          // app_handle.join().unwrap();
                           tauri_handle.join().unwrap();
                         },
                         None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch web-app --help` for help."),

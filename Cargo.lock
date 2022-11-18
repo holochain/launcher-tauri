@@ -2508,8 +2508,10 @@ name = "holochain_cli_launch"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "futures",
  "holochain_cli_sandbox",
  "holochain_types 0.0.67 (registry+https://github.com/rust-lang/crates.io-index)",
+ "holochain_util 0.0.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "lair_keystore_manager",
  "log",
  "nanoid 0.3.0",
@@ -2518,6 +2520,7 @@ dependencies = [
  "tauri",
  "thiserror",
  "tokio",
+ "tracing",
  "zip 0.5.13",
 ]
 
