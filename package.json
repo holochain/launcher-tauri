@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run dev:ui\" \"sleep 14 && npm run tauri dev\"",
@@ -10,13 +10,13 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "tauri": "tauri",
-    "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/8xdcHKQmjkmrGGn/download"
+    "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/LBntYzLvzjh680s/download"
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",
     "@holochain-open-dev/utils": "^0.0.9",
     "@holo-host/identicon": "^0.1.0",
-    "@holochain/client": "^0.3.2",
+    "@holochain/client": "file:/home/matthias/code/holochain/holochain/holochain-client-js",
     "@material/mwc-button": "^0.25.1",
     "@material/mwc-circular-progress": "0.25.1",
     "@material/mwc-dialog": "^0.25.1",
@@ -35,7 +35,8 @@
     "lodash-es": "^4.17.21",
     "vue": "^3.1.5",
     "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0"
+    "vuex": "^4.0.0-0",
+    "pretty-bytes": "^6.0.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "1.0.4",
