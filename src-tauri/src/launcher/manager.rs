@@ -385,12 +385,22 @@ impl LauncherManager {
 
     // println!("%*%*%*% INDEX PATH: {:?}", index_path);
 
-
+    // can be removed once the js-client switched to using window.__HC_LAUNCHER_ENV__ instead
     let launcher_env = format!(r#"{{
         "APP_INTERFACE_PORT": {},
         "ADMIN_INTERFACE_PORT": {},
         "INSTALLED_APP_ID": "{}"
       }}"#,
+      manager.holochain_manager.app_interface_port(),
+      manager.holochain_manager.admin_interface_port(),
+      app_id
+    );
+
+    let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
+      "APP_INTERFACE_PORT": {},
+      "ADMIN_INTERFACE_PORT": {},
+      "INSTALLED_APP_ID": "{}"
+    }}"#,
       manager.holochain_manager.app_interface_port(),
       manager.holochain_manager.admin_interface_port(),
       app_id
@@ -455,6 +465,7 @@ impl LauncherManager {
 
 
     })
+    .initialization_script(launcher_env_command.as_str())
     .inner_size(1000.0, 700.0)
     .title(app_id)
     .enable_clipboard_access() // TODO! potentially make this optional
