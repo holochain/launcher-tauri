@@ -12,6 +12,8 @@ pub fn restart(
     return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (J)"))
   }
 
+  log::warn!("A Restart of the Launcher has been requested, restarting...");
+
   app_handle.restart();
   Ok(())
 }
