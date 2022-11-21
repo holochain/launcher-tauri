@@ -146,98 +146,53 @@
         }}</span>
       </div>
 
-      <!-- Add Gossip state here if holochain version is not 0.0.169 or lower -->
-      <!-- calls a tauri command to get the gossip state -->
-
-      <table style="text-align: left; margin-top: 20px; margin-left: 140px">
-        <tr>
-          <th></th>
-          <th>Dna Hash / Gossip Info</th>
-        </tr>
-
-        <tr>
-          <th>Main Cells</th>
-          <th></th>
-        </tr>
-
-        <tr
-          style=""
-          v-for="cellData in mainCells"
-          :key="
-            JSON.stringify([...cellData.cell_id[0], ...cellData.cell_id[1]])
-          "
+      <!-- main cells -->
+      <div class="row" style="margin-top: 20px; margin-left: 140px">
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >Main Cells:</span
         >
-          <td>
-            <span
-              >{{ cellData.role_id.slice(0, 20)
-              }}{{ cellData.role_id.length > 20 ? "..." : "" }}</span
-            >
-          </td>
-          <td>
-            <span style="margin-right: 20px">Dna Hash:</span>
-            <span
-              style="opacity: 0.7; font-family: monospace; font-size: 14px"
-              >{{ serializeHash(cellData.cell_id[0]) }}</span
-            ><br />
-            <span>Peer Synchronization:</span><br />
-            <div class="row" style="align-items: center">
-              <div>incoming:</div>
-              <div style="width: 50%; margin: 0 20px">
-                <HCProgressBar
-                  :progress="
-                    gossipProgressIncoming(gossipInfo[cellData.role_id])
-                  "
-                  style="--height: 10px"
-                />
-              </div>
-              <div>
-                {{ gossipProgressIncomingString(gossipInfo[cellData.role_id]) }}
-              </div>
-            </div>
-            <div class="row" style="align-items: center">
-              <div>outgoing:</div>
-              <div style="width: 50%; margin: 0 20px">
-                <HCProgressBar
-                  :progress="
-                    gossipProgressOutgoing(gossipInfo[cellData.role_id])
-                  "
-                  style="--height: 10px"
-                />
-              </div>
-              <div>
-                {{ gossipProgressOutgoingString(gossipInfo[cellData.role_id]) }}
-              </div>
-            </div>
-          </td>
-        </tr>
-
-        <br />
-        <tr v-if="clonedCells.length > 0">
-          <th>Cloned Cells</th>
-          <th></th>
-        </tr>
-
-        <tr
-          style=""
-          v-for="cellData in clonedCells"
-          :key="
-            JSON.stringify([...cellData.cell_id[0], ...cellData.cell_id[1]])
-          "
+      </div>
+      <div style="margin-left: 140px; margin-right: 20px">
+        <InstalledCellCard
+          v-for="cell in mainCells"
+          :key="JSON.stringify(cell.cell_id[0])"
+          style="margin: 12px 0"
+          :cell="cell"
+          :holochainId="app.holochainId"
         >
-          <td>
-            <span
-              >{{ cellData.role_id.slice(0, 20)
-              }}{{ cellData.role_id.length > 20 ? "..." : "" }}</span
-            >
-          </td>
-          <td>
-            <span
-              style="opacity: 0.7; font-family: monospace; font-size: 14px"
-              >{{ serializeHash(cellData.cell_id[0]) }}</span
-            >
-          </td>
-        </tr>
-      </table>
+        </InstalledCellCard>
+      </div>
+
+      <!-- cloned cells -->
+      <div class="row" style="margin-top: 20px; margin-left: 140px">
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >Cloned Cells:</span
+        >
+      </div>
+      <div
+        v-if="clonedCells.length > 0"
+        style="margin-left: 140px; margin-right: 20px"
+      >
+        <InstalledCellCard
+          v-for="cell in mainCells"
+          :key="JSON.stringify(cell.cell_id[0])"
+          style="margin: 12px 0"
+          :cell="cell"
+          :holochainId="app.holochainId"
+        >
+        </InstalledCellCard>
+      </div>
+      <div
+        v-else
+        style="
+          margin-left: 140px;
+          margin-right: 20px;
+          text-align: center;
+          opacity: 0.7;
+        "
+      >
+        There are no cloned cells in this app.
+      </div>
 
       <span
         v-if="getReason(app.webAppInfo.installed_app_info)"
@@ -317,7 +272,7 @@ import ToggleSwitch from "./subcomponents/ToggleSwitch.vue";
 import HCButton from "./subcomponents/HCButton.vue";
 import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
-import HCProgressBar from "./subcomponents/HCProgressBar.vue";
+import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
 
 export default defineComponent({
   name: "InstalledAppCard",
@@ -327,7 +282,7 @@ export default defineComponent({
     HCMoreToggle,
     HCGenericDialog,
     HoloIdenticon,
-    HCProgressBar,
+    InstalledCellCard,
   },
   props: {
     appIcon: {
@@ -361,9 +316,6 @@ export default defineComponent({
       const allCells = this.app.webAppInfo.installed_app_info.cell_data;
       return allCells.filter((cell) => cell.role_id.includes("."));
     },
-  },
-  async mounted() {
-    await this.getGossipInfo(this.app);
   },
   methods: {
     serializeHash,
@@ -429,57 +381,6 @@ export default defineComponent({
       setTimeout(() => {
         this.showPubKeyTooltip = false;
       }, 1200);
-    },
-    async getGossipInfo(app: HolochainAppInfo) {
-      const port = this.$store.getters["appInterfacePort"](app.holochainId);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
-      let dnas: DnaHash[] = app.webAppInfo.installed_app_info.cell_data.map(
-        (cell) => cell.cell_id[0]
-      );
-      let roleIds: string[] = app.webAppInfo.installed_app_info.cell_data.map(
-        (cell) => cell.role_id
-      );
-      const gossipInfo: DnaGossipInfo[] = await appWs.gossipInfo({
-        dnas: app.webAppInfo.installed_app_info.cell_data.map(
-          (cell) => cell.cell_id[0]
-        ),
-      });
-
-      let output: Record<string, DnaGossipInfo> = {};
-      roleIds.forEach((id, idx) => (output[id] = gossipInfo[idx]));
-      this.gossipInfo = output;
-    },
-    gossipProgressIncoming(info: DnaGossipInfo) {
-      const incoming_bytes_expected =
-        info.total_historical_gossip_throughput.expected_op_bytes.incoming;
-      const incoming_bytes_actual =
-        info.total_historical_gossip_throughput.op_bytes.incoming;
-      return 100 * (incoming_bytes_actual / incoming_bytes_expected);
-    },
-    gossipProgressOutgoing(info: DnaGossipInfo) {
-      const outgoing_bytes_expected =
-        info.total_historical_gossip_throughput.expected_op_bytes.outgoing;
-      const outgoing_bytes_actual =
-        info.total_historical_gossip_throughput.op_bytes.outgoing;
-      return 100 * (outgoing_bytes_actual / outgoing_bytes_expected);
-    },
-    gossipProgressIncomingString(info: DnaGossipInfo) {
-      const incoming_bytes_expected =
-        info.total_historical_gossip_throughput.expected_op_bytes.incoming;
-      const incoming_bytes_actual =
-        info.total_historical_gossip_throughput.op_bytes.incoming;
-      return `${prettyBytes(incoming_bytes_actual)} / ${prettyBytes(
-        incoming_bytes_expected
-      )}`;
-    },
-    gossipProgressOutgoingString(info: DnaGossipInfo) {
-      const outgoing_bytes_expected =
-        info.total_historical_gossip_throughput.expected_op_bytes.outgoing;
-      const outgoing_bytes_actual =
-        info.total_historical_gossip_throughput.op_bytes.outgoing;
-      return `${prettyBytes(outgoing_bytes_actual)} / ${prettyBytes(
-        outgoing_bytes_expected
-      )}`;
     },
   },
 });
