@@ -49,7 +49,7 @@
           "
         >
           To fix it, <strong>quit the Holochain Launcher</strong> and
-          <strong>manually kill all existing processes</strong> that start with
+          <strong>manually kill all running processes</strong> that start with
           <span
             style="
               font-family: monospace;
