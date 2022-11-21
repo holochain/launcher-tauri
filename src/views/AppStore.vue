@@ -79,6 +79,63 @@
     </div>
   </div>
 
+  <div class="progress-indicator">
+    <div
+      style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
+      title="Full Synchronization with Peers Required to Reliably Download all Apps."
+    >
+      App Library Synchronization Progress:
+    </div>
+    <div v-if="gossipInfo">
+      <div v-for="(cell, idx) in cells" :key="cell.role_id" class="column">
+        <div class="row" style="align-items: center">
+          <div
+            style="
+              width: 25%;
+              margin-left: 20px;
+              font-size: 0.95em;
+              text-align: right;
+            "
+          >
+            {{ cell.role_id }}
+          </div>
+          <div style="width: 50%; margin: 0 30px">
+            <HCProgressBar
+              v-if="
+                gossipInfo[idx].total_historical_gossip_throughput
+                  .expected_op_bytes.incoming > 0
+              "
+              title="Full Synchronization Required to Download All Apps."
+              :progress="gossipProgressIncoming(gossipInfo[idx])"
+              style="--height: 10px"
+            />
+            <span
+              v-else
+              style="
+                opacity: 0.7;
+                font-size: 0.8em;
+                display: flex;
+                justify-content: center;
+              "
+            >
+              no other peers discovered yet</span
+            >
+          </div>
+          <div
+            style="width: 25%; text-align: left"
+            title="actual bytes / expected bytes"
+          >
+            {{ gossipProgressIncomingString(gossipInfo[idx]) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else style="text-align: center; opacity: 0.7">
+      No Information available.
+    </div>
+  </div>
+
   <InstallAppDialog
     v-if="selectedAppBundlePath"
     :appBundlePath="selectedAppBundlePath"
@@ -91,7 +148,7 @@
     ref="install-app-dialog"
   ></InstallAppDialog>
   <HCSnackbar
-    labelText="App download failed. Please try again later."
+    labelText="Peer Synchronization not Ready. Please try again later."
     ref="snackbar"
   ></HCSnackbar>
 </template>
@@ -101,11 +158,12 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket } from "@holochain/client";
+import { AppWebsocket, DnaGossipInfo, InstalledCell } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
+import HCProgressBar from "@/components/subcomponents/HCProgressBar.vue";
 
 import {
   AppWithReleases,
@@ -119,6 +177,13 @@ import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
+import { HolochainId } from "@/types";
+import {
+  gossipProgressIncoming,
+  gossipProgressIncomingString,
+  gossipProgressOutgoing,
+  gossipProgressOutgoingString,
+} from "@/utils";
 
 export default defineComponent({
   name: "AppStore",
@@ -128,6 +193,7 @@ export default defineComponent({
     AppPreviewCard,
     HCLoading,
     HCSnackbar,
+    HCProgressBar,
   },
   data(): {
     loadingText: string;
@@ -136,6 +202,10 @@ export default defineComponent({
     selectedAppBundlePath: string | undefined;
     hdkVersionForApp: HdkVersion | undefined;
     howToPublishUrl: string;
+    gossipInfo: DnaGossipInfo[] | undefined;
+    holochainId: HolochainId | undefined;
+    pollInterval: number | null;
+    cells: InstalledCell[] | undefined;
   } {
     return {
       loadingText: "",
@@ -145,11 +215,22 @@ export default defineComponent({
       hdkVersionForApp: undefined,
       howToPublishUrl:
         "https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub",
+      gossipInfo: undefined,
+      holochainId: undefined,
+      pollInterval: null,
+      cells: undefined,
     };
   },
-
+  async created() {
+    console.log("Hello I'm created.");
+  },
+  beforeUnmount() {
+    clearInterval(this.pollInterval!);
+  },
   async mounted() {
     const holochainId = this.$store.getters["holochainIdForDevhub"];
+    this.holochainId = holochainId;
+
     const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
 
     const port = this.$store.getters["appInterfacePort"](holochainId);
@@ -159,6 +240,8 @@ export default defineComponent({
     const devhubInfo = await appWs.appInfo({
       installed_app_id: `DevHub-${holochainId.content}`,
     });
+
+    this.cells = devhubInfo.cell_data;
 
     let allApps: Array<AppWithReleases>;
     try {
@@ -175,9 +258,22 @@ export default defineComponent({
     );
     this.installableApps = filterByHdkVersion(hdk_versions, allApps);
 
+    await this.getGossipInfo();
+    // set up polling loop to periodically get gossip progress, global scope (window) seems to
+    // be required to clear it again on beforeUnmount()
+    await this.getGossipInfo();
+    this.pollInterval = window.setInterval(
+      async () => await this.getGossipInfo(),
+      2000
+    );
+
     this.loading = false;
   },
   methods: {
+    gossipProgressIncoming,
+    gossipProgressOutgoing,
+    gossipProgressIncomingString,
+    gossipProgressOutgoingString,
     async howToPublish() {
       await invoke("open_url_cmd", {
         url: this.howToPublishUrl,
@@ -239,6 +335,16 @@ export default defineComponent({
       this.selectedAppBundlePath = undefined;
       this.hdkVersionForApp = undefined;
     },
+    async getGossipInfo() {
+      console.log("fetching gossip info...");
+      const port = this.$store.getters["appInterfacePort"](this.holochainId);
+      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      const gossipInfo: DnaGossipInfo[] = await appWs.gossipInfo({
+        dnas: this.cells!.map((cell) => cell.cell_id[0] as Uint8Array),
+      });
+      console.log("Received gossip info: ", gossipInfo);
+      this.gossipInfo = gossipInfo;
+    },
   },
 });
 </script>
@@ -252,5 +358,15 @@ export default defineComponent({
   box-shadow: 0 0px 5px #9b9b9b;
   position: sticky;
   top: 0;
+}
+
+.progress-indicator {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  padding: 20px;
+  background-color: white;
+  border-radius: 20px 0 0 0;
+  min-width: 520px;
 }
 </style>

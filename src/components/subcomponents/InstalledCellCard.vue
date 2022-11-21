@@ -7,7 +7,6 @@
         >{{ serializeHash(cell.cell_id[0]) }}
       </span>
     </div>
-    <div @click="getGossipInfo" style="cursor: pointer">REFRESH</div>
     <div>
       <div style="margin-bottom: 10px" title="Historical Gossip Throughput">
         Peer Synchronization Progress:
@@ -30,7 +29,10 @@
               style="--height: 10px"
             />
           </div>
-          <div style="width: 20%; text-align: left">
+          <div
+            style="width: 20%; text-align: left"
+            title="actual bytes / expected bytes"
+          >
             {{ gossipProgressIncomingString(gossipInfo) }}
           </div>
         </div>
@@ -51,7 +53,10 @@
               style="--height: 10px"
             />
           </div>
-          <div style="width: 20%; text-align: left">
+          <div
+            style="width: 20%; text-align: left"
+            title="actual bytes / expected bytes"
+          >
             {{ gossipProgressOutgoingString(gossipInfo) }}
           </div>
         </div>
@@ -74,6 +79,12 @@ import prettyBytes from "pretty-bytes";
 import HCProgressBar from "./HCProgressBar.vue";
 import { HolochainId } from "@/types";
 import { serializeHash } from "@holochain-open-dev/utils";
+import {
+  gossipProgressIncoming,
+  gossipProgressIncomingString,
+  gossipProgressOutgoing,
+  gossipProgressOutgoingString,
+} from "@/utils";
 
 export default defineComponent({
   name: "InstalledCellCard",
@@ -110,6 +121,10 @@ export default defineComponent({
     clearInterval(this.pollInterval!);
   },
   methods: {
+    gossipProgressIncoming,
+    gossipProgressOutgoing,
+    gossipProgressIncomingString,
+    gossipProgressOutgoingString,
     serializeHash,
     async getGossipInfo() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
@@ -124,38 +139,6 @@ export default defineComponent({
         gossipInfo
       );
       this.gossipInfo = gossipInfo[0];
-    },
-    gossipProgressIncoming(info: DnaGossipInfo) {
-      const incoming_bytes_expected =
-        info.total_historical_gossip_throughput.expected_op_bytes.incoming;
-      const incoming_bytes_actual =
-        info.total_historical_gossip_throughput.op_bytes.incoming;
-      return 100 * (incoming_bytes_actual / incoming_bytes_expected);
-    },
-    gossipProgressOutgoing(info: DnaGossipInfo) {
-      const outgoing_bytes_expected =
-        info.total_historical_gossip_throughput.expected_op_bytes.outgoing;
-      const outgoing_bytes_actual =
-        info.total_historical_gossip_throughput.op_bytes.outgoing;
-      return 100 * (outgoing_bytes_actual / outgoing_bytes_expected);
-    },
-    gossipProgressIncomingString(info: DnaGossipInfo) {
-      const incoming_bytes_expected =
-        info.total_historical_gossip_throughput.expected_op_bytes.incoming;
-      const incoming_bytes_actual =
-        info.total_historical_gossip_throughput.op_bytes.incoming;
-      return `${prettyBytes(incoming_bytes_actual)} / ${prettyBytes(
-        incoming_bytes_expected
-      )}`;
-    },
-    gossipProgressOutgoingString(info: DnaGossipInfo) {
-      const outgoing_bytes_expected =
-        info.total_historical_gossip_throughput.expected_op_bytes.outgoing;
-      const outgoing_bytes_actual =
-        info.total_historical_gossip_throughput.op_bytes.outgoing;
-      return `${prettyBytes(outgoing_bytes_actual)} / ${prettyBytes(
-        outgoing_bytes_expected
-      )}`;
     },
   },
 });

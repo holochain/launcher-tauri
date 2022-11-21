@@ -1,4 +1,9 @@
-import { DisabledAppReason, InstalledAppInfo } from "@holochain/client";
+import {
+  DisabledAppReason,
+  DnaGossipInfo,
+  InstalledAppInfo,
+} from "@holochain/client";
+import prettyBytes from "pretty-bytes";
 
 export function isAppRunning(app: InstalledAppInfo): boolean {
   return (app.status as any) === "running";
@@ -40,4 +45,40 @@ export function getReason(app: InstalledAppInfo): string | undefined {
       }
     ).paused.reason.error;
   }
+}
+
+export function gossipProgressIncoming(info: DnaGossipInfo) {
+  const incoming_bytes_expected =
+    info.total_historical_gossip_throughput.expected_op_bytes.incoming;
+  const incoming_bytes_actual =
+    info.total_historical_gossip_throughput.op_bytes.incoming;
+  return 100 * (incoming_bytes_actual / incoming_bytes_expected);
+}
+
+export function gossipProgressOutgoing(info: DnaGossipInfo) {
+  const outgoing_bytes_expected =
+    info.total_historical_gossip_throughput.expected_op_bytes.outgoing;
+  const outgoing_bytes_actual =
+    info.total_historical_gossip_throughput.op_bytes.outgoing;
+  return 100 * (outgoing_bytes_actual / outgoing_bytes_expected);
+}
+
+export function gossipProgressIncomingString(info: DnaGossipInfo) {
+  const incoming_bytes_expected =
+    info.total_historical_gossip_throughput.expected_op_bytes.incoming;
+  const incoming_bytes_actual =
+    info.total_historical_gossip_throughput.op_bytes.incoming;
+  return `${prettyBytes(incoming_bytes_actual)} / ${prettyBytes(
+    incoming_bytes_expected
+  )}`;
+}
+
+export function gossipProgressOutgoingString(info: DnaGossipInfo) {
+  const outgoing_bytes_expected =
+    info.total_historical_gossip_throughput.expected_op_bytes.outgoing;
+  const outgoing_bytes_actual =
+    info.total_historical_gossip_throughput.op_bytes.outgoing;
+  return `${prettyBytes(outgoing_bytes_actual)} / ${prettyBytes(
+    outgoing_bytes_expected
+  )}`;
 }
