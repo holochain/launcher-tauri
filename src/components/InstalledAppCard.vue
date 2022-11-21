@@ -147,12 +147,20 @@
       </div>
 
       <!-- main cells -->
-      <div class="row" style="margin-top: 20px; margin-left: 140px">
+      <div
+        class="row"
+        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+      >
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Main Cells:</span
-        >
+        ><span style="display: flex; flex: 1"></span>
+        <span
+          style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
+          @click="showMainCells = !showMainCells"
+          >{{ showMainCells ? "[Hide]" : "[Show]" }}
+        </span>
       </div>
-      <div style="margin-left: 140px; margin-right: 20px">
+      <div v-if="showMainCells" style="margin-left: 140px; margin-right: 20px">
         <InstalledCellCard
           v-for="cell in mainCells"
           :key="JSON.stringify(cell.cell_id[0])"
@@ -164,36 +172,38 @@
       </div>
 
       <!-- cloned cells -->
-      <div class="row" style="margin-top: 20px; margin-left: 140px">
+      <div
+        class="row"
+        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+      >
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Cloned Cells:</span
-        >
+        ><span style="display: flex; flex: 1"></span>
+        <span
+          style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
+          @click="showClonedCells = !showClonedCells"
+          >{{ showClonedCells ? "[Hide]" : "[Show]" }}
+        </span>
       </div>
       <div
-        v-if="clonedCells.length > 0"
+        v-if="showClonedCells"
         style="margin-left: 140px; margin-right: 20px"
       >
-        <InstalledCellCard
-          v-for="cell in mainCells"
-          :key="JSON.stringify(cell.cell_id[0])"
-          style="margin: 12px 0"
-          :cell="cell"
-          :holochainId="app.holochainId"
-        >
-        </InstalledCellCard>
-      </div>
-      <div
-        v-else
-        style="
-          margin-left: 140px;
-          margin-right: 20px;
-          text-align: center;
-          opacity: 0.7;
-        "
-      >
-        There are no cloned cells in this app.
-      </div>
+        <div v-if="clonedCells.length > 0">
+          <InstalledCellCard
+            v-for="cell in mainCells"
+            :key="JSON.stringify(cell.cell_id[0])"
+            style="margin: 12px 0"
+            :cell="cell"
+            :holochainId="app.holochainId"
+          >
+          </InstalledCellCard>
+        </div>
 
+        <div v-else style="text-align: center; opacity: 0.7">
+          There are no cloned cells in this app.
+        </div>
+      </div>
       <span
         v-if="getReason(app.webAppInfo.installed_app_info)"
         style="margin-top: 16px; margin-left: 140px"
@@ -298,12 +308,16 @@ export default defineComponent({
     showUninstallDialog: boolean;
     showPubKeyTooltip: boolean;
     gossipInfo: Record<string, DnaGossipInfo>;
+    showMainCells: boolean;
+    showClonedCells: boolean;
   } {
     return {
       showMore: false,
       showUninstallDialog: false,
       showPubKeyTooltip: false,
       gossipInfo: {},
+      showMainCells: true,
+      showClonedCells: true,
     };
   },
   emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp"],

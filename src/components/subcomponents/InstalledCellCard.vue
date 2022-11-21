@@ -8,7 +8,9 @@
       </span>
     </div>
     <div>
-      <div style="margin-bottom: 10px">Peer Synchronization:</div>
+      <div style="margin-bottom: 10px" title="Historical Gossip Throughput">
+        Peer Synchronization Progress:
+      </div>
       <div v-if="gossipInfo" class="column">
         <div class="row" style="align-items: center">
           <div
@@ -147,6 +149,6 @@ export default defineComponent({
   background: white;
   border-radius: 15px;
   box-shadow: 0 0px 5px #9b9b9b;
-  padding: 10px 20px 20px 25px;
+  padding: 9px 20px 20px 25px;
 }
 </style>
