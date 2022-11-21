@@ -7,6 +7,7 @@
         >{{ serializeHash(cell.cell_id[0]) }}
       </span>
     </div>
+    <div @click="getGossipInfo" style="cursor: pointer">REFRESH</div>
     <div>
       <div style="margin-bottom: 10px" title="Historical Gossip Throughput">
         Peer Synchronization Progress:
@@ -89,13 +90,24 @@ export default defineComponent({
   },
   data(): {
     gossipInfo: DnaGossipInfo | undefined;
+    pollInterval: number | null;
   } {
     return {
       gossipInfo: undefined,
+      pollInterval: null,
     };
   },
-  async mounted() {
+  async created() {
+    // set up polling loop to periodically get gossip progress, global scope (window) seems to
+    // be required to clear it again on beforeUnmount()
     await this.getGossipInfo();
+    this.pollInterval = window.setInterval(
+      async () => await this.getGossipInfo(),
+      2000
+    );
+  },
+  beforeUnmount() {
+    clearInterval(this.pollInterval!);
   },
   methods: {
     serializeHash,
@@ -105,6 +117,12 @@ export default defineComponent({
       const gossipInfo: DnaGossipInfo[] = await appWs.gossipInfo({
         dnas: [this.cell.cell_id[0]],
       });
+      console.log(
+        "Gossip Info fetched for ",
+        this.cell.role_id,
+        ": ",
+        gossipInfo
+      );
       this.gossipInfo = gossipInfo[0];
     },
     gossipProgressIncoming(info: DnaGossipInfo) {
