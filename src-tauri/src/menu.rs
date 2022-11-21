@@ -1,4 +1,4 @@
-use crate::{commands::open_app::report_issue, setup::logs};
+use crate::{commands::open_app::report_issue, setup::logs, quit};
 use tauri::{CustomMenuItem, Manager, Menu, Submenu, Window, Wry};
 
 pub fn build_menu() -> Menu {
@@ -32,7 +32,7 @@ pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
     "about" => window.emit("about", ()).unwrap(),
     "restart" => window.emit("request-restart", ()).unwrap(),
     "quit" => {
-      window.app_handle().exit(0);
+      quit(window.clone(), window.app_handle()).unwrap();
     }
     "report_issue" => report_issue(),
     "open_logs" => {
