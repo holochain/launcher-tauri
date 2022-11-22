@@ -34,14 +34,15 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.1 lair_keystore
+          cargo install --version 0.2.2 lair_keystore
           $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
           Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
 
 
-          cargo install holochain --version 0.0.172 --locked --features db-encryption
+
+          cargo install holochain --version 0.0.173 --locked --features db-encryption
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
-          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.172-x86_64-pc-windows-msvc.exe
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.173-x86_64-pc-windows-msvc.exe
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
@@ -51,14 +52,14 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.1 lair_keystore
+          cargo install --version 0.2.2 lair_keystore
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-apple-darwin
 
 
-          cargo install holochain --version 0.0.172 --locked --features db-encryption
+          cargo install holochain --version 0.0.173 --locked --features db-encryption
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.172-x86_64-apple-darwin
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.173-x86_64-apple-darwin
 
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
@@ -75,14 +76,14 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.1 lair_keystore
+          cargo install --version 0.2.2 lair_keystore
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-unknown-linux-gnu
 
 
-          cargo install holochain --version 0.0.172 --locked --features db-encryption
+          cargo install holochain --version 0.0.173 --locked --features db-encryption
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.172-x86_64-unknown-linux-gnu
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.173-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 

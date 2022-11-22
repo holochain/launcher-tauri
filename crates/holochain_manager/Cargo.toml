@@ -7,19 +7,14 @@ version = "0.1.0"
 
 [dependencies]
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch="hc-0.0.172"}
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch="hc-0.0.173"}
 
 
 # NEW_VERSION add latest crates here
 
-holochain_conductor_api_0_0_172 = {package = "holochain_conductor_api", version = "0.0.69"}
-holochain_p2p_0_0_172 = {package = "holochain_p2p", version = "0.0.66"}
-holochain_types_0_0_172 = {package = "holochain_types", version = "0.0.66"}
-
-holochain_conductor_api_0_0_172DEBUG = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev = "614fe041f684a81537d803778923ef15209779ae"}
-holochain_p2p_0_0_172DEBUG = {package = "holochain_p2p", git = "https://github.com/holochain/holochain", rev = "614fe041f684a81537d803778923ef15209779ae"}
-holochain_types_0_0_172DEBUG = {package = "holochain_types", git = "https://github.com/holochain/holochain", rev = "614fe041f684a81537d803778923ef15209779ae"}
-
+holochain_conductor_api_0_0_173 = {package = "holochain_conductor_api", version = "0.0.70"}
+holochain_p2p_0_0_173 = {package = "holochain_p2p", version = "0.0.67"}
+holochain_types_0_0_173 = {package = "holochain_types", version = "0.0.67"}
 
 
 mr_bundle = {package = "mr_bundle", version = "0.0.13"}
