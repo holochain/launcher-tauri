@@ -116,8 +116,9 @@
             )
           "
           style="margin-right: 29px"
-          :sliderOn="isAppRunning(app.webAppInfo.installed_app_info)"
+          :sliderOn="isSliderOn"
           @click="handleSlider(app)"
+          @keydown.enter="handleSlider(app)"
         />
       </sl-tooltip>
 
@@ -329,6 +330,9 @@ export default defineComponent({
     clonedCells() {
       const allCells = this.app.webAppInfo.installed_app_info.cell_data;
       return allCells.filter((cell) => cell.role_id.includes("."));
+    },
+    isSliderOn() {
+      return isAppRunning(this.app.webAppInfo.installed_app_info);
     },
   },
   methods: {

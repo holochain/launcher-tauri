@@ -1,6 +1,6 @@
 <template>
   <label class="switch">
-    <input type="checkbox" :checked="sliderOn" />
+    <input tabindex="0" type="checkbox" :checked="sliderOn" />
     <span class="slider round" @click.stop="handleSlide"></span>
   </label>
 </template>
