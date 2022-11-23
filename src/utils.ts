@@ -52,7 +52,9 @@ export function gossipProgressIncoming(info: DnaGossipInfo) {
     info.total_historical_gossip_throughput.expected_op_bytes.incoming;
   const incoming_bytes_actual =
     info.total_historical_gossip_throughput.op_bytes.incoming;
-  return 100 * (incoming_bytes_actual / incoming_bytes_expected);
+
+  const ratio = 100 * (incoming_bytes_actual / incoming_bytes_expected);
+  return ratio > 100 ? 100 : ratio;
 }
 
 export function gossipProgressOutgoing(info: DnaGossipInfo) {
@@ -60,7 +62,9 @@ export function gossipProgressOutgoing(info: DnaGossipInfo) {
     info.total_historical_gossip_throughput.expected_op_bytes.outgoing;
   const outgoing_bytes_actual =
     info.total_historical_gossip_throughput.op_bytes.outgoing;
-  return 100 * (outgoing_bytes_actual / outgoing_bytes_expected);
+
+  const ratio = 100 * (outgoing_bytes_actual / outgoing_bytes_expected);
+  return ratio > 100 ? 100 : ratio;
 }
 
 export function gossipProgressIncomingString(info: DnaGossipInfo) {
