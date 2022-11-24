@@ -9,7 +9,7 @@
     </div>
     <div>
       <div style="margin-bottom: 10px" title="Historical Gossip Throughput">
-        Active Peer Synchronization:
+        Active Peer Synchronizations:
       </div>
       <div class="column">
         <!-- active incoming gossip rounds -->
@@ -40,7 +40,9 @@
             </div>
           </div>
           <div
-            style="width: 25%; text-align: left"
+            :style="`width: 25%; text-align: center; ${
+              incomingIdle ? 'opacity: 0.7;' : ''
+            }`"
             title="actual bytes / expected bytes"
           >
             {{ gossipProgressString(gossipProgressIncoming) }}
@@ -75,7 +77,9 @@
             </div>
           </div>
           <div
-            style="width: 25%; text-align: left"
+            :style="`width: 25%; text-align: center; ${
+              outgoingIdle ? 'opacity: 0.7;' : ''
+            }`"
             title="actual bytes / expected bytes"
           >
             {{ gossipProgressString(gossipProgressOutgoing) }}
@@ -187,7 +191,7 @@ export default defineComponent({
       ) {
         this.incomingIdle = false;
         this.gossipProgressIncoming = gossipProgressIncoming;
-        this.latestIncomingUpdate = new Date().getTime();
+        this.latestIncomingUpdate = Date.now();
       }
 
       if (
@@ -196,7 +200,7 @@ export default defineComponent({
       ) {
         this.outgoingIdle = false;
         this.gossipProgressOutgoing = gossipProgressOutgoing;
-        this.latestOutgoingUpdate = new Date().getTime();
+        this.latestOutgoingUpdate = Date.now();
       }
 
       // If actual/expected are both zero, set the progress bar to idle state
@@ -216,11 +220,11 @@ export default defineComponent({
 
       console.log(
         "time elapsed since latest incoming update: ",
-        new Date().getTime() - this.latestIncomingUpdate
+        Date.now() - this.latestIncomingUpdate
       );
       console.log(
         "time elapsed since latest outgoing update: ",
-        new Date().getTime() - this.latestOutgoingUpdate
+        Date.now() - this.latestOutgoingUpdate
       );
 
       // if latest updates to gorrsip progress are older than 30 seconds, set them to undefined again

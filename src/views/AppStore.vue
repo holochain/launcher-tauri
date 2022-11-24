@@ -84,7 +84,7 @@
       style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
       title="Full Synchronization with Peers Required to Reliably Download all Apps."
     >
-      Ongoing App Library Synchronizations (incoming):
+      App Library Synchronizations (incoming):
     </div>
     <div>
       <div v-for="(cell, idx) in cells" :key="cell.role_id" class="column">
@@ -121,7 +121,9 @@
             >
           </div>
           <div
-            style="width: 30%; text-align: left"
+            :style="`width: 30%; text-align: center; ${
+              idleStates[idx] ? 'opacity: 0.7;' : ''
+            }`"
             title="actual bytes / expected bytes"
           >
             {{ gossipProgressString(gossipStates[idx]) }}
@@ -204,6 +206,7 @@ export default defineComponent({
     gossipStates: (GossipProgress | undefined)[];
     latestGossipUpdates: number[]; // timestamps of the latest non-zero gossipInfo update
     idleStates: boolean[];
+    showProgressIndicator: boolean;
   } {
     return {
       loadingText: "",
@@ -219,6 +222,7 @@ export default defineComponent({
       gossipStates: [undefined, undefined, undefined],
       latestGossipUpdates: [0, 0, 0],
       idleStates: [true, true, true],
+      showProgressIndicator: false,
     };
   },
   beforeUnmount() {
@@ -245,7 +249,6 @@ export default defineComponent({
     let allApps: Array<AppWithReleases>;
     try {
       allApps = await getAllPublishedApps(appWs, devhubInfo);
-      console.log("ALL APPS: ", allApps);
     } catch (e) {
       console.error(e);
       // Catch other errors than being offline
@@ -268,6 +271,11 @@ export default defineComponent({
 
     this.loading = false;
   },
+  // computed: {
+  //   synchronizing(): boolean {
+  //     return this.latestGossipUpdates.some((latest) => (Date.now() - latest) < 10000);
+  //   }
+  // },
   methods: {
     gossipProgressPercent,
     gossipProgressString,
@@ -341,73 +349,38 @@ export default defineComponent({
       });
       console.log("Received gossip info: ", gossipInfo);
 
-      // cells are alphabetically ordered
-      const gossipProgressDnaRepo = {
-        expectedBytes:
-          gossipInfo[0].total_historical_gossip_throughput.expected_op_bytes
-            .incoming,
-        actualBytes:
-          gossipInfo[0].total_historical_gossip_throughput.op_bytes.incoming,
-      };
-      const gossipProgressHapps = {
-        expectedBytes:
-          gossipInfo[1].total_historical_gossip_throughput.expected_op_bytes
-            .incoming,
-        actualBytes:
-          gossipInfo[1].total_historical_gossip_throughput.op_bytes.incoming,
-      };
-      const gossipProgressWebApps = {
-        expectedBytes:
-          gossipInfo[2].total_historical_gossip_throughput.expected_op_bytes
-            .incoming,
-        actualBytes:
-          gossipInfo[2].total_historical_gossip_throughput.op_bytes.incoming,
-      };
+      gossipInfo.forEach((info, idx) => {
+        const gossipProgress = {
+          expectedBytes:
+            info.total_historical_gossip_throughput.expected_op_bytes.incoming,
+          actualBytes:
+            info.total_historical_gossip_throughput.op_bytes.incoming,
+        };
+        // Check gossip info. In case expected and actual op bytes are 0, keep the chached values
+        if (
+          gossipProgress.expectedBytes != 0 ||
+          gossipProgress.actualBytes != 0
+        ) {
+          this.idleStates[idx] = false;
+          this.gossipStates[idx] = gossipProgress;
+          this.latestGossipUpdates[idx] = Date.now();
+        }
 
-      // Check gossip info. In case expected and actual op bytes are 0, keep the chached values
-      if (
-        gossipProgressDnaRepo.expectedBytes != 0 ||
-        gossipProgressDnaRepo.actualBytes != 0
-      ) {
-        this.idleStates[0] = false;
-        this.gossipStates[0] = gossipProgressDnaRepo;
-        console.log(
-          "Set this.gossipStates[0] with the followin gossipProgressDnaRepo: ",
-          gossipProgressDnaRepo
-        );
-        console.log("this.gossipStates[0]: ", this.gossipStates[0]);
-      }
-      if (
-        gossipProgressHapps.expectedBytes != 0 ||
-        gossipProgressHapps.actualBytes != 0
-      ) {
-        this.idleStates[1] = false;
-        this.gossipStates[1] = gossipProgressHapps;
-      }
-      if (
-        gossipProgressWebApps.expectedBytes != 0 ||
-        gossipProgressWebApps.actualBytes != 0
-      ) {
-        this.idleStates[2] = false;
-        this.gossipStates[2] = gossipProgressWebApps;
-      }
-
-      // If actual/expected are both zero, set the progress bar to idle state
-      this.gossipStates.forEach((state, idx) => {
-        if (state && state.actualBytes == 0 && state.expectedBytes == 0) {
+        // If actual/expected are both zero, set the progress bar to idle state
+        if (
+          gossipProgress.actualBytes == 0 &&
+          gossipProgress.expectedBytes == 0
+        ) {
           this.idleStates[idx] = true;
         }
       });
 
       // if latest updates to gossip progress are older than 30 seconds, set them to undefined again
       this.latestGossipUpdates.forEach((latest, idx) => {
-        if (new Date().getTime() - latest > 30000) {
+        if (Date.now() - latest > 30000) {
           this.gossipStates[idx] = undefined;
         }
       });
-
-      console.log("gossipStates: ", this.gossipStates);
-      console.log("idleStates: ", this.idleStates);
     },
   },
 });
@@ -431,6 +404,6 @@ export default defineComponent({
   padding: 20px;
   background-color: white;
   border-radius: 20px 0 0 0;
-  min-width: 520px;
+  min-width: 540px;
 }
 </style>

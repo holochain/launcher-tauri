@@ -27,17 +27,23 @@
         padding: 55px 50px 50px 50px;
       "
     >
-      <img
-        src="/img/lock_icon.svg"
-        style="height: 35px; margin-bottom: 40px; opacity: 0.95"
-      />
-      <div style="font-size: 1.1em; margin-bottom: 15px">
+      <div class="row" style="margin-bottom: 40px">
+        <img
+          src="/img/lock_icon.svg"
+          style="height: 35px; opacity: 0.95; margin-right: 20px"
+        />
+        <div style="font-size: 27px; font-weight: 600; margin-bottom: 25px">
+          Set up password
+        </div>
+      </div>
+
+      <div style="font-size: 1.1em; margin-bottom: 15px; width: 100%">
         To get started, you need to set up a password for the Holochain
         Launcher.
       </div>
-      <div style="font-size: 1.1em; text-align: center; margin-bottom: 40px">
+      <div style="font-size: 1.1em; text-align: left; margin-bottom: 40px">
         This password is used to secure your cryptographic private keys
-        associated to your identities in Holochain apps.
+        associated with your identities in Holochain apps.
       </div>
       <div class="column" style="margin-bottom: 20px">
         <div style="font-weight: bold; margin-bottom: 2px">
@@ -123,7 +129,11 @@
           height: 22px;
         "
       >
-        {{ passwordsDontMatch ? "Password's don't match." : "" }}
+        {{
+          passwordsDontMatch && repeatedPassword
+            ? "Password's don't match."
+            : ""
+        }}
       </div>
       <div class="row">
         <HCButton
@@ -133,6 +143,7 @@
             step = 1;
             firstPassword = undefined;
             backupConfirmed = false;
+            repeatedPassword = undefined;
           "
         >
           Back
@@ -148,7 +159,7 @@
     </div>
 
     <div v-if="step == 3">
-      <div class="animated" style="font-size: 40px">Setting you up...</div>
+      <div class="animated" style="font-size: 40px">Setting up...</div>
     </div>
   </div>
 </template>
@@ -173,6 +184,7 @@ export default defineComponent({
       pwInputDisabled: false,
       backupConfirmed: false,
       step: 0,
+      repeatedPassword: undefined,
     };
   },
   created() {
@@ -199,6 +211,7 @@ export default defineComponent({
       const repeatPasswordValue = (
         this.$refs.repeatPassword as typeof PasswordField
       ).value;
+      this.repeatedPassword = repeatPasswordValue;
       const itsAMatch = this.firstPassword === repeatPasswordValue;
       this.passwordsDontMatch = !itsAMatch;
       return itsAMatch;
