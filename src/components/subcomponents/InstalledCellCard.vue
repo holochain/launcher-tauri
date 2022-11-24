@@ -242,9 +242,10 @@ export default defineComponent({
 <style scoped>
 .card {
   min-width: 630px;
-  background: white;
+  background: #f6f6fa;
   border-radius: 15px;
   box-shadow: 0 0px 5px #9b9b9b;
+  /* border: 2px solid #e1e1e1; */
   padding: 9px 20px 20px 25px;
 }
 </style>

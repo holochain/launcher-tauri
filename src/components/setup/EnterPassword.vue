@@ -1,5 +1,8 @@
 <template>
-  <div class="background">
+  <div v-if="entering" class="entering-background">
+    <div class="animated" style="font-size: 40px">{{ bootUpSlogan }}</div>
+  </div>
+  <div v-else class="background">
     <div
       class="row"
       style="box-shadow: 0 0 35px rgb(21, 16, 65); border-radius: 15px"
@@ -56,7 +59,7 @@
               :disabled="entering"
               @click="enterPassword()"
               style="width: 128px"
-              >{{ this.entering ? "Starting..." : "Continue" }}
+              >{{ entering ? "Starting..." : "Continue" }}
             </HCButton>
           </div>
         </form>
@@ -71,6 +74,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import PasswordField from "../subcomponents/PasswordField.vue";
 import HCButton from "../subcomponents/HCButton.vue";
+import { bootUpSlogans } from "../../bootUpSlogans";
 
 export default defineComponent({
   name: "EnterPassword",
@@ -79,12 +83,18 @@ export default defineComponent({
     entering: boolean;
     pwInputDisabled: boolean;
     invalidPassword: boolean;
+    bootUpSlogan: string | undefined;
   } {
     return {
       entering: false,
       pwInputDisabled: false,
       invalidPassword: false,
+      bootUpSlogan: undefined,
     };
+  },
+  mounted() {
+    this.bootUpSlogan =
+      bootUpSlogans[Math.floor(Math.random() * bootUpSlogans.length)];
   },
   methods: {
     async enterPassword() {
@@ -120,6 +130,7 @@ export default defineComponent({
   /* background-color: rgb(21, 16, 65); */
   /* background-color: #e3e4eb; */
   background-color: #e8e8eb;
+  /* background-color: #331ead; */
 }
 
 .left-half {
@@ -147,5 +158,35 @@ export default defineComponent({
   right: 51.81%;
   top: 0;
   bottom: 18.88%;
+}
+
+.entering-background {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* background-color: rgb(21, 16, 65); */
+  /* background-color: #e3e4eb; */
+  background-color: #331ead;
+  background-size: cover;
+  background-position: center center;
+  background-image: url(/img/Holochain_Halo_complete.svg);
+}
+
+.animated {
+  animation: colorchange 7s linear infinite;
+}
+
+@keyframes colorchange {
+  0% {
+    color: #6b66c9;
+  }
+  50% {
+    color: #ffffff;
+  }
+  100% {
+    color: #6b66c9;
+  }
 }
 </style>

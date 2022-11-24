@@ -84,7 +84,7 @@
       style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
       title="Full Synchronization with Peers Required to Reliably Download all Apps."
     >
-      App Library Synchronizations (incoming):
+      App Library Synchronization (incoming):
     </div>
     <div>
       <div v-for="(cell, idx) in cells" :key="cell.role_id" class="column">
@@ -403,6 +403,7 @@ export default defineComponent({
   right: 0;
   padding: 20px;
   background-color: white;
+  box-shadow: 0 0px 5px #9b9b9b;
   border-radius: 20px 0 0 0;
   min-width: 540px;
 }
