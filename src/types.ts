@@ -126,3 +126,8 @@ export interface HolochainAppInfo {
   holochainId: HolochainId;
   holochainVersion: HolochainVersion;
 }
+
+export interface GossipProgress {
+  expectedBytes: number;
+  actualBytes: number;
+}

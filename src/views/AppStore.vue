@@ -86,7 +86,7 @@
     >
       App Library Synchronization Progress:
     </div>
-    <div v-if="gossipInfo">
+    <div>
       <div v-for="(cell, idx) in cells" :key="cell.role_id" class="column">
         <div class="row" style="align-items: center">
           <div
@@ -101,12 +101,9 @@
           </div>
           <div style="width: 50%; margin: 0 30px">
             <HCProgressBar
-              v-if="
-                gossipInfo[idx].total_historical_gossip_throughput
-                  .expected_op_bytes.incoming > 0
-              "
+              v-if="gossipState[idx]"
               title="Full Synchronization Required to Download All Apps."
-              :progress="gossipProgressIncoming(gossipInfo[idx])"
+              :progress="gossipProgressPercent(gossipState[idx])"
               style="--height: 10px"
             />
             <span
@@ -118,21 +115,17 @@
                 justify-content: center;
               "
             >
-              no other peers discovered yet</span
+              no active gossip rounds</span
             >
           </div>
           <div
             style="width: 25%; text-align: left"
             title="actual bytes / expected bytes"
           >
-            {{ gossipProgressIncomingString(gossipInfo[idx]) }}
+            {{ gossipProgressString(gossipState[idx]) }}
           </div>
         </div>
       </div>
-    </div>
-
-    <div v-else style="text-align: center; opacity: 0.7">
-      No Information available.
     </div>
   </div>
 
@@ -177,13 +170,14 @@ import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
-import { HolochainId } from "@/types";
-import {
-  gossipProgressIncoming,
-  gossipProgressIncomingString,
-  gossipProgressOutgoing,
-  gossipProgressOutgoingString,
-} from "@/utils";
+import { HolochainId, GossipProgress } from "@/types";
+import { gossipProgressPercent, gossipProgressString } from "@/utils";
+
+interface GossipState {
+  dnarepo: GossipProgress | undefined;
+  happs: GossipProgress | undefined;
+  web_apps: GossipProgress | undefined;
+}
 
 export default defineComponent({
   name: "AppStore",
@@ -202,10 +196,10 @@ export default defineComponent({
     selectedAppBundlePath: string | undefined;
     hdkVersionForApp: HdkVersion | undefined;
     howToPublishUrl: string;
-    gossipInfo: DnaGossipInfo[] | undefined;
     holochainId: HolochainId | undefined;
     pollInterval: number | null;
     cells: InstalledCell[] | undefined;
+    gossipState: (GossipProgress | undefined)[];
   } {
     return {
       loadingText: "",
@@ -215,14 +209,11 @@ export default defineComponent({
       hdkVersionForApp: undefined,
       howToPublishUrl:
         "https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub",
-      gossipInfo: undefined,
       holochainId: undefined,
       pollInterval: null,
       cells: undefined,
+      gossipState: [undefined, undefined, undefined],
     };
-  },
-  async created() {
-    console.log("Hello I'm created.");
   },
   beforeUnmount() {
     clearInterval(this.pollInterval!);
@@ -241,7 +232,9 @@ export default defineComponent({
       installed_app_id: `DevHub-${holochainId.content}`,
     });
 
-    this.cells = devhubInfo.cell_data;
+    this.cells = devhubInfo.cell_data.sort((a, b) =>
+      a.role_id.localeCompare(b.role_id)
+    );
 
     let allApps: Array<AppWithReleases>;
     try {
@@ -258,22 +251,19 @@ export default defineComponent({
     );
     this.installableApps = filterByHdkVersion(hdk_versions, allApps);
 
-    await this.getGossipInfo();
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
-    await this.getGossipInfo();
+    await this.getGossipState();
     this.pollInterval = window.setInterval(
-      async () => await this.getGossipInfo(),
+      async () => await this.getGossipState(),
       2000
     );
 
     this.loading = false;
   },
   methods: {
-    gossipProgressIncoming,
-    gossipProgressOutgoing,
-    gossipProgressIncomingString,
-    gossipProgressOutgoingString,
+    gossipProgressPercent,
+    gossipProgressString,
     async howToPublish() {
       await invoke("open_url_cmd", {
         url: this.howToPublishUrl,
@@ -335,7 +325,7 @@ export default defineComponent({
       this.selectedAppBundlePath = undefined;
       this.hdkVersionForApp = undefined;
     },
-    async getGossipInfo() {
+    async getGossipState() {
       console.log("fetching gossip info...");
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
@@ -343,7 +333,49 @@ export default defineComponent({
         dnas: this.cells!.map((cell) => cell.cell_id[0] as Uint8Array),
       });
       console.log("Received gossip info: ", gossipInfo);
-      this.gossipInfo = gossipInfo;
+
+      // cells are alphabetically ordered
+      const gossipProgressDnaRepo = {
+        expectedBytes:
+          gossipInfo[0].total_historical_gossip_throughput.expected_op_bytes
+            .incoming,
+        actualBytes:
+          gossipInfo[0].total_historical_gossip_throughput.op_bytes.incoming,
+      };
+      const gossipProgressHapps = {
+        expectedBytes:
+          gossipInfo[1].total_historical_gossip_throughput.expected_op_bytes
+            .incoming,
+        actualBytes:
+          gossipInfo[1].total_historical_gossip_throughput.op_bytes.incoming,
+      };
+      const gossipProgressWebApps = {
+        expectedBytes:
+          gossipInfo[2].total_historical_gossip_throughput.expected_op_bytes
+            .incoming,
+        actualBytes:
+          gossipInfo[2].total_historical_gossip_throughput.op_bytes.incoming,
+      };
+
+      // Check gossip info. In case expected and actual op bytes are 0, keep the chached values
+      if (
+        gossipProgressDnaRepo.expectedBytes != 0 ||
+        gossipProgressDnaRepo.actualBytes != 0
+      ) {
+        this.gossipState[0] = gossipProgressDnaRepo;
+      }
+      if (
+        gossipProgressHapps.expectedBytes != 0 ||
+        gossipProgressHapps.actualBytes != 0
+      ) {
+        this.gossipState[1] = gossipProgressHapps;
+      }
+      if (
+        gossipProgressWebApps.expectedBytes != 0 ||
+        gossipProgressWebApps.actualBytes != 0
+      ) {
+        this.gossipState[2] = gossipProgressWebApps;
+      }
     },
   },
 });

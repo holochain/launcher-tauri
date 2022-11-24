@@ -9,9 +9,10 @@
     </div>
     <div>
       <div style="margin-bottom: 10px" title="Historical Gossip Throughput">
-        Peer Synchronization Progress:
+        Active Peer Synchronization:
       </div>
-      <div v-if="gossipInfo" class="column">
+      <div class="column">
+        <!-- active incoming gossip rounds -->
         <div class="row" style="align-items: center">
           <div
             style="
@@ -25,17 +26,21 @@
           </div>
           <div style="width: 65%; margin: 0 30px">
             <HCProgressBar
-              :progress="gossipProgressIncoming(gossipInfo)"
+              v-if="gossipProgressIncoming"
+              :progress="gossipProgressPercent(gossipProgressIncoming)"
               style="--height: 10px"
             />
+            <div v-else style="text-align: center">No active gossip rounds</div>
           </div>
           <div
             style="width: 20%; text-align: left"
             title="actual bytes / expected bytes"
           >
-            {{ gossipProgressIncomingString(gossipInfo) }}
+            {{ gossipProgressString(gossipProgressIncoming) }}
           </div>
         </div>
+
+        <!-- active outgoing gossip rounds -->
         <div class="row" style="align-items: center">
           <div
             style="
@@ -49,15 +54,17 @@
           </div>
           <div style="width: 65%; margin: 0 30px; align-items: center">
             <HCProgressBar
-              :progress="gossipProgressOutgoing(gossipInfo)"
+              v-if="gossipProgressOutgoing"
+              :progress="gossipProgressPercent(gossipProgressOutgoing)"
               style="--height: 10px"
             />
+            <div v-else>No active gossip rounds</div>
           </div>
           <div
             style="width: 20%; text-align: left"
             title="actual bytes / expected bytes"
           >
-            {{ gossipProgressOutgoingString(gossipInfo) }}
+            {{ gossipProgressString(gossipProgressOutgoing) }}
           </div>
         </div>
       </div>
@@ -79,12 +86,9 @@ import prettyBytes from "pretty-bytes";
 import HCProgressBar from "./HCProgressBar.vue";
 import { HolochainId } from "@/types";
 import { serializeHash } from "@holochain-open-dev/utils";
-import {
-  gossipProgressIncoming,
-  gossipProgressIncomingString,
-  gossipProgressOutgoing,
-  gossipProgressOutgoingString,
-} from "@/utils";
+import { gossipProgressPercent, gossipProgressString } from "@/utils";
+
+import { GossipProgress } from "../../types";
 
 export default defineComponent({
   name: "InstalledCellCard",
@@ -100,12 +104,14 @@ export default defineComponent({
     },
   },
   data(): {
-    gossipInfo: DnaGossipInfo | undefined;
     pollInterval: number | null;
+    gossipProgressIncoming: GossipProgress | undefined;
+    gossipProgressOutgoing: GossipProgress | undefined;
   } {
     return {
-      gossipInfo: undefined,
       pollInterval: null,
+      gossipProgressIncoming: undefined,
+      gossipProgressOutgoing: undefined,
     };
   },
   async created() {
@@ -121,10 +127,8 @@ export default defineComponent({
     clearInterval(this.pollInterval!);
   },
   methods: {
-    gossipProgressIncoming,
-    gossipProgressOutgoing,
-    gossipProgressIncomingString,
-    gossipProgressOutgoingString,
+    gossipProgressPercent,
+    gossipProgressString,
     serializeHash,
     async getGossipInfo() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
@@ -138,7 +142,36 @@ export default defineComponent({
         ": ",
         gossipInfo
       );
-      this.gossipInfo = gossipInfo[0];
+
+      const gossipProgressIncoming = {
+        expectedBytes:
+          gossipInfo[0].total_historical_gossip_throughput.expected_op_bytes
+            .incoming,
+        actualBytes:
+          gossipInfo[0].total_historical_gossip_throughput.op_bytes.incoming,
+      };
+      const gossipProgressOutgoing: GossipProgress = {
+        expectedBytes:
+          gossipInfo[0].total_historical_gossip_throughput.expected_op_bytes
+            .outgoing,
+        actualBytes:
+          gossipInfo[0].total_historical_gossip_throughput.op_bytes.outgoing,
+      };
+
+      // Check gossip info. In case expected and actual op bytes are 0, keep the chached values
+      if (
+        gossipProgressIncoming.expectedBytes != 0 ||
+        gossipProgressIncoming.actualBytes != 0
+      ) {
+        this.gossipProgressIncoming = gossipProgressIncoming;
+      }
+
+      if (
+        gossipProgressOutgoing.expectedBytes != 0 ||
+        gossipProgressOutgoing.actualBytes != 0
+      ) {
+        this.gossipProgressOutgoing = gossipProgressOutgoing;
+      }
     },
   },
 });

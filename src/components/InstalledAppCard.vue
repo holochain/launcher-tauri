@@ -325,11 +325,15 @@ export default defineComponent({
   computed: {
     mainCells() {
       const allCells = this.app.webAppInfo.installed_app_info.cell_data;
-      return allCells.filter((cell) => !cell.role_id.includes("."));
+      return allCells
+        .filter((cell) => !cell.role_id.includes("."))
+        .sort((a, b) => a.role_id.localeCompare(b.role_id));
     },
     clonedCells() {
       const allCells = this.app.webAppInfo.installed_app_info.cell_data;
-      return allCells.filter((cell) => cell.role_id.includes("."));
+      return allCells
+        .filter((cell) => cell.role_id.includes("."))
+        .sort((a, b) => a.role_id.localeCompare(b.role_id));
     },
     isSliderOn() {
       return isAppRunning(this.app.webAppInfo.installed_app_info);
