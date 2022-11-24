@@ -1,9 +1,7 @@
 
-
-
 // restarts the Holochain Launcher
 #[tauri::command]
-pub fn restart(
+pub fn quit(
   window: tauri::Window,
   app_handle: tauri::AppHandle,
 ) -> Result<(), String> {
@@ -12,8 +10,8 @@ pub fn restart(
     return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (J)"))
   }
 
-  log::warn!("A Restart of the Launcher has been requested, restarting...");
+  log::warn!("Quitting the Launcher has been requested, Quitting...");
 
-  app_handle.restart();
+  app_handle.exit(0);
   Ok(())
 }

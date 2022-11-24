@@ -4,9 +4,11 @@
     <Error
       v-else-if="
         $store.getters[`errorLaunching`] &&
-        !$store.getters[`databaseFileTypeError`]
+        !$store.getters[`databaseFileTypeError`] &&
+        !$store.getters[`addressAlreadyInUseError`]
       "
       heading="Error Launching Holochain"
+      offerRestart
     >
       <div
         style="
@@ -21,6 +23,49 @@
         "
       >
         {{ $store.getters[`errorLaunching`] }}
+      </div>
+    </Error>
+    <Error
+      v-else-if="$store.getters[`addressAlreadyInUseError`]"
+      heading="Error Launching Holochain"
+      offerQuit
+    >
+      <div class="column" style="align-items: center">
+        <div style="font-weight: bold; margin-bottom: 20px; font-size: 1.1em">
+          Websocket address is already in use.
+        </div>
+        <div style="text-align: left; margin-bottom: 25px">
+          This error usually occurs when the Launcher has earlier crashed
+          unexpectedly or has been force quit manually, which leads to
+          <strong>one or more orphan holochain processes</strong> still running
+          in the background.<br />
+        </div>
+        <div
+          style="
+            text-align: center;
+            background-color: #9fe09d;
+            border-radius: 8px;
+            padding: 10px;
+          "
+        >
+          To fix it, <strong>quit the Holochain Launcher</strong> and
+          <strong>manually kill all running processes</strong> that start with
+          <span
+            style="
+              font-family: monospace;
+              font-size: 1.1em;
+              background-color: rgba(0, 0, 0, 0.2);
+              padding: 2px 6px;
+              border-radius: 5px;
+            "
+            >holochain-v</span
+          >.
+        </div>
+        <div style="text-align: left; margin-top: 25px">
+          You can kill running processes by opening the Task-Manager (Windows,
+          Ctrl+Alt+Delete) or Activity Monitor (MacOs) and search for the
+          corresponding processes.<br />
+        </div>
       </div>
     </Error>
     <Setup v-else-if="$store.getters[`setupNeeded`]"></Setup>

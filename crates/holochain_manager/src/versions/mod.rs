@@ -21,7 +21,6 @@ use version_manager::VersionManager;
 
 pub mod v0_0_173;
 
-
 use v0_0_173::HolochainV0_0_173;
 
 

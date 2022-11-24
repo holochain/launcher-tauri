@@ -7,7 +7,7 @@ version = "0.1.0"
 
 [dependencies]
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch="hc-0.0.173"}
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch="hc-0.0.173" }
 
 
 # NEW_VERSION add latest crates here

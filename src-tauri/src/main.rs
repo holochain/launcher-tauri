@@ -33,6 +33,7 @@ use crate::commands::open_app::report_issue_cmd;
 use crate::commands::save_app::save_app;
 use crate::commands::start_app::start_app;
 use crate::commands::restart::restart;
+use crate::commands::quit::quit;
 use crate::commands::{
   choose_version::choose_version_for_hdk,
   config::write_config,
@@ -84,6 +85,7 @@ fn main() {
       start_app,
       execute_factory_reset,
       restart,
+      quit,
       write_config,
       setup::logs::log,
     ])

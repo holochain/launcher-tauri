@@ -39,7 +39,6 @@ jobs:
           Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
 
 
-
           cargo install holochain --version 0.0.173 --locked --features db-encryption
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.0.173-x86_64-pc-windows-msvc.exe

@@ -125,6 +125,31 @@ export const store = createStore<LauncherAdminState>({
         }
       }
     },
+    addressAlreadyInUseError(state) {
+      if (state.launcherStateInfo === "loading") return undefined;
+
+      if (
+        state.launcherStateInfo.state.type === "Running" &&
+        state.launcherStateInfo.state.content.type === "Running"
+      ) {
+        const c = state.launcherStateInfo.state.content.content;
+
+        const allHolochains = Object.values(c.versions);
+        if (c.custom_binary) allHolochains.push(c.custom_binary);
+
+        const error = allHolochains.find((v) => v.type === "Error");
+        if (
+          error &&
+          error.content
+            .toString()
+            .includes(
+              "InterfaceError(WebsocketError(Io(Os { code: 98, kind: AddrInUse"
+            )
+        ) {
+          return true;
+        }
+      }
+    },
     holochainIdForDevhub(state) {
       const stateInfo = state.launcherStateInfo;
 

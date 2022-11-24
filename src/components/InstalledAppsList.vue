@@ -58,103 +58,107 @@
         >sort</mwc-icon
       >
     </div>
-    <!-- <InstallAppDialog ref="test-dialog"/> -->
-
-    <!-- <InstalledAppCard style="margin: 5px" />
-    <InstalledAppCard appIcon="/img/dummy_app_icon.png" style="margin: 5px" /> -->
 
     <div
-      style="
-        border-bottom: 2px solid rgba(0, 0, 0, 0.4);
-        width: 98%;
-        margin: 10px;
-        margin-top: -18px;
-        max-width: 1080px;
-        padding-bottom: 3px;
-      "
+      class="row section-title"
+      :class="{ borderBottomed: showWebApps }"
+      style="margin-top: -18px"
     >
       <span
         style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
         title="Holochain Apps with Graphical User Interface"
         >Web Apps</span
       >
+      <span
+        v-if="!noWebApps"
+        @click="showWebApps = !showWebApps"
+        class="show-hide"
+        style="opacity: 0.7; cursor: pointer; margin-left: 10px"
+      >
+        {{ showWebApps ? "[-]" : "[show]" }}
+      </span>
     </div>
+    <div v-if="showWebApps" style="margin-bottom: 50px">
+      <div v-if="noWebApps" style="margin-top: 30px; color: rgba(0, 0, 0, 0.6)">
+        There are no Web Apps installed{{
+          selectedHolochainVersion === "All Versions"
+            ? "."
+            : " in this Holochain Version."
+        }}
+      </div>
 
-    <div v-if="noWebApps" style="margin-top: 30px; color: rgba(0, 0, 0, 0.6)">
-      There are no Web Apps installed{{
-        selectedHolochainVersion === "All Versions"
-          ? "."
-          : " in this Holochain Version."
-      }}
+      <div
+        v-else
+        v-for="app in sortedApps"
+        :key="app.webAppInfo.installed_app_info.installed_app_id"
+        style="
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          align-items: center;
+        "
+      >
+        <InstalledAppCard
+          v-if="app.webAppInfo.web_ui_info.type !== 'Headless'"
+          style="margin: 5px; display: flex; flex: 1"
+          :app="app"
+          @openApp="$emit('openApp', $event)"
+          @uninstallApp="$emit('uninstall-app', $event)"
+          @disableApp="$emit('disable-app', $event)"
+          @enableApp="$emit('enable-app', $event)"
+        />
+      </div>
     </div>
 
     <div
-      v-else
-      v-for="app in sortedApps"
-      :key="app.webAppInfo.installed_app_info.installed_app_id"
-      style="
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        align-items: center;
-      "
-    >
-      <InstalledAppCard
-        v-if="app.webAppInfo.web_ui_info.type !== 'Headless'"
-        style="margin: 5px; display: flex; flex: 1"
-        :app="app"
-        @openApp="$emit('openApp', $event)"
-        @uninstallApp="$emit('uninstall-app', $event)"
-        @disableApp="$emit('disable-app', $event)"
-        @enableApp="$emit('enable-app', $event)"
-      />
-    </div>
-
-    <div
-      style="
-        border-bottom: 2px solid rgba(0, 0, 0, 0.4);
-        width: 98%;
-        margin: 10px;
-        margin-top: 50px;
-        max-width: 1080px;
-        padding-bottom: 3px;
-      "
+      class="row section-title"
+      :class="{ borderBottomed: showHeadlessApps }"
     >
       <span
         style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
         title="Holochain Apps without Graphical User Interface"
         >Headless Apps</span
       >
+      <span
+        v-if="noHeadlessApps"
+        @click="showHeadlessApps = !showHeadlessApps"
+        class="show-hide"
+        style="opacity: 0.7; cursor: pointer; margin-left: 10px"
+      >
+        {{ showHeadlessApps ? "[-]" : "[show]" }}
+      </span>
     </div>
-    <div
-      v-if="noHeadlessApps"
-      style="margin-top: 30px; color: rgba(0, 0, 0, 0.6)"
-    >
-      There are no headless apps installed{{
-        selectedHolochainVersion === "All Versions"
-          ? "."
-          : " in this Holochain Version."
-      }}
-    </div>
-    <div
-      v-for="app in sortedApps"
-      :key="app.webAppInfo.installed_app_info.installed_app_id"
-      style="
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        align-items: center;
-      "
-    >
-      <InstalledAppCard
-        v-if="app.webAppInfo.web_ui_info.type === 'Headless'"
-        style="margin: 5px; display: flex; flex: 1"
-        :app="app"
-        @openApp="$emit('openApp', $event)"
-        @uninstallApp="$emit('uninstall-app', $event)"
-        @disableApp="$emit('disable-app', $event)"
-        @enableApp="$emit('enable-app', $event)"
-      />
+    <div v-if="showHeadlessApps">
+      <div
+        v-if="noHeadlessApps"
+        style="margin-top: 30px; color: rgba(0, 0, 0, 0.6)"
+      >
+        There are no headless apps installed{{
+          selectedHolochainVersion === "All Versions"
+            ? "."
+            : " in this Holochain Version."
+        }}
+      </div>
+      <div
+        v-for="app in sortedApps"
+        :key="app.webAppInfo.installed_app_info.installed_app_id"
+        style="
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          align-items: center;
+        "
+      >
+        <InstalledAppCard
+          v-if="app.webAppInfo.web_ui_info.type === 'Headless'"
+          style="margin: 5px; display: flex; flex: 1"
+          :app="app"
+          @openApp="$emit('openApp', $event)"
+          @uninstallApp="$emit('uninstall-app', $event)"
+          @disableApp="$emit('disable-app', $event)"
+          @enableApp="$emit('enable-app', $event)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -189,6 +193,8 @@ export default defineComponent({
     sortOptions: [string, string][];
     sortOption: string | undefined;
     selectedHolochainVersion: string;
+    showHeadlessApps: boolean;
+    showWebApps: boolean;
   } {
     return {
       sortOptions: [
@@ -198,6 +204,8 @@ export default defineComponent({
       ],
       sortOption: undefined,
       selectedHolochainVersion: "All Versions",
+      showHeadlessApps: true,
+      showWebApps: true,
     };
   },
   emits: ["openApp"],
@@ -261,3 +269,20 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.show-hide:hover {
+  color: black;
+}
+.section-title {
+  width: 98%;
+  margin: 10px;
+  max-width: 1080px;
+  padding-bottom: 3px;
+  align-items: center;
+}
+
+.borderBottomed {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+}
+</style>

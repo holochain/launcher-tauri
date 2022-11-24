@@ -79,6 +79,58 @@
     </div>
   </div>
 
+  <div class="progress-indicator">
+    <div
+      style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
+      title="Full Synchronization with Peers Required to Reliably Download all Apps."
+    >
+      Ongoing App Library Synchronizations (incoming):
+    </div>
+    <div>
+      <div v-for="(cell, idx) in cells" :key="cell.role_id" class="column">
+        <div class="row" style="align-items: center">
+          <div
+            style="
+              width: 20%;
+              margin-left: 20px;
+              font-size: 0.95em;
+              text-align: right;
+            "
+          >
+            {{ cell.role_id }}
+          </div>
+          <div style="width: 50%; margin: 0 30px">
+            <HCProgressBar
+              v-if="gossipStates[idx]"
+              title="Full Synchronization Required to Download All Apps."
+              :progress="gossipProgressPercent(gossipStates[idx])"
+              :style="`--height: 10px; --hc-primary-color:${
+                idleStates[idx] ? '#6B6B6B' : '#482edf'
+              };`"
+            />
+            <span
+              v-else
+              style="
+                opacity: 0.7;
+                font-size: 0.8em;
+                display: flex;
+                justify-content: center;
+              "
+            >
+              no ongoing peer synchronization</span
+            >
+          </div>
+          <div
+            style="width: 30%; text-align: left"
+            title="actual bytes / expected bytes"
+          >
+            {{ gossipProgressString(gossipStates[idx]) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <InstallAppDialog
     v-if="selectedAppBundlePath"
     :appBundlePath="selectedAppBundlePath"
@@ -91,7 +143,7 @@
     ref="install-app-dialog"
   ></InstallAppDialog>
   <HCSnackbar
-    labelText="App download failed. Please try again later."
+    labelText="Peer Synchronization not Complete. Please try again later."
     ref="snackbar"
   ></HCSnackbar>
 </template>
@@ -101,11 +153,12 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket } from "@holochain/client";
+import { AppWebsocket, DnaGossipInfo, InstalledCell } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
+import HCProgressBar from "@/components/subcomponents/HCProgressBar.vue";
 
 import {
   AppWithReleases,
@@ -119,6 +172,14 @@ import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
+import { HolochainId, GossipProgress } from "@/types";
+import { gossipProgressPercent, gossipProgressString } from "@/utils";
+
+interface GossipState {
+  dnarepo: GossipProgress | undefined;
+  happs: GossipProgress | undefined;
+  web_apps: GossipProgress | undefined;
+}
 
 export default defineComponent({
   name: "AppStore",
@@ -128,6 +189,7 @@ export default defineComponent({
     AppPreviewCard,
     HCLoading,
     HCSnackbar,
+    HCProgressBar,
   },
   data(): {
     loadingText: string;
@@ -136,6 +198,12 @@ export default defineComponent({
     selectedAppBundlePath: string | undefined;
     hdkVersionForApp: HdkVersion | undefined;
     howToPublishUrl: string;
+    holochainId: HolochainId | undefined;
+    pollInterval: number | null;
+    cells: InstalledCell[] | undefined;
+    gossipStates: (GossipProgress | undefined)[];
+    latestGossipUpdates: number[]; // timestamps of the latest non-zero gossipInfo update
+    idleStates: boolean[];
   } {
     return {
       loadingText: "",
@@ -145,11 +213,21 @@ export default defineComponent({
       hdkVersionForApp: undefined,
       howToPublishUrl:
         "https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub",
+      holochainId: undefined,
+      pollInterval: null,
+      cells: undefined,
+      gossipStates: [undefined, undefined, undefined],
+      latestGossipUpdates: [0, 0, 0],
+      idleStates: [true, true, true],
     };
   },
-
+  beforeUnmount() {
+    clearInterval(this.pollInterval!);
+  },
   async mounted() {
     const holochainId = this.$store.getters["holochainIdForDevhub"];
+    this.holochainId = holochainId;
+
     const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
 
     const port = this.$store.getters["appInterfacePort"](holochainId);
@@ -159,6 +237,10 @@ export default defineComponent({
     const devhubInfo = await appWs.appInfo({
       installed_app_id: `DevHub-${holochainId.content}`,
     });
+
+    this.cells = devhubInfo.cell_data.sort((a, b) =>
+      a.role_id.localeCompare(b.role_id)
+    );
 
     let allApps: Array<AppWithReleases>;
     try {
@@ -176,9 +258,19 @@ export default defineComponent({
     );
     this.installableApps = filterByHdkVersion(hdk_versions, allApps);
 
+    // set up polling loop to periodically get gossip progress, global scope (window) seems to
+    // be required to clear it again on beforeUnmount()
+    await this.getGossipState();
+    this.pollInterval = window.setInterval(
+      async () => await this.getGossipState(),
+      2000
+    );
+
     this.loading = false;
   },
   methods: {
+    gossipProgressPercent,
+    gossipProgressString,
     async howToPublish() {
       await invoke("open_url_cmd", {
         url: this.howToPublishUrl,
@@ -240,6 +332,83 @@ export default defineComponent({
       this.selectedAppBundlePath = undefined;
       this.hdkVersionForApp = undefined;
     },
+    async getGossipState() {
+      console.log("fetching gossip info...");
+      const port = this.$store.getters["appInterfacePort"](this.holochainId);
+      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      const gossipInfo: DnaGossipInfo[] = await appWs.gossipInfo({
+        dnas: this.cells!.map((cell) => cell.cell_id[0] as Uint8Array),
+      });
+      console.log("Received gossip info: ", gossipInfo);
+
+      // cells are alphabetically ordered
+      const gossipProgressDnaRepo = {
+        expectedBytes:
+          gossipInfo[0].total_historical_gossip_throughput.expected_op_bytes
+            .incoming,
+        actualBytes:
+          gossipInfo[0].total_historical_gossip_throughput.op_bytes.incoming,
+      };
+      const gossipProgressHapps = {
+        expectedBytes:
+          gossipInfo[1].total_historical_gossip_throughput.expected_op_bytes
+            .incoming,
+        actualBytes:
+          gossipInfo[1].total_historical_gossip_throughput.op_bytes.incoming,
+      };
+      const gossipProgressWebApps = {
+        expectedBytes:
+          gossipInfo[2].total_historical_gossip_throughput.expected_op_bytes
+            .incoming,
+        actualBytes:
+          gossipInfo[2].total_historical_gossip_throughput.op_bytes.incoming,
+      };
+
+      // Check gossip info. In case expected and actual op bytes are 0, keep the chached values
+      if (
+        gossipProgressDnaRepo.expectedBytes != 0 ||
+        gossipProgressDnaRepo.actualBytes != 0
+      ) {
+        this.idleStates[0] = false;
+        this.gossipStates[0] = gossipProgressDnaRepo;
+        console.log(
+          "Set this.gossipStates[0] with the followin gossipProgressDnaRepo: ",
+          gossipProgressDnaRepo
+        );
+        console.log("this.gossipStates[0]: ", this.gossipStates[0]);
+      }
+      if (
+        gossipProgressHapps.expectedBytes != 0 ||
+        gossipProgressHapps.actualBytes != 0
+      ) {
+        this.idleStates[1] = false;
+        this.gossipStates[1] = gossipProgressHapps;
+      }
+      if (
+        gossipProgressWebApps.expectedBytes != 0 ||
+        gossipProgressWebApps.actualBytes != 0
+      ) {
+        this.idleStates[2] = false;
+        this.gossipStates[2] = gossipProgressWebApps;
+      }
+
+      // If actual/expected are both zero, set the progress bar to idle state
+      this.gossipStates.forEach((state, idx) => {
+        if (state && state.actualBytes == 0 && state.expectedBytes == 0) {
+          this.idleStates[idx] = true;
+        }
+      });
+
+      // if latest updates to gossip progress are older than 30 seconds, set them to undefined again
+      this.latestGossipUpdates.forEach((latest, idx) => {
+        if (new Date().getTime() - latest > 30000) {
+          this.gossipStates[idx] = undefined;
+        }
+      });
+
+      console.log("gossipStates: ", this.gossipStates);
+      console.log("idleStates: ", this.idleStates);
+    },
   },
 });
 </script>
@@ -253,5 +422,15 @@ export default defineComponent({
   box-shadow: 0 0px 5px #9b9b9b;
   position: sticky;
   top: 0;
+}
+
+.progress-indicator {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  padding: 20px;
+  background-color: white;
+  border-radius: 20px 0 0 0;
+  min-width: 520px;
 }
 </style>

@@ -116,8 +116,9 @@
             )
           "
           style="margin-right: 29px"
-          :sliderOn="isAppRunning(app.webAppInfo.installed_app_info)"
+          :sliderOn="isSliderOn"
           @click="handleSlider(app)"
+          @keydown.enter="handleSlider(app)"
         />
       </sl-tooltip>
 
@@ -146,62 +147,64 @@
         }}</span>
       </div>
 
-      <table style="text-align: left; margin-top: 20px; margin-left: 140px">
-        <tr>
-          <th></th>
-          <th>Dna Hash</th>
-        </tr>
-
-        <tr>
-          <th>Main Cells</th>
-          <th></th>
-        </tr>
-
-        <tr
-          style=""
-          v-for="cellData in mainCells"
-          :key="[...cellData.cell_id[0], ...cellData.cell_id[1]]"
+      <!-- main cells -->
+      <div
+        class="row"
+        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+      >
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >Main Cells:</span
+        ><span style="display: flex; flex: 1"></span>
+        <span
+          style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
+          @click="showMainCells = !showMainCells"
+          >{{ showMainCells ? "[Hide]" : "[Show]" }}
+        </span>
+      </div>
+      <div v-if="showMainCells" style="margin-left: 140px; margin-right: 20px">
+        <InstalledCellCard
+          v-for="cell in mainCells"
+          :key="JSON.stringify(cell.cell_id[0])"
+          style="margin: 12px 0"
+          :cell="cell"
+          :holochainId="app.holochainId"
         >
-          <td>
-            <span
-              >{{ cellData.role_id.slice(0, 20)
-              }}{{ cellData.role_id.length > 20 ? "..." : "" }}</span
-            >
-          </td>
-          <td>
-            <span
-              style="opacity: 0.7; font-family: monospace; font-size: 14px"
-              >{{ serializeHash(cellData.cell_id[0]) }}</span
-            >
-          </td>
-        </tr>
+        </InstalledCellCard>
+      </div>
 
-        <br />
-        <tr v-if="clonedCells.length > 0">
-          <th>Cloned Cells</th>
-          <th></th>
-        </tr>
+      <!-- cloned cells -->
+      <div
+        class="row"
+        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+      >
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >Cloned Cells:</span
+        ><span style="display: flex; flex: 1"></span>
+        <span
+          style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
+          @click="showClonedCells = !showClonedCells"
+          >{{ showClonedCells ? "[Hide]" : "[Show]" }}
+        </span>
+      </div>
+      <div
+        v-if="showClonedCells"
+        style="margin-left: 140px; margin-right: 20px"
+      >
+        <div v-if="clonedCells.length > 0">
+          <InstalledCellCard
+            v-for="cell in mainCells"
+            :key="JSON.stringify(cell.cell_id[0])"
+            style="margin: 12px 0"
+            :cell="cell"
+            :holochainId="app.holochainId"
+          >
+          </InstalledCellCard>
+        </div>
 
-        <tr
-          style=""
-          v-for="cellData in clonedCells"
-          :key="[...cellData.cell_id[0], ...cellData.cell_id[1]]"
-        >
-          <td>
-            <span
-              >{{ cellData.role_id.slice(0, 20)
-              }}{{ cellData.role_id.length > 20 ? "..." : "" }}</span
-            >
-          </td>
-          <td>
-            <span
-              style="opacity: 0.7; font-family: monospace; font-size: 14px"
-              >{{ serializeHash(cellData.cell_id[0]) }}</span
-            >
-          </td>
-        </tr>
-      </table>
-
+        <div v-else style="text-align: center; opacity: 0.7">
+          There are no cloned cells in this app.
+        </div>
+      </div>
       <span
         v-if="getReason(app.webAppInfo.installed_app_info)"
         style="margin-top: 16px; margin-left: 140px"
@@ -268,6 +271,8 @@ import { HolochainAppInfo } from "../types";
 import { serializeHash } from "@holochain-open-dev/utils";
 import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
+import { AppWebsocket, DnaHash, DnaGossipInfo } from "@holochain/client";
+import prettyBytes from "pretty-bytes";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
@@ -278,6 +283,7 @@ import ToggleSwitch from "./subcomponents/ToggleSwitch.vue";
 import HCButton from "./subcomponents/HCButton.vue";
 import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
+import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
 
 export default defineComponent({
   name: "InstalledAppCard",
@@ -287,6 +293,7 @@ export default defineComponent({
     HCMoreToggle,
     HCGenericDialog,
     HoloIdenticon,
+    InstalledCellCard,
   },
   props: {
     appIcon: {
@@ -301,22 +308,35 @@ export default defineComponent({
     showMore: boolean;
     showUninstallDialog: boolean;
     showPubKeyTooltip: boolean;
+    gossipInfo: Record<string, DnaGossipInfo>;
+    showMainCells: boolean;
+    showClonedCells: boolean;
   } {
     return {
       showMore: false,
       showUninstallDialog: false,
       showPubKeyTooltip: false,
+      gossipInfo: {},
+      showMainCells: true,
+      showClonedCells: true,
     };
   },
   emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp"],
   computed: {
     mainCells() {
       const allCells = this.app.webAppInfo.installed_app_info.cell_data;
-      return allCells.filter((cell) => !cell.role_id.includes("."));
+      return allCells
+        .filter((cell) => !cell.role_id.includes("."))
+        .sort((a, b) => a.role_id.localeCompare(b.role_id));
     },
     clonedCells() {
       const allCells = this.app.webAppInfo.installed_app_info.cell_data;
-      return allCells.filter((cell) => cell.role_id.includes("."));
+      return allCells
+        .filter((cell) => cell.role_id.includes("."))
+        .sort((a, b) => a.role_id.localeCompare(b.role_id));
+    },
+    isSliderOn() {
+      return isAppRunning(this.app.webAppInfo.installed_app_info);
     },
   },
   methods: {
