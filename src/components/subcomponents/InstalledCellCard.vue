@@ -28,11 +28,14 @@
             <HCProgressBar
               v-if="gossipProgressIncoming"
               :progress="gossipProgressPercent(gossipProgressIncoming)"
-              :style="`--height: 10px; --hc-primary-color=${
-                incomingIdle ? '#6B6B6B' : '#482edf'
+              :style="`--height: 10px; --hc-primary-color:${
+                incomingIdle ? '#D0D0D0' : '#482edf'
               };`"
             />
-            <div v-else style="text-align: center">
+            <div
+              v-else
+              style="text-align: center; opacity: 0.7; font-size: 0.9em"
+            >
               no ongoing peer synchronization
             </div>
           </div>
@@ -60,12 +63,15 @@
             <HCProgressBar
               v-if="gossipProgressOutgoing"
               :progress="gossipProgressPercent(gossipProgressOutgoing)"
-              :style="`--height: 10px; --hc-primary-color=${
-                outgoingIdle ? '#6B6B6B' : '#482edf'
+              :style="`--height: 10px; --hc-primary-color:${
+                outgoingIdle ? '#D0D0D0' : '#482edf'
               };`"
             />
-            <div v-else style="text-align: center">
-              no ongoing synchronization
+            <div
+              v-else
+              style="text-align: center; opacity: 0.7; font-size: 0.9em"
+            >
+              no ongoing peer synchronization
             </div>
           </div>
           <div
@@ -198,6 +204,7 @@ export default defineComponent({
         gossipProgressIncoming.expectedBytes == 0 &&
         gossipProgressIncoming.actualBytes == 0
       ) {
+        console.log("Hello from incoming idle check!");
         this.incomingIdle = true;
       }
       if (

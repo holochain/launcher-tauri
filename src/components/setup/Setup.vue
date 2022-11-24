@@ -6,7 +6,7 @@
         Welcome to Holochain!
       </div>
       <div style="color: white; margin-bottom: 80px; font-size: 22px">
-        [imagine a catchy slogan of here]
+        [imagine a catchy slogan here]
       </div>
       <HCButton
         @click="step = 1"
