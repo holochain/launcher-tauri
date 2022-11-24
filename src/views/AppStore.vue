@@ -370,6 +370,11 @@ export default defineComponent({
       ) {
         this.idleStates[0] = false;
         this.gossipStates[0] = gossipProgressDnaRepo;
+        console.log(
+          "Set this.gossipStates[0] with the followin gossipProgressDnaRepo: ",
+          gossipProgressDnaRepo
+        );
+        console.log("this.gossipStates[0]: ", this.gossipStates[0]);
       }
       if (
         gossipProgressHapps.expectedBytes != 0 ||
