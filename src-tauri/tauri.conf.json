@@ -10,6 +10,16 @@
     "beforeBuildCommand": ""
   },
   "tauri": {
+    "cli": {
+      "description": "Running the Holochain Launcher from the command line",
+      "args": [
+        {
+          "name": "config-path",
+          "takesValue": true,
+          "multiple": false
+        }
+      ]
+    },
     "systemTray": {
       "iconPath": "icons/icon.png"
     },

@@ -2,20 +2,20 @@ use std::{path::PathBuf, sync::Arc};
 use url2::Url2;
 
 // NEW_VERSION: Import the exact same types but from the new crates
-use holochain_conductor_api_0_0_173::{
+use holochain_conductor_api_0_0_172::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_0_173::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
+use holochain_p2p_0_0_172::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
 
 use super::{version_manager::VersionManager, HdkVersion, HdiVersion, common::{proxy_url, boostrap_service}};
 
-pub struct HolochainV0_0_173;
+pub struct HolochainV0_0_172;
 
-impl VersionManager for HolochainV0_0_173 {
+impl VersionManager for HolochainV0_0_172 {
   // NEW_VERSION: Careful! Indicate here which HDK version comes bundled with this Holochain version
   fn hdk_version(&self) -> HdkVersion {
-    HdkVersion::V0_0_161
+    HdkVersion::V0_0_160
   }
 
   // NEW_VERSION: Careful! Indicate here which HDI version comes bundled with this Holochain version
@@ -58,12 +58,11 @@ impl VersionManager for HolochainV0_0_173 {
         driver: InterfaceDriver::Websocket { port: admin_port },
       }]),
       network: Some(network_config),
-      db_sync_strategy: Default::default(),
       chc_namespace: None,
+      db_sync_strategy: Default::default(),
     };
 
     serde_yaml::to_string(&config).expect("Could not convert conductor config to string")
   }
 
 }
-

@@ -245,6 +245,7 @@ export default defineComponent({
     let allApps: Array<AppWithReleases>;
     try {
       allApps = await getAllPublishedApps(appWs, devhubInfo);
+      console.log("ALL APPS: ", allApps);
     } catch (e) {
       console.error(e);
       // Catch other errors than being offline
