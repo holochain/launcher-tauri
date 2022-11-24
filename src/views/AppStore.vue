@@ -84,7 +84,7 @@
       style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
       title="Full Synchronization with Peers Required to Reliably Download all Apps."
     >
-      App Library Synchronization Progress:
+      Ongoing App Library Synchronizations (incoming):
     </div>
     <div>
       <div v-for="(cell, idx) in cells" :key="cell.role_id" class="column">
@@ -115,7 +115,7 @@
                 justify-content: center;
               "
             >
-              no active gossip rounds</span
+              no ongoing peer synchronization</span
             >
           </div>
           <div
@@ -141,7 +141,7 @@
     ref="install-app-dialog"
   ></InstallAppDialog>
   <HCSnackbar
-    labelText="Peer Synchronization not Ready. Please try again later."
+    labelText="Peer Synchronization not Complete. Please try again later."
     ref="snackbar"
   ></HCSnackbar>
 </template>
@@ -200,6 +200,7 @@ export default defineComponent({
     pollInterval: number | null;
     cells: InstalledCell[] | undefined;
     gossipState: (GossipProgress | undefined)[];
+    latestGossipUpdates: number[]; // timestamps of the latest non-zero gossipInfo update
   } {
     return {
       loadingText: "",
@@ -213,6 +214,7 @@ export default defineComponent({
       pollInterval: null,
       cells: undefined,
       gossipState: [undefined, undefined, undefined],
+      latestGossipUpdates: [0, 0, 0],
     };
   },
   beforeUnmount() {
@@ -376,6 +378,13 @@ export default defineComponent({
       ) {
         this.gossipState[2] = gossipProgressWebApps;
       }
+
+      // if latest updates to gossip progress are older than 30 seconds, set them to undefined again
+      this.latestGossipUpdates.forEach((latest, idx) => {
+        if (new Date().getTime() - latest > 30000) {
+          this.gossipState[idx] = undefined;
+        }
+      });
     },
   },
 });

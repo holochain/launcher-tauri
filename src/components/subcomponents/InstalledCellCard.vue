@@ -24,16 +24,18 @@
           >
             incoming:
           </div>
-          <div style="width: 65%; margin: 0 30px">
+          <div style="width: 60%; margin: 0 30px">
             <HCProgressBar
               v-if="gossipProgressIncoming"
               :progress="gossipProgressPercent(gossipProgressIncoming)"
               style="--height: 10px"
             />
-            <div v-else style="text-align: center">No active gossip rounds</div>
+            <div v-else style="text-align: center">
+              no ongoing peer synchronization
+            </div>
           </div>
           <div
-            style="width: 20%; text-align: left"
+            style="width: 25%; text-align: left"
             title="actual bytes / expected bytes"
           >
             {{ gossipProgressString(gossipProgressIncoming) }}
@@ -58,7 +60,7 @@
               :progress="gossipProgressPercent(gossipProgressOutgoing)"
               style="--height: 10px"
             />
-            <div v-else>No active gossip rounds</div>
+            <div v-else>no ongoing synchronization</div>
           </div>
           <div
             style="width: 20%; text-align: left"
@@ -107,11 +109,15 @@ export default defineComponent({
     pollInterval: number | null;
     gossipProgressIncoming: GossipProgress | undefined;
     gossipProgressOutgoing: GossipProgress | undefined;
+    latestIncomingUpdate: number;
+    latestOutgoingUpdate: number;
   } {
     return {
       pollInterval: null,
       gossipProgressIncoming: undefined,
       gossipProgressOutgoing: undefined,
+      latestIncomingUpdate: 0,
+      latestOutgoingUpdate: 0,
     };
   },
   async created() {
@@ -164,6 +170,7 @@ export default defineComponent({
         gossipProgressIncoming.actualBytes != 0
       ) {
         this.gossipProgressIncoming = gossipProgressIncoming;
+        this.latestIncomingUpdate = new Date().getTime();
       }
 
       if (
@@ -171,6 +178,15 @@ export default defineComponent({
         gossipProgressOutgoing.actualBytes != 0
       ) {
         this.gossipProgressOutgoing = gossipProgressOutgoing;
+        this.latestOutgoingUpdate = new Date().getTime();
+      }
+
+      // if latest updates to gorrsip progress are older than 30 seconds, set them to undefined again
+      if (new Date().getTime() - this.latestIncomingUpdate > 30000) {
+        this.gossipProgressIncoming = undefined;
+      }
+      if (new Date().getTime() - this.latestOutgoingUpdate > 30000) {
+        this.gossipProgressOutgoing = undefined;
       }
     },
   },
