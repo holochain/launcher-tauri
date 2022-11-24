@@ -91,7 +91,7 @@
         <div class="row" style="align-items: center">
           <div
             style="
-              width: 25%;
+              width: 20%;
               margin-left: 20px;
               font-size: 0.95em;
               text-align: right;
@@ -104,7 +104,9 @@
               v-if="gossipState[idx]"
               title="Full Synchronization Required to Download All Apps."
               :progress="gossipProgressPercent(gossipState[idx])"
-              style="--height: 10px"
+              :style="`--height: 10px; --hc-primary-color=${
+                idleStates[idx] ? '#6B6B6B' : '#482edf'
+              };`"
             />
             <span
               v-else
@@ -119,7 +121,7 @@
             >
           </div>
           <div
-            style="width: 25%; text-align: left"
+            style="width: 30%; text-align: left"
             title="actual bytes / expected bytes"
           >
             {{ gossipProgressString(gossipState[idx]) }}
@@ -201,6 +203,7 @@ export default defineComponent({
     cells: InstalledCell[] | undefined;
     gossipState: (GossipProgress | undefined)[];
     latestGossipUpdates: number[]; // timestamps of the latest non-zero gossipInfo update
+    idleStates: boolean[];
   } {
     return {
       loadingText: "",
@@ -215,6 +218,7 @@ export default defineComponent({
       cells: undefined,
       gossipState: [undefined, undefined, undefined],
       latestGossipUpdates: [0, 0, 0],
+      idleStates: [true, true, true],
     };
   },
   beforeUnmount() {
@@ -364,20 +368,30 @@ export default defineComponent({
         gossipProgressDnaRepo.expectedBytes != 0 ||
         gossipProgressDnaRepo.actualBytes != 0
       ) {
+        this.idleStates[0] = false;
         this.gossipState[0] = gossipProgressDnaRepo;
       }
       if (
         gossipProgressHapps.expectedBytes != 0 ||
         gossipProgressHapps.actualBytes != 0
       ) {
+        this.idleStates[1] = false;
         this.gossipState[1] = gossipProgressHapps;
       }
       if (
         gossipProgressWebApps.expectedBytes != 0 ||
         gossipProgressWebApps.actualBytes != 0
       ) {
+        this.idleStates[2] = false;
         this.gossipState[2] = gossipProgressWebApps;
       }
+
+      // If actual/expected are both zero, set the progress bar to idle state
+      this.gossipState.forEach((state, idx) => {
+        if (state && state.actualBytes == 0 && state.expectedBytes == 0) {
+          this.idleStates[idx] = true;
+        }
+      });
 
       // if latest updates to gossip progress are older than 30 seconds, set them to undefined again
       this.latestGossipUpdates.forEach((latest, idx) => {

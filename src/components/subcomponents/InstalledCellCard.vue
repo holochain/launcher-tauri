@@ -28,7 +28,9 @@
             <HCProgressBar
               v-if="gossipProgressIncoming"
               :progress="gossipProgressPercent(gossipProgressIncoming)"
-              style="--height: 10px"
+              :style="`--height: 10px; --hc-primary-color=${
+                incomingIdle ? '#6B6B6B' : '#482edf'
+              };`"
             />
             <div v-else style="text-align: center">
               no ongoing peer synchronization
@@ -54,16 +56,20 @@
           >
             outgoing:
           </div>
-          <div style="width: 65%; margin: 0 30px; align-items: center">
+          <div style="width: 60%; margin: 0 30px; align-items: center">
             <HCProgressBar
               v-if="gossipProgressOutgoing"
               :progress="gossipProgressPercent(gossipProgressOutgoing)"
-              style="--height: 10px"
+              :style="`--height: 10px; --hc-primary-color=${
+                outgoingIdle ? '#6B6B6B' : '#482edf'
+              };`"
             />
-            <div v-else>no ongoing synchronization</div>
+            <div v-else style="text-align: center">
+              no ongoing synchronization
+            </div>
           </div>
           <div
-            style="width: 20%; text-align: left"
+            style="width: 25%; text-align: left"
             title="actual bytes / expected bytes"
           >
             {{ gossipProgressString(gossipProgressOutgoing) }}
@@ -111,6 +117,8 @@ export default defineComponent({
     gossipProgressOutgoing: GossipProgress | undefined;
     latestIncomingUpdate: number;
     latestOutgoingUpdate: number;
+    outgoingIdle: boolean;
+    incomingIdle: boolean;
   } {
     return {
       pollInterval: null,
@@ -118,6 +126,8 @@ export default defineComponent({
       gossipProgressOutgoing: undefined,
       latestIncomingUpdate: 0,
       latestOutgoingUpdate: 0,
+      incomingIdle: true,
+      outgoingIdle: true,
     };
   },
   async created() {
@@ -169,6 +179,7 @@ export default defineComponent({
         gossipProgressIncoming.expectedBytes != 0 ||
         gossipProgressIncoming.actualBytes != 0
       ) {
+        this.incomingIdle = false;
         this.gossipProgressIncoming = gossipProgressIncoming;
         this.latestIncomingUpdate = new Date().getTime();
       }
@@ -177,9 +188,33 @@ export default defineComponent({
         gossipProgressOutgoing.expectedBytes != 0 ||
         gossipProgressOutgoing.actualBytes != 0
       ) {
+        this.outgoingIdle = false;
         this.gossipProgressOutgoing = gossipProgressOutgoing;
         this.latestOutgoingUpdate = new Date().getTime();
       }
+
+      // If actual/expected are both zero, set the progress bar to idle state
+      if (
+        gossipProgressIncoming.expectedBytes == 0 &&
+        gossipProgressIncoming.actualBytes == 0
+      ) {
+        this.incomingIdle = true;
+      }
+      if (
+        gossipProgressIncoming.expectedBytes == 0 &&
+        gossipProgressIncoming.actualBytes == 0
+      ) {
+        this.outgoingIdle = true;
+      }
+
+      console.log(
+        "time elapsed since latest incoming update: ",
+        new Date().getTime() - this.latestIncomingUpdate
+      );
+      console.log(
+        "time elapsed since latest outgoing update: ",
+        new Date().getTime() - this.latestOutgoingUpdate
+      );
 
       // if latest updates to gorrsip progress are older than 30 seconds, set them to undefined again
       if (new Date().getTime() - this.latestIncomingUpdate > 30000) {
