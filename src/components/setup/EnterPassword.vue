@@ -1,6 +1,19 @@
 <template>
   <div v-if="entering" class="entering-background">
-    <div class="animated" style="font-size: 40px">{{ bootUpSlogan }}</div>
+    <div class="column" style="align-items: center">
+      <div
+        style="
+          font-size: 40px;
+          color: #e2e1f5;
+          max-width: 660px;
+          margin-bottom: 50px;
+          text-align: center;
+        "
+      >
+        {{ bootUpSlogan }}
+      </div>
+      <LoadingDots style="--radius: 15px; --fill-color: #e2e1f5"></LoadingDots>
+    </div>
   </div>
   <div v-else class="background">
     <div
@@ -75,10 +88,11 @@ import { defineComponent } from "vue";
 import PasswordField from "../subcomponents/PasswordField.vue";
 import HCButton from "../subcomponents/HCButton.vue";
 import { bootUpSlogans } from "../../bootUpSlogans";
+import LoadingDots from "../subcomponents/LoadingDots.vue";
 
 export default defineComponent({
   name: "EnterPassword",
-  components: { PasswordField, HCButton },
+  components: { PasswordField, HCButton, LoadingDots },
   data(): {
     entering: boolean;
     pwInputDisabled: boolean;

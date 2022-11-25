@@ -117,6 +117,7 @@
           ref="repeatPassword"
           placeholder="Repeat password"
           @input="checkRepeatPasswordValidity"
+          @keydown.enter="initialize()"
         />
       </div>
       <div
@@ -148,6 +149,7 @@
         >
           Back
         </HCButton>
+
         <HCButton
           @click="initialize()"
           :disabled="!backupConfirmed || passwordsDontMatch"
@@ -158,8 +160,15 @@
       </div>
     </div>
 
-    <div v-if="step == 3">
-      <div class="animated" style="font-size: 40px">Setting up...</div>
+    <div
+      v-if="step == 3"
+      class="column"
+      style="max-width: 660px; align-items: center"
+    >
+      <div style="font-size: 40px; margin-bottom: 50px; color: white">
+        Setting up
+      </div>
+      <LoadingDots style="--radius: 15px"></LoadingDots>
     </div>
   </div>
 </template>
@@ -171,10 +180,11 @@ import { defineComponent } from "vue";
 import PasswordField from "../subcomponents/PasswordField.vue";
 import HCButton from "../subcomponents/HCButton.vue";
 import ToggleSwitch from "../subcomponents/ToggleSwitch.vue";
+import LoadingDots from "../subcomponents/LoadingDots.vue";
 
 export default defineComponent({
   name: "Setup",
-  components: { PasswordField, HCButton, ToggleSwitch },
+  components: { PasswordField, HCButton, ToggleSwitch, LoadingDots },
   data() {
     return {
       isPasswordValid: false,
@@ -195,7 +205,7 @@ export default defineComponent({
   methods: {
     async initialize() {
       this.step = 3;
-      if (!this.initializing) {
+      if (!this.initializing && !this.passwordsDontMatch) {
         const password = this.firstPassword;
 
         await invoke("initialize_keystore", { password });

@@ -27,6 +27,7 @@
           <div style="width: 60%; margin: 0 30px">
             <HCProgressBar
               v-if="gossipProgressIncoming"
+              title="currently ongoing data exchanges with peers"
               :progress="gossipProgressPercent(gossipProgressIncoming)"
               :style="`--height: 10px; --hc-primary-color:${
                 incomingIdle ? '#D0D0D0' : '#482edf'
@@ -35,6 +36,7 @@
             <div
               v-else
               style="text-align: center; opacity: 0.7; font-size: 0.9em"
+              title="currently ongoing data exchanges with peers"
             >
               no ongoing peer synchronization
             </div>
@@ -64,6 +66,7 @@
           <div style="width: 60%; margin: 0 30px; align-items: center">
             <HCProgressBar
               v-if="gossipProgressOutgoing"
+              title="currently ongoing data exchanges with peers"
               :progress="gossipProgressPercent(gossipProgressOutgoing)"
               :style="`--height: 10px; --hc-primary-color:${
                 outgoingIdle ? '#D0D0D0' : '#482edf'
@@ -71,6 +74,7 @@
             />
             <div
               v-else
+              title="currently ongoing data exchanges with peers"
               style="text-align: center; opacity: 0.7; font-size: 0.9em"
             >
               no ongoing peer synchronization

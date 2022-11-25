@@ -79,7 +79,7 @@
     </div>
   </div>
 
-  <div class="progress-indicator">
+  <div class="progress-indicator" :class="{ highlighted: downloadFailed }">
     <div
       style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
       title="Full Synchronization with Peers Required to Reliably Download all Apps."
@@ -102,7 +102,7 @@
           <div style="width: 50%; margin: 0 30px">
             <HCProgressBar
               v-if="gossipStates[idx]"
-              title="Full Synchronization Required to Download All Apps."
+              title="currently ongoing data exchanges with peers"
               :progress="gossipProgressPercent(gossipStates[idx])"
               :style="`--height: 10px; --hc-primary-color:${
                 idleStates[idx] ? '#6B6B6B' : '#482edf'
@@ -116,6 +116,7 @@
                 display: flex;
                 justify-content: center;
               "
+              title="currently ongoing data exchanges with peers"
             >
               no ongoing peer synchronization</span
             >
@@ -145,7 +146,7 @@
     ref="install-app-dialog"
   ></InstallAppDialog>
   <HCSnackbar
-    labelText="Peer Synchronization not Complete. Please try again later."
+    labelText="App Library Synchronization not Complete. Please try again later."
     ref="snackbar"
   ></HCSnackbar>
 </template>
@@ -207,6 +208,7 @@ export default defineComponent({
     latestGossipUpdates: number[]; // timestamps of the latest non-zero gossipInfo update
     idleStates: boolean[];
     showProgressIndicator: boolean;
+    downloadFailed: boolean;
   } {
     return {
       loadingText: "",
@@ -223,6 +225,7 @@ export default defineComponent({
       latestGossipUpdates: [0, 0, 0],
       idleStates: [true, true, true],
       showProgressIndicator: false,
+      downloadFailed: false,
     };
   },
   beforeUnmount() {
@@ -323,6 +326,8 @@ export default defineComponent({
         console.log(e);
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
+        this.downloadFailed = true;
+        setTimeout(() => (this.downloadFailed = false), 3000);
       }
     },
     async selectFromFileSystem() {
@@ -406,5 +411,23 @@ export default defineComponent({
   box-shadow: 0 0px 5px #9b9b9b;
   border-radius: 20px 0 0 0;
   min-width: 540px;
+}
+
+.highlighted {
+  border-top: 4px solid transparent;
+  border-left: 4px solid transparent;
+  animation: bordercolorchange 1s linear infinite;
+}
+
+@keyframes bordercolorchange {
+  0% {
+    border-color: white;
+  }
+  50% {
+    border-color: #482edf;
+  }
+  100% {
+    border-color: white;
+  }
 }
 </style>
