@@ -1,4 +1,21 @@
 <template>
+  <HCDialog ref="forgot-password" closeOnSideClick>
+    <div class="column" style="padding: 30px; align-items: center">
+      <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
+        Oh my!
+      </div>
+      <div>
+        Unfortunately, the Holochain Launcher does not support a password
+        recovery mechanism at this stage.
+        <br />
+        <br />
+        Your only option is to do a factory reset (Settings > Factory Reset) to
+        delete your current profile alongside with all your holochain apps and
+        restart from scratch.
+      </div>
+    </div>
+  </HCDialog>
+
   <div v-if="entering" class="entering-background">
     <div class="column" style="align-items: center">
       <div
@@ -6,7 +23,7 @@
           font-size: 40px;
           color: #e2e1f5;
           max-width: 660px;
-          margin-bottom: 50px;
+          margin-bottom: 45px;
           text-align: center;
         "
       >
@@ -34,7 +51,7 @@
         </div>
         <img class="halo" src="/img/Holochain_Halo.svg" />
       </div>
-      <div class="column center-content right-half">
+      <div class="column center-content right-half" style="position: relative">
         <img
           src="/img/lock_icon.svg"
           style="height: 35px; margin-bottom: 10px; opacity: 0.95"
@@ -76,6 +93,21 @@
             </HCButton>
           </div>
         </form>
+        <div
+          style="
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            font-size: 0.8em;
+            color: #331ead;
+            text-decoration: underline;
+            margin: 5px 10px;
+            cursor: pointer;
+          "
+          @click="openForgotPasswordDialog"
+        >
+          forgot password
+        </div>
       </div>
     </div>
   </div>
@@ -89,21 +121,24 @@ import PasswordField from "../subcomponents/PasswordField.vue";
 import HCButton from "../subcomponents/HCButton.vue";
 import { bootUpSlogans } from "../../bootUpSlogans";
 import LoadingDots from "../subcomponents/LoadingDots.vue";
+import HCDialog from "../subcomponents/HCDialog.vue";
 
 export default defineComponent({
   name: "EnterPassword",
-  components: { PasswordField, HCButton, LoadingDots },
+  components: { PasswordField, HCButton, LoadingDots, HCDialog },
   data(): {
     entering: boolean;
     pwInputDisabled: boolean;
     invalidPassword: boolean;
     bootUpSlogan: string | undefined;
+    forgotPassword: boolean;
   } {
     return {
       entering: false,
       pwInputDisabled: false,
       invalidPassword: false,
       bootUpSlogan: undefined,
+      forgotPassword: false,
     };
   },
   mounted() {
@@ -129,6 +164,9 @@ export default defineComponent({
         this.$nextTick(() => passwordField.setFocus());
       }
       this.entering = false;
+    },
+    openForgotPasswordDialog() {
+      (this.$refs["forgot-password"] as typeof HCDialog).open();
     },
   },
 });

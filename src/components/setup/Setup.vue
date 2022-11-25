@@ -3,7 +3,7 @@
     <!-- <img src="/img/Holochain_Halo_complete.svg" style="height: 110vh;"> -->
     <div v-if="step == 0" class="column" style="align-items: center">
       <div style="color: white; font-size: 56px; margin-bottom: 30px">
-        Welcome to Holochain!
+        Welcome to Holochain
       </div>
       <div style="color: white; margin-bottom: 80px; font-size: 22px">
         [imagine a catchy slogan here]
@@ -165,7 +165,7 @@
       class="column"
       style="max-width: 660px; align-items: center"
     >
-      <div style="font-size: 40px; margin-bottom: 50px; color: white">
+      <div style="font-size: 40px; margin-bottom: 45px; color: white">
         Setting up
       </div>
       <LoadingDots style="--radius: 15px"></LoadingDots>
