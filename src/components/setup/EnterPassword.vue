@@ -1,6 +1,9 @@
 <template>
   <HCDialog ref="forgot-password" closeOnSideClick>
-    <div class="column" style="padding: 30px; align-items: center">
+    <div
+      class="column"
+      style="padding: 30px; align-items: center; max-width: 600px"
+    >
       <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
         Oh my!
       </div>
