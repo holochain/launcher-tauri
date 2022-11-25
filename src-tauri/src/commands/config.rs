@@ -32,13 +32,7 @@ pub async fn write_config(
     }
   }
 
-  kill_children();
-
-  let manager = LauncherManager::launch(app_handle, custom_path).await?;
-
-  let mut m = state.lock().await;
-
-  (*m) = RunningState::Running(manager);
+  app_handle.restart();
 
   Ok(())
 }
