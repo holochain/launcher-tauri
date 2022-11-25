@@ -34,6 +34,18 @@
       </div>
       <LoadingDots style="--radius: 15px; --fill-color: #e2e1f5"></LoadingDots>
     </div>
+    <div
+      v-if="loadingState"
+      style="
+        position: fixed;
+        bottom: 5px;
+        left: 10px;
+        color: #e2e1f5;
+        font-size: 0.9em;
+      "
+    >
+      {{ loadingState }}...
+    </div>
   </div>
   <div v-else class="background">
     <div
@@ -125,6 +137,7 @@ import HCButton from "../subcomponents/HCButton.vue";
 import { bootUpSlogans } from "../../bootUpSlogans";
 import LoadingDots from "../subcomponents/LoadingDots.vue";
 import HCDialog from "../subcomponents/HCDialog.vue";
+import { listen } from "@tauri-apps/api/event";
 
 export default defineComponent({
   name: "EnterPassword",
@@ -135,6 +148,7 @@ export default defineComponent({
     invalidPassword: boolean;
     bootUpSlogan: string | undefined;
     forgotPassword: boolean;
+    loadingState: string | undefined;
   } {
     return {
       entering: false,
@@ -142,11 +156,17 @@ export default defineComponent({
       invalidPassword: false,
       bootUpSlogan: undefined,
       forgotPassword: false,
+      loadingState: undefined,
     };
   },
-  mounted() {
+  async mounted() {
     this.bootUpSlogan =
       bootUpSlogans[Math.floor(Math.random() * bootUpSlogans.length)];
+
+    this.loadingState = undefined;
+    await listen("progress-update", (event) => {
+      this.loadingState = event.payload as string;
+    });
   },
   methods: {
     async enterPassword() {

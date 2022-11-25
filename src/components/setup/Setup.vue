@@ -165,10 +165,23 @@
       class="column"
       style="max-width: 660px; align-items: center"
     >
-      <div style="font-size: 40px; margin-bottom: 45px; color: white">
+      <div style="font-size: 40px; margin-bottom: 45px; color: #e2e1f5">
         Setting up
       </div>
       <LoadingDots style="--radius: 15px"></LoadingDots>
+    </div>
+
+    <div
+      v-if="loadingState"
+      style="
+        position: fixed;
+        bottom: 5px;
+        left: 10px;
+        color: #e2e1f5;
+        font-size: 0.9em;
+      "
+    >
+      {{ loadingState }}...
     </div>
   </div>
 </template>
@@ -181,11 +194,22 @@ import PasswordField from "../subcomponents/PasswordField.vue";
 import HCButton from "../subcomponents/HCButton.vue";
 import ToggleSwitch from "../subcomponents/ToggleSwitch.vue";
 import LoadingDots from "../subcomponents/LoadingDots.vue";
+import { listen } from "@tauri-apps/api/event";
 
 export default defineComponent({
   name: "Setup",
   components: { PasswordField, HCButton, ToggleSwitch, LoadingDots },
-  data() {
+  data(): {
+    isPasswordValid: boolean;
+    passwordsDontMatch: boolean;
+    firstPassword: string | undefined;
+    initializing: boolean;
+    pwInputDisabled: boolean;
+    backupConfirmed: boolean;
+    step: number;
+    repeatedPassword: string | undefined;
+    loadingState: string | undefined;
+  } {
     return {
       isPasswordValid: false,
       passwordsDontMatch: true,
@@ -195,7 +219,14 @@ export default defineComponent({
       backupConfirmed: false,
       step: 0,
       repeatedPassword: undefined,
+      loadingState: undefined,
     };
+  },
+  async mounted() {
+    this.loadingState = undefined;
+    await listen("progress-update", (event) => {
+      this.loadingState = event.payload as string;
+    });
   },
   created() {
     this.$nextTick(() => {

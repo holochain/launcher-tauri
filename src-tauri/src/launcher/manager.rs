@@ -102,11 +102,22 @@ impl LauncherManager {
   }
 
   pub async fn initialize_and_launch_keystore(&mut self, password: String, custom_path: Option<String>) -> Result<(), String> {
+
+    // emitting signal to the front-end for progress indication
+    self.app_handle.get_window("admin").unwrap()
+      .emit("progress-update", String::from("Initializing keystore"))
+      .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
+
     let keystore_path = keystore_data_path(LairKeystoreManagerV0_2::lair_keystore_version(), custom_path.clone());
 
     LairKeystoreManagerV0_2::initialize(keystore_path, password.clone())
       .await
       .map_err(|err| format!("Error initializing the keystore: {:?}", err))?;
+
+    // emitting signal to the front-end for progress indication
+    self.app_handle.get_window("admin").unwrap()
+      .emit("progress-update", String::from("Launching keystore"))
+      .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
     self.launch_keystore(password, custom_path).await?;
 
@@ -127,6 +138,11 @@ impl LauncherManager {
     holochain_versions_to_run.insert(HolochainVersion::default());
 
     for version in holochain_versions_to_run {
+      // emitting signal to the front-end for progress indication
+      self.app_handle.get_window("admin").unwrap()
+        .emit("progress-update", format!("Launching Holochain version {}", version.to_string()))
+        .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
+
       self.launch_holochain_manager(version, None, custom_path.clone()).await?;
     }
 

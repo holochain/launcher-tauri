@@ -10,6 +10,10 @@ pub async fn initialize_keystore(
   if window.label() != "admin" {
     return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (J)"))
   }
+  // emitting signal to the front-end for progress indication
+  window.emit("progress-update", String::from("Initializing keystore"))
+    .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
+
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
 
