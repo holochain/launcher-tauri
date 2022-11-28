@@ -9,7 +9,7 @@ pub fn restart(
 ) -> Result<(), String> {
 
   if window.label() != "admin" {
-    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (J)"))
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (M)"))
   }
 
   log::warn!("A Restart of the Launcher has been requested, restarting...");

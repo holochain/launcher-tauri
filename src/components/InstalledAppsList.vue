@@ -30,7 +30,7 @@
           --hc-label-background: #e8e8eb;
         "
         placeholder="Holochain Versions"
-        :items="holochainVersions"
+        :items="holochainVersionOptions"
         @item-selected="selectedHolochainVersion = $event"
       ></HCSelectCard>
       <img
@@ -59,6 +59,7 @@
       >
     </div>
 
+    <!-- Web Apps -->
     <div
       class="row section-title"
       :class="{ borderBottomed: showWebApps }"
@@ -70,7 +71,6 @@
         >Web Apps</span
       >
       <span
-        v-if="!noWebApps"
         @click="showWebApps = !showWebApps"
         class="show-hide"
         style="opacity: 0.7; cursor: pointer; margin-left: 10px"
@@ -78,8 +78,11 @@
         {{ showWebApps ? "[-]" : "[show]" }}
       </span>
     </div>
-    <div v-if="showWebApps" style="margin-bottom: 50px">
-      <div v-if="noWebApps" style="margin-top: 30px; color: rgba(0, 0, 0, 0.6)">
+    <div v-if="showWebApps" style="margin-bottom: 50px; width: 100%">
+      <div
+        v-if="noWebApps"
+        style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
+      >
         There are no Web Apps installed{{
           selectedHolochainVersion === "All Versions"
             ? "."
@@ -110,6 +113,7 @@
       </div>
     </div>
 
+    <!-- Headless Apps -->
     <div
       class="row section-title"
       :class="{ borderBottomed: showHeadlessApps }"
@@ -120,7 +124,6 @@
         >Headless Apps</span
       >
       <span
-        v-if="noHeadlessApps"
         @click="showHeadlessApps = !showHeadlessApps"
         class="show-hide"
         style="opacity: 0.7; cursor: pointer; margin-left: 10px"
@@ -128,10 +131,10 @@
         {{ showHeadlessApps ? "[-]" : "[show]" }}
       </span>
     </div>
-    <div v-if="showHeadlessApps">
+    <div v-if="showHeadlessApps" style="margin-bottom: 50px; width: 100%">
       <div
         v-if="noHeadlessApps"
-        style="margin-top: 30px; color: rgba(0, 0, 0, 0.6)"
+        style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
       >
         There are no headless apps installed{{
           selectedHolochainVersion === "All Versions"
@@ -160,6 +163,82 @@
         />
       </div>
     </div>
+
+    <!-- Holochain verison info -->
+    <div
+      class="row section-title"
+      :class="{ borderBottomed: showHolochainVersions }"
+    >
+      <span
+        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
+        title="Installed Holochain Versions"
+        >Holochain Versions</span
+      >
+      <span
+        @click="showHolochainVersions = !showHolochainVersions"
+        class="show-hide"
+        style="opacity: 0.7; cursor: pointer; margin-left: 10px"
+      >
+        {{ showHolochainVersions ? "[-]" : "[show]" }}
+      </span>
+    </div>
+    <div
+      v-if="showHolochainVersions"
+      class="column"
+      style="margin-bottom: 50px; width: 100%; align-items: center"
+    >
+      <div
+        v-if="noHolochainVersions"
+        style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
+      >
+        There are no Holochain Versions installed.
+      </div>
+      <div v-else style="max-width: 1090px; width: 100%">
+        <div class="row">
+          <span style="flex: 1"></span>
+          <span style="font-weight: 600; margin: 0 90px; text-align: center"
+            >Storage</span
+          >
+        </div>
+        <div class="row">
+          <span style="flex: 1"></span>
+          <span style="width: 120px; text-align: center">conductor</span>
+          <span style="width: 120px; text-align: center">web assets</span>
+        </div>
+        <div
+          v-for="hcVersion in holochainVersions"
+          :key="hcVersion"
+          style="
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            width: 100%;
+            align-items: center;
+          "
+        >
+          <div class="row hc-version">
+            <img
+              src="/img/Square284x284Logo.png"
+              style="height: 42px; margin-left: 11px; margin-right: 11px"
+            />
+            <div style="font-weight: 600; font-size: 1.1em">
+              {{ hcVersion }}
+            </div>
+            <span style="display: flex; flex: 1"></span>
+            <span style="width: 120px; text-align: center">{{
+              storageInfos[hcVersion]
+                ? prettyBytes(storageInfos[hcVersion].conductor)
+                : "?"
+            }}</span>
+            <span style="width: 120px; text-align: center">{{
+              storageInfos[hcVersion]
+                ? prettyBytes(storageInfos[hcVersion].uis)
+                : "?"
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -172,10 +251,12 @@ import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
 
-import { HolochainAppInfo } from "../types";
+import { HolochainAppInfo, HolochainId, StorageInfo } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
 import HCSelectCard from "./subcomponents/HCSelectCard.vue";
+import { invoke } from "@tauri-apps/api/tauri";
+import prettyBytes from "pretty-bytes";
 
 export default defineComponent({
   name: "InstalledAppsList",
@@ -195,6 +276,8 @@ export default defineComponent({
     selectedHolochainVersion: string;
     showHeadlessApps: boolean;
     showWebApps: boolean;
+    showHolochainVersions: boolean;
+    storageInfos: Record<string, StorageInfo>;
   } {
     return {
       sortOptions: [
@@ -206,9 +289,21 @@ export default defineComponent({
       selectedHolochainVersion: "All Versions",
       showHeadlessApps: true,
       showWebApps: true,
+      showHolochainVersions: true,
+      storageInfos: {},
     };
   },
-  emits: ["openApp"],
+  emits: ["openApp", "uninstall-app", "enable-app", "disable-app"],
+  async mounted() {
+    Promise.all(
+      this.installedApps.map(async (app) => {
+        this.storageInfos[app.holochainVersion] = await invoke(
+          "get_storage_info",
+          { holochainId: app.holochainId }
+        );
+      })
+    );
+  },
   computed: {
     sortedApps() {
       let sortedAppList = this.installedApps;
@@ -252,7 +347,14 @@ export default defineComponent({
         (app) => app.webAppInfo.web_ui_info.type === "Headless"
       );
     },
-    holochainVersions(): [string, string][] {
+    noHolochainVersions(): boolean {
+      return this.noWebApps && this.noHeadlessApps;
+    },
+    holochainVersions(): string[] {
+      const allApps = this.installedApps;
+      return allApps.map((app) => app.holochainVersion);
+    },
+    holochainVersionOptions(): [string, string][] {
       let allApps = this.installedApps;
       let hcVersions: [string, string][] = [["All Versions", "All Versions"]];
       uniq(allApps.map((app) => app.holochainVersion)).forEach((hcVer) => {
@@ -262,6 +364,7 @@ export default defineComponent({
     },
   },
   methods: {
+    prettyBytes,
     isAppRunning,
     isAppHeadless(app: HolochainAppInfo) {
       return app.webAppInfo.web_ui_info.type === "Headless";
@@ -284,5 +387,17 @@ export default defineComponent({
 
 .borderBottomed {
   border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+}
+
+.hc-version {
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  max-width: 1090px;
+  margin-top: 8px;
+  border-radius: 15px;
+  padding: 8px 0;
+  background: white;
+  box-shadow: 0 0px 5px #9b9b9b;
 }
 </style>

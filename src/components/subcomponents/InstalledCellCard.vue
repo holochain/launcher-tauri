@@ -166,12 +166,6 @@ export default defineComponent({
       const gossipInfo: DnaGossipInfo[] = await appWs.gossipInfo({
         dnas: [this.cell.cell_id[0]],
       });
-      console.log(
-        "Gossip Info fetched for ",
-        this.cell.role_id,
-        ": ",
-        gossipInfo
-      );
 
       const gossipProgressIncoming = {
         expectedBytes:
@@ -212,7 +206,6 @@ export default defineComponent({
         gossipProgressIncoming.expectedBytes == 0 &&
         gossipProgressIncoming.actualBytes == 0
       ) {
-        console.log("Hello from incoming idle check!");
         this.incomingIdle = true;
       }
       if (
@@ -221,15 +214,6 @@ export default defineComponent({
       ) {
         this.outgoingIdle = true;
       }
-
-      console.log(
-        "time elapsed since latest incoming update: ",
-        Date.now() - this.latestIncomingUpdate
-      );
-      console.log(
-        "time elapsed since latest outgoing update: ",
-        Date.now() - this.latestOutgoingUpdate
-      );
 
       // if latest updates to gorrsip progress are older than 30 seconds, set them to undefined again
       if (new Date().getTime() - this.latestIncomingUpdate > 30000) {

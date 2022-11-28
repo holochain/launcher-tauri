@@ -8,7 +8,7 @@ pub async fn start_app(
   holochain_id: HolochainId,
 ) -> Result<(), String> {
   if window.label() != "admin" {
-    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (N)"))
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (O)"))
   }
 
   let mut mutex = (*state).lock().await;

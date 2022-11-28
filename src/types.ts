@@ -131,3 +131,8 @@ export interface GossipProgress {
   expectedBytes: number;
   actualBytes: number;
 }
+
+export interface StorageInfo {
+  uis: number;
+  conductor: number;
+}

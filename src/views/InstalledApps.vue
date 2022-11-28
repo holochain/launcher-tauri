@@ -7,10 +7,7 @@
   </div>
 
   <div v-else>
-    <div
-      v-if="view.type === 'installedApps'"
-      style="display: flex; flex: 1; flex-direction: column"
-    >
+    <div style="display: flex; flex: 1; flex-direction: column">
       <div class="row top-bar" style="position: sticky; top: 0; z-index: 1">
         <img
           src="/img/Square284x284Logo.png"
@@ -41,7 +38,6 @@
         <InstalledAppsList
           :installedApps="$store.getters[`allApps`]"
           @open-app="openApp($event)"
-          @app-selected="selectApp($event)"
           @disable-app="disableApp($event)"
           @enable-app="enableApp($event)"
           @start-app="startApp($event)"
@@ -81,44 +77,17 @@ import InstalledAppsList from "../components/InstalledAppsList.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 
-type View =
-  | {
-      type: "installedApps";
-    }
-  | {
-      type: "appDetail";
-      holochainId: HolochainId;
-      appId: string;
-    };
-
 export default defineComponent({
   name: "InstalledApps",
   components: { InstalledAppsList, HCButton, HCSnackbar },
   data(): {
     snackbarText: string | undefined;
-    view: View;
     reportIssueUrl: string;
   } {
     return {
       snackbarText: undefined,
-      view: { type: "installedApps" },
       reportIssueUrl: "https://github.com/holochain/launcher/issues/new",
     };
-  },
-  computed: {
-    selectedAppInfo() {
-      const view = this.view as View;
-      if (view.type !== "appDetail") return undefined;
-      if (!this.$store.getters[`appsForHolochain`]) return undefined;
-
-      const apps: InstalledWebAppInfo[] = this.$store.getters[
-        `appsForHolochain`
-      ](view.holochainId);
-
-      return apps.find(
-        (app) => app.installed_app_info.installed_app_id === view.appId
-      );
-    },
   },
   async created() {
     await this.$store.dispatch(ActionTypes.fetchStateInfo);
@@ -126,13 +95,6 @@ export default defineComponent({
   methods: {
     isLoading() {
       return this.$store.state.launcherStateInfo === "loading";
-    },
-    selectApp(holochainId: HolochainId, appId: string) {
-      this.view = {
-        type: "appDetail",
-        holochainId,
-        appId,
-      };
     },
     async openApp(app: HolochainAppInfo) {
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
@@ -201,7 +163,6 @@ export default defineComponent({
       try {
         await invoke("uninstall_app", { appId, holochainId: app.holochainId });
 
-        this.view = { type: "installedApps" };
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
         this.showMessage(`Uninstalled ${appId}`);

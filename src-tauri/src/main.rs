@@ -45,6 +45,7 @@ use crate::commands::{
   open_app::open_app_ui,
   password::{initialize_keystore, unlock_and_launch},
   uninstall_app::uninstall_app,
+  storage::get_storage_info,
 };
 use crate::launcher::manager::LauncherManager;
 use crate::launcher::state::LauncherState;
@@ -69,6 +70,7 @@ fn main() {
     })
     .invoke_handler(tauri::generate_handler![
       get_state_info,
+      get_storage_info,
       open_app_ui,
       initialize_keystore,
       report_issue_cmd,

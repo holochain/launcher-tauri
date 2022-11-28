@@ -8,7 +8,7 @@ pub async fn initialize_keystore(
   password: String,
 ) -> Result<(), String> {
   if window.label() != "admin" {
-    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (J)"))
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (K)"))
   }
   // emitting signal to the front-end for progress indication
   window.emit("progress-update", String::from("Initializing keystore"))

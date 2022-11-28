@@ -7,7 +7,7 @@ pub fn quit(
 ) -> Result<(), String> {
 
   if window.label() != "admin" {
-    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (J)"))
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (L)"))
   }
 
   log::warn!("Quitting the Launcher has been requested, Quitting...");

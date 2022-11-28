@@ -6,7 +6,7 @@ pub fn save_app(
   app_bundle_bytes: Vec<u8>,
 ) -> Result<PathBuf, String> {
   if window.label() != "admin" {
-    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (M)"))
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (N)"))
   }
 
   let now = SystemTime::now();

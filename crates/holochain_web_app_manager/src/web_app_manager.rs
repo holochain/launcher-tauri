@@ -12,6 +12,7 @@ use holochain_manager::{
   HolochainManager,
 };
 use lair_keystore_manager::utils::create_dir_if_necessary;
+use serde::{Serialize, Deserialize};
 use std::{
   collections::HashMap,
   fs::{self, File},
@@ -304,6 +305,23 @@ impl WebAppManager {
   pub fn app_interface_port(&mut self) -> u16 {
     self.holochain_manager.app_interface_port()
   }
+
+  pub fn get_storage_info(&self) -> Result<StorageInfo, String> {
+    let ui_path = uis_data_path(&self.environment_path);
+    let conductor_path = conductor_path(&self.environment_path);
+    let uis_size = fs_extra::dir::get_size(ui_path)
+      .map_err(|e| format!("Failed to get UI directory size: {:?}", e))?;
+    let conductor_size = fs_extra::dir::get_size(conductor_path)
+      .map_err(|e| format!("Failed to get conductor directory size: {:?}", e))?;
+
+    Ok(
+      StorageInfo {
+        uis: uis_size,
+        conductor: conductor_size,
+      }
+    )
+
+  }
 }
 
 fn uis_data_path(root_path: &PathBuf) -> PathBuf {
@@ -312,4 +330,16 @@ fn uis_data_path(root_path: &PathBuf) -> PathBuf {
 
 fn app_ui_path(root_path: &PathBuf, app_id: &String) -> PathBuf {
   uis_data_path(root_path).join(app_id)
+}
+
+fn conductor_path(root_path: &PathBuf) -> PathBuf {
+  root_path.join("conductor")
+}
+
+
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct StorageInfo {
+  uis: u64,
+  conductor: u64,
 }
