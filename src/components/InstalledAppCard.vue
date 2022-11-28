@@ -145,6 +145,13 @@
             ? "Custom Binary"
             : app.holochainId.content
         }}</span>
+        <!-- <span style="flex: 1;"></span>
+        <img
+          src="/img/refresh.png"
+          title="Refresh"
+          @click="refresh"
+          style="width: 20px; height: 20px; margin-right: 30px; cursor: pointer;"
+        > -->
       </div>
 
       <!-- main cells -->
