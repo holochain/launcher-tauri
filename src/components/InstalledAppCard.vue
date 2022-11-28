@@ -192,7 +192,7 @@
       >
         <div v-if="clonedCells.length > 0">
           <InstalledCellCard
-            v-for="cell in mainCells"
+            v-for="cell in clonedCells"
             :key="JSON.stringify(cell.cell_id[0])"
             style="margin: 12px 0"
             :cell="cell"

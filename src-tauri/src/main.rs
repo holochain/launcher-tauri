@@ -99,7 +99,7 @@ fn main() {
             custom_path: Some(path),
           },
           _ => {
-            println!("ERROR: Value passed to --config-path option could not be interpreted as string.");
+            // println!("ERROR: Value passed to --config-path option could not be interpreted as string.");
             CustomPath {
               custom_path: None
             }

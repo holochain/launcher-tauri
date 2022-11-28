@@ -430,7 +430,7 @@ impl LauncherManager {
     let window = WindowBuilder::new(
       &self.app_handle,
       window_label.clone(),
-      WindowUrl::App("index.html".into())
+      WindowUrl::App("".into())
     )
     .on_web_resource_request(move |request, response| {
       // println!("£*£*£*£* REQUEST BEFORE {:?}", request);
