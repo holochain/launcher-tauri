@@ -4,7 +4,11 @@
     @confirm="executeFactoryReset()"
     closeOnSideClick
     :primaryButtonDisabled="executing"
-    :primaryButtonLabel="executing ? 'Executing...' : 'Execute Factory Reset'"
+    :primaryButtonLabel="
+      executing
+        ? $t('dialogs.factoryReset.executing')
+        : $t('dialogs.factoryReset.primaryButton')
+    "
   >
     <div class="column" style="margin: 0 20px; max-width: 500px">
       <span
@@ -63,10 +67,11 @@
       </div>
 
       <span v-else style="margin-top: 8px; text-align: center">
-        This will <b>uninstall all Holochain apps</b> on your computer of
-        Holochain versions supported by this version of the Holochain
-        Launcher.<br /><br />
-        It will also <b>delete all data stored in those apps.</b>
+        {{ $t("dialogs.factoryReset.part1") }}
+        <b>{{ $t("dialogs.factoryReset.bold1") }}</b>
+        {{ $t("dialogs.factoryReset.part2") }}<br /><br />
+        {{ $t("dialogs.factoryReset.part3")
+        }}<b>{{ $t("dialogs.factoryReset.bold2") }}</b>
       </span>
     </div>
   </HCGenericDialog>

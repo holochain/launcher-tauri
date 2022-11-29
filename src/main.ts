@@ -23,6 +23,14 @@ window.onerror = function (message, source, lineno, colno, error) {
   });
 };
 
+const defaultLanguage = navigator.language;
+
+if (defaultLanguage.startsWith("de")) {
+  i18n.global.locale = "de";
+} else {
+  i18n.global.locale = "en";
+}
+
 const app = createApp(App);
 
 app.use(store);

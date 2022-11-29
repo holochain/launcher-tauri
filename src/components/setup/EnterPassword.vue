@@ -5,16 +5,13 @@
       style="padding: 30px; align-items: center; max-width: 600px"
     >
       <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
-        Oh my!
+        {{ $t("dialogs.forgotPassword.title") }}
       </div>
       <div>
-        Unfortunately, the Holochain Launcher does not support a password
-        recovery mechanism at this stage.
+        {{ $t("dialogs.forgotPassword.part1") }}
         <br />
         <br />
-        Your only option is to do a factory reset (Settings > Factory Reset) to
-        delete your current profile alongside with all your holochain apps and
-        restart from scratch.
+        {{ $t("dialogs.forgotPassword.part2") }}
       </div>
     </div>
   </HCDialog>
@@ -97,7 +94,7 @@
                 height: 22px;
               "
             >
-              {{ invalidPassword ? "Invalid Password." : "" }}
+              {{ invalidPassword ? $t("setup.login.invalidPassword") : "" }}
             </div>
 
             <HCButton

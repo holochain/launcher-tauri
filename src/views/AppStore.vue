@@ -6,6 +6,7 @@
       <mwc-icon-button
         icon="arrow_back"
         @click="$emit('go-back')"
+        :title="$t('buttons.back')"
       ></mwc-icon-button>
 
       <span
@@ -17,14 +18,14 @@
           top: 0;
           z-index: 1;
         "
-        >App Library</span
+        >{{ $t("appStore.appStore") }}</span
       >
       <HCButton
         outlined
         @click="howToPublish()"
         style="height: 36px; border-radius: 8px; padding: 0 20px"
         :title="howToPublishUrl"
-        >How to publish an app
+        >{{ $t("appStore.howToPublishAnApp") }}
       </HCButton>
       <HCButton
         icon="folder"
@@ -39,7 +40,9 @@
       >
         <div class="row center-content">
           <mwc-icon>folder</mwc-icon>
-          <span style="margin-left: 5px">Select app from Filesystem</span>
+          <span style="margin-left: 5px">{{
+            $t("appStore.selectAppFromFileSystem")
+          }}</span>
         </div>
       </HCButton>
     </div>
@@ -53,7 +56,7 @@
       class="column center-content"
       style="flex: 1"
     >
-      <span>There are no apps available yet in the DevHub.</span>
+      <span>{{ $t("appStore.noAppsInStore") }}</span>
       <span style="margin-top: 8px"
         ><span
           style="cursor: pointer; text-decoration: underline"
@@ -61,9 +64,9 @@
           @click="howToPublish()"
           @keydown.enter="howToPublish()"
           tabindex="0"
-          >Read this</span
+          >{{ $t("appStore.readThis") }}</span
         >
-        to learn how to publish a Holochain application to the DevHub.</span
+        {{ $t("appStore.readThisToPublish") }}</span
       >
     </div>
 
