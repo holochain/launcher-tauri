@@ -62,7 +62,7 @@
             margin: 20px;
           "
         >
-          Discover, install and easily manage your Holochain apps
+          {{ $t("setup.login.slogan") }}
         </div>
         <img class="halo" src="/img/Holochain_Halo.svg" />
       </div>
@@ -72,7 +72,7 @@
           style="height: 35px; margin-bottom: 10px; opacity: 0.95"
         />
         <div style="font-size: 27px; font-weight: 600; margin-bottom: 25px">
-          Enter password
+          {{ $t("setup.login.enterPassword") }}
         </div>
 
         <form>
@@ -82,7 +82,7 @@
               initialFocus
               :disabled="pwInputDisabled"
               ref="password"
-              placeholder="Enter password"
+              :placeholder="$t('setup.login.enterPassword')"
               style="margin-bottom: 5px"
               @input="invalidPassword = false"
             />
@@ -104,7 +104,7 @@
               :disabled="entering"
               @click="enterPassword()"
               style="width: 128px"
-              >{{ entering ? "Starting..." : "Continue" }}
+              >{{ $t("buttons.continue") }}
             </HCButton>
           </div>
         </form>
@@ -121,7 +121,7 @@
           "
           @click="openForgotPasswordDialog"
         >
-          forgot password
+          {{ $t("setup.login.forgotPassword") }}
         </div>
       </div>
     </div>
