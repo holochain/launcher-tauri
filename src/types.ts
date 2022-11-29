@@ -134,5 +134,10 @@ export interface GossipProgress {
 
 export interface StorageInfo {
   uis: number;
+  authored: number;
+  cached: number;
   conductor: number;
+  dht: number;
+  p2p: number;
+  wasm: number;
 }

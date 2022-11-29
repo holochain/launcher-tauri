@@ -193,18 +193,7 @@
       >
         There are no Holochain Versions installed.
       </div>
-      <div v-else style="max-width: 1090px; width: 100%">
-        <div class="row">
-          <span style="flex: 1"></span>
-          <span style="font-weight: 600; margin: 0 90px; text-align: center"
-            >Storage</span
-          >
-        </div>
-        <div class="row">
-          <span style="flex: 1"></span>
-          <span style="width: 120px; text-align: center">conductor</span>
-          <span style="width: 120px; text-align: center">web assets</span>
-        </div>
+      <div v-else style="max-width: 1090px; width: 99%">
         <div
           v-for="hcVersion in holochainVersions"
           :key="hcVersion"
@@ -216,7 +205,7 @@
             align-items: center;
           "
         >
-          <div class="row hc-version">
+          <div class="row hc-version" style="margin: 5px 0">
             <img
               src="/img/Square284x284Logo.png"
               style="height: 42px; margin-left: 11px; margin-right: 11px"
@@ -225,7 +214,22 @@
               {{ hcVersion }}
             </div>
             <span style="display: flex; flex: 1"></span>
-            <span style="width: 120px; text-align: center">{{
+            <span
+              v-if="storageInfos"
+              style="font-weight: 600; margin-right: 15px"
+              >{{
+                totalStorage(hcVersion)
+                  ? prettyBytes(totalStorage(hcVersion))
+                  : "?"
+              }}</span
+            >
+            <StackedChart
+              v-if="storageInfos"
+              :fractions="storageFractions(hcVersion)"
+              :labels="storageLabels(hcVersion)"
+              style="width: 200px; height: 34px; margin-right: 12px"
+            ></StackedChart>
+            <!-- <span style="width: 120px; text-align: center">{{
               storageInfos[hcVersion]
                 ? prettyBytes(storageInfos[hcVersion].conductor)
                 : "?"
@@ -234,7 +238,7 @@
               storageInfos[hcVersion]
                 ? prettyBytes(storageInfos[hcVersion].uis)
                 : "?"
-            }}</span>
+            }}</span> -->
           </div>
         </div>
       </div>
@@ -255,6 +259,7 @@ import { HolochainAppInfo, HolochainId, StorageInfo } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
 import HCSelectCard from "./subcomponents/HCSelectCard.vue";
+import StackedChart from "./subcomponents/StackedChart.vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import prettyBytes from "pretty-bytes";
 
@@ -263,6 +268,7 @@ export default defineComponent({
   components: {
     InstalledAppCard,
     HCSelectCard,
+    StackedChart,
   },
   props: {
     installedApps: {
@@ -295,7 +301,7 @@ export default defineComponent({
   },
   emits: ["openApp", "uninstall-app", "enable-app", "disable-app"],
   async mounted() {
-    Promise.all(
+    await Promise.all(
       this.installedApps.map(async (app) => {
         this.storageInfos[app.holochainVersion] = await invoke(
           "get_storage_info",
@@ -352,7 +358,7 @@ export default defineComponent({
     },
     holochainVersions(): string[] {
       const allApps = this.installedApps;
-      return allApps.map((app) => app.holochainVersion);
+      return uniq(allApps.map((app) => app.holochainVersion));
     },
     holochainVersionOptions(): [string, string][] {
       let allApps = this.installedApps;
@@ -368,6 +374,38 @@ export default defineComponent({
     isAppRunning,
     isAppHeadless(app: HolochainAppInfo) {
       return app.webAppInfo.web_ui_info.type === "Headless";
+    },
+    storageFractions(holochainVersion: string) {
+      const storageInfo: StorageInfo = this.storageInfos[holochainVersion];
+      if (storageInfo) {
+        const totalStorage = this.totalStorage(holochainVersion);
+        const fractions = Object.values(storageInfo).map(
+          (value: number) => (value / totalStorage!) * 100
+        );
+        return fractions;
+      } else {
+        return undefined;
+      }
+    },
+    totalStorage(holochainVersion: string): number | undefined {
+      const storageInfo = this.storageInfos[holochainVersion];
+      if (storageInfo) {
+        return Object.values(storageInfo).reduce(
+          (acc, currValue) => acc + currValue
+        );
+      } else {
+        return undefined;
+      }
+    },
+    storageLabels(holochainVersion: string) {
+      const storageInfo = this.storageInfos[holochainVersion];
+      if (storageInfo) {
+        return Object.entries(storageInfo).map(
+          ([key, value]) => `${key} (${prettyBytes(value)})`
+        );
+      } else {
+        return undefined;
+      }
     },
   },
 });
