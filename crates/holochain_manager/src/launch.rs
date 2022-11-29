@@ -74,7 +74,6 @@ pub async fn launch_holochain_process(
           fatal_error = true;
         }
         if line.contains("Could not initialize Conductor from configuration: InterfaceError(WebsocketError(Io(Os { code: 98, kind: AddrInUse, message: \"Address already in use\" })))") {
-          println!("Fatal error? {}", fatal_error);
           launch_state = LaunchHolochainProcessState::InitializeConductorError(
             InitializeConductorError::AddressAlreadyInUse(
               String::from("Could not initialize Conductor from configuration: InterfaceError(WebsocketError(Io(Os { code: 98, kind: AddrInUse, message: \"Address already in use\" })))")

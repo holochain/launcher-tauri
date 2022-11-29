@@ -384,6 +384,7 @@ impl LauncherManager {
     Ok(())
   }
 
+
   pub fn open_app(&mut self, holochain_id: HolochainId, app_id: &String) -> Result<(), String> {
     let mut window_label = app_id.clone().replace("-", "--").replace(" ", "-").replace(".", "_");
     window_label.push_str("---EXTERNAL"); // !! this line is required for security reasons, to unambiguously differentiate the this window from the admin window
@@ -426,6 +427,7 @@ impl LauncherManager {
       manager.holochain_manager.admin_interface_port(),
       app_id
     );
+
 
     let window = WindowBuilder::new(
       &self.app_handle,
@@ -494,6 +496,8 @@ impl LauncherManager {
       "Settings",
       Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
     )))
+    // .icon(tauri::Icon::File(icon_path)) // placeholder for when apps come shipped with their custom icons
+    // .map_err(|err| format!("Error adding icon: {:?}", err))?
     .build()
     .map_err(|err| format!("Error opening app: {:?}", err))?;
 
