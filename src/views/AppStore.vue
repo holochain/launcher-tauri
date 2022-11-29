@@ -229,7 +229,7 @@ export default defineComponent({
     };
   },
   beforeUnmount() {
-    clearInterval(this.pollInterval!);
+    window.clearInterval(this.pollInterval!);
   },
   async mounted() {
     const holochainId = this.$store.getters["holochainIdForDevhub"];
@@ -346,13 +346,11 @@ export default defineComponent({
       this.hdkVersionForApp = undefined;
     },
     async getGossipState() {
-      console.log("fetching gossip info...");
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       const gossipInfo: DnaGossipInfo[] = await appWs.gossipInfo({
         dnas: this.cells!.map((cell) => cell.cell_id[0] as Uint8Array),
       });
-      console.log("Received gossip info: ", gossipInfo);
 
       gossipInfo.forEach((info, idx) => {
         const gossipProgress = {

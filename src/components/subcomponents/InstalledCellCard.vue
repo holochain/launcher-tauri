@@ -154,7 +154,7 @@ export default defineComponent({
     );
   },
   beforeUnmount() {
-    clearInterval(this.pollInterval!);
+    window.clearInterval(this.pollInterval!);
   },
   methods: {
     gossipProgressPercent,

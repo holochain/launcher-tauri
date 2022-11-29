@@ -181,6 +181,17 @@
       >
         {{ showHolochainVersions ? "[-]" : "[show]" }}
       </span>
+      <span style="flex: 1"></span>
+      <span
+        @click="refreshStorageInfo"
+        style="margin-right: 5px; margin-bottom: -8px; cursor: pointer"
+      >
+        <img
+          src="/img/refresh.png"
+          style="height: 12px; margin-right: 3px; opacity: 0.7"
+        />
+        Refresh
+      </span>
     </div>
     <div
       v-if="showHolochainVersions"
@@ -215,7 +226,7 @@
             </div>
             <span style="display: flex; flex: 1"></span>
             <span
-              v-if="storageInfos"
+              v-if="storageInfos && !refreshing"
               style="font-weight: 600; margin-right: 15px"
               >{{
                 totalStorage(hcVersion)
@@ -224,7 +235,7 @@
               }}</span
             >
             <StackedChart
-              v-if="storageInfos"
+              v-if="storageInfos && !refreshing"
               :fractions="storageFractions(hcVersion)"
               :labels="storageLabels(hcVersion)"
               style="width: 200px; height: 34px; margin-right: 12px"
@@ -284,6 +295,8 @@ export default defineComponent({
     showWebApps: boolean;
     showHolochainVersions: boolean;
     storageInfos: Record<string, StorageInfo>;
+    refreshing: boolean;
+    refreshTimeout: number | null;
   } {
     return {
       sortOptions: [
@@ -297,6 +310,8 @@ export default defineComponent({
       showWebApps: true,
       showHolochainVersions: true,
       storageInfos: {},
+      refreshing: false,
+      refreshTimeout: null,
     };
   },
   emits: ["openApp", "uninstall-app", "enable-app", "disable-app"],
@@ -406,6 +421,21 @@ export default defineComponent({
       } else {
         return undefined;
       }
+    },
+    async refreshStorageInfo() {
+      this.refreshing = true;
+      this.refreshTimeout = window.setTimeout(
+        () => (this.refreshing = false),
+        200
+      );
+      await Promise.all(
+        this.installedApps.map(async (app) => {
+          this.storageInfos[app.holochainVersion] = await invoke(
+            "get_storage_info",
+            { holochainId: app.holochainId }
+          );
+        })
+      );
     },
   },
 });
