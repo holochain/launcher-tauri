@@ -3,23 +3,7 @@
     "cli": {
       "description": "Launching tauri windows that connect to sandboxed Holochain applications for development purposes",
       "beforeHelp": "",
-      "afterHelp": "",
-      "args": [
-        {
-          "name": "ui-path",
-          "takesValue": true,
-          "multiple": false
-        },
-        {
-          "name": "watch",
-          "short": "w",
-          "takesValue": false
-        }
-      ],
-      "subcommands": {
-        "subcommand-name": {
-        }
-      }
+      "afterHelp": ""
     },
     "allowlist": {
       "all": true

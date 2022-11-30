@@ -1,5 +1,5 @@
 [package]
-name = "holochain_cli_launch"
+name = "holochain_cli_launch_old"
 version = "0.0.1"
 edition = "2021"
 license = "Apache-2.0"

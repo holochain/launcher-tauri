@@ -14,45 +14,71 @@ use url::Url;
 mod utils;
 mod commands;
 mod error;
+mod cli;
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
 use commands::sign_zome_call::sign_zome_call;
 
+use structopt::StructOpt;
+
+
+
 fn main() {
+  // run sandboxes
+
+  // build tauri windows
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![sign_zome_call]) // uncomment when testing with right version
     .setup(|app| {
 
-      let cli_matches = app.get_cli_matches()?;
+      // clean existing sandboxes
+      holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
+
+      let args = tauri::async_runtime::block_on(async move {
+
+        if std::env::var_os("RUST_LOG").is_some() {
+            observability::init_fmt(observability::Output::Log).ok();
+        }
+        let opt = cli::HcLaunch::from_args();
+
+        let args = opt.args().unwrap();
+        match opt.run().await {
+          Ok(()) => (),
+          Err(e) => {
+            println!("Failed to run HcLaunch: {:?}", e);
+            panic!("Failed to run HcLaunch: {:?}", e);
+          }
+        }
+
+        args
+      });
+
+      println!("@tauri main: conductors launched.");
+
+      println!("waiting a few seconds before starting tauri windows...");
+      std::thread::sleep(std::time::Duration::from_millis(5000));
 
       let pwd = std::env::current_dir().unwrap();
-      // let assets_path: PathBuf = pwd.parent().unwrap().parent().unwrap().join(".hc_launch").join("ui").into();
-      let assets_path: PathBuf = match cli_matches.args.get("ui-path") {
-        Some(data) => match data.value.clone() {
-          Value::String(path) => path.into(),
-          Value::Bool(false) => pwd.join(".hc_launch").join("ui").into(),
-          Value::Bool(true) => {
-            println!("ERROR: --ui-path option must be accompanied by a value.");
-            panic!("--ui-path option must be accompanied by a value.")
-          },
-          _ => {
-            println!("ERROR: Value passed to --ui-path option could not be interpreted as string or boolean: {:?}", data);
-            panic!("Value passed to --ui-path option could not be interpreted as string.")
-          }
-        },
-        None => pwd.join(".hc_launch").join("ui").into(),
+
+      println!("@tauri main: matching ui_path.");
+
+      let ui_path = match args.ui_path {
+        Some(p) => p,
+        None => pwd.join(".hc_launch").join("ui").into(), // TODO! switch to tmp directory for ui and .happ
       };
 
-      if !assets_path.exists() {
-        println!("ERROR: Specified UI path does not exist.");
-        panic!("Specified UI path does not exist.");
-      }
+      println!("@tauri main: B.");
+
 
       // read the .hc file to get the number of apps
       let dot_hc_path = pwd.join(".hc");
 
+      println!("@tauri main: C");
+
       let dot_hc_content = std::fs::read_to_string(dot_hc_path).unwrap();
+
+      println!("@tauri main: D");
 
       // open a tauri window for each app instance and create a lair client instance for each window
       let mut windows: Vec<Window> = vec![];
@@ -60,13 +86,21 @@ fn main() {
 
       let mut app_counter = 0;
 
-      let (windows, assets_path, lair_clients, app) = tauri::async_runtime::block_on( async move {
+      println!("@tauri main: E");
+
+
+      let (windows, ui_path, lair_clients, app) = tauri::async_runtime::block_on( async move {
 
         for tmp_directory_path in dot_hc_content.lines() {
 
           let app_id = String::from("test-app");
           let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
+          println!("@tauri main: F");
+
           let admin_port = std::fs::read_to_string(dot_hc_live_path).unwrap();
+
+          println!("@tauri main: G");
+
           let admin_port_clone = admin_port.clone();
 
           let app_port = match get_app_websocket(admin_port_clone).await {
@@ -76,6 +110,9 @@ fn main() {
               panic!("Failed to get app websocket port.");
             }
           };
+
+          println!("@tauri main: H");
+
 
           // TODO! implement writing it to window object instead
           let launcher_env = format!(
@@ -91,12 +128,12 @@ fn main() {
 
           let window_label = format!("Agent-{}", app_counter);
 
-          let window = match utils::generate_window(
+          let window = match utils::generate_window::generate_window(
             &app.handle(),
             &app_id,
             window_label.clone(),
-            assets_path.clone().join("index.html"),
-            assets_path.clone(),
+            ui_path.clone().join("index.html"),
+            ui_path.clone(),
             launcher_env,
           ) {
             Ok(window) => window,
@@ -143,57 +180,52 @@ fn main() {
           app_counter += 1;
         }
 
-        (windows, assets_path, lair_clients, app)
+        (windows, ui_path, lair_clients, app)
       });
 
       app.manage(lair_clients);
 
+
       // watch for file changes in the UI folder if requested
-      match cli_matches.args.get("watch") {
-        Some(data) => {
-          match data.value.clone() {
-            Value::Bool(true) => {
-              println!(
-                "Watching file changes in folder {:?}",
-                assets_path.as_path()
-              );
+      match args.watch {
+        true => {
+          println!(
+            "Watching file changes in folder {:?}",
+            ui_path.as_path()
+          );
 
-              let watch_handle = std::thread::spawn(move || {
-                let (tx_watcher, rx_watcher) = std::sync::mpsc::channel();
+          let watch_handle = std::thread::spawn(move || {
+            let (tx_watcher, rx_watcher) = std::sync::mpsc::channel();
 
-                let mut watcher = match RecommendedWatcher::new(tx_watcher, Config::default()) {
-                  Ok(w) => w,
-                  Err(e) => panic!("Failed to create file system watcher: {:?}", e),
-                };
+            let mut watcher = match RecommendedWatcher::new(tx_watcher, Config::default()) {
+              Ok(w) => w,
+              Err(e) => panic!("Failed to create file system watcher: {:?}", e),
+            };
 
-                match watcher.watch(assets_path.as_path(), RecursiveMode::Recursive) {
-                  Ok(()) => (),
-                  Err(e) => {
-                    println!("Failed to watch: {:?}", e);
-                    panic!("Failed to watch.");
-                  }
-                };
+            match watcher.watch(ui_path.as_path(), RecursiveMode::Recursive) {
+              Ok(()) => (),
+              Err(e) => {
+                println!("Failed to watch: {:?}", e);
+                panic!("Failed to watch.");
+              }
+            };
 
-                for res in rx_watcher {
-                  match res {
-                    Ok(event) => {
-                      println!("event: {:?}", event);
-											for window in &windows {
-												window.eval("location.reload()").unwrap();
-											}
-                    }
-                    Err(e) => println!("watch error: {:?}", e),
+            for res in rx_watcher {
+              match res {
+                Ok(event) => {
+                  println!("event: {:?}", event);
+                  for window in &windows {
+                    window.eval("location.reload()").unwrap();
                   }
                 }
-              });
-
-              Some(watch_handle)
+                Err(e) => println!("watch error: {:?}", e),
+              }
             }
-            _ => None,
-          }
-        }
-        _ => None,
-      };
+          });
+        },
+
+        false => (),
+      }
 
       Ok(())
     })

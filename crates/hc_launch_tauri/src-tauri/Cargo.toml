@@ -1,7 +1,7 @@
 [package]
-name = "hc-launch-tauri"
+name = "holochain_cli_launch"
 version = "0.0.1"
-description = "Launching tauri windows that connect to sandboxed Holochain applications for development purposes"
+description = "A CLI to launch holochain apps in a Holochain Launcher environment for testing and development purposes."
 authors = ["you"]
 license = ""
 repository = ""
@@ -14,25 +14,37 @@ rust-version = "1.57"
 tauri-build = { version = "1.1", features = [] }
 
 [dependencies]
-notify= "5.0.0"
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.1", features = ["api-all", "cli",  "devtools"] }
-
-mime_guess = "2.0.4"
-log = "0.4.14"
+anyhow = "1.0"
+futures = "0.3"
 
 holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch="sign-zome-call-testing-launcher"}
+holochain_cli_sandbox = "0.0.64"
 holochain_types = {package = "holochain_types", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
+holochain_util = { version = "^0.0.13", features = [ "pw" ] }
 holochain_zome_types = {package = "holochain_zome_types", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
 holochain_conductor_api = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
 
 lair_keystore_api = "0.2.1"
+
+log = "0.4.14"
+mime_guess = "2.0.4"
+notify= "5.0.0"
+observability = "0.1.3"
 portpicker = "0.1.1"
+structopt = "0.3"
 thiserror = "1.0.22"
+serde_json = "1.0"
+
+serde = { version = "1.0", features = ["derive"] }
+tauri = { version = "1.2", features = ["api-all", "cli",  "devtools"] }
+
+tokio = "1.21.2"
+tracing = "0.1"
 url = "2.3.1"
 url2 = "0.0.6"
+zip = "0.5.0"
 
+lair_keystore_manager = {path = "../../lair_keystore_manager"}
 
 [features]
 # by default Tauri runs in production mode
