@@ -7605,7 +7605,6 @@ dependencies = [
  "anyhow",
  "attohttpc",
  "bytes",
- "clap 3.2.20",
  "cocoa",
  "dirs-next",
  "embed_plist",

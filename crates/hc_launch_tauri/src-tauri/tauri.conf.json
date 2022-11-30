@@ -1,10 +1,5 @@
 {
   "tauri": {
-    "cli": {
-      "description": "Launching tauri windows that connect to sandboxed Holochain applications for development purposes",
-      "beforeHelp": "",
-      "afterHelp": ""
-    },
     "allowlist": {
       "all": true
     },

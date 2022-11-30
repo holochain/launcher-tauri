@@ -4,72 +4,26 @@
 )]
 
 use holochain_client::AdminWebsocket;
-use serde_json::value::Value;
 use std::path::PathBuf;
 use std::collections::HashMap;
 use tauri::Window;
 use tauri::Manager;
 use lair_keystore_api::{LairClient, ipc_keystore_connect};
 use url::Url;
-mod utils;
-mod commands;
-mod error;
-mod cli;
+
+use crate::utils;
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
-use commands::sign_zome_call::sign_zome_call;
 
-use structopt::StructOpt;
-
-
-
-fn main() {
-  // run sandboxes
+pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
 
   // build tauri windows
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![sign_zome_call]) // uncomment when testing with right version
-    .setup(|app| {
-
-      // clean existing sandboxes
-      holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
-
-      let args = tauri::async_runtime::block_on(async move {
-
-        if std::env::var_os("RUST_LOG").is_some() {
-            observability::init_fmt(observability::Output::Log).ok();
-        }
-        let opt = cli::HcLaunch::from_args();
-
-        let args = opt.args().unwrap();
-        match opt.run().await {
-          Ok(()) => (),
-          Err(e) => {
-            println!("Failed to run HcLaunch: {:?}", e);
-            panic!("Failed to run HcLaunch: {:?}", e);
-          }
-        }
-
-        args
-      });
-
-      println!("@tauri main: conductors launched.");
-
-      println!("waiting a few seconds before starting tauri windows...");
-      std::thread::sleep(std::time::Duration::from_millis(5000));
+    .invoke_handler(tauri::generate_handler![crate::commands::sign_zome_call::sign_zome_call]) // uncomment when testing with right version
+    .setup(move |app| {
 
       let pwd = std::env::current_dir().unwrap();
-
-      println!("@tauri main: matching ui_path.");
-
-      let ui_path = match args.ui_path {
-        Some(p) => p,
-        None => pwd.join(".hc_launch").join("ui").into(), // TODO! switch to tmp directory for ui and .happ
-      };
-
-      println!("@tauri main: B.");
-
 
       // read the .hc file to get the number of apps
       let dot_hc_path = pwd.join(".hc");
@@ -187,14 +141,14 @@ fn main() {
 
 
       // watch for file changes in the UI folder if requested
-      match args.watch {
+      match watch {
         true => {
           println!(
             "Watching file changes in folder {:?}",
             ui_path.as_path()
           );
 
-          let watch_handle = std::thread::spawn(move || {
+          let _watch_handle = std::thread::spawn(move || {
             let (tx_watcher, rx_watcher) = std::sync::mpsc::channel();
 
             let mut watcher = match RecommendedWatcher::new(tx_watcher, Config::default()) {
@@ -232,6 +186,7 @@ fn main() {
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
+
 
 async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
   // Try to connect twice. This fixes the os(111) error for now that occurs when the conducor is not ready yet.

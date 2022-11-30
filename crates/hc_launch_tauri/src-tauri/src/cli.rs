@@ -5,7 +5,9 @@
 use std::path::{ Path, PathBuf };
 use structopt::StructOpt;
 use holochain_types::prelude::InstalledAppId;
+use tokio::task::JoinHandle;
 
+use crate::launch_tauri::launch_tauri;
 use crate::utils;
 use crate::error::HcLaunchError;
 use holochain_cli_sandbox::cmds::Create;
@@ -91,37 +93,41 @@ impl HcLaunch {
                         }
                       };
 
+                      // TODO! remove once temp folder is used
+                      let pwd = std::env::current_dir().unwrap();
+
+                      // generate temp folder
+                      let temp_folder = pwd.join(".hc_launch");
+
                       // generate agents
-                      let happ_path = PathBuf::from(".hc_launch/happ.happ");
-                      // let app_handle = crate::generate_agents(happ_path, self.agents, Some(String::from("mdns")));
-                      let sandbox_paths = generate(
+                      let happ_path = temp_folder.join("happ.happ");
+
+                      // clean existing sandboxes
+                      holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
+
+                      // spawn sandboxes
+                      let join_handles = spawn_sandboxes(
                         &self.holochain_path,
-                        Some(happ_path),
+                        happ_path,
                         create,
-                        String::from("test-app")
+                        String::from("test-app"),
                       ).await?;
 
 
-                      let run: Option<Vec<u16>> = Some(vec![]);
-                      let force_admin_ports: Vec<u16> = vec![];
+                      // launch tauri windows
+                      println!("waiting a few seconds before starting tauri windows...");
+                      std::thread::sleep(std::time::Duration::from_millis(5000));
+                      let ui_path = match ui_path {
+                        Some(p) => p,
+                        None => temp_folder.join("ui").into(), // TODO! switch to tmp directory for ui and .happ
+                      };
+                      launch_tauri(ui_path, watch);
 
-                      if let Some(ports) = run {
-                        let holochain_path = self.holochain_path.clone();
-                        let force_admin_ports = force_admin_ports.clone();
-                        tokio::task::spawn(async move {
-                            if let Err(e) =
-                                run_n(&holochain_path, sandbox_paths, ports, force_admin_ports).await
-                            {
-                                tracing::error!(failed_to_run = ?e);
-                            }
-                        });
+
+                      // wait for sandbox processes to finish to make sure their processes get cleaned up
+                      for handle in join_handles {
+                        handle.await?;
                       }
-
-                      // // launch tauri windows via hc-launch-tauri
-                      // let tauri_handle = crate::launch_tauri(None, watch);
-
-                      // app_handle.join().unwrap();
-                      // tauri_handle.join().unwrap();
 
                       // release app ports
                       holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
@@ -165,13 +171,13 @@ impl HcLaunch {
                         None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch web-app --help` for help."),
                       }
                     },
-                    _ => eprintln!("Error: You need to provide a path that points to either a .webhapp a .happ file."),
+                    _ => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file."),
                   }
                 },
                 None => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file.")
               }
             },
-            None => println!("You need to provide a path that points to either a .webhapp a .happ file. Auto-detection is not implemented yet.")
+            None => println!("You need to provide a path that points to either a .webhapp or a .happ file. Auto-detection is not implemented yet.")
           }
         },
     }
@@ -201,6 +207,44 @@ impl HcLaunch {
 }
 
 
+
+
+
+async fn spawn_sandboxes(
+  holochain_path: &PathBuf,
+  happ_path: PathBuf,
+  create: Create,
+  app_id: InstalledAppId
+) -> anyhow::Result<Vec<JoinHandle<()>>> {
+
+
+  let sandbox_paths = generate(
+    holochain_path,
+    Some(happ_path),
+    create,
+    app_id,
+  ).await?;
+
+
+  let run: Option<Vec<u16>> = Some(vec![]);
+  let force_admin_ports: Vec<u16> = vec![];
+  let mut join_handles = vec![];
+
+  if let Some(ports) = run {
+    let holochain_path_clone = holochain_path.clone();
+    let force_admin_ports = force_admin_ports.clone();
+    let handle = tokio::task::spawn(async move {
+        if let Err(e) =
+            run_n(&holochain_path_clone, sandbox_paths, ports, force_admin_ports).await
+        {
+            tracing::error!(failed_to_run = ?e);
+        }
+    });
+    join_handles.push(handle);
+  }
+
+  Ok(join_handles)
+}
 
 
 
