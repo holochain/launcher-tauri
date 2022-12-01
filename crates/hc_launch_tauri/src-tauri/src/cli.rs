@@ -84,20 +84,18 @@ impl HcLaunch {
                 Some(extension) => {
                   match extension.to_str().unwrap() {
                     "webhapp" => {
+                      // generate temp folder
+                      let temp_dir = tempdir::TempDir::new("hc_launch").unwrap();
+                      let temp_folder = temp_dir.path().to_path_buf();
+
                       // unzip the webhapp, prepare UI etc.
-                      match utils::prepare_webapp::read_and_prepare_webapp(&p).await {
+                      match utils::prepare_webapp::read_and_prepare_webapp(&p, &temp_folder).await {
                         Ok(()) => (),
                         Err(e) => {
                           println!("Failed to read and prepare webhapp: {:?}", e);
                           panic!("Failed to read and prepare webhapp");
                         }
                       };
-
-                      // TODO! remove once temp folder is used
-                      let pwd = std::env::current_dir().unwrap();
-
-                      // generate temp folder
-                      let temp_folder = pwd.join(".hc_launch");
 
                       // generate agents
                       let happ_path = temp_folder.join("happ.happ");
@@ -121,13 +119,12 @@ impl HcLaunch {
 
                       launch_tauri(ui_path, watch);
 
+                      // This stuff is never being called :/
+                      tokio::signal::ctrl_c().await?;
+                      holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
                       for handle in join_handles {
                         handle.await?;
                       }
-
-                      println!("Everything cleaned up.");
-
-
                     }
                     "happ" => {
                       match ui_path {
@@ -138,30 +135,24 @@ impl HcLaunch {
                             return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
                           }
 
-                          // generate agents
-                          // let app_handle = crate::generate_agents(p.clone(), self.agents, Some(String::from("mdns")));
-                          let sandbox_paths = generate(
+                          // clean existing sandboxes
+                          holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
+
+                          // spawn sandboxes
+                          let join_handles = spawn_sandboxes(
                             &self.holochain_path,
-                            Some(p),
+                            p,
                             create,
                             String::from("test-app"),
                           ).await?;
 
-                          let run: Option<Vec<u16>> = Some(vec![]);
-                          let force_admin_ports: Vec<u16> = vec![];
 
-                          if let Some(ports) = run {
-                            let holochain_path = self.holochain_path.clone();
-                            let force_admin_ports = force_admin_ports.clone();
-                            tokio::task::spawn(async move {
-                                if let Err(e) =
-                                    run_n(&holochain_path, sandbox_paths, ports, force_admin_ports).await
-                                {
-                                    tracing::error!(failed_to_run = ?e);
-                                }
-                            });
-                            // tokio::signal::ctrl_c().await?;
-                            // holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
+                          launch_tauri(ui_p, watch);
+
+                          tokio::signal::ctrl_c().await?;
+                          holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
+                          for handle in join_handles {
+                            handle.await?;
                           }
 
                         },

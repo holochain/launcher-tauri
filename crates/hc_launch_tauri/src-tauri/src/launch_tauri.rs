@@ -5,10 +5,11 @@
 
 use structopt::StructOpt;
 use holochain_client::AdminWebsocket;
-use tokio::runtime::Handle;
+use tauri::RunEvent;
 use std::path::PathBuf;
 use std::collections::HashMap;
 use tauri::Window;
+use tauri::WindowEvent;
 use tauri::Manager;
 use lair_keystore_api::{LairClient, ipc_keystore_connect};
 use url::Url;
@@ -23,7 +24,7 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
   // tauri::async_runtime::set(tokio::runtime::Handle::current());
 
   // build tauri windows
-  tauri::Builder::default()
+  let builder_result = tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![crate::commands::sign_zome_call::sign_zome_call]) // uncomment when testing with right version
     .setup(move |app| {
 
@@ -40,19 +41,13 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
       // read the .hc file to get the number of apps
       let dot_hc_path = pwd.join(".hc");
 
-      println!("@tauri main: C");
-
       let dot_hc_content = std::fs::read_to_string(dot_hc_path).unwrap();
-
-      println!("@tauri main: D");
 
       // open a tauri window for each app instance and create a lair client instance for each window
       let mut windows: Vec<Window> = vec![];
       let mut lair_clients: HashMap<String, LairClient> = HashMap::new();
 
       let mut app_counter = 0;
-
-      println!("@tauri main: E");
 
       let (windows, ui_path, lair_clients, app) =
         tokio::task::block_in_place( || {
@@ -62,11 +57,8 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
 
             let app_id = String::from("test-app");
             let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
-            println!("@tauri main: F");
 
             let admin_port = std::fs::read_to_string(dot_hc_live_path).unwrap();
-
-            println!("@tauri main: G");
 
             let admin_port_clone = admin_port.clone();
 
@@ -77,9 +69,6 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
                 panic!("Failed to get app websocket port.");
               }
             };
-
-            println!("@tauri main: H");
-
 
             // TODO! implement writing it to window object instead
             let launcher_env = format!(
@@ -117,6 +106,13 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
             window.on_menu_event(move |_| {
               if let Some(w) = a.get_window(window_label_clone.as_str()) {
                 w.open_devtools();
+              }
+            });
+
+            window.on_window_event(|event| {
+              match event {
+                WindowEvent::CloseRequested { api: _, .. } => (),
+                _ => (),
               }
             });
 
@@ -201,8 +197,20 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
 
       Ok(())
     })
-    .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+    .build(tauri::generate_context!());
+
+    match builder_result {
+      Ok(builder) => {
+        builder.run(move |_app_handle, event| {
+          if let RunEvent::ExitRequested { api, .. } = event {
+            api.prevent_exit();
+          }
+        });
+      },
+      Err(e) => eprintln!("Error building tauri windows: {:?}", e)
+    }
+    // .run(tauri::generate_context!())
+    // .expect("error while running tauri application");
 }
 
 

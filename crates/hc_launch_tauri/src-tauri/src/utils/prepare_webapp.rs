@@ -6,7 +6,7 @@ use holochain_types::web_app::WebAppBundle;
 use lair_keystore_manager::utils::{path_exists, create_dir_if_necessary};
 
 
-pub async fn read_and_prepare_webapp(web_happ_path: &PathBuf) -> Result<(), String> {
+pub async fn read_and_prepare_webapp(web_happ_path: &PathBuf, out_path: &PathBuf) -> Result<(), String> {
 
   // 1. read the .webhapp file
   let bytes = fs::read(web_happ_path)
@@ -26,13 +26,13 @@ pub async fn read_and_prepare_webapp(web_happ_path: &PathBuf) -> Result<(), Stri
 
 
   // TODO! Add to tmp directory instead
-  // creating .hc_launch directory if necessary
+  // creating temp directory if necessary
   // 2. store the .happ and the unzipped UI assets in respective folders
-  create_dir_if_necessary(&PathBuf::from(".hc_launch"))
-    .map_err(|e| format!("Failed to create temporary directory .hc_launch: {:?}", e))?;
+  create_dir_if_necessary(out_path)
+    .map_err(|e| format!("Failed to create temporary directory: {:?}", e))?;
 
 
-  let ui_folder_path = PathBuf::from(".hc_launch").join("ui");
+  let ui_folder_path = out_path.join("ui");
   // remove existing assets first
   if path_exists(&ui_folder_path) {
     fs::remove_dir_all(ui_folder_path.clone()).unwrap();
@@ -60,7 +60,7 @@ pub async fn read_and_prepare_webapp(web_happ_path: &PathBuf) -> Result<(), Stri
     .map_err(|e| format!("Failed to remove ui.zip: {:?}", e))?;
 
   // Writing .happ file
-  app_bundle.write_to_file(&PathBuf::from(".hc_launch").join("happ.happ")).await
+  app_bundle.write_to_file(out_path.join("happ.happ").as_path()).await
     .map_err(|e| format!("Failed to write .happ file: {:?}", e))?;
 
   Ok(())
