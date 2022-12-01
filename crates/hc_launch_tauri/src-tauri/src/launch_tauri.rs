@@ -3,7 +3,6 @@
   windows_subsystem = "windows"
 )]
 
-use structopt::StructOpt;
 use holochain_client::AdminWebsocket;
 use tauri::RunEvent;
 use std::path::PathBuf;
@@ -28,9 +27,6 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
     .invoke_handler(tauri::generate_handler![crate::commands::sign_zome_call::sign_zome_call]) // uncomment when testing with right version
     .setup(move |app| {
 
-      // generate temp folder
-
-      // TODO! remove once temp folder is used
       let pwd = std::env::current_dir().unwrap();
 
       // launch tauri windows
@@ -209,6 +205,7 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
       },
       Err(e) => eprintln!("Error building tauri windows: {:?}", e)
     }
+
     // .run(tauri::generate_context!())
     // .expect("error while running tauri application");
 }

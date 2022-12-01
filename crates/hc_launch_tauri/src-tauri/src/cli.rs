@@ -117,6 +117,7 @@ impl HcLaunch {
                         None => temp_folder.join("ui").into(), // TODO! switch to tmp directory for ui and .happ
                       };
 
+
                       launch_tauri(ui_path, watch);
 
                       // This stuff is never being called :/
