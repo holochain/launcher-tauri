@@ -35,7 +35,7 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
 
       // launch tauri windows
       println!("waiting a few seconds before starting tauri windows...");
-      std::thread::sleep(std::time::Duration::from_millis(5000));
+      std::thread::sleep(std::time::Duration::from_millis(8000));
 
 
       // read the .hc file to get the number of apps
@@ -130,7 +130,7 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
             let connection_url = Url::parse(connection_url.as_str()).unwrap();
 
             // create lair client and add it to hashmap
-            let client = match ipc_keystore_connect(connection_url.clone(), "".as_bytes()).await {
+            let client = match ipc_keystore_connect(connection_url.clone(), "pass".as_bytes()).await {
               Ok(client) => client,
               Err(e) => {
                 println!("Failed to connect to lair client: {:?}", e);

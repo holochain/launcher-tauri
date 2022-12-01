@@ -146,7 +146,6 @@ impl HcLaunch {
                             String::from("test-app"),
                           ).await?;
 
-
                           launch_tauri(ui_p, watch);
 
                           tokio::signal::ctrl_c().await?;
