@@ -113,24 +113,21 @@ impl HcLaunch {
                         String::from("test-app"),
                       ).await?;
 
-
-                      // launch tauri windows
-                      println!("waiting a few seconds before starting tauri windows...");
-                      std::thread::sleep(std::time::Duration::from_millis(5000));
+                      // spawn tauri windows
                       let ui_path = match ui_path {
                         Some(p) => p,
                         None => temp_folder.join("ui").into(), // TODO! switch to tmp directory for ui and .happ
                       };
+
                       launch_tauri(ui_path, watch);
 
-
-                      // wait for sandbox processes to finish to make sure their processes get cleaned up
                       for handle in join_handles {
                         handle.await?;
                       }
 
-                      // release app ports
-                      holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
+                      println!("Everything cleaned up.");
+
+
                     }
                     "happ" => {
                       match ui_path {

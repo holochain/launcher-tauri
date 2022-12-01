@@ -3,7 +3,9 @@
   windows_subsystem = "windows"
 )]
 
+use structopt::StructOpt;
 use holochain_client::AdminWebsocket;
+use tokio::runtime::Handle;
 use std::path::PathBuf;
 use std::collections::HashMap;
 use tauri::Window;
@@ -18,12 +20,22 @@ use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
 pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
 
+  // tauri::async_runtime::set(tokio::runtime::Handle::current());
+
   // build tauri windows
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![crate::commands::sign_zome_call::sign_zome_call]) // uncomment when testing with right version
     .setup(move |app| {
 
+      // generate temp folder
+
+      // TODO! remove once temp folder is used
       let pwd = std::env::current_dir().unwrap();
+
+      // launch tauri windows
+      println!("waiting a few seconds before starting tauri windows...");
+      std::thread::sleep(std::time::Duration::from_millis(5000));
+
 
       // read the .hc file to get the number of apps
       let dot_hc_path = pwd.join(".hc");
@@ -42,99 +54,101 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
 
       println!("@tauri main: E");
 
+      let (windows, ui_path, lair_clients, app) =
+        tokio::task::block_in_place( || {
+          tauri::async_runtime::block_on( async move {
 
-      let (windows, ui_path, lair_clients, app) = tauri::async_runtime::block_on( async move {
+          for tmp_directory_path in dot_hc_content.lines() {
 
-        for tmp_directory_path in dot_hc_content.lines() {
+            let app_id = String::from("test-app");
+            let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
+            println!("@tauri main: F");
 
-          let app_id = String::from("test-app");
-          let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
-          println!("@tauri main: F");
+            let admin_port = std::fs::read_to_string(dot_hc_live_path).unwrap();
 
-          let admin_port = std::fs::read_to_string(dot_hc_live_path).unwrap();
+            println!("@tauri main: G");
 
-          println!("@tauri main: G");
+            let admin_port_clone = admin_port.clone();
 
-          let admin_port_clone = admin_port.clone();
+            let app_port = match get_app_websocket(admin_port_clone).await {
+              Ok(ws) => ws,
+              Err(e) => {
+                println!("ERROR! Error getting app websocket port: {}", e);
+                panic!("Failed to get app websocket port.");
+              }
+            };
 
-          let app_port = match get_app_websocket(admin_port_clone).await {
-            Ok(ws) => ws,
-            Err(e) => {
-              println!("ERROR! Error getting app websocket port: {}", e);
-              panic!("Failed to get app websocket port.");
-            }
-          };
-
-          println!("@tauri main: H");
+            println!("@tauri main: H");
 
 
-          // TODO! implement writing it to window object instead
-          let launcher_env = format!(
-            r#"{{
-              "APP_INTERFACE_PORT": {},
-              "ADMIN_INTERFACE_PORT": {},
-              "INSTALLED_APP_ID": "{}"
-            }}"#,
-            app_port,
-            admin_port,
-            app_id.clone(),
-          );
+            // TODO! implement writing it to window object instead
+            let launcher_env = format!(
+              r#"{{
+                "APP_INTERFACE_PORT": {},
+                "ADMIN_INTERFACE_PORT": {},
+                "INSTALLED_APP_ID": "{}"
+              }}"#,
+              app_port,
+              admin_port,
+              app_id.clone(),
+            );
 
-          let window_label = format!("Agent-{}", app_counter);
+            let window_label = format!("Agent-{}", app_counter);
 
-          let window = match utils::generate_window::generate_window(
-            &app.handle(),
-            &app_id,
-            window_label.clone(),
-            ui_path.clone().join("index.html"),
-            ui_path.clone(),
-            launcher_env,
-          ) {
-            Ok(window) => window,
-            Err(e) => {
-              println!("ERROR! Failed to build window: {}", e);
-              panic!("Failed to build Window: {:?}", e);
-            }
-          };
+            let window = match utils::generate_window::generate_window(
+              &app.handle(),
+              &app_id,
+              window_label.clone(),
+              ui_path.clone().join("index.html"),
+              ui_path.clone(),
+              launcher_env,
+            ) {
+              Ok(window) => window,
+              Err(e) => {
+                println!("ERROR! Failed to build window: {}", e);
+                panic!("Failed to build Window: {:?}", e);
+              }
+            };
 
-          let a = app.handle().clone();
+            let a = app.handle().clone();
 
-          let window_label_clone = window_label.clone();
+            let window_label_clone = window_label.clone();
 
-          window.on_menu_event(move |_| {
-            if let Some(w) = a.get_window(window_label_clone.as_str()) {
-              w.open_devtools();
-            }
-          });
+            window.on_menu_event(move |_| {
+              if let Some(w) = a.get_window(window_label_clone.as_str()) {
+                w.open_devtools();
+              }
+            });
 
-          windows.push(window);
+            windows.push(window);
 
-          // read lair-keystore-config.yaml file
-          let connection_url = match read_lair_yaml(PathBuf::from(tmp_directory_path)) {
-            Some(url) => url,
-            None => {
-              println!("ERROR: No connectionUrl found in lair-keystore-config.yaml");
-              panic!("No connectionUrl found in lair-keystore-config.yaml")
-            }
-          };
+            // read lair-keystore-config.yaml file
+            let connection_url = match read_lair_yaml(PathBuf::from(tmp_directory_path)) {
+              Some(url) => url,
+              None => {
+                println!("ERROR: No connectionUrl found in lair-keystore-config.yaml");
+                panic!("No connectionUrl found in lair-keystore-config.yaml")
+              }
+            };
 
-          let connection_url = Url::parse(connection_url.as_str()).unwrap();
+            let connection_url = Url::parse(connection_url.as_str()).unwrap();
 
-          // create lair client and add it to hashmap
-          let client = match ipc_keystore_connect(connection_url.clone(), "".as_bytes()).await {
-            Ok(client) => client,
-            Err(e) => {
-              println!("Failed to connect to lair client: {:?}", e);
-              panic!("Failed to connect to lair client");
-            }
-          };
+            // create lair client and add it to hashmap
+            let client = match ipc_keystore_connect(connection_url.clone(), "".as_bytes()).await {
+              Ok(client) => client,
+              Err(e) => {
+                println!("Failed to connect to lair client: {:?}", e);
+                panic!("Failed to connect to lair client");
+              }
+            };
 
-          lair_clients.insert(window_label.to_string(), client);
+            lair_clients.insert(window_label.to_string(), client);
 
-          app_counter += 1;
-        }
+            app_counter += 1;
+          }
 
-        (windows, ui_path, lair_clients, app)
+          (windows, ui_path, lair_clients, app)
+        })
       });
 
       app.manage(lair_clients);
@@ -180,6 +194,10 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
 
         false => (),
       }
+
+
+      // // release app ports
+      // holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
 
       Ok(())
     })
