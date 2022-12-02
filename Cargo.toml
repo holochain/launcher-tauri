@@ -2,8 +2,7 @@
 members = [
   "crates/holochain*",
   "crates/lair_keystore_manager",
-  "crates/hc_launch",
-  "crates/hc_launch_tauri/src-tauri",
+  "crates/hc_launch/src-tauri",
   "src-tauri",
 ]
 resolver = "2"

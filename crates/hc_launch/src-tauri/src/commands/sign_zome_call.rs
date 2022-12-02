@@ -4,14 +4,14 @@ use holochain_conductor_api::ZomeCall;
 use lair_keystore_api::LairClient;
 use std::collections::HashMap;
 
-use crate::error::HcLaunchTauriError;
+use crate::error::HcLaunchError;
 
 #[tauri::command]
 pub async fn sign_zome_call(
   window: tauri::Window,
   state: tauri::State<'_, HashMap<String, LairClient>>,
   zome_call_unsigned: ZomeCallUnsigned,
-) -> Result<ZomeCall, HcLaunchTauriError> {
+) -> Result<ZomeCall, HcLaunchError> {
 
   let window_label = window.label().to_string();
 
@@ -29,14 +29,14 @@ pub async fn sign_zome_call(
   pub_key_2.copy_from_slice(pub_key.get_raw_32());
 
   let data_to_sign = zome_call_unsigned.data_to_sign()
-    .map_err(|e| HcLaunchTauriError::DataToSignError(e.into()))?;
+    .map_err(|e| HcLaunchError::DataToSignError(e.into()))?;
 
   let sig = client.sign_by_pub_key(
     pub_key_2.into(),
      None,
     data_to_sign)
     .await
-    .map_err(|e| HcLaunchTauriError::SignZomeCallError(e.str_kind().to_string()))?;
+    .map_err(|e| HcLaunchError::SignZomeCallError(e.str_kind().to_string()))?;
 
   let signature = Signature(*sig.0);
 
