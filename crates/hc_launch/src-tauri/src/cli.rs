@@ -21,8 +21,6 @@ use holochain_cli_sandbox::cmds::Create;
 /// Helper for launching holochain apps in a holochain-launcher environment for testing and development purposes.
 ///
 pub struct HcLaunch {
-    #[structopt(subcommand)]
-    command: HcLaunchSubcommand,
 
     /// Instead of the normal "interactive" passphrase mode,
     /// collect the passphrase by reading stdin to the end.
@@ -32,15 +30,7 @@ pub struct HcLaunch {
     /// Set the path to the holochain binary.
     #[structopt(short, long, env = "HC_HOLOCHAIN_PATH", default_value = "holochain")]
     holochain_path: PathBuf,
-}
 
-/// The list of subcommands for `hc launch`
-#[derive(Debug, StructOpt)]
-#[structopt(setting = structopt::clap::AppSettings::InferSubcommands)]
-pub enum HcLaunchSubcommand {
-  ///
-  /// Launch a .webhapp file in a launcher testing environment.
-  WebApp {
     /// Path to .webhapp file to launch.
     path: Option<PathBuf>,
 
@@ -59,143 +49,110 @@ pub enum HcLaunchSubcommand {
     /// (flattened)
     #[structopt(flatten)]
     create: Create,
-  },
+
+
 }
 
-pub struct WebAppArgs {
-  pub path: Option<PathBuf>,
-  pub ui_path: Option<PathBuf>,
-  pub watch: bool,
-  pub create: Create,
-}
 
 impl HcLaunch {
   /// Run this command
   pub async fn run(self) -> anyhow::Result<()> {
     holochain_util::pw::pw_set_piped(self.piped);
-    match self.command {
-      HcLaunchSubcommand::WebApp {
-          path,
-          ui_path,
-          watch,
-          create,
-        } => {
 
-          match path {
-            Some(p) => {
-              match p.extension() {
-                Some(extension) => {
-                  match extension.to_str().unwrap() {
-                    "webhapp" => {
-                      // generate temp folder
-                      let temp_dir = tempdir::TempDir::new("hc_launch").unwrap();
-                      let temp_folder = temp_dir.path().to_path_buf();
+    match self.path {
+      Some(p) => {
+        match p.extension() {
+          Some(extension) => {
+            match extension.to_str().unwrap() {
+              "webhapp" => {
+                // generate temp folder
+                let temp_dir = tempdir::TempDir::new("hc_launch").unwrap();
+                let temp_folder = temp_dir.path().to_path_buf();
 
-                      // unzip the webhapp, prepare UI etc.
-                      match utils::prepare_webapp::read_and_prepare_webapp(&p, &temp_folder).await {
-                        Ok(()) => (),
-                        Err(e) => {
-                          println!("Failed to read and prepare webhapp: {:?}", e);
-                          panic!("Failed to read and prepare webhapp");
-                        }
-                      };
-
-                      // generate agents
-                      let happ_path = temp_folder.join("happ.happ");
-
-                      // clean existing sandboxes
-                      holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
-
-                      // spawn sandboxes
-                      let join_handles = spawn_sandboxes(
-                        &self.holochain_path,
-                        happ_path,
-                        create,
-                        String::from("test-app"),
-                      ).await?;
-
-                      // spawn tauri windows
-                      let ui_path = match ui_path {
-                        Some(p) => p,
-                        None => temp_folder.join("ui").into(), // TODO! switch to tmp directory for ui and .happ
-                      };
-
-                      tauri::async_runtime::spawn(async move {
-                        // This stuff is never being called :/
-                        tokio::signal::ctrl_c().await.unwrap();
-                        holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
-                        temp_dir.close().unwrap();
-                        std::process::exit(0);
-                      });
-
-                      launch_tauri(ui_path, watch);
-
-                    }
-                    "happ" => {
-                      match ui_path {
-                        Some(ui_p) => {
-
-                          // check whether path exists
-                          if !ui_p.exists() {
-                            return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
-                          }
-
-                          // clean existing sandboxes
-                          holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
-
-                          // spawn sandboxes
-                          let join_handles = spawn_sandboxes(
-                            &self.holochain_path,
-                            p,
-                            create,
-                            String::from("test-app"),
-                          ).await?;
-
-                          launch_tauri(ui_p, watch);
-
-                          tokio::signal::ctrl_c().await?;
-                          holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
-                          for handle in join_handles {
-                            handle.await?;
-                          }
-
-                        },
-                        None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch web-app --help` for help."),
-                      }
-                    },
-                    _ => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file."),
+                // unzip the webhapp, prepare UI etc.
+                match utils::prepare_webapp::read_and_prepare_webapp(&p, &temp_folder).await {
+                  Ok(()) => (),
+                  Err(e) => {
+                    println!("Failed to read and prepare webhapp: {:?}", e);
+                    panic!("Failed to read and prepare webhapp");
                   }
-                },
-                None => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file.")
+                };
+
+                // generate agents
+                let happ_path = temp_folder.join("happ.happ");
+
+                // clean existing sandboxes
+                holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
+
+                // spawn sandboxes
+                let _join_handles = spawn_sandboxes(
+                  &self.holochain_path,
+                  happ_path,
+                  self.create,
+                  String::from("test-app"),
+                ).await?;
+
+                // spawn tauri windows
+                let ui_path = match self.ui_path {
+                  Some(p) => p,
+                  None => temp_folder.join("ui").into(), // TODO! switch to tmp directory for ui and .happ
+                };
+
+                tauri::async_runtime::spawn(async move {
+                  // This stuff is never being called :/
+                  tokio::signal::ctrl_c().await.unwrap();
+                  holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
+                  temp_dir.close().unwrap();
+                  std::process::exit(0);
+                });
+
+                launch_tauri(ui_path, self.watch);
+
               }
-            },
-            None => println!("You need to provide a path that points to either a .webhapp or a .happ file. Auto-detection is not implemented yet.")
-          }
-        },
+              "happ" => {
+                match self.ui_path {
+                  Some(ui_p) => {
+
+                    // check whether path exists
+                    if !ui_p.exists() {
+                      return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
+                    }
+
+                    // clean existing sandboxes
+                    holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
+
+                    // spawn sandboxes
+                    let join_handles = spawn_sandboxes(
+                      &self.holochain_path,
+                      p,
+                      self.create,
+                      String::from("test-app"),
+                    ).await?;
+
+                    launch_tauri(ui_p, self.watch);
+
+                    tokio::signal::ctrl_c().await?;
+                    holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
+                    for handle in join_handles {
+                      handle.await?;
+                    }
+
+                  },
+                  None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch web-app --help` for help."),
+                }
+              },
+              _ => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file."),
+            }
+          },
+          None => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file.")
+        }
+      },
+      None => println!("You need to provide a path that points to either a .webhapp or a .happ file. Auto-detection is not implemented yet.")
     }
 
     Ok(())
   }
 
-  pub fn args(&self) -> Option<WebAppArgs> {
-    match &self.command {
-      HcLaunchSubcommand::WebApp {
-          path,
-          ui_path,
-          watch,
-          create,
-        } => {
-          Some(WebAppArgs {
-            path: path.to_owned(),
-            ui_path: ui_path.to_owned(),
-            watch: watch.to_owned(),
-            create: create.to_owned()
-           }
-          )
-        }
-      _ => None,
-    }
-  }
 }
 
 
