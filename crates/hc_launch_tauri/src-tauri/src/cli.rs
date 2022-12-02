@@ -3,6 +3,9 @@
 // use holochain_types::prelude::InstalledAppId;
 // use std::path::Path;
 use std::path::{ Path, PathBuf };
+use holochain_cli_sandbox::CmdRunner;
+use holochain_cli_sandbox::calls::{AddAppWs, attach_app_interface};
+use holochain_cli_sandbox::run::run_async;
 use structopt::StructOpt;
 use holochain_types::prelude::InstalledAppId;
 use tokio::task::JoinHandle;
@@ -117,15 +120,16 @@ impl HcLaunch {
                         None => temp_folder.join("ui").into(), // TODO! switch to tmp directory for ui and .happ
                       };
 
+                      tauri::async_runtime::spawn(async move {
+                        // This stuff is never being called :/
+                        tokio::signal::ctrl_c().await.unwrap();
+                        holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
+                        temp_dir.close().unwrap();
+                        std::process::exit(0);
+                      });
 
                       launch_tauri(ui_path, watch);
 
-                      // This stuff is never being called :/
-                      tokio::signal::ctrl_c().await?;
-                      holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
-                      for handle in join_handles {
-                        handle.await?;
-                      }
                     }
                     "happ" => {
                       match ui_path {
@@ -259,7 +263,7 @@ async fn run_n(
   force_admin_ports: Vec<u16>,
 ) -> anyhow::Result<()> {
   let run_holochain = |holochain_path: PathBuf, path: PathBuf, ports, force_admin_port| async move {
-      holochain_cli_sandbox::run::run(&holochain_path, path, ports, force_admin_port).await?;
+      run(&holochain_path, path, ports, force_admin_port).await?;
       Result::<_, anyhow::Error>::Ok(())
   };
   let mut force_admin_ports = force_admin_ports.into_iter();
@@ -278,5 +282,39 @@ async fn run_n(
           tokio::task::spawn(f)
       });
   futures::future::try_join_all(jhs).await?;
+  Ok(())
+}
+
+
+// Copied over from hc_sandbox (https://github.com/holochain/holochain/blob/540c2497f778cc004c1e7114662733fe197790cc/crates/hc_sandbox/src/run.rs#L32)
+// to make it possible to listen to when conductors are ready
+pub async fn run(
+  holochain_path: &Path,
+  sandbox_path: PathBuf,
+  app_ports: Vec<u16>,
+  force_admin_port: Option<u16>,
+) -> anyhow::Result<()> {
+  let (port, mut holochain, mut lair) =
+      run_async(holochain_path, sandbox_path.clone(), force_admin_port).await?;
+      println!("Running conductor on admin port {}", port);
+  for app_port in app_ports {
+      let mut cmd = CmdRunner::try_new(port).await?;
+      let port = attach_app_interface(
+          &mut cmd,
+          AddAppWs {
+              port: Some(app_port),
+          },
+      )
+      .await?;
+      println!("App port attached at {}", port);
+  }
+  holochain_cli_sandbox::save::lock_live(std::env::current_dir()?, &sandbox_path, port).await?;
+  println!("Connected successfully to a running holochain");
+  let e = format!("Failed to run holochain at {}", sandbox_path.display());
+
+  holochain.wait().await.expect(&e);
+  let _ = lair.kill().await;
+  lair.wait().await.expect("Failed to wait on lair-keystore");
+
   Ok(())
 }
