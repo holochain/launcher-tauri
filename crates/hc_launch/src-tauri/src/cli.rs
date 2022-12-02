@@ -106,7 +106,6 @@ impl HcLaunch {
                 });
 
                 launch_tauri(ui_path, self.watch);
-
               }
               "happ" => {
                 match self.ui_path {
@@ -128,14 +127,14 @@ impl HcLaunch {
                       String::from("test-app"),
                     ).await?;
 
+                    tauri::async_runtime::spawn(async move {
+                      // This stuff is never being called :/
+                      tokio::signal::ctrl_c().await.unwrap();
+                      holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
+                      std::process::exit(0);
+                    });
+
                     launch_tauri(ui_p, self.watch);
-
-                    tokio::signal::ctrl_c().await?;
-                    holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
-                    for handle in join_handles {
-                      handle.await?;
-                    }
-
                   },
                   None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch --help` for help."),
                 }
