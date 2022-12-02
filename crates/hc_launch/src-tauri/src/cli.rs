@@ -28,7 +28,7 @@ pub struct HcLaunch {
     piped: bool,
 
     /// Set the path to the holochain binary.
-    #[structopt(short, long, env = "HC_HOLOCHAIN_PATH", default_value = "holochain")]
+    #[structopt(long, env = "HC_HOLOCHAIN_PATH", default_value = "holochain")]
     holochain_path: PathBuf,
 
     /// Path to .webhapp file to launch.
@@ -49,7 +49,6 @@ pub struct HcLaunch {
     /// (flattened)
     #[structopt(flatten)]
     create: Create,
-
 
 }
 
@@ -138,7 +137,7 @@ impl HcLaunch {
                     }
 
                   },
-                  None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch web-app --help` for help."),
+                  None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch --help` for help."),
                 }
               },
               _ => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file."),
