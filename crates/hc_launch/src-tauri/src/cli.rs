@@ -162,7 +162,7 @@ async fn spawn_sandboxes(
   happ_path: PathBuf,
   create: Create,
   app_id: InstalledAppId
-) -> anyhow::Result<Vec<JoinHandle<()>>> {
+) -> anyhow::Result<()> {
 
 
   let sandbox_paths = generate(
@@ -175,22 +175,20 @@ async fn spawn_sandboxes(
 
   let run: Option<Vec<u16>> = Some(vec![]);
   let force_admin_ports: Vec<u16> = vec![];
-  let mut join_handles = vec![];
 
   if let Some(ports) = run {
     let holochain_path_clone = holochain_path.clone();
     let force_admin_ports = force_admin_ports.clone();
-    let handle = tokio::task::spawn(async move {
+    tokio::task::spawn(async move {
         if let Err(e) =
             run_n(&holochain_path_clone, sandbox_paths, ports, force_admin_ports).await
         {
             tracing::error!(failed_to_run = ?e);
         }
     });
-    join_handles.push(handle);
   }
 
-  Ok(join_handles)
+  Ok(())
 }
 
 
@@ -251,7 +249,7 @@ pub async fn run(
 ) -> anyhow::Result<()> {
   let (port, mut holochain, mut lair) =
       run_async(holochain_path, sandbox_path.clone(), force_admin_port).await?;
-      println!("Running conductor on admin port {}", port);
+  println!("Running conductor on admin port {}", port);
   for app_port in app_ports {
       let mut cmd = CmdRunner::try_new(port).await?;
       let port = attach_app_interface(

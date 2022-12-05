@@ -30,7 +30,7 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
       let pwd = std::env::current_dir().unwrap();
 
       // launch tauri windows
-      println!("waiting a few seconds before starting tauri windows...");
+      println!("Waiting a few seconds before starting tauri windows...");
       std::thread::sleep(std::time::Duration::from_millis(8000));
 
 
