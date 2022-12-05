@@ -31,7 +31,7 @@ pub struct HcLaunch {
     #[structopt(long, env = "HC_HOLOCHAIN_PATH", default_value = "holochain")]
     holochain_path: PathBuf,
 
-    /// Path to .webhapp file to launch.
+    /// Path to .webhapp of .happ file to launch.
     path: Option<PathBuf>,
 
     // #[structopt(long)]
@@ -39,7 +39,7 @@ pub struct HcLaunch {
     // ui_port: Option<u16>,
 
     #[structopt(long)]
-    /// path to the UI
+    /// path to the UI. Required if a .happ file is passed.
     ui_path: Option<PathBuf>,
 
     /// Watch for file changes in the UI folder. Requires --ui-path to be specified.
