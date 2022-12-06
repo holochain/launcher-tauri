@@ -37,7 +37,13 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
       // read the .hc file to get the number of apps
       let dot_hc_path = pwd.join(".hc");
 
-      let dot_hc_content = std::fs::read_to_string(dot_hc_path).unwrap();
+      let dot_hc_content = match std::fs::read_to_string(dot_hc_path) {
+        Ok(p) => p,
+        Err(e) => {
+          println!("Failed to read content of .hc file: {}", e);
+          panic!("Failed to read content of .hc file: {}", e);
+        }
+      };
 
       // open a tauri window for each app instance and create a lair client instance for each window
       let mut windows: Vec<Window> = vec![];
@@ -54,7 +60,13 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
             let app_id = String::from("test-app");
             let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
 
-            let admin_port = std::fs::read_to_string(dot_hc_live_path).unwrap();
+            let admin_port = match std::fs::read_to_string(dot_hc_live_path) {
+              Ok(p) => p,
+              Err(e) => {
+                println!("Failed to read content of .hc_live file: {}", e);
+                panic!("Failed to read content of .hc_live file: {}", e);
+              }
+            };
 
             let admin_port_clone = admin_port.clone();
 
