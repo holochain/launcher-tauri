@@ -49,6 +49,7 @@ export function getReason(app: InstalledAppInfo): string | undefined {
   }
 }
 
+// GossipProgress will only return anticipated bytes soon so these methods will become obsolete
 export function gossipProgressPercent(progress: GossipProgress | undefined) {
   if (!progress) {
     return undefined;

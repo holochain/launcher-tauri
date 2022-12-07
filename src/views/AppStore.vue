@@ -103,7 +103,7 @@
             <HCProgressBar
               v-if="gossipStates[idx]"
               title="currently ongoing data exchanges with peers"
-              :progress="gossipProgressPercent(gossipStates[idx])"
+              :progress="progressRatio(idx)"
               :style="`--height: 10px; --hc-primary-color:${
                 idleStates[idx] ? '#6B6B6B' : '#482edf'
               };`"
@@ -125,9 +125,12 @@
             :style="`width: 30%; text-align: center; ${
               idleStates[idx] ? 'opacity: 0.7;' : ''
             }`"
-            title="actual bytes / expected bytes"
+            title="max expected bytes | remaining expected bytes"
           >
-            {{ gossipProgressString(gossipStates[idx]) }}
+            <span :class="{ highglightedText: maxExceeded[idx] }">{{
+              prettyBytesLocal(cachedMaxExpected[idx])
+            }}</span>
+            | {{ prettyBytesLocal(gossipStates[idx]) }}
           </div>
         </div>
       </div>
@@ -175,14 +178,8 @@ import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
-import { HolochainId, GossipProgress } from "@/types";
-import { gossipProgressPercent, gossipProgressString } from "@/utils";
-
-interface GossipState {
-  dnarepo: GossipProgress | undefined;
-  happs: GossipProgress | undefined;
-  web_apps: GossipProgress | undefined;
-}
+import { HolochainId } from "@/types";
+import prettyBytes from "pretty-bytes";
 
 export default defineComponent({
   name: "AppStore",
@@ -204,9 +201,11 @@ export default defineComponent({
     holochainId: HolochainId | undefined;
     pollInterval: number | null;
     cells: InstalledCell[] | undefined;
-    gossipStates: (GossipProgress | undefined)[];
+    gossipStates: (number | undefined)[];
+    cachedMaxExpected: (number | undefined)[];
     latestGossipUpdates: number[]; // timestamps of the latest non-zero gossipInfo update
     idleStates: boolean[];
+    maxExceeded: boolean[];
     showProgressIndicator: boolean;
     downloadFailed: boolean;
   } {
@@ -222,8 +221,10 @@ export default defineComponent({
       pollInterval: null,
       cells: undefined,
       gossipStates: [undefined, undefined, undefined],
+      cachedMaxExpected: [undefined, undefined, undefined],
       latestGossipUpdates: [0, 0, 0],
       idleStates: [true, true, true],
+      maxExceeded: [false, false, false],
       showProgressIndicator: false,
       downloadFailed: false,
     };
@@ -280,8 +281,6 @@ export default defineComponent({
   //   }
   // },
   methods: {
-    gossipProgressPercent,
-    gossipProgressString,
     async howToPublish() {
       await invoke("open_url_cmd", {
         url: this.howToPublishUrl,
@@ -353,28 +352,36 @@ export default defineComponent({
       });
 
       gossipInfo.forEach((info, idx) => {
-        const gossipProgress = {
-          expectedBytes:
-            info.total_historical_gossip_throughput.expected_op_bytes.incoming,
-          actualBytes:
-            info.total_historical_gossip_throughput.op_bytes.incoming,
-        };
-        // Check gossip info. In case expected and actual op bytes are 0, keep the chached values
-        if (
-          gossipProgress.expectedBytes != 0 ||
-          gossipProgress.actualBytes != 0
-        ) {
+        const expectedIncoming =
+          info.total_historical_gossip_throughput.expected_op_bytes.incoming;
+
+        // In case expected incoming bytes are 0, keep the chached values, otherwise update
+        // expectedIncoming
+        if (expectedIncoming != 0) {
           this.idleStates[idx] = false;
-          this.gossipStates[idx] = gossipProgress;
           this.latestGossipUpdates[idx] = Date.now();
+          // if the expected incoming bytes are larger then the max cached value or there
+          // is no cached max value, replace it
+          const currentMax = this.cachedMaxExpected[idx];
+          if (!currentMax || expectedIncoming > currentMax) {
+            this.cachedMaxExpected[idx] = expectedIncoming;
+            this.maxExceeded[idx] = true;
+            setTimeout(() => (this.maxExceeded[idx] = false), 500);
+          }
+          // make this call after setting max cached value to ensure it is always <= to it
+          this.gossipStates[idx] = expectedIncoming;
         }
 
-        // If actual/expected are both zero, set the progress bar to idle state
-        if (
-          gossipProgress.actualBytes == 0 &&
-          gossipProgress.expectedBytes == 0
-        ) {
+        // If expected incoming is zero, set the progress bar to idle state
+        if (expectedIncoming == 0) {
           this.idleStates[idx] = true;
+        }
+
+        // if latest non-zero update to gossip progress is older than 30 seconds, set expected incoming
+        // and max cached expected incoming to undefined again
+        if (new Date().getTime() - this.latestGossipUpdates[idx] > 30000) {
+          this.gossipStates[idx] = undefined;
+          this.cachedMaxExpected[idx] = undefined;
         }
       });
 
@@ -382,8 +389,25 @@ export default defineComponent({
       this.latestGossipUpdates.forEach((latest, idx) => {
         if (Date.now() - latest > 30000) {
           this.gossipStates[idx] = undefined;
+          this.cachedMaxExpected[idx] = undefined;
         }
       });
+    },
+    progressRatio(idx: number) {
+      if (this.gossipStates[idx] && this.cachedMaxExpected[idx]) {
+        return (
+          (1 - this.gossipStates[idx]! / this.cachedMaxExpected[idx]!) * 100
+        );
+      } else {
+        return undefined;
+      }
+    },
+    prettyBytesLocal(input: number | undefined) {
+      if (input) {
+        return prettyBytes(input);
+      } else {
+        return "-";
+      }
     },
   },
 });
@@ -415,6 +439,11 @@ export default defineComponent({
   border-top: 4px solid transparent;
   border-left: 4px solid transparent;
   animation: bordercolorchange 1s linear infinite;
+}
+
+.highglightedText {
+  font-weight: bold;
+  color: #482edf;
 }
 
 @keyframes bordercolorchange {
