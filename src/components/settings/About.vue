@@ -23,7 +23,7 @@
         >About</span
       > -->
       <div class="column">
-        <span> Holochain Launcher v0.8.0 </span>
+        <span> Holochain Launcher v{{ launcherVersion }} </span>
         <span
           style="margin-top: 8px"
           v-for="version in holochainVersions"
@@ -42,6 +42,7 @@ import { defineComponent } from "vue";
 import { getCurrent } from "@tauri-apps/api/window";
 import { HolochainVersion } from "@/types";
 import { invoke } from "@tauri-apps/api/tauri";
+import { getVersion } from "@tauri-apps/api/app";
 import HCDialogHeaded from "../subcomponents/HCDialogHeaded.vue";
 
 export default defineComponent({
@@ -52,16 +53,20 @@ export default defineComponent({
   data(): {
     snackbarText: string | undefined;
     holochainVersions: HolochainVersion[] | undefined;
+    launcherVersion: string | undefined;
   } {
     return {
       snackbarText: undefined,
       holochainVersions: undefined,
+      launcherVersion: undefined,
     };
   },
   async mounted() {
     const current = await getCurrent().listen("about", () =>
       (this.$refs.dialog as typeof HCDialogHeaded).open()
     );
+
+    this.launcherVersion = await getVersion();
 
     const { holochain_versions }: { holochain_versions: HolochainVersion[] } =
       await invoke("get_supported_versions", {});

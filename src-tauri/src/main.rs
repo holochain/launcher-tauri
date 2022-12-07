@@ -9,6 +9,7 @@ use running_state::RunningState;
 use std::path::Path;
 use std::sync::Arc;
 use tauri::AppHandle;
+use serde_json::value::Value;
 
 use system_tray::initial_system_tray;
 use tauri;
@@ -32,6 +33,7 @@ use crate::commands::open_app::report_issue_cmd;
 use crate::commands::save_app::save_app;
 use crate::commands::start_app::start_app;
 use crate::commands::restart::restart;
+use crate::commands::quit::quit;
 use crate::commands::{
   choose_version::choose_version_for_hdk,
   config::write_config,
@@ -44,6 +46,7 @@ use crate::commands::{
   password::{initialize_keystore, unlock_and_launch},
   uninstall_app::uninstall_app,
   sign_zome_call::sign_zome_call,
+  storage::get_storage_info,
 };
 use crate::launcher::manager::LauncherManager;
 use crate::launcher::state::LauncherState;
@@ -51,29 +54,12 @@ use crate::menu::build_menu;
 use crate::menu::handle_menu_event;
 use crate::setup::logs::setup_logs;
 use crate::system_tray::handle_system_tray_event;
+use crate::file_system::CustomPath;
+
+
 
 fn main() {
-  if let Err(err) = setup_logs() {
-    println!("Error setting up the logs: {:?}", err);
-  }
 
-  let already_running = LauncherManager::is_launcher_already_running();
-
-  // If holochain is already running, only display a small notice window
-  if already_running {
-    let state: LauncherState = Arc::new(Mutex::new(RunningState::Error(
-      LauncherError::AnotherInstanceIsAlreadyRunning,
-    )));
-
-    let build_result = tauri::Builder::default()
-      .manage(state)
-      .invoke_handler(tauri::generate_handler![get_state_info])
-      .run(tauri::generate_context!());
-    if let Err(err) = build_result {
-      log::error!("Error building the window: {}", err);
-    }
-    return ();
-  }
 
   let builder_result = tauri::Builder::default()
     .menu(build_menu())
@@ -85,6 +71,7 @@ fn main() {
     })
     .invoke_handler(tauri::generate_handler![
       get_state_info,
+      get_storage_info,
       open_app_ui,
       initialize_keystore,
       report_issue_cmd,
@@ -101,14 +88,42 @@ fn main() {
       start_app,
       execute_factory_reset,
       restart,
+      quit,
       write_config,
       sign_zome_call,
       setup::logs::log,
     ])
     .setup(|app| {
+
+      // reading custom path from cli
+      let cli_matches = app.get_cli_matches()?;
+      let custom_path: CustomPath = match cli_matches.args.get("config-path") {
+        Some(data) => match data.value.clone() {
+          Value::String(path) => CustomPath {
+            custom_path: Some(path),
+          },
+          _ => {
+            // println!("ERROR: Value passed to --config-path option could not be interpreted as string.");
+            CustomPath {
+              custom_path: None
+            }
+            // panic!("Value passed to --config-path option could not be interpreted as string.")
+          }
+        },
+        None => CustomPath {
+          custom_path: None
+        },
+      };
+
+      app.manage(custom_path.clone());
+
+      if let Err(err) = setup_logs(custom_path.custom_path.clone()) {
+        println!("Error setting up the logs: {:?}", err);
+      }
+
       let handle = app.handle().clone();
       let launcher_state =
-        tauri::async_runtime::block_on(async move { launch_manager(handle).await });
+        tauri::async_runtime::block_on(async move { launch_manager(handle, custom_path.custom_path).await });
 
       app.manage(Arc::new(Mutex::new(launcher_state)));
 
@@ -128,12 +143,12 @@ fn main() {
   }
 }
 
-async fn launch_manager(app_handle: AppHandle) -> RunningState<LauncherManager, LauncherError> {
-  if Path::new(&root_holochain_data_path().join("conductor")).exists() {
+async fn launch_manager(app_handle: AppHandle, custom_path: Option<String>) -> RunningState<LauncherManager, LauncherError> {
+  if Path::new(&root_holochain_data_path(custom_path.clone()).join("conductor")).exists() {
     return RunningState::Error(LauncherError::OldFilesExist);
   }
 
-  let manager_launch = LauncherManager::launch(app_handle).await;
+  let manager_launch = LauncherManager::launch(app_handle, custom_path).await;
 
   match manager_launch {
     Ok(launcher_manager) => {

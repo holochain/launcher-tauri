@@ -1,24 +1,22 @@
+use holochain_web_app_manager::StorageInfo;
+
 use crate::launcher::{state::LauncherState, manager::HolochainId};
 
 #[tauri::command]
-pub async fn uninstall_app(
+pub async fn get_storage_info(
   window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
-  app_id: String,
   holochain_id: HolochainId,
-) -> Result<(), String> {
+) -> Result<StorageInfo, String> {
   if window.label() != "admin" {
-    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (P)"))
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (H)"))
   }
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
 
-  manager
+  let storage_info = manager
     .get_web_happ_manager(holochain_id)?
-    .uninstall_app(app_id)
-    .await?;
+    .get_storage_info()?;
 
-  manager.on_apps_changed().await?;
-
-  Ok(())
+  Ok(storage_info)
 }

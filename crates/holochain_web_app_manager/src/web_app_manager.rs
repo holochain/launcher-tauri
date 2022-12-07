@@ -12,6 +12,7 @@ use holochain_manager::{
   HolochainManager,
 };
 use lair_keystore_manager::utils::create_dir_if_necessary;
+use serde::{Serialize, Deserialize};
 use std::{
   collections::HashMap,
   fs::{self, File},
@@ -304,6 +305,38 @@ impl WebAppManager {
   pub fn app_interface_port(&mut self) -> u16 {
     self.holochain_manager.app_interface_port()
   }
+
+  pub fn get_storage_info(&self) -> Result<StorageInfo, String> {
+    let ui_path = uis_data_path(&self.environment_path);
+    let conductor_path = conductor_path(&self.environment_path);
+    let uis_size = fs_extra::dir::get_size(ui_path)
+      .map_err(|e| format!("Failed to get UI directory size: {:?}", e))?;
+    let authored_size = fs_extra::dir::get_size(conductor_path.join("authored"))
+      .map_err(|e| format!("Failed to get conductor directory size: {:?}", e))?;
+    let cache_size = fs_extra::dir::get_size(conductor_path.join("cache"))
+      .map_err(|e| format!("Failed to get conductor directory size: {:?}", e))?;
+    let conductor_size = fs_extra::dir::get_size(conductor_path.join("conductor"))
+      .map_err(|e| format!("Failed to get conductor directory size: {:?}", e))?;
+    let dht_size = fs_extra::dir::get_size(conductor_path.join("dht"))
+      .map_err(|e| format!("Failed to get conductor directory size: {:?}", e))?;
+    let p2p_size = fs_extra::dir::get_size(conductor_path.join("p2p"))
+      .map_err(|e| format!("Failed to get conductor directory size: {:?}", e))?;
+    let wasm_size = fs_extra::dir::get_size(conductor_path.join("wasm"))
+      .map_err(|e| format!("Failed to get conductor directory size: {:?}", e))?;
+
+    Ok(
+      StorageInfo {
+        uis: uis_size,
+        authored: authored_size,
+        cache: cache_size,
+        conductor: conductor_size,
+        dht: dht_size,
+        p2p: p2p_size,
+        wasm: wasm_size,
+      }
+    )
+
+  }
 }
 
 fn uis_data_path(root_path: &PathBuf) -> PathBuf {
@@ -312,4 +345,21 @@ fn uis_data_path(root_path: &PathBuf) -> PathBuf {
 
 fn app_ui_path(root_path: &PathBuf, app_id: &String) -> PathBuf {
   uis_data_path(root_path).join(app_id)
+}
+
+fn conductor_path(root_path: &PathBuf) -> PathBuf {
+  root_path.join("conductor")
+}
+
+
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct StorageInfo {
+  uis: u64,
+  authored: u64,
+  cache: u64,
+  conductor: u64,
+  dht: u64,
+  p2p: u64,
+  wasm: u64,
 }

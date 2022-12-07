@@ -2,7 +2,7 @@ import { HdkVersion } from "@/hdk";
 import {
   AppWebsocket,
   EntryHash,
-  HeaderHash as ActionHash,
+  ActionHash,
   InstalledAppInfo,
 } from "@holochain/client";
 import { Happ, HappRelease } from "./types";

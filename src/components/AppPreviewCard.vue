@@ -5,6 +5,16 @@
       class="column"
       style="flex: 1; overflow-y: auto; padding: 20px"
     >
+      <div style="font-weight: bold">Compatibility:</div>
+      <div v-if="holochainVersion" class="row">
+        <div style="width: 160px">Holochain version:</div>
+        <div>{{ holochainVersion }}</div>
+      </div>
+      <div class="row">
+        <div style="width: 160px">HDK version:</div>
+        <div>{{ getLatestRelease(app).content.hdk_version }}</div>
+      </div>
+      <div style="font-weight: bold; margin-top: 10px">Description:</div>
       {{ app.app.content.description }}
     </div>
 
@@ -93,6 +103,8 @@
 
 <script lang="ts">
 import { AppWithReleases, getLatestRelease } from "@/devhub/get-happs";
+import { HolochainVersion } from "@/types";
+import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent, PropType } from "vue";
 
 import HCButton from "./subcomponents/HCButton.vue";
@@ -112,12 +124,19 @@ export default defineComponent({
   },
   data(): {
     showDescription: boolean;
+    holochainVersion: HolochainVersion | undefined;
   } {
     return {
       showDescription: false,
+      holochainVersion: undefined,
     };
   },
   emits: ["installApp"],
+  async mounted() {
+    this.holochainVersion = await invoke("choose_version_for_hdk", {
+      hdkVersion: getLatestRelease(this.app).content.hdk_version,
+    });
+  },
   methods: {
     getLatestRelease,
   },

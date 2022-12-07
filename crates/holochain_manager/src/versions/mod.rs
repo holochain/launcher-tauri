@@ -23,6 +23,7 @@ pub mod v0_0_173;
 
 use v0_0_173::HolochainV0_0_173;
 
+
 // NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HdkVersion {

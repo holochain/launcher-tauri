@@ -9,10 +9,10 @@ use log4rs::{
 
 use crate::file_system::{logs_folder_path, logs_path};
 
-pub fn setup_logs() -> Result<(), String> {
+pub fn setup_logs(custom_path: Option<String>) -> Result<(), String> {
   let logfile = FileAppender::builder()
     .encoder(Box::new(PatternEncoder::new("[{d}] {l} - {m}\n")))
-    .build(logs_path())
+    .build(logs_path(custom_path))
     .map_err(|err| format!("Could not build log config: {:?}", err))?;
 
   let config = Config::builder()
@@ -31,8 +31,8 @@ pub fn log(log: String) -> Result<(), String> {
   Ok(())
 }
 
-pub fn open_logs_folder() {
-  if let Err(err) = opener::open(logs_folder_path()) {
+pub fn open_logs_folder(custom_path: Option<String>) {
+  if let Err(err) = opener::open(logs_folder_path(custom_path)) {
     log::error!("Error opening logs folder: {}", err);
   }
 }

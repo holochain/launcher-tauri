@@ -1,4 +1,11 @@
-import { DisabledAppReason, InstalledAppInfo } from "@holochain/client";
+import {
+  DisabledAppReason,
+  DnaGossipInfo,
+  InstalledAppInfo,
+} from "@holochain/client";
+import prettyBytes from "pretty-bytes";
+
+import { GossipProgress } from "./types";
 
 export function isAppRunning(app: InstalledAppInfo): boolean {
   return (app.status as any) === "running";
@@ -40,4 +47,22 @@ export function getReason(app: InstalledAppInfo): string | undefined {
       }
     ).paused.reason.error;
   }
+}
+
+// GossipProgress will only return anticipated bytes soon so these methods will become obsolete
+export function gossipProgressPercent(progress: GossipProgress | undefined) {
+  if (!progress) {
+    return undefined;
+  }
+  const ratio = 100 * (progress.actualBytes / progress.expectedBytes);
+  return ratio > 100 ? 100 : ratio;
+}
+
+export function gossipProgressString(progress: GossipProgress | undefined) {
+  if (!progress) {
+    return "- / -";
+  }
+  return `${prettyBytes(progress.actualBytes)} / ${prettyBytes(
+    progress.expectedBytes
+  )}`;
 }
