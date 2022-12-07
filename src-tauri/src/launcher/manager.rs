@@ -386,11 +386,11 @@ impl LauncherManager {
     // println!("%*%*%*% INDEX PATH: {:?}", index_path);
 
 
-    let launcher_env = format!(r#"{{
-        "APP_INTERFACE_PORT": {},
-        "ADMIN_INTERFACE_PORT": {},
-        "INSTALLED_APP_ID": "{}"
-      }}"#,
+    let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
+      "APP_INTERFACE_PORT": {},
+      "ADMIN_INTERFACE_PORT": {},
+      "INSTALLED_APP_ID": "{}"
+    }}"#,
       manager.holochain_manager.app_interface_port(),
       manager.holochain_manager.admin_interface_port(),
       app_id
@@ -411,11 +411,6 @@ impl LauncherManager {
             Ok(index_html) => *mutable_response = index_html, // TODO! Check if there are better ways of dealing with errors here
             Err(e) => log::error!("Error reading the path of the UI's index.html: {:?}", e),
           }
-        },
-        "tauri://localhost/.launcher-env.json" => {
-          let mutable_response = response.body_mut();
-          *mutable_response = launcher_env.as_bytes().to_vec();
-          response.set_mimetype(Some(String::from("application/json")));
         },
         _ => {
           if uri.starts_with("tauri://localhost/") {
@@ -455,6 +450,7 @@ impl LauncherManager {
 
 
     })
+    .initialization_script(launcher_env_command.as_str())
     .inner_size(1000.0, 700.0)
     .title(app_id)
     .enable_clipboard_access() // TODO! potentially make this optional
