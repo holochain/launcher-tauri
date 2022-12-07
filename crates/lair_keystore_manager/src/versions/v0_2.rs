@@ -49,7 +49,7 @@ impl LairKeystoreManager for LairKeystoreManagerV0_2 {
 
     let client = ipc_keystore_connect(Url::from(connection_url.clone()), password.clone().into_bytes())
       .await
-      .map_err(|_e| LairKeystoreError::ErrorCreatingLairClient(String::from("Failed to create LairClient.")))?;
+      .map_err(|e| LairKeystoreError::ErrorCreatingLairClient(format!("Failed to create LairClient: {:?}", e)))?;
 
 
     Ok(LairKeystoreManagerV0_2 {
