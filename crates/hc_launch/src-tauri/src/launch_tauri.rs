@@ -5,35 +5,32 @@
 
 use holochain_client::AdminWebsocket;
 use lair_keystore_api::dependencies::sodoken;
-use tauri::RunEvent;
-use std::path::PathBuf;
 use std::collections::HashMap;
+use std::path::PathBuf;
+use std::path::PathBuf;
+use tauri::Manager;
+use tauri::RunEvent;
+use tauri::RunEvent;
 use tauri::Window;
 use tauri::WindowEvent;
-use tauri::Manager;
-use lair_keystore_api::{LairClient, ipc_keystore_connect};
 use url::Url;
 
 use crate::utils;
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
-
 pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead) -> () {
-
   // tauri::async_runtime::set(tokio::runtime::Handle::current());
 
   // build tauri windows
   let builder_result = tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![crate::commands::sign_zome_call::sign_zome_call]) // uncomment when testing with right version
+    .invoke_handler(tauri::generate_handler![
+      crate::commands::sign_zome_call::sign_zome_call
+    ]) // uncomment when testing with right version
     .setup(move |app| {
-
       let pwd = std::env::current_dir().unwrap();
 
       // launch tauri windows
-      println!("Waiting a few seconds before starting tauri windows...");
-      std::thread::sleep(std::time::Duration::from_millis(8000));
-
 
       // read the .hc file to get the number of apps
       let dot_hc_path = pwd.join(".hc");
@@ -52,12 +49,9 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead)
 
       let mut app_counter = 0;
 
-      let (windows, ui_path, lair_clients, app) =
-        tokio::task::block_in_place( || {
-          tauri::async_runtime::block_on( async move {
-
+      let (windows, ui_path, lair_clients, app) = tokio::task::block_in_place(|| {
+        tauri::async_runtime::block_on(async move {
           for tmp_directory_path in dot_hc_content.lines() {
-
             let app_id = String::from("test-app");
             let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
 
@@ -118,11 +112,9 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead)
               }
             });
 
-            window.on_window_event(|event| {
-              match event {
-                WindowEvent::CloseRequested { api: _, .. } => (),
-                _ => (),
-              }
+            window.on_window_event(|event| match event {
+              WindowEvent::CloseRequested { api: _, .. } => (),
+              _ => (),
             });
 
             windows.push(window);
@@ -139,13 +131,14 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead)
             let connection_url = Url::parse(connection_url.as_str()).unwrap();
 
             // create lair client and add it to hashmap
-            let client = match ipc_keystore_connect(connection_url.clone(), passphrase.clone()).await {
-              Ok(client) => client,
-              Err(e) => {
-                println!("Failed to connect to lair client: {:?}", e);
-                panic!("Failed to connect to lair client");
-              }
-            };
+            let client =
+              match ipc_keystore_connect(connection_url.clone(), passphrase.clone()).await {
+                Ok(client) => client,
+                Err(e) => {
+                  println!("Failed to connect to lair client: {:?}", e);
+                  panic!("Failed to connect to lair client");
+                }
+              };
 
             lair_clients.insert(window_label.to_string(), client);
 
@@ -158,14 +151,10 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead)
 
       app.manage(lair_clients);
 
-
       // watch for file changes in the UI folder if requested
       match watch {
         true => {
-          println!(
-            "Watching file changes in folder {:?}",
-            ui_path.as_path()
-          );
+          println!("Watching file changes in folder {:?}", ui_path.as_path());
 
           let _watch_handle = std::thread::spawn(move || {
             let (tx_watcher, rx_watcher) = std::sync::mpsc::channel();
@@ -195,11 +184,10 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead)
               }
             }
           });
-        },
+        }
 
         false => (),
       }
-
 
       // // release app ports
       // holochain_cli_sandbox::save::release_ports(std::env::current_dir()?).await?;
@@ -208,21 +196,20 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead)
     })
     .build(tauri::generate_context!());
 
-    match builder_result {
-      Ok(builder) => {
-        builder.run(move |_app_handle, event| {
-          if let RunEvent::ExitRequested { api, .. } = event {
-            api.prevent_exit();
-          }
-        });
-      },
-      Err(e) => eprintln!("Error building tauri windows: {:?}", e)
+  match builder_result {
+    Ok(builder) => {
+      builder.run(move |_app_handle, event| {
+        if let RunEvent::ExitRequested { api, .. } = event {
+          api.prevent_exit();
+        }
+      });
     }
+    Err(e) => eprintln!("Error building tauri windows: {:?}", e),
+  }
 
-    // .run(tauri::generate_context!())
-    // .expect("error while running tauri application");
+  // .run(tauri::generate_context!())
+  // .expect("error while running tauri application");
 }
-
 
 async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
   // Try to connect twice. This fixes the os(111) error for now that occurs when the conducor is not ready yet.
@@ -252,24 +239,25 @@ async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
   Ok(app_interface_port)
 }
 
-
 fn read_lair_yaml(path: PathBuf) -> Option<String> {
-
   let yaml_content = match std::fs::read_to_string(
-    PathBuf::from(path).join("keystore").join("lair-keystore-config.yaml")) {
-      Ok(content) => content,
-      Err(e) => {
-        println!("Failed to read lair-keystore-config.yaml: {:?}", e);
-        panic!("Failed to read lair-keystore-config.yaml");
-      }
-    };
-
-    for line in yaml_content.lines() {
-      match line.contains("connectionUrl") {
-        true => return Some(line[15..].to_string()),
-        false => ()
-      }
+    PathBuf::from(path)
+      .join("keystore")
+      .join("lair-keystore-config.yaml"),
+  ) {
+    Ok(content) => content,
+    Err(e) => {
+      println!("Failed to read lair-keystore-config.yaml: {:?}", e);
+      panic!("Failed to read lair-keystore-config.yaml");
     }
+  };
 
-    None
+  for line in yaml_content.lines() {
+    match line.contains("connectionUrl") {
+      true => return Some(line[15..].to_string()),
+      false => (),
+    }
+  }
+
+  None
 }
