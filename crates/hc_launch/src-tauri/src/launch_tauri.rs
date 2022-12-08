@@ -4,6 +4,7 @@
 )]
 
 use holochain_client::AdminWebsocket;
+use lair_keystore_api::dependencies::sodoken;
 use tauri::RunEvent;
 use std::path::PathBuf;
 use std::collections::HashMap;
@@ -18,7 +19,7 @@ use crate::utils;
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
 
-pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
+pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead) -> () {
 
   // tauri::async_runtime::set(tokio::runtime::Handle::current());
 
@@ -138,7 +139,7 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool) -> () {
             let connection_url = Url::parse(connection_url.as_str()).unwrap();
 
             // create lair client and add it to hashmap
-            let client = match ipc_keystore_connect(connection_url.clone(), "pass".as_bytes()).await {
+            let client = match ipc_keystore_connect(connection_url.clone(), passphrase.clone()).await {
               Ok(client) => client,
               Err(e) => {
                 println!("Failed to connect to lair client: {:?}", e);

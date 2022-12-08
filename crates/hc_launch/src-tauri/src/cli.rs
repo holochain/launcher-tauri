@@ -97,6 +97,8 @@ impl HcLaunch {
                   None => temp_folder.join("ui").into(), // TODO! switch to tmp directory for ui and .happ
                 };
 
+                let passphrase = holochain_util::pw::pw_get()?;
+
                 tauri::async_runtime::spawn(async move {
                   // This stuff is never being called :/
                   tokio::signal::ctrl_c().await.unwrap();
@@ -105,7 +107,7 @@ impl HcLaunch {
                   std::process::exit(0);
                 });
 
-                launch_tauri(ui_path, self.watch);
+                launch_tauri(ui_path, self.watch, passphrase);
               }
               "happ" => {
                 match self.ui_path {
@@ -134,7 +136,9 @@ impl HcLaunch {
                       std::process::exit(0);
                     });
 
-                    launch_tauri(ui_p, self.watch);
+                    let passphrase = holochain_util::pw::pw_get()?;
+
+                    launch_tauri(ui_p, self.watch, passphrase);
                   },
                   None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch --help` for help."),
                 }
