@@ -4,18 +4,19 @@
 )]
 
 use holochain_client::AdminWebsocket;
-use lair_keystore_api::dependencies::sodoken;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::path::PathBuf;
 use tauri::Manager;
-use tauri::RunEvent;
 use tauri::RunEvent;
 use tauri::Window;
 use tauri::WindowEvent;
 use url::Url;
 
 use crate::utils;
+
+use lair_keystore_api::dependencies::sodoken;
+use lair_keystore_api::{LairClient, ipc_keystore_connect};
+
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
