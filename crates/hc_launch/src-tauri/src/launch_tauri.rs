@@ -74,13 +74,12 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead)
               }
             };
 
-            // TODO! implement writing it to window object instead
-            let launcher_env = format!(
-              r#"{{
-                "APP_INTERFACE_PORT": {},
-                "ADMIN_INTERFACE_PORT": {},
-                "INSTALLED_APP_ID": "{}"
-              }}"#,
+
+            let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
+              "APP_INTERFACE_PORT": {},
+              "ADMIN_INTERFACE_PORT": {},
+              "INSTALLED_APP_ID": "{}"
+            }}"#,
               app_port,
               admin_port,
               app_id.clone(),
@@ -94,7 +93,7 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead)
               window_label.clone(),
               ui_path.clone().join("index.html"),
               ui_path.clone(),
-              launcher_env,
+              launcher_env_command,
             ) {
               Ok(window) => window,
               Err(e) => {

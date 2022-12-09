@@ -11,7 +11,7 @@ pub fn generate_window(
   label: String,
   index_path: PathBuf,
   assets_path: PathBuf,
-  launcher_env: String
+  launcher_env_command: String
 ) -> Result<Window> {
 
     WindowBuilder::new(
@@ -29,11 +29,6 @@ pub fn generate_window(
             Ok(index_html) => *mutable_response = index_html, // TODO! Check if there are better ways of dealing with errors here
             Err(e) => log::error!("Error reading the path of the UI's index.html: {:?}", e),
           }
-        },
-        "tauri://localhost/.launcher-env.json" => {
-          let mutable_response = response.body_mut();
-          *mutable_response = launcher_env.as_bytes().to_vec();
-          response.set_mimetype(Some(String::from("application/json")));
         },
         _ => {
           if uri.starts_with("tauri://localhost/") {
@@ -71,6 +66,7 @@ pub fn generate_window(
 
 
     })
+    .initialization_script(launcher_env_command.as_str())
     .inner_size(1000.0, 700.0)
     .title(label)
     .menu(Menu::new().add_submenu(Submenu::new(
