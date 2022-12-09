@@ -115,6 +115,8 @@ fn main() {
         },
       };
 
+      println!("Custom path: {:?}", custom_path);
+
       app.manage(custom_path.clone());
 
       if let Err(err) = setup_logs(custom_path.custom_path.clone()) {

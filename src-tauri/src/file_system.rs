@@ -4,6 +4,7 @@ use holochain_manager::versions::HolochainVersion;
 use lair_keystore_manager::versions::LairKeystoreVersion;
 use tauri::api::path::{config_dir, data_dir};
 
+#[derive(Debug)]
 pub struct CustomPath {
   pub custom_path: Option<String>
 }
