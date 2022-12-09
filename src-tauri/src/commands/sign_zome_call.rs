@@ -13,7 +13,7 @@ pub struct ZomeCallUnsignedTauri {
   pub fn_name: FunctionName,
   pub cap_secret: Option<CapSecret>,
   pub payload: ExternIO,
-  pub nonce: Vec<u8>,
+  pub nonce: [u8; 32],
   pub expires_at: Timestamp,
 }
 
@@ -37,9 +37,7 @@ pub async fn sign_zome_call(
     fn_name: zome_call_unsigned.fn_name,
     cap_secret: zome_call_unsigned.cap_secret,
     payload: zome_call_unsigned.payload,
-    nonce: zome_call_unsigned.nonce
-      .try_into()
-      .map_err(|e| format!("Failed to convert nonce from Vec<u8> to [u8; 32]: {}", e))?,
+    nonce: zome_call_unsigned.nonce.into(),
     expires_at: zome_call_unsigned.expires_at,
   };
 
