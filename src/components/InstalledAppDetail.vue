@@ -33,8 +33,8 @@
         >
           <td>
             <span
-              >{{ cellData.role_id.slice(0, 20)
-              }}{{ cellData.role_id.length > 20 ? "..." : "" }}</span
+              >{{ cellData.role_name.slice(0, 20)
+              }}{{ cellData.role_name.length > 20 ? "..." : "" }}</span
             >
           </td>
           <td>

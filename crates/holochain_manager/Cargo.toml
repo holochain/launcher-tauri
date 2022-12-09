@@ -7,13 +7,18 @@ version = "0.1.0"
 
 [dependencies]
 # NEW_VERSION update holochain-client-rust to the latest holochain version
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch="sign-zome-call-testing-launcher"}
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="253a378d2226ede77c37875ed278a0fed118785b"}
+
+
+holochain_conductor_api_0_0_175 = {package = "holochain_conductor_api", version="0.0.72"}
+holochain_p2p_0_0_175 = {package = "holochain_p2p", version="0.0.69"}
+holochain_types_0_0_175 = {package = "holochain_types", version="0.0.69"}
 
 
 # NEW_VERSION add latest crates here # taken from commit instead this time
-holochain_conductor_api_0_0_173 = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
-holochain_p2p_0_0_173 = {package = "holochain_p2p", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
-holochain_types_0_0_173 = {package = "holochain_types", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
+holochain_conductor_api_0_0_175szc = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
+holochain_p2p_0_0_175szc = {package = "holochain_p2p", git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
+holochain_types_0_0_175szc = {package = "holochain_types", git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
 
 
 

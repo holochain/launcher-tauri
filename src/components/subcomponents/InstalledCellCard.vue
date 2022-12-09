@@ -1,6 +1,6 @@
 <template>
   <div class="column card">
-    <div style="text-align: right; font-weight: 600">{{ cell.role_id }}</div>
+    <div style="text-align: right; font-weight: 600">{{ cell.role_name }}</div>
     <div style="margin-bottom: 15px">
       <span style="margin-right: 20px">Dna Hash:</span>
       <span style="opacity: 0.7; font-family: monospace; font-size: 14px"

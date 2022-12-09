@@ -5,7 +5,7 @@
   },
   "build": {
     "distDir": "target/webpack_dist",
-    "devPath": "http://localhost:8080",
+    "devPath": "target/webpack_dist",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
   },
@@ -14,7 +14,7 @@
       "description": "Running the Holochain Launcher from the command line",
       "args": [
         {
-          "name": "config-path",
+          "name": "profile",
           "takesValue": true,
           "multiple": false
         }
@@ -37,7 +37,8 @@
       ],
       "resources": [],
       "externalBin": [
-        "bins/holochain-v0.0.173",
+        "bins/holochain-v0.0.175",
+        "bins/holochain-v0.0.175-signed-zome-calls",
         "bins/lair-keystore"
       ],
       "copyright": "",
