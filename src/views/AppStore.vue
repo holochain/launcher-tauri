@@ -87,7 +87,7 @@
       App Library Synchronization (incoming):
     </div>
     <div>
-      <div v-for="(cell, idx) in cells" :key="cell.role_id" class="column">
+      <div v-for="(cell, idx) in cells" :key="cell.role_name" class="column">
         <div class="row" style="align-items: center">
           <div
             style="
@@ -97,7 +97,7 @@
               text-align: right;
             "
           >
-            {{ cell.role_id }}
+            {{ cell.role_name }}
           </div>
           <div style="width: 50%; margin: 0 30px">
             <HCProgressBar
@@ -247,7 +247,7 @@ export default defineComponent({
     });
 
     this.cells = devhubInfo.cell_data.sort((a, b) =>
-      a.role_id.localeCompare(b.role_id)
+      a.role_name.localeCompare(b.role_name)
     );
 
     let allApps: Array<AppWithReleases>;

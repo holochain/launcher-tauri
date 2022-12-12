@@ -276,7 +276,7 @@ export default defineComponent({
   background-color: #331ead;
   background-size: cover;
   background-position: center center;
-  background-image: url(/img/Holochain_Halo_complete.svg);
+  background-image: url(/img/Holochain_Halo.svg);
 }
 
 .left-half {

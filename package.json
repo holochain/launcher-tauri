@@ -16,7 +16,7 @@
     "@fontsource/poppins": "^4.5.9",
     "@holochain-open-dev/utils": "^0.0.9",
     "@holo-host/identicon": "^0.1.0",
-    "@holochain/client": "file:/home/matthias/code/holochain/holochain/holochain-client-js",
+    "@holochain/client": "^0.10.2",
     "@material/mwc-button": "^0.25.1",
     "@material/mwc-circular-progress": "0.25.1",
     "@material/mwc-dialog": "^0.25.1",
@@ -63,6 +63,7 @@
     "prettier": "^2.2.1",
     "replace-in-files-cli": "^1.0.0",
     "typescript": "~4.1.5",
+    "wasm-loader": "^1.3.0",
     "vue-jest": "^5.0.0-0"
   },
   "gitHooks": {
