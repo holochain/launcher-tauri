@@ -81,7 +81,8 @@ impl HcLaunch {
                 holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
 
                 // spawn sandboxes
-                let child_processes = spawn_sandboxes(
+                println!("# hc launch: Spawning sandbox conductors.");
+                let _child_processes = spawn_sandboxes(
                   &self.holochain_path,
                   happ_path,
                   self.create,
@@ -89,20 +90,28 @@ impl HcLaunch {
                 ).await?;
 
                 // spawn tauri windows
-                let ui_path = match self.ui_path {
+                let ui_path = match self.ui_path.clone() {
                   Some(p) => p,
-                  None => temp_folder.join("ui").into(), // TODO! switch to tmp directory for ui and .happ
+                  None => temp_folder.join("ui").into(),
                 };
 
                 let passphrase = holochain_util::pw::pw_get()?;
 
                 tauri::async_runtime::spawn(async move {
-                  // This stuff is never being called :/
                   tokio::signal::ctrl_c().await.unwrap();
                   holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
                   temp_dir.close().unwrap();
                   std::process::exit(0);
                 });
+
+                // In case a dedicated ui path is passed, check whether it exists, otherwise wait
+                if let Some(ui_p) = self.ui_path {
+                  while !ui_p.exists() {
+                    println!("# hc launch: You specified a dedicated UI path to use instead of the UI of the .webhapp file but this path does not exist (yet). Waiting before launching tauri windows...");
+                    tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                    // return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
+                  }
+                }
 
                 launch_tauri(ui_path, self.watch, passphrase);
               }
@@ -110,16 +119,12 @@ impl HcLaunch {
                 match self.ui_path {
                   Some(ui_p) => {
 
-                    // check whether path exists
-                    if !ui_p.exists() {
-                      return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
-                    }
-
                     // clean existing sandboxes
                     holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
 
                     // spawn sandboxes
-                    let child_processes = spawn_sandboxes(
+                    println!("# hc launch: Spawning sandbox conductors.");
+                    let _child_processes = spawn_sandboxes(
                       &self.holochain_path,
                       p,
                       self.create,
@@ -135,6 +140,14 @@ impl HcLaunch {
 
                     let passphrase = holochain_util::pw::pw_get()?;
 
+
+                    // check whether ui path exists
+                    while !ui_p.exists() {
+                      println!("# hc launch: Specified UI path does not exist (yet). Waiting before launching tauri windows...");
+                      tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                      // return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
+                    }
+                    println!("# hc launch: Launching tauri windows.");
                     launch_tauri(ui_p, self.watch, passphrase);
                   },
                   None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch --help` for help."),
