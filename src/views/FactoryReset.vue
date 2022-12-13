@@ -77,7 +77,7 @@
 import { defineComponent } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import { getCurrent } from "@tauri-apps/api/window";
-import { ActionTypes } from "@/store/actions";
+import { ActionTypes } from "../store/actions";
 import { listen } from "@tauri-apps/api/event";
 
 import HCGenericDialog from "../components/subcomponents/HCGenericDialog.vue";

@@ -187,7 +187,7 @@
 </template>
 
 <script lang="ts">
-import { ActionTypes } from "@/store/actions";
+import { ActionTypes } from "../../store/actions";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import PasswordField from "../subcomponents/PasswordField.vue";

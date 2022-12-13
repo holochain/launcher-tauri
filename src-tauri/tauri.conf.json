@@ -4,10 +4,10 @@
     "version": "0.8.0"
   },
   "build": {
-    "distDir": "target/webpack_dist",
-    "devPath": "http://localhost:8080",
-    "beforeDevCommand": "",
-    "beforeBuildCommand": ""
+    "distDir": "../dist",
+    "devPath": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
   },
   "tauri": {
     "cli": {

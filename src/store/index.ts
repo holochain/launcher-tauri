@@ -3,7 +3,7 @@ import {
   HolochainId,
   HolochainState,
   LauncherStateInfo,
-} from "@/types";
+} from "../types";
 import { invoke } from "@tauri-apps/api/tauri";
 import { createStore } from "vuex";
 import { flatten, uniq } from "lodash-es";
@@ -226,6 +226,7 @@ export const store = createStore<LauncherAdminState>({
       ) {
         versions.push({
           type: "CustomBinary",
+          content: undefined,
         });
       }
 
@@ -256,6 +257,7 @@ export const store = createStore<LauncherAdminState>({
               webAppInfo: app,
               holochainId: {
                 type: "CustomBinary",
+                content: undefined,
               },
               holochainVersion: "Custom Binary",
             });

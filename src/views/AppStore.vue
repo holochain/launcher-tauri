@@ -164,7 +164,7 @@ import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
-import HCProgressBar from "@/components/subcomponents/HCProgressBar.vue";
+import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 
 import {
   AppWithReleases,
@@ -173,12 +173,12 @@ import {
   getLatestRelease,
   fetchWebHapp,
 } from "../devhub/get-happs";
-import { HdkVersion } from "@/hdk";
+import { HdkVersion } from "../hdk";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
-import { HolochainId } from "@/types";
+import { HolochainId } from "../types";
 import prettyBytes from "pretty-bytes";
 
 export default defineComponent({

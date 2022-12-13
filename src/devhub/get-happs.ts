@@ -1,4 +1,4 @@
-import { HdkVersion } from "@/hdk";
+import { HdkVersion } from "../hdk";
 import {
   AppWebsocket,
   EntryHash,

@@ -20,10 +20,7 @@
       v-if="!passwordVisible"
       class="eye-icon"
       :class="{ eyeIconFocus: inFocus && !disabled }"
-      @click="
-        this.$refs.passwordInput.focus();
-        passwordVisible = !passwordVisible;
-      "
+      @click="clickEye()"
       aria-label="show password"
       width="23"
       height="15"
@@ -40,10 +37,7 @@
       v-else
       class="eye-icon"
       :class="{ eyeIconFocus: inFocus && !disabled }"
-      @click="
-        this.$refs.passwordInput.focus();
-        passwordVisible = !passwordVisible;
-      "
+      @click="clickEye()"
       aria-label="hide password"
       width="23"
       height="15"
@@ -103,6 +97,10 @@ export default defineComponent({
       (this.$refs.passwordInput as HTMLElement).blur();
       this.inFocus = false;
     },
+    clickEye() {
+      (this.$refs.passwordInput as any).focus();
+      this.passwordVisible = !this.passwordVisible;
+    }
   },
 });
 </script>

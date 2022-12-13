@@ -94,7 +94,7 @@
       <HCButton
         class="install-btn"
         style="border-radius: 12px; margin: 8px"
-        @click="$emit('install-app')"
+        @click="$emit('installApp')"
         >Install</HCButton
       >
     </div>
@@ -102,8 +102,8 @@
 </template>
 
 <script lang="ts">
-import { AppWithReleases, getLatestRelease } from "@/devhub/get-happs";
-import { HolochainVersion } from "@/types";
+import { AppWithReleases, getLatestRelease } from "../devhub/get-happs";
+import { HolochainVersion } from "../types";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent, PropType } from "vue";
 

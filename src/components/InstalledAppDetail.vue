@@ -29,7 +29,7 @@
         <tr
           style=""
           v-for="cellData in installedAppInfo.cell_data"
-          :key="[...cellData.cell_id[0], ...cellData.cell_id[1]]"
+          :key="cellData.role_name"
         >
           <td>
             <span
@@ -57,7 +57,7 @@
         "
       >
         <mwc-button
-          @click="$refs['uninstallDialog'].show()"
+          @click="showUninstallDialog"
           style="margin-left: 8px"
           label="Uninstall"
           icon="delete"
@@ -167,6 +167,9 @@ export default defineComponent({
     async uninstallApp() {
       this.$emit("uninstallApp", this.appId);
     },
+    showUninstallDialog() {
+      (this.$refs['uninstallDialog'] as any).show()
+    }
   },
 });
 </script>
