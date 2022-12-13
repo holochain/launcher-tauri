@@ -4,7 +4,7 @@
     <div style="margin-bottom: 15px">
       <span style="margin-right: 20px">Dna Hash:</span>
       <span style="opacity: 0.7; font-family: monospace; font-size: 14px"
-        >{{ serializeHash(cell.cell_id[0]) }}
+        >{{ dnaHashForCell(cell) }}
       </span>
     </div>
     <div>
@@ -183,6 +183,9 @@ export default defineComponent({
         return undefined;
       }
     },
+    dnaHashForCell(cell: InstalledCell) {
+      return serializeHash(new Uint8Array(cell.cell_id[0]))
+    }
   },
 });
 </script>
