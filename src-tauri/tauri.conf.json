@@ -7,7 +7,7 @@
     "distDir": "../dist",
     "devPath": "http://localhost:1420",
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "beforeBuildCommand": "npm run build:ui"
   },
   "tauri": {
     "cli": {
