@@ -1,16 +1,15 @@
 <template>
   <div class="background">
-    <!-- <img src="/img/Holochain_Halo_complete.svg" style="height: 110vh;"> -->
     <div v-if="step == 0" class="column" style="align-items: center">
-      <div style="color: white; font-size: 56px; margin-bottom: 30px">
+      <div style="color: white; font-size: 56px; margin-bottom: 30px; opacity: 0.9;">
         Welcome to Holochain
       </div>
-      <div style="color: white; margin-bottom: 80px; font-size: 22px">
+      <div style="color: white; margin-bottom: 80px; font-size: 22px; opacity: 0.9;">
         [imagine a catchy slogan here]
       </div>
       <HCButton
         @click="step = 1"
-        style="--hc-primary-color: white; color: #331ead"
+        style="--hc-primary-color: white; color: #331ead;"
         >Get started</HCButton
       >
     </div>
@@ -276,7 +275,7 @@ export default defineComponent({
   background-color: #331ead;
   background-size: cover;
   background-position: center center;
-  background-image: url(/img/Holochain_Halo.svg);
+  background-image: url(/img/Holochain_Halo_complete_transparent.svg);
 }
 
 .left-half {
