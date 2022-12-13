@@ -14,7 +14,7 @@
       "description": "Running the Holochain Launcher from the command line",
       "args": [
         {
-          "name": "config-path",
+          "name": "profile",
           "takesValue": true,
           "multiple": false
         }
