@@ -144,7 +144,7 @@
         >
         <HCButton
           style="width: 80px; margin: 4px 6px"
-          :disabled="installDisabled"
+          :disabled="!isAppReadyToInstall || installing || !!appIdInvalid"
           @click="installApp()"
           >Install</HCButton
         >
@@ -229,13 +229,7 @@ export default defineComponent({
     };
   },
   computed: {
-    installDisabled() {
-      console.log("Computing: ", this.isAppReadyToInstall, this.installing, !!this.appIdInvalid, this.appIdInvalid);
-      console.log("Disabled: ", !this.isAppReadyToInstall || this.installing || !!this.appIdInvalid);
-      return !this.isAppReadyToInstall || this.installing || !!this.appIdInvalid
-    },
     isAppReadyToInstall() {
-      console.log("APP READY TO INSTALL? : ", this.appId, this.holochainId, this.isAppIdValid);
       if (!this.appId) return false;
       if (!this.holochainId) return false;
       if (!this.isAppIdValid) return false;
@@ -259,22 +253,9 @@ export default defineComponent({
       const allPubKeys: [string, string | undefined][] = [
         ["Generate New Public Key (default)", undefined],
       ];
-      console.log("Before serializing public keys: ", allPubKeys);
-
-      const serializedPubKeys = pubkeys.map((hash) => {
-        console.log("hash to serialized: ", hash);
-        serializeHash(hash);
-      });
-      console.log("serializedPubKeys: ", serializedPubKeys);
-
-      const uniqueSerializedPubKeys = uniq(serializedPubKeys);
-      console.log("uniqueSerializedPubKeys: ", uniqueSerializedPubKeys);
-
-      uniqueSerializedPubKeys.forEach((pubKey) => {
+      uniq(pubkeys.map(serializeHash)).forEach((pubKey) => {
         allPubKeys.push([pubKey, pubKey]);
       });
-
-      console.log("After serializing public keys: ", allPubKeys);
 
       return allPubKeys;
     },

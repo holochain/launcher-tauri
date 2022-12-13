@@ -349,7 +349,7 @@ export const store = createStore<LauncherAdminState>({
         )
       );
 
-      return uniq(allCells.map((c) => c.cell_id[1]));
+      return uniq(allCells.map((c) => new Uint8Array(c.cell_id[1])));
     },
     appInterfacePort: (state) => (holochainId: HolochainId) => {
       const stateInfo = state.launcherStateInfo;
