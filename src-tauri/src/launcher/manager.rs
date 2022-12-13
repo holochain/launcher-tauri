@@ -480,7 +480,14 @@ impl LauncherManager {
                 *mutable_response = asset;
                 response.set_mimetype(mime_type);
               },
-              Err(e) => log::error!("Error reading asset file from path '{:?}'. Error: {:?}", asset_path, e),
+              Err(e) => {
+                log::error!("Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}", asset_path, e);
+                let mutable_response = response.body_mut();
+                match read(index_path.clone()) {
+                  Ok(index_html) => *mutable_response = index_html,
+                  Err(e) => log::error!("Error reading the path of the UI's index.html: {:?}", e),
+                }
+              },
             }
           }
         }
