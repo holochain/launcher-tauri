@@ -180,7 +180,7 @@ const messages = {
       forgotPassword: {
         title: "Oh nein!",
         part1:
-          "Leider unterstützt der Holochain Launcher momentan noch keinen Passwort Wiederherstellungs-Mechanismus.",
+          "Leider unterstützt Holochain Launcher momentan noch keinen Passwort Wiederherstellungs-Mechanismus.",
         part2:
           "Die einzige Option ist, den Holochain Launcher komplett zurückzusetzen (Settings > Factory Reset) um dein Profil und all deine Holochain Apps zu löschen und von vorne zu beginnen.",
       },
