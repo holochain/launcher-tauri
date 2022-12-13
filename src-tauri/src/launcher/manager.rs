@@ -499,10 +499,10 @@ impl LauncherManager {
     .inner_size(1000.0, 700.0)
     .title(app_id)
     .enable_clipboard_access() // TODO! potentially make this optional
-    .menu(Menu::new().add_submenu(Submenu::new(
-      "Settings",
-      Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
-    )))
+    // .menu(Menu::new().add_submenu(Submenu::new( // removing menu because it overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
+    //   "Settings",
+    //   Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
+    // )))
     // .icon(tauri::Icon::File(icon_path)) // placeholder for when apps come shipped with their custom icons
     // .map_err(|err| format!("Error adding icon: {:?}", err))?
     .build()
