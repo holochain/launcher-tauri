@@ -61,15 +61,6 @@
     "vite": "^4.0.0",
     "vue-tsc": "^1.0.11"
   },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,vue,ts,tsx}": [
-      "vue-cli-service lint",
-      "git add"
-    ]
-  },
   "resolutions": {
     "@tauri-apps/cli": "1.0.0-rc.7"
   }
