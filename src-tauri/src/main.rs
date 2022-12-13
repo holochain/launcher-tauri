@@ -95,17 +95,17 @@ fn main() {
 
       // reading custom path from cli
       let cli_matches = app.get_cli_matches()?;
-      let custom_path: CustomPath = match cli_matches.args.get("config-path") {
+      let custom_path: CustomPath = match cli_matches.args.get("profile") {
         Some(data) => match data.value.clone() {
           Value::String(path) => CustomPath {
             custom_path: Some(path),
           },
           _ => {
-            // println!("ERROR: Value passed to --config-path option could not be interpreted as string.");
+            // println!("ERROR: Value passed to --profile option could not be interpreted as string.");
             CustomPath {
               custom_path: None
             }
-            // panic!("Value passed to --config-path option could not be interpreted as string.")
+            // panic!("Value passed to --profile option could not be interpreted as string.")
           }
         },
         None => CustomPath {

@@ -118,11 +118,11 @@
 
         <div
           v-for="(appRole, index) of appInfo.roles_to_create"
-          :key="appRole.id"
+          :key="appRole.name"
           class="column"
           style="flex: 1; margin-top: 8px"
         >
-          <span>#{{ index + 1 }} {{ appRole.id }}</span>
+          <span>#{{ index + 1 }} {{ appRole.name }}</span>
 
           <HCTextArea
             placeholder="Membrane Proof"
@@ -130,10 +130,7 @@
             :cols="32"
             label="Membrane Proof"
             helper="Check with the author if this is required."
-            @input="
-              membraneProofs[appRole.id] = $event.target.value;
-              onChange();
-            "
+            @input="membraneProofs[appRole.name] = $event.target.value"
           />
         </div>
       </div>
@@ -147,7 +144,7 @@
         >
         <HCButton
           style="width: 80px; margin: 4px 6px"
-          :disabled="!isAppReadyToInstall || installing || appIdInvalid"
+          :disabled="!isAppReadyToInstall || installing || !!appIdInvalid"
           @click="installApp()"
           >Install</HCButton
         >
@@ -165,7 +162,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
-import { ActionTypes } from "@/store/actions";
+import { ActionTypes } from "../store/actions";
 import { serializeHash } from "@holochain-open-dev/utils";
 import { flatten, uniq } from "lodash-es";
 import { toUint8Array } from "js-base64";
@@ -182,6 +179,8 @@ import {
   InstalledWebAppInfo,
   WebAppInfo,
 } from "../types";
+import { AppWithReleases } from "../devhub/get-happs";
+import { AppRoleManifest } from "@holochain/client";
 
 export default defineComponent({
   name: "InstallAppDialog",
@@ -206,7 +205,7 @@ export default defineComponent({
     showAdvanced: boolean;
     installing: boolean;
     appId: string | undefined;
-    membraneProofs: { [key: string]: string } | undefined;
+    membraneProofs: { [key: string]: string };
     appInfo: WebAppInfo | undefined;
     isAppIdValid: boolean;
     reuseAgentPubKey: string | undefined;
@@ -219,7 +218,7 @@ export default defineComponent({
       showAdvanced: false,
       installing: false,
       appId: undefined,
-      membraneProofs: undefined,
+      membraneProofs: {},
       appInfo: undefined,
       isAppIdValid: true,
       reuseAgentPubKey: undefined,
@@ -294,7 +293,6 @@ export default defineComponent({
       };
     }
 
-    this.membraneProofs = {};
     this.appInfo = (await invoke("get_app_info", {
       appBundlePath: this.appBundlePath,
     })) as WebAppInfo;
@@ -353,6 +351,7 @@ export default defineComponent({
       if (version === "CustomBinary") {
         this.holochainId = {
           type: "CustomBinary",
+          content: undefined,
         };
       } else {
         this.holochainId = {

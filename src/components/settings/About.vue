@@ -40,7 +40,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { getCurrent } from "@tauri-apps/api/window";
-import { HolochainVersion } from "@/types";
+import { HolochainVersion } from "../../types";
 import { invoke } from "@tauri-apps/api/tauri";
 import { getVersion } from "@tauri-apps/api/app";
 import HCDialogHeaded from "../subcomponents/HCDialogHeaded.vue";

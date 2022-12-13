@@ -40,6 +40,7 @@ export type HolochainId =
     }
   | {
       type: "CustomBinary";
+      content: undefined;
     };
 
 export type LaunchTauriSidecarError =

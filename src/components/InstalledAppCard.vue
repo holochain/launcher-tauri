@@ -333,14 +333,14 @@ export default defineComponent({
     mainCells() {
       const allCells = this.app.webAppInfo.installed_app_info.cell_data;
       return allCells
-        .filter((cell) => !cell.role_id.includes("."))
-        .sort((a, b) => a.role_id.localeCompare(b.role_id));
+        .filter((cell) => !cell.role_name.includes("."))
+        .sort((a, b) => a.role_name.localeCompare(b.role_name));
     },
     clonedCells() {
       const allCells = this.app.webAppInfo.installed_app_info.cell_data;
       return allCells
-        .filter((cell) => cell.role_id.includes("."))
-        .sort((a, b) => a.role_id.localeCompare(b.role_id));
+        .filter((cell) => cell.role_name.includes("."))
+        .sort((a, b) => a.role_name.localeCompare(b.role_name));
     },
     isSliderOn() {
       return isAppRunning(this.app.webAppInfo.installed_app_info);
@@ -405,7 +405,7 @@ export default defineComponent({
     copyPubKey() {
       const pubKey =
         this.app.webAppInfo.installed_app_info.cell_data[0].cell_id[1];
-      this.writeText(serializeHash(pubKey));
+      this.writeText(serializeHash(new Uint8Array(pubKey)));
       this.showPubKeyTooltip = true;
       setTimeout(() => {
         this.showPubKeyTooltip = false;

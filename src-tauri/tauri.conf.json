@@ -4,17 +4,17 @@
     "version": "0.8.0"
   },
   "build": {
-    "distDir": "target/webpack_dist",
-    "devPath": "http://localhost:8080",
-    "beforeDevCommand": "",
-    "beforeBuildCommand": ""
+    "distDir": "../dist",
+    "devPath": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build:ui"
   },
   "tauri": {
     "cli": {
       "description": "Running the Holochain Launcher from the command line",
       "args": [
         {
-          "name": "config-path",
+          "name": "profile",
           "takesValue": true,
           "multiple": false
         }
@@ -37,7 +37,7 @@
       ],
       "resources": [],
       "externalBin": [
-        "bins/holochain-v0.0.173",
+        "bins/holochain-v0.0.175",
         "bins/lair-keystore"
       ],
       "copyright": "",

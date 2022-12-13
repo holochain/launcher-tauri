@@ -230,11 +230,7 @@
             <span
               v-if="storageInfos && !refreshing"
               style="font-weight: 600; margin-right: 15px"
-              >{{
-                totalStorage(hcVersion)
-                  ? prettyBytes(totalStorage(hcVersion))
-                  : "?"
-              }}</span
+              >{{ totalStorageString(hcVersion) }}</span
             >
             <StackedChart
               v-if="storageInfos && !refreshing"
@@ -263,7 +259,6 @@
 import { defineComponent, PropType } from "vue";
 import { uniq } from "lodash-es";
 
-import "@ui5/webcomponents/dist/Card.js";
 import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
@@ -439,6 +434,14 @@ export default defineComponent({
         })
       );
     },
+    totalStorageString(hcVersion: string) {
+      const totalStorageBytes = this.totalStorage(hcVersion);
+      if (totalStorageBytes) {
+        return prettyBytes(totalStorageBytes);
+      } else {
+        return "?";
+      }
+    }
   },
 });
 </script>

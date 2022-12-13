@@ -10,17 +10,17 @@ use holochain_p2p_0_0_175::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, Transpor
 
 use super::{version_manager::VersionManager, HdkVersion, HdiVersion, common::{proxy_url, boostrap_service}};
 
-pub struct HolochainV0_0_173;
+pub struct HolochainV0_0_175;
 
-impl VersionManager for HolochainV0_0_173 {
+impl VersionManager for HolochainV0_0_175 {
   // NEW_VERSION: Careful! Indicate here which HDK version comes bundled with this Holochain version
   fn hdk_version(&self) -> HdkVersion {
-    HdkVersion::V0_0_161
+    HdkVersion::V0_0_163
   }
 
   // NEW_VERSION: Careful! Indicate here which HDI version comes bundled with this Holochain version
   fn hdi_version(&self) -> HdiVersion {
-    HdiVersion::V0_1_8
+    HdiVersion::V0_1_10
   }
 
   // NEW_VERSION: Duplicate and change whatever config is necessary to change
@@ -66,4 +66,3 @@ impl VersionManager for HolochainV0_0_173 {
   }
 
 }
-

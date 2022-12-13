@@ -1,11 +1,10 @@
 <template>
   <div class="background">
-    <!-- <img src="/img/Holochain_Halo_complete.svg" style="height: 110vh;"> -->
     <div v-if="step == 0" class="column" style="align-items: center">
-      <div style="color: white; font-size: 56px; margin-bottom: 30px">
+      <div style="color: white; font-size: 56px; margin-bottom: 30px; opacity: 0.9;">
         {{ $t("setup.setup.welcome") }}
       </div>
-      <div style="color: white; margin-bottom: 80px; font-size: 22px">
+      <div style="color: white; margin-bottom: 80px; font-size: 22px; opacity: 0.9;">
         {{ $t("setup.setup.slogan") }}
       </div>
       <HCButton
@@ -186,7 +185,7 @@
 </template>
 
 <script lang="ts">
-import { ActionTypes } from "@/store/actions";
+import { ActionTypes } from "../../store/actions";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import PasswordField from "../subcomponents/PasswordField.vue";
@@ -275,7 +274,7 @@ export default defineComponent({
   background-color: #331ead;
   background-size: cover;
   background-position: center center;
-  background-image: url(/img/Holochain_Halo_complete.svg);
+  background-image: url(/img/Holochain_Halo_complete_transparent.svg);
 }
 
 .left-half {
