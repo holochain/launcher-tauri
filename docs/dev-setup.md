@@ -13,7 +13,7 @@ Check out `.github/workflows/release.yaml` to see what holochain and lair-keysto
 The commands to install them should look like below, replacing the version numbers with the right ones. Run them in the root directory of this repository:
 
 ### Linux/macOs
-```bash
+```
 cargo install --version 0.2.2 lair_keystore
 LAIR_PATH=$(which lair-keystore)
 cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-apple-darwin
@@ -28,7 +28,7 @@ cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.175-x86_64-apple-darwin
 ```
 
 ### Windows
-```bash
+```
 cargo install --version 0.2.2 lair_keystore
 $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
 Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
@@ -49,7 +49,7 @@ npm run build:ui
 npm run tauri dev
 ```
 **Note:** This mode will show different behavior in some cases than running production builds.
-To get the production build behavior (but without hot-reloading), run instead:
+To get the production build behavior (but thereby sacrificing hot-reloading), run instead:
 
 ```bash
 npm run build:ui
