@@ -29,7 +29,7 @@
           box-shadow: 0 0px 3px -1px #9b9b9b;
           --hc-label-background: #e8e8eb;
         "
-        placeholder="Holochain Versions"
+        :placeholder="$t('main.holochainVersions')"
         :items="holochainVersionOptions"
         @item-selected="selectedHolochainVersion = $event"
       ></HCSelectCard>
@@ -50,7 +50,7 @@
           box-shadow: 0 0px 3px -1px #9b9b9b;
           --hc-label-background: #e8e8eb;
         "
-        placeholder="sort by"
+        :placeholder="$t('main.sortBy')"
         :items="sortOptions"
         @item-selected="sortOption = $event"
       ></HCSelectCard>
@@ -67,8 +67,8 @@
     >
       <span
         style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
-        title="Holochain Apps with Graphical User Interface"
-        >Web Apps</span
+        :title="$t('main.webAppsHelper')"
+        >{{ $t("main.webApps") }}</span
       >
       <span
         @click="showWebApps = !showWebApps"
@@ -83,7 +83,8 @@
         v-if="noWebApps"
         style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
       >
-        There are no Web Apps installed{{
+        {{ $t("main.noWebApps") }}
+        {{
           selectedHolochainVersion === "All Versions"
             ? "."
             : " in this Holochain Version."
@@ -120,8 +121,8 @@
     >
       <span
         style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
-        title="Holochain Apps without Graphical User Interface"
-        >Headless Apps</span
+        :title="$t('main.headlessAppsHelper')"
+        >{{ $t("main.headlessApps") }}</span
       >
       <span
         @click="showHeadlessApps = !showHeadlessApps"
@@ -136,7 +137,8 @@
         v-if="noHeadlessApps"
         style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
       >
-        There are no headless apps installed{{
+        {{ $t("main.noHeadlessApps") }}
+        {{
           selectedHolochainVersion === "All Versions"
             ? "."
             : " in this Holochain Version."
@@ -171,8 +173,8 @@
     >
       <span
         style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
-        title="Installed Holochain Versions"
-        >Holochain Versions</span
+        :title="$t('main.holochainVersionsHelper')"
+        >{{ $t("main.holochainVersions") }}</span
       >
       <span
         @click="showHolochainVersions = !showHolochainVersions"
@@ -190,7 +192,7 @@
           src="/img/refresh.png"
           style="height: 12px; margin-right: 3px; opacity: 0.7"
         />
-        Refresh
+        {{ $t("main.refresh") }}
       </span>
     </div>
     <div
@@ -202,7 +204,7 @@
         v-if="noHolochainVersions"
         style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
       >
-        There are no Holochain Versions installed.
+        {{ $t("main.noHolochainVersions") }}
       </div>
       <div v-else style="max-width: 1090px; width: 99%">
         <div

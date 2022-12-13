@@ -5,16 +5,13 @@
       style="padding: 30px; align-items: center; max-width: 600px"
     >
       <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
-        Oh my!
+        {{ $t("dialogs.forgotPassword.title") }}
       </div>
       <div>
-        Unfortunately, the Holochain Launcher does not support a password
-        recovery mechanism at this stage.
+        {{ $t("dialogs.forgotPassword.part1") }}
         <br />
         <br />
-        Your only option is to do a factory reset (Settings > Factory Reset) to
-        delete your current profile alongside with all your holochain apps and
-        restart from scratch.
+        {{ $t("dialogs.forgotPassword.part2") }}
       </div>
     </div>
   </HCDialog>
@@ -62,7 +59,7 @@
             margin: 20px;
           "
         >
-          Discover, install and easily manage your Holochain apps
+          {{ $t("setup.login.slogan") }}
         </div>
         <img class="halo" src="/img/Holochain_Halo.svg" />
       </div>
@@ -72,7 +69,7 @@
           style="height: 35px; margin-bottom: 10px; opacity: 0.95"
         />
         <div style="font-size: 27px; font-weight: 600; margin-bottom: 25px">
-          Enter password
+          {{ $t("setup.login.enterPassword") }}
         </div>
 
         <form>
@@ -82,7 +79,7 @@
               initialFocus
               :disabled="pwInputDisabled"
               ref="password"
-              placeholder="Enter password"
+              :placeholder="$t('setup.login.enterPassword')"
               style="margin-bottom: 5px"
               @input="invalidPassword = false"
             />
@@ -97,14 +94,14 @@
                 height: 22px;
               "
             >
-              {{ invalidPassword ? "Invalid Password." : "" }}
+              {{ invalidPassword ? $t("setup.login.invalidPassword") : "" }}
             </div>
 
             <HCButton
               :disabled="entering"
               @click="enterPassword()"
               style="width: 128px"
-              >{{ entering ? "Starting..." : "Continue" }}
+              >{{ $t("buttons.continue") }}
             </HCButton>
           </div>
         </form>
@@ -121,7 +118,7 @@
           "
           @click="openForgotPasswordDialog"
         >
-          forgot password
+          {{ $t("setup.login.forgotPassword") }}
         </div>
       </div>
     </div>

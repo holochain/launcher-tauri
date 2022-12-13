@@ -13,7 +13,9 @@
           src="/img/Square284x284Logo.png"
           style="height: 42px; margin-left: 11px"
         />
-        <span style="font-size: 1.5em; margin-left: 13px">Installed Apps</span>
+        <span style="font-size: 1.5em; margin-left: 13px">{{
+          $t("main.installedApps")
+        }}</span>
         <span style="display: flex; flex: 1"></span>
         <HCButton
           style="
@@ -23,10 +25,11 @@
             border-radius: 8px;
             padding: 0 20px;
           "
+          :title="reportIssueUrl"
           @click="reportIssue()"
         >
           <div class="row center-content">
-            <span style="margin-left: 5px">Report Issue</span>
+            <span style="margin-left: 5px">{{ $t("main.reportIssue") }}</span>
           </div>
         </HCButton>
       </div>
@@ -58,7 +61,7 @@
         "
         ><div class="row center-content" style="font-size: 18px">
           <mwc-icon style="margin-right: 10px; font-size: 26px">add</mwc-icon
-          >INSTALL NEW APP
+          >{{ $t("main.installNewApp") }}
         </div>
       </HCButton>
     </div>
