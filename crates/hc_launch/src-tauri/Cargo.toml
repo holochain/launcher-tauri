@@ -1,6 +1,6 @@
 [package]
 name = "holochain_cli_launch"
-version = "0.0.1"
+version = "0.0.2-alpha.1"
 description = "A CLI to launch holochain apps in a Holochain Launcher environment for testing and development purposes."
 authors = ["you"]
 license = ""
@@ -27,7 +27,9 @@ holochain_types = {package = "holochain_types", git = "https://github.com/holoch
 holochain_util = { version = "^0.0.13", features = [ "pw" ] }
 holochain_zome_types = {package = "holochain_zome_types", git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
 holochain_conductor_api = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
-holochain = {git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
+
+holochain = ">=0.0.175, <0.2"
+
 
 lair_keystore_api = "0.2.2"
 
@@ -52,6 +54,9 @@ url2 = "0.0.6"
 zip = "0.5.0"
 
 lair_keystore_manager = {path = "../../lair_keystore_manager"}
+
+
+
 
 [features]
 # by default Tauri runs in production mode

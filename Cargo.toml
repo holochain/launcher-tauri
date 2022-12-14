@@ -6,3 +6,7 @@ members = [
   "src-tauri",
 ]
 resolver = "2"
+
+
+[patch.crates-io]
+holochain = {git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
