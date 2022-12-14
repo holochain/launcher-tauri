@@ -403,6 +403,16 @@ impl LauncherManager {
 
     let index_path = manager.get_ui_index_path(app_id);
     let assets_path = manager.get_app_ui_path(app_id);
+    let local_storage_path = manager.get_app_local_storage_path(app_id);
+
+    // println!("local_storage_path: {:?}", local_storage_path);
+
+    // let contents = std::fs::read_dir(local_storage_path.clone()).unwrap().last().unwrap().unwrap();
+
+    // println!("Contents of directory: {:?}", contents);
+    // println!("filename: {:?}", contents.file_name());
+    // println!("filetype: {:?}", contents.file_type());
+
 
 
     // println!("%*%*%*% INDEX PATH: {:?}", index_path);
@@ -441,7 +451,10 @@ impl LauncherManager {
         "tauri://localhost" => {
           let mutable_response = response.body_mut();
           match read(index_path.clone()) {
-            Ok(index_html) => *mutable_response = index_html, // TODO! Check if there are better ways of dealing with errors here
+            Ok(index_html) => {
+              *mutable_response = index_html;
+              response.set_mimetype(Some(String::from("text/html")));
+            }, // TODO! Check if there are better ways of dealing with errors here
             Err(e) => log::error!("Error reading the path of the UI's index.html: {:?}", e),
           }
         },
@@ -466,25 +479,33 @@ impl LauncherManager {
               Some(mime) => Some(mime.essence_str().to_string()),
               None => {
                 log::info!("Could not deterine MIME Type of file '{:?}'", asset_file);
+                println!("Could not deterine MIME Type of file '{:?}'", asset_file);
                 None
               }
             };
 
             // println!("%#%#%# ASSEETTT: {:?}", asset_file);
             // println!("%#%#%# Mime type: {:?}", mime_type);
+
+            // TODO! if files in subfolders are requested, additional logic may be required here to get paths right across platforms
             let asset_path = assets_path.join(asset_file);
             // println!("%#%#%# ASSEETTT PATH: {:?}", asset_path);
             match read(asset_path.clone()) {
               Ok(asset) => {
                 let mutable_response = response.body_mut();
                 *mutable_response = asset;
-                response.set_mimetype(mime_type);
+                response.set_mimetype(mime_type.clone());
+                println!("Requested file: {}", asset_file);
+                println!("Detected mime type: {:?}", mime_type);
               },
               Err(e) => {
                 log::error!("Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}", asset_path, e);
                 let mutable_response = response.body_mut();
                 match read(index_path.clone()) {
-                  Ok(index_html) => *mutable_response = index_html,
+                  Ok(index_html) =>  {
+                    *mutable_response = index_html;
+                    response.set_mimetype(Some(String::from("text/html")));
+                  },
                   Err(e) => log::error!("Error reading the path of the UI's index.html: {:?}", e),
                 }
               },
@@ -495,6 +516,7 @@ impl LauncherManager {
 
 
     })
+    .data_directory(local_storage_path)
     .initialization_script(launcher_env_command.as_str())
     .inner_size(1000.0, 700.0)
     .title(app_id)
