@@ -20,7 +20,7 @@ use lair_keystore_api::{LairClient, ipc_keystore_connect};
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
-pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead) -> () {
+pub fn launch_tauri(ui_path: PathBuf, local_storage_path: PathBuf, watch: bool, passphrase: sodoken::BufRead) -> () {
   // tauri::async_runtime::set(tokio::runtime::Handle::current());
 
   // build tauri windows
@@ -93,6 +93,7 @@ pub fn launch_tauri(ui_path: PathBuf, watch: bool, passphrase: sodoken::BufRead)
               window_label.clone(),
               ui_path.clone().join("index.html"),
               ui_path.clone(),
+              local_storage_path.clone().join(format!("Agent-{}", app_counter)),
               launcher_env_command,
             ) {
               Ok(window) => window,

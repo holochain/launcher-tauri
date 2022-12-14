@@ -113,7 +113,10 @@ impl HcLaunch {
                   }
                 }
 
-                launch_tauri(ui_path, self.watch, passphrase);
+                let local_storage_path = temp_folder.join("tauri");
+
+                println!("# hc launch: Launching tauri windows.");
+                launch_tauri(ui_path, local_storage_path, self.watch, passphrase);
               }
               "happ" => {
                 match self.ui_path {
@@ -148,7 +151,14 @@ impl HcLaunch {
                       // return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
                     }
                     println!("# hc launch: Launching tauri windows.");
-                    launch_tauri(ui_p, self.watch, passphrase);
+
+                    // generate temp folder for localStorage
+                    let temp_dir = tempdir::TempDir::new("hc_launch").unwrap();
+                    let temp_folder = temp_dir.path().to_path_buf();
+
+                    let local_storage_path = temp_folder.join("tauri");
+
+                    launch_tauri(ui_p, local_storage_path, self.watch, passphrase);
                   },
                   None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch --help` for help."),
                 }

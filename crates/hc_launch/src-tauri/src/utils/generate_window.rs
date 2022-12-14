@@ -11,6 +11,7 @@ pub fn generate_window(
   label: String,
   index_path: PathBuf,
   assets_path: PathBuf,
+  local_storage_path: PathBuf,
   launcher_env_command: String
 ) -> Result<Window> {
 
@@ -66,6 +67,7 @@ pub fn generate_window(
 
 
     })
+    .data_directory(local_storage_path)
     .initialization_script(launcher_env_command.as_str())
     .inner_size(1000.0, 700.0)
     .title(label)
