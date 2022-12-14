@@ -709,12 +709,11 @@ dependencies = [
 
 [[package]]
 name = "cargo_toml"
-version = "0.11.6"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4419e9adae9fd7e231b60d50467481bf8181ddeef6ed54683b23ae925c74c9c"
+checksum = "aa0e3586af56b3bfa51fca452bd56e8dbbbd5d8d81cbf0b7e4e35b695b537eb8"
 dependencies = [
  "serde",
- "serde_derive",
  "toml",
 ]
 
@@ -6966,7 +6965,7 @@ dependencies = [
  "tauri-macros",
  "tauri-runtime",
  "tauri-runtime-wry",
- "tauri-utils 1.2.1",
+ "tauri-utils",
  "tempfile",
  "thiserror",
  "tokio",
@@ -6979,8 +6978,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-build"
-version = "1.0.4"
-source = "git+https://github.com/tauri-apps/tauri?rev=447370fa50a82f8086554086ca9038f4a008a456#447370fa50a82f8086554086ca9038f4a008a456"
+version = "1.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8807c85d656b2b93927c19fe5a5f1f1f348f96c2de8b90763b3c2d561511f9b4"
 dependencies = [
  "anyhow",
  "cargo_toml",
@@ -6988,7 +6988,7 @@ dependencies = [
  "json-patch",
  "semver 1.0.13",
  "serde_json",
- "tauri-utils 1.0.3",
+ "tauri-utils",
  "winres",
 ]
 
@@ -7011,7 +7011,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
- "tauri-utils 1.2.1",
+ "tauri-utils",
  "thiserror",
  "time 0.3.14",
  "uuid 1.2.2",
@@ -7029,7 +7029,7 @@ dependencies = [
  "quote",
  "syn",
  "tauri-codegen",
- "tauri-utils 1.2.1",
+ "tauri-utils",
 ]
 
 [[package]]
@@ -7045,7 +7045,7 @@ dependencies = [
  "raw-window-handle",
  "serde",
  "serde_json",
- "tauri-utils 1.2.1",
+ "tauri-utils",
  "thiserror",
  "uuid 1.2.2",
  "webview2-com",
@@ -7064,37 +7064,12 @@ dependencies = [
  "rand 0.8.5",
  "raw-window-handle",
  "tauri-runtime",
- "tauri-utils 1.2.1",
+ "tauri-utils",
  "uuid 1.2.2",
  "webkit2gtk",
  "webview2-com",
  "windows 0.39.0",
  "wry",
-]
-
-[[package]]
-name = "tauri-utils"
-version = "1.0.3"
-source = "git+https://github.com/tauri-apps/tauri?rev=447370fa50a82f8086554086ca9038f4a008a456#447370fa50a82f8086554086ca9038f4a008a456"
-dependencies = [
- "ctor",
- "glob",
- "heck 0.4.0",
- "html5ever",
- "json-patch",
- "kuchiki",
- "memchr",
- "phf 0.10.1",
- "proc-macro2",
- "quote",
- "semver 1.0.13",
- "serde",
- "serde_json",
- "serde_with",
- "thiserror",
- "url",
- "walkdir",
- "windows 0.39.0",
 ]
 
 [[package]]

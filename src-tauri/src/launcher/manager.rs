@@ -455,7 +455,10 @@ impl LauncherManager {
               *mutable_response = index_html;
               response.set_mimetype(Some(String::from("text/html")));
             }, // TODO! Check if there are better ways of dealing with errors here
-            Err(e) => log::error!("Error reading the path of the UI's index.html: {:?}", e),
+            Err(e) => {
+              println!("### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+              log::error!("Error reading the path of the UI's index.html: {:?}", e);
+            },
           }
         },
         "tauri://localhost/.launcher-env.json" => {
@@ -478,8 +481,8 @@ impl LauncherManager {
             let mime_type = match mime_guess.first() {
               Some(mime) => Some(mime.essence_str().to_string()),
               None => {
-                log::info!("Could not deterine MIME Type of file '{:?}'", asset_file);
-                println!("Could not deterine MIME Type of file '{:?}'", asset_file);
+                log::info!("Could not determine MIME Type of file '{:?}'", asset_file);
+                println!("\n### ERROR ### Could not determine MIME Type of file '{:?}'\n", asset_file);
                 None
               }
             };
@@ -495,18 +498,22 @@ impl LauncherManager {
                 let mutable_response = response.body_mut();
                 *mutable_response = asset;
                 response.set_mimetype(mime_type.clone());
-                println!("Requested file: {}", asset_file);
-                println!("Detected mime type: {:?}", mime_type);
+                println!("\nRequested file: {}", asset_file);
+                println!("Detected mime type: {:?}\n", mime_type);
               },
               Err(e) => {
-                log::error!("Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}", asset_path, e);
+                println!("### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
+                log::error!("Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
                 let mutable_response = response.body_mut();
                 match read(index_path.clone()) {
                   Ok(index_html) =>  {
                     *mutable_response = index_html;
                     response.set_mimetype(Some(String::from("text/html")));
                   },
-                  Err(e) => log::error!("Error reading the path of the UI's index.html: {:?}", e),
+                  Err(e) => {
+                    println!("### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+                    log::error!("Error reading the path of the UI's index.html: {:?}", e);
+                  },
                 }
               },
             }
