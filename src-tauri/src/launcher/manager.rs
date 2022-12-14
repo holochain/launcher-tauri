@@ -456,7 +456,7 @@ impl LauncherManager {
               response.set_mimetype(Some(String::from("text/html")));
             }, // TODO! Check if there are better ways of dealing with errors here
             Err(e) => {
-              println!("### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+              println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
               log::error!("Error reading the path of the UI's index.html: {:?}", e);
             },
           }
@@ -502,7 +502,7 @@ impl LauncherManager {
                 println!("Detected mime type: {:?}\n", mime_type);
               },
               Err(e) => {
-                println!("### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
+                println!("\n### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.\n", asset_path, e);
                 log::error!("Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
                 let mutable_response = response.body_mut();
                 match read(index_path.clone()) {
@@ -511,7 +511,7 @@ impl LauncherManager {
                     response.set_mimetype(Some(String::from("text/html")));
                   },
                   Err(e) => {
-                    println!("### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+                    println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
                     log::error!("Error reading the path of the UI's index.html: {:?}", e);
                   },
                 }
