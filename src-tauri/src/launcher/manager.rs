@@ -492,6 +492,10 @@ impl LauncherManager {
 
             // TODO! if files in subfolders are requested, additional logic may be required here to get paths right across platforms
             let asset_path = assets_path.join(asset_file);
+
+            let path_str = asset_path.to_str().unwrap();
+            println!("¬½¬½¬½¬ str of asset_path: {}", path_str);
+
             // println!("%#%#%# ASSEETTT PATH: {:?}", asset_path);
             match read(asset_path.clone()) {
               Ok(asset) => {
@@ -500,21 +504,77 @@ impl LauncherManager {
                 response.set_mimetype(mime_type.clone());
                 println!("\nRequested file: {}", asset_file);
                 println!("Detected mime type: {:?}\n", mime_type);
+                if asset_file == "holochain-home.png" {
+                  println!("\n\n\n#################################\nHOLOCHAIN-HOME.PNG:\n{:?}", response);
+                }
+                if asset_file == "DnaPickerModal.html" {
+                  println!("\n\n\n#################################\nHOLOCHAIN-HOME.PNG:\n{:?}", response);
+                }
               },
               Err(e) => {
-                println!("\n### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.\n", asset_path, e);
-                log::error!("Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
-                let mutable_response = response.body_mut();
-                match read(index_path.clone()) {
-                  Ok(index_html) =>  {
-                    *mutable_response = index_html;
-                    response.set_mimetype(Some(String::from("text/html")));
-                  },
-                  Err(e) => {
-                    println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
-                    log::error!("Error reading the path of the UI's index.html: {:?}", e);
-                  },
+                // If nothing found at asset path, try removing stuff after a ?
+                // 1. convert path to str, then trim_end_matches()
+                // 2. str back to path and guess mime type
+                let maybe_stripped_str = asset_file.rsplit_once("?");
+
+                match maybe_stripped_str {
+                  Some(s) => {
+                    let new_mime_guess = mime_guess::from_path(s.0);
+
+                    let new_mime_type = match new_mime_guess.first() {
+                      Some(mime) => Some(mime.essence_str().to_string()),
+                      None => {
+                        log::info!("Could not determine MIME Type of stripped path_str: '{:?}'", s.0);
+                        println!("\n### ERROR ### Could not determine MIME Type of stripped path_str '{:?}'\n", s.0);
+                        None
+                      }
+                    };
+
+                    let stripped_asset_path = assets_path.join(s.0);
+
+                    match read(stripped_asset_path.clone()) {
+                      Ok(asset) => {
+                        let mutable_response = response.body_mut();
+                        *mutable_response = asset;
+                        response.set_mimetype(new_mime_type.clone());
+                        println!("\nRequested stripped file: {}", s.0);
+                        println!("Detected mime type: {:?}\n", new_mime_type);
+                      },
+                      Err(e) => {
+                        println!("\n### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.\n", asset_path, e);
+                        log::error!("Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
+                        let mutable_response = response.body_mut();
+                        match read(index_path.clone()) {
+                          Ok(index_html) =>  {
+                            *mutable_response = index_html;
+                            response.set_mimetype(Some(String::from("text/html")));
+                          },
+                          Err(e) => {
+                            println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+                            log::error!("Error reading the path of the UI's index.html: {:?}", e);
+                          },
+                        }
+                      }
+                    }
+                  }
+                  None => {
+                    println!("\n### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.\n", asset_path, e);
+                    log::error!("Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
+                    let mutable_response = response.body_mut();
+                    match read(index_path.clone()) {
+                      Ok(index_html) =>  {
+                        *mutable_response = index_html;
+                        response.set_mimetype(Some(String::from("text/html")));
+                      },
+                      Err(e) => {
+                        println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+                        log::error!("Error reading the path of the UI's index.html: {:?}", e);
+                      },
+                    }
+                  }
                 }
+
+
               },
             }
           }
