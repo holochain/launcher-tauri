@@ -7,6 +7,3 @@ members = [
 ]
 resolver = "2"
 
-
-[patch.crates-io]
-holochain = {git = "https://github.com/holochain/holochain", rev="c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
