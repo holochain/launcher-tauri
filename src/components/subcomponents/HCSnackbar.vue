@@ -55,7 +55,7 @@ export default defineComponent({
   --hc-primary-color: #482edf;
   --hc-text-color: white;
   position: fixed;
-  bottom: 5vh;
+  bottom: 2.5vh;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10000; /* make sure this is higher than the z-index of HCDialog! */

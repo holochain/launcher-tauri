@@ -40,7 +40,7 @@
         placeholder="/path/to/custom/binary"
         style="margin-top: 20px; width: 100%"
         label="Custom Holochain Binary Path"
-        :default="this.customBinaryPath"
+        :default="customBinaryPath"
       ></HCTextField>
     </div>
   </HCGenericDialog>

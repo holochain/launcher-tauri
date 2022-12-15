@@ -6,14 +6,17 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# NEW_VERSION pick right client version
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch="sign-zome-call-testing-launcher"}
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="267d19279495f1705a89202b2802980a233471b8" }
 
 
-# NEW_VERSION add latest crates here
-holochain_conductor_api_0_0_173 = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
-holochain_p2p_0_0_173 = {package = "holochain_p2p", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
-holochain_types_0_0_173 = {package = "holochain_types", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
+
+# NEW_VERSION add latest crates here # taken from commit instead this time
+
+holochain_conductor_api_0_0_175 = { git = "https://github.com/holochain/holochain", package = "holochain_conductor_api", rev = "c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+holochain_p2p_0_0_175 = { git = "https://github.com/holochain/holochain", package = "holochain_p2p", rev = "c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+holochain_types_0_0_175 = { git = "https://github.com/holochain/holochain", package = "holochain_types", rev = "c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
 
 
 mr_bundle = {package = "mr_bundle", version = "0.0.13"}
@@ -28,6 +31,6 @@ portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}
 serde-enum-str = "0.2"
 serde_yaml = "0.8"
-tauri = {version="1.1.1", features = ["api-all", "system-tray", "native-tls-vendored", "reqwest-native-tls-vendored"]}
+tauri = {version = "1.2.1", features = ["api-all", "system-tray", "native-tls-vendored", "reqwest-native-tls-vendored"]}
 thiserror = "1.0.30"
 url2 = "0.0.6"

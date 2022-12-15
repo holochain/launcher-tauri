@@ -8,7 +8,7 @@ pub async fn uninstall_app(
   holochain_id: HolochainId,
 ) -> Result<(), String> {
   if window.label() != "admin" {
-    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (O)"))
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (P)"))
   }
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;

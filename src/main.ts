@@ -13,6 +13,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 
 import App from "./App.vue";
 import { store } from "./store";
+import { i18n } from "./locale";
 
 window.onerror = function (message, source, lineno, colno, error) {
   invoke("log", {
@@ -22,7 +23,21 @@ window.onerror = function (message, source, lineno, colno, error) {
   });
 };
 
+const defaultLanguage = navigator.language;
+
+// if (defaultLanguage.startsWith("de")) {
+//   i18n.global.locale = "de";
+// } else {
+//   i18n.global.locale = "en";
+// }
+
+// always english for now
+i18n.global.locale = "en";
+
+
 const app = createApp(App);
 
 app.use(store);
+app.use(i18n);
+
 app.mount("#app");

@@ -1,8 +1,8 @@
-import { HdkVersion } from "@/hdk";
+import { HdkVersion } from "../hdk";
 import {
   AppWebsocket,
   EntryHash,
-  HeaderHash as ActionHash,
+  ActionHash,
   InstalledAppInfo,
 } from "@holochain/client";
 import { Happ, HappRelease } from "./types";
@@ -156,10 +156,10 @@ export async function fetchWebHapp(
 }
 
 function devhubCells(devhubHapp: InstalledAppInfo) {
-  const happs = devhubHapp.cell_data.find((c) => c.role_id === "happs");
-  const dnarepo = devhubHapp.cell_data.find((c) => c.role_id === "dnarepo");
+  const happs = devhubHapp.cell_data.find((c) => c.role_name === "happs");
+  const dnarepo = devhubHapp.cell_data.find((c) => c.role_name === "dnarepo");
   const webassets = devhubHapp.cell_data.find(
-    (c) => c.role_id === "web_assets"
+    (c) => c.role_name === "web_assets"
   );
 
   if (!happs || !dnarepo || !webassets) throw new Error("Bad app info");

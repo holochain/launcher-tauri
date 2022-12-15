@@ -8,7 +8,7 @@ pub async fn open_app_ui(
   app_id: String,
 ) -> Result<(), String> {
   if window.label() != "admin" {
-    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (I)"))
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (J)"))
   }
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;

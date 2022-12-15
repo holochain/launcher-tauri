@@ -1,5 +1,50 @@
 <template>
-  <div class="background">
+  <HCDialog ref="forgot-password" closeOnSideClick>
+    <div
+      class="column"
+      style="padding: 30px; align-items: center; max-width: 600px"
+    >
+      <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
+        {{ $t("dialogs.forgotPassword.title") }}
+      </div>
+      <div>
+        {{ $t("dialogs.forgotPassword.part1") }}
+        <br />
+        <br />
+        {{ $t("dialogs.forgotPassword.part2") }}
+      </div>
+    </div>
+  </HCDialog>
+
+  <div v-if="entering" class="entering-background">
+    <div class="column" style="align-items: center">
+      <div
+        style="
+          font-size: 40px;
+          color: #e2e1f5;
+          max-width: 660px;
+          margin-bottom: 45px;
+          text-align: center;
+        "
+      >
+        {{ bootUpSlogan }}
+      </div>
+      <LoadingDots style="--radius: 15px; --fill-color: #e2e1f5"></LoadingDots>
+    </div>
+    <div
+      v-if="loadingState"
+      style="
+        position: fixed;
+        bottom: 5px;
+        left: 10px;
+        color: #e2e1f5;
+        font-size: 0.9em;
+      "
+    >
+      {{ loadingState }}...
+    </div>
+  </div>
+  <div v-else class="background">
     <div
       class="row"
       style="box-shadow: 0 0 35px rgb(21, 16, 65); border-radius: 15px"
@@ -14,17 +59,17 @@
             margin: 20px;
           "
         >
-          Discover, install and easily manage your Holochain apps
+          {{ $t("setup.login.slogan") }}
         </div>
         <img class="halo" src="/img/Holochain_Halo.svg" />
       </div>
-      <div class="column center-content right-half">
+      <div class="column center-content right-half" style="position: relative">
         <img
           src="/img/lock_icon.svg"
           style="height: 35px; margin-bottom: 10px; opacity: 0.95"
         />
         <div style="font-size: 27px; font-weight: 600; margin-bottom: 25px">
-          Enter password
+          {{ $t("setup.login.enterPassword") }}
         </div>
 
         <form>
@@ -34,7 +79,7 @@
               initialFocus
               :disabled="pwInputDisabled"
               ref="password"
-              placeholder="Enter password"
+              :placeholder="$t('setup.login.enterPassword')"
               style="margin-bottom: 5px"
               @input="invalidPassword = false"
             />
@@ -49,42 +94,76 @@
                 height: 22px;
               "
             >
-              {{ invalidPassword ? "Invalid Password." : "" }}
+              {{ invalidPassword ? $t("setup.login.invalidPassword") : "" }}
             </div>
 
             <HCButton
               :disabled="entering"
               @click="enterPassword()"
               style="width: 128px"
-              >{{ this.entering ? "Starting..." : "Continue" }}
+              >{{ $t("buttons.continue") }}
             </HCButton>
           </div>
         </form>
+        <div
+          style="
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            font-size: 0.8em;
+            color: #331ead;
+            text-decoration: underline;
+            margin: 5px 10px;
+            cursor: pointer;
+          "
+          @click="openForgotPasswordDialog"
+        >
+          {{ $t("setup.login.forgotPassword") }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { ActionTypes } from "@/store/actions";
+import { ActionTypes } from "../../store/actions";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import PasswordField from "../subcomponents/PasswordField.vue";
 import HCButton from "../subcomponents/HCButton.vue";
+import { bootUpSlogans } from "../../bootUpSlogans";
+import LoadingDots from "../subcomponents/LoadingDots.vue";
+import HCDialog from "../subcomponents/HCDialog.vue";
+import { listen } from "@tauri-apps/api/event";
 
 export default defineComponent({
   name: "EnterPassword",
-  components: { PasswordField, HCButton },
+  components: { PasswordField, HCButton, LoadingDots, HCDialog },
   data(): {
     entering: boolean;
     pwInputDisabled: boolean;
     invalidPassword: boolean;
+    bootUpSlogan: string | undefined;
+    forgotPassword: boolean;
+    loadingState: string | undefined;
   } {
     return {
       entering: false,
       pwInputDisabled: false,
       invalidPassword: false,
+      bootUpSlogan: undefined,
+      forgotPassword: false,
+      loadingState: undefined,
     };
+  },
+  async mounted() {
+    this.bootUpSlogan =
+      bootUpSlogans[Math.floor(Math.random() * bootUpSlogans.length)];
+
+    this.loadingState = undefined;
+    await listen("progress-update", (event) => {
+      this.loadingState = event.payload as string;
+    });
   },
   methods: {
     async enterPassword() {
@@ -106,6 +185,9 @@ export default defineComponent({
       }
       this.entering = false;
     },
+    openForgotPasswordDialog() {
+      (this.$refs["forgot-password"] as typeof HCDialog).open();
+    },
   },
 });
 </script>
@@ -120,6 +202,7 @@ export default defineComponent({
   /* background-color: rgb(21, 16, 65); */
   /* background-color: #e3e4eb; */
   background-color: #e8e8eb;
+  /* background-color: #331ead; */
 }
 
 .left-half {
@@ -147,5 +230,35 @@ export default defineComponent({
   right: 51.81%;
   top: 0;
   bottom: 18.88%;
+}
+
+.entering-background {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* background-color: rgb(21, 16, 65); */
+  /* background-color: #e3e4eb; */
+  background-color: #331ead;
+  background-size: cover;
+  background-position: center center;
+  background-image: url(/img/Holochain_Halo_complete.svg);
+}
+
+.animated {
+  animation: colorchange 7s linear infinite;
+}
+
+@keyframes colorchange {
+  0% {
+    color: #6b66c9;
+  }
+  50% {
+    color: #ffffff;
+  }
+  100% {
+    color: #6b66c9;
+  }
 }
 </style>

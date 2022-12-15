@@ -6,12 +6,13 @@ use holochain_manager::versions::{
 };
 use std::{collections::HashMap, fs, sync::Arc};
 
-use crate::launcher::{state::LauncherState, manager::HolochainId};
+use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::CustomPath};
 
 #[tauri::command]
 pub async fn install_app(
   window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
+  custom_path: tauri::State<'_, CustomPath>,
   holochain_id: HolochainId,
   app_id: String,
   app_bundle_path: String,
@@ -20,7 +21,7 @@ pub async fn install_app(
   reuse_agent_pub_key: Option<AgentPubKey>,
 ) -> Result<(), String> {
   if window.label() != "admin" {
-    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (H)"))
+    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (I)"))
   }
 
   log::info!("Installing: web_app_bundle = {}", app_bundle_path);
@@ -41,7 +42,7 @@ pub async fn install_app(
   match WebAppBundle::decode(&bytes) {
     Ok(web_app_bundle) => {
       manager
-        .get_or_launch_holochain(holochain_id)
+        .get_or_launch_holochain(holochain_id, custom_path.custom_path.clone())
         .await?
         .install_web_app(
           app_id.clone(),
@@ -55,7 +56,7 @@ pub async fn install_app(
     Err(_) => {
       let app_bundle = AppBundle::decode(&bytes).or(Err("Failed to read Web hApp bundle file"))?;
       manager
-        .get_or_launch_holochain(holochain_id)
+        .get_or_launch_holochain(holochain_id, custom_path.custom_path.clone())
         .await?
         .install_app(
           app_id.clone(),

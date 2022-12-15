@@ -11,11 +11,12 @@ async-trait = "0.1.52"
 holochain_manager = {path = "../holochain_manager"}
 lair_keystore_manager = {path = "../lair_keystore_manager"}
 
+fs_extra = "1.2.0"
 log = "0.4.14"
 portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}
 serde_yaml = "0.8"
-tauri = {version="1.1.1", features = ["api-all", "system-tray", "native-tls-vendored", "reqwest-native-tls-vendored"]}
+tauri = {version = "1.2.1", features = ["api-all", "system-tray", "native-tls-vendored", "reqwest-native-tls-vendored"]}
 thiserror = "1.0.30"
 url2 = "0.0.6"
 zip = "0.5.0"

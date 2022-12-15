@@ -8,10 +8,10 @@ version = "0.1.0"
 [dependencies]
 
 # NEW_VERSION update holochain_types, holochain_zome_types and holochain_conductor_api here and if necessary also lair_keystore_api
-lair_keystore_api = "0.2.2"
-holochain_types = { package = "holochain_types", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
-holochain_conductor_api = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
-holochain_zome_types = {package = "holochain_zome_types", git = "https://github.com/holochain/holochain", rev="8f76e9204014e4f2ce35851780957bc144c34357"}
+lair_keystore_api = "0.2.3"
+holochain_types = { package = "holochain_types", git = "https://github.com/holochain/holochain", rev="c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+holochain_conductor_api = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev="c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+holochain_zome_types = {package = "holochain_zome_types", git = "https://github.com/holochain/holochain", rev="c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
 
 
 ascii = "1.0.0"
@@ -19,6 +19,7 @@ async-trait = "0.1.52"
 log = "0.4.14"
 serde = {version = "1", features = ["derive"]}
 serde-enum-str = "0.2"
-tauri = {version="1.1.1", features = ["api-all", "system-tray", "native-tls-vendored", "reqwest-native-tls-vendored"]}
+tauri = {version = "1.2.1", features = ["api-all", "system-tray", "native-tls-vendored", "reqwest-native-tls-vendored"]}
 thiserror = "1.0.30"
 url2 = "0.0.6"
+url = "2.3.1"

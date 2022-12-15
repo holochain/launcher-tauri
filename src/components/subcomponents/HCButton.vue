@@ -1,7 +1,7 @@
 <template>
   <button
     class="btn"
-    :class="{ outlined: this.outlined }"
+    :class="{ outlined: outlined }"
     :disabled="disabled"
     tabindex="0"
   >
