@@ -142,3 +142,14 @@ export interface StorageInfo {
   p2p: number;
   wasm: number;
 }
+
+export interface NetworkInfo {
+  fetch_queue_info: FetchQueueInfo,
+}
+
+export interface FetchQueueInfo {
+  /// Total number of bytes expected to be received through fetches
+  op_bytes_to_fetch: number,
+  /// Total number of ops expected to be received through fetches
+  num_ops_to_fetch: number,
+}

@@ -71,7 +71,7 @@ import {
 import prettyBytes from "pretty-bytes";
 
 import HCProgressBar from "./HCProgressBar.vue";
-import { HolochainId } from "../../types";
+import { HolochainId, NetworkInfo } from "../../types";
 import { serializeHash } from "@holochain-open-dev/utils";
 
 export default defineComponent({
@@ -107,9 +107,9 @@ export default defineComponent({
   async created() {
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
-    await this.getGossipInfo();
+    await this.getNetworkInfo();
     this.pollInterval = window.setInterval(
-      async () => await this.getGossipInfo(),
+      async () => await this.getNetworkInfo(),
       2000
     );
   },
@@ -119,16 +119,15 @@ export default defineComponent({
   methods: {
     prettyBytes,
     serializeHash,
-    async getGossipInfo() {
+    async getNetworkInfo() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
-      const gossipInfo: DnaGossipInfo[] = await appWs.gossipInfo({
+      const networkInfo: NetworkInfo[] = await appWs.networkInfo({
         dnas: [this.cell.cell_id[0]],
       });
 
       const expectedIncoming =
-        gossipInfo[0].total_historical_gossip_throughput.expected_op_bytes
-          .incoming;
+      networkInfo[0].fetch_queue_info.op_bytes_to_fetch;
 
       // In case expected incoming bytes are 0, keep the chached values, otherwise update
       // expectedIncoming
