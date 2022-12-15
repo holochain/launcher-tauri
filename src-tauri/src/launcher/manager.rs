@@ -403,7 +403,26 @@ impl LauncherManager {
 
     let index_path = manager.get_ui_index_path(app_id);
     let assets_path = manager.get_app_ui_path(app_id);
+    let local_storage_path = manager.get_app_local_storage_path(app_id);
 
+    // println!("local_storage_path: {:?}", local_storage_path);
+
+    // let contents = std::fs::read_dir(local_storage_path.clone()).unwrap().last().unwrap().unwrap();
+
+    // println!("Contents of directory: {:?}", contents);
+    // println!("filename: {:?}", contents.file_name());
+    // println!("filetype: {:?}", contents.file_type());
+
+
+    log::error!("Testing app_interface_port...");
+    let test_port = manager.holochain_manager.app_interface_port();
+
+    println!("Test app interface port: {}", test_port);
+
+    log::error!("Testing app_interface_port...");
+    let test_port = manager.holochain_manager.admin_interface_port();
+
+    println!("Test admin interface port: {}", test_port);
 
     // println!("%*%*%*% INDEX PATH: {:?}", index_path);
 
@@ -430,8 +449,14 @@ impl LauncherManager {
         "tauri://localhost" => {
           let mutable_response = response.body_mut();
           match read(index_path.clone()) {
-            Ok(index_html) => *mutable_response = index_html, // TODO! Check if there are better ways of dealing with errors here
-            Err(e) => log::error!("Error reading the path of the UI's index.html: {:?}", e),
+            Ok(index_html) => {
+              *mutable_response = index_html;
+              response.set_mimetype(Some(String::from("text/html")));
+            }, // TODO! Check if there are better ways of dealing with errors here
+            Err(e) => {
+              println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+              log::error!("Error reading the path of the UI's index.html: {:?}", e);
+            },
           }
         },
         _ => {
@@ -449,22 +474,41 @@ impl LauncherManager {
             let mime_type = match mime_guess.first() {
               Some(mime) => Some(mime.essence_str().to_string()),
               None => {
-                log::info!("Could not deterine MIME Type of file '{:?}'", asset_file);
+                log::info!("Could not determine MIME Type of file '{:?}'", asset_file);
+                println!("\n### ERROR ### Could not determine MIME Type of file '{:?}'\n", asset_file);
                 None
               }
             };
 
             // println!("%#%#%# ASSEETTT: {:?}", asset_file);
             // println!("%#%#%# Mime type: {:?}", mime_type);
+
+            // TODO! if files in subfolders are requested, additional logic may be required here to get paths right across platforms
             let asset_path = assets_path.join(asset_file);
             // println!("%#%#%# ASSEETTT PATH: {:?}", asset_path);
             match read(asset_path.clone()) {
               Ok(asset) => {
                 let mutable_response = response.body_mut();
                 *mutable_response = asset;
-                response.set_mimetype(mime_type);
+                response.set_mimetype(mime_type.clone());
+                println!("\nRequested file: {}", asset_file);
+                println!("Detected mime type: {:?}\n", mime_type);
               },
-              Err(e) => log::error!("Error reading asset file from path '{:?}'. Error: {:?}", asset_path, e),
+              Err(e) => {
+                println!("\n### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.\n", asset_path, e);
+                log::error!("Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
+                let mutable_response = response.body_mut();
+                match read(index_path.clone()) {
+                  Ok(index_html) =>  {
+                    *mutable_response = index_html;
+                    response.set_mimetype(Some(String::from("text/html")));
+                  },
+                  Err(e) => {
+                    println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+                    log::error!("Error reading the path of the UI's index.html: {:?}", e);
+                  },
+                }
+              },
             }
           }
         }
@@ -472,14 +516,15 @@ impl LauncherManager {
 
 
     })
+    .data_directory(local_storage_path)
     .initialization_script(launcher_env_command.as_str())
     .inner_size(1000.0, 700.0)
     .title(app_id)
     .enable_clipboard_access() // TODO! potentially make this optional
-    .menu(Menu::new().add_submenu(Submenu::new(
-      "Settings",
-      Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
-    )))
+    // .menu(Menu::new().add_submenu(Submenu::new( // removing menu because it overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
+    //   "Settings",
+    //   Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
+    // )))
     // .icon(tauri::Icon::File(icon_path)) // placeholder for when apps come shipped with their custom icons
     // .map_err(|err| format!("Error adding icon: {:?}", err))?
     .build()

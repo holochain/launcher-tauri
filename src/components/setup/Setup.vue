@@ -1,17 +1,16 @@
 <template>
   <div class="background">
-    <!-- <img src="/img/Holochain_Halo_complete.svg" style="height: 110vh;"> -->
     <div v-if="step == 0" class="column" style="align-items: center">
-      <div style="color: white; font-size: 56px; margin-bottom: 30px">
-        Welcome to Holochain
+      <div style="color: white; font-size: 56px; margin-bottom: 30px; opacity: 0.9;">
+        {{ $t("setup.setup.welcome") }}
       </div>
-      <div style="color: white; margin-bottom: 80px; font-size: 22px">
-        [imagine a catchy slogan here]
+      <div style="color: white; margin-bottom: 80px; font-size: 22px; opacity: 0.9;">
+        {{ $t("setup.setup.slogan") }}
       </div>
       <HCButton
         @click="step = 1"
         style="--hc-primary-color: white; color: #331ead"
-        >Get started</HCButton
+        >{{ $t("buttons.getStarted") }}</HCButton
       >
     </div>
 
@@ -33,27 +32,25 @@
           style="height: 35px; opacity: 0.95; margin-right: 20px"
         />
         <div style="font-size: 27px; font-weight: 600; margin-bottom: 25px">
-          Set up password
+          {{ $t("dialogs.setupPassword.title") }}
         </div>
       </div>
 
       <div style="font-size: 1.1em; margin-bottom: 15px; width: 100%">
-        To get started, you need to set up a password for the Holochain
-        Launcher.
+        {{ $t("dialogs.setupPassword.part1") }}
       </div>
       <div style="font-size: 1.1em; text-align: left; margin-bottom: 40px">
-        This password is used to secure your cryptographic private keys
-        associated with your identities in Holochain apps.
+        {{ $t("dialogs.setupPassword.part2") }}
       </div>
       <div class="column" style="margin-bottom: 20px">
         <div style="font-weight: bold; margin-bottom: 2px">
-          Choose your password:
+          {{ $t("dialogs.setupPassword.choosePassword") }}:
         </div>
         <PasswordField
           required
           initialFocus
           ref="password"
-          placeholder="Choose password"
+          :placeholder="$t('dialogs.setupPassword.inputPlaceholder')"
           @input="checkPasswordValidity"
           style="margin-bottom: 12px"
         />
@@ -66,10 +63,11 @@
           margin-bottom: 30px;
         "
       >
-        ⚠️ This password <strong>cannot be reset or changed</strong> without
-        losing access to your Holochain apps on this device.<br />
-        Make sure to write it on paper right now and create at least one backup
-        of it in a safe place.
+        ⚠️ {{ $t("dialogs.setupPassword.warningPart1")
+        }}<strong>{{ $t("dialogs.setupPassword.warningBold1") }}</strong>
+        {{ $t("dialogs.setupPassword.warningPart2") }}
+        <br />
+        {{ $t("dialogs.setupPassword.warningPart3") }}
       </div>
       <div class="row" style="align-items: center; margin-bottom: 50px">
         <ToggleSwitch
@@ -79,7 +77,7 @@
           @keydown.enter="backupConfirmed = !backupConfirmed"
         ></ToggleSwitch>
         <div style="margin-left: 10px">
-          I confirm that I have created a safe backup of my password.
+          {{ $t("dialogs.setupPassword.confirmation") }}
         </div>
       </div>
       <HCButton
@@ -87,7 +85,7 @@
         :disabled="!backupConfirmed || !isPasswordValid"
         style="width: 70px"
       >
-        Next
+        {{ $t("buttons.next") }}
       </HCButton>
     </div>
 
@@ -109,13 +107,13 @@
       />
       <div class="column" style="margin-bottom: 3px">
         <div style="font-weight: bold; margin-bottom: 2px">
-          Repeat your password:
+          {{ $t("dialogs.setupPassword.repeatPassword") }}:
         </div>
         <PasswordField
           required
           initialFocus
           ref="repeatPassword"
-          placeholder="Repeat password"
+          :placeholder="$t('dialogs.setupPassword.inputPlaceholder2')"
           @input="checkRepeatPasswordValidity"
           @keydown.enter="initialize()"
         />
@@ -132,7 +130,7 @@
       >
         {{
           passwordsDontMatch && repeatedPassword
-            ? "Password's don't match."
+            ? $t("dialogs.setupPassword.passwordsDontMatch")
             : ""
         }}
       </div>
@@ -187,7 +185,7 @@
 </template>
 
 <script lang="ts">
-import { ActionTypes } from "@/store/actions";
+import { ActionTypes } from "../../store/actions";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import PasswordField from "../subcomponents/PasswordField.vue";
@@ -276,7 +274,7 @@ export default defineComponent({
   background-color: #331ead;
   background-size: cover;
   background-position: center center;
-  background-image: url(/img/Holochain_Halo_complete.svg);
+  background-image: url(/img/Holochain_Halo_complete_transparent.svg);
 }
 
 .left-half {

@@ -6,20 +6,17 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# NEW_VERSION update holochain-client-rust to the latest holochain version
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="253a378d2226ede77c37875ed278a0fed118785b"}
+# NEW_VERSION pick right client version
 
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="267d19279495f1705a89202b2802980a233471b8" }
 
-holochain_conductor_api_0_0_175 = {package = "holochain_conductor_api", version="0.0.72"}
-holochain_p2p_0_0_175 = {package = "holochain_p2p", version="0.0.69"}
-holochain_types_0_0_175 = {package = "holochain_types", version="0.0.69"}
 
 
 # NEW_VERSION add latest crates here # taken from commit instead this time
-holochain_conductor_api_0_0_175szc = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
-holochain_p2p_0_0_175szc = {package = "holochain_p2p", git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
-holochain_types_0_0_175szc = {package = "holochain_types", git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
 
+holochain_conductor_api_0_0_175 = { git = "https://github.com/holochain/holochain", package = "holochain_conductor_api", rev = "c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+holochain_p2p_0_0_175 = { git = "https://github.com/holochain/holochain", package = "holochain_p2p", rev = "c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+holochain_types_0_0_175 = { git = "https://github.com/holochain/holochain", package = "holochain_types", rev = "c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
 
 
 mr_bundle = {package = "mr_bundle", version = "0.0.13"}

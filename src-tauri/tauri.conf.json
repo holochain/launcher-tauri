@@ -4,10 +4,10 @@
     "version": "0.8.0"
   },
   "build": {
-    "distDir": "target/webpack_dist",
-    "devPath": "target/webpack_dist",
-    "beforeDevCommand": "",
-    "beforeBuildCommand": ""
+    "distDir": "../dist",
+    "devPath": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build:ui"
   },
   "tauri": {
     "cli": {
@@ -37,8 +37,7 @@
       ],
       "resources": [],
       "externalBin": [
-        "bins/holochain-v0.0.175",
-        "bins/holochain-v0.0.175-signed-zome-calls",
+        "bins/holochain-v0.0.175-preRC0",
         "bins/lair-keystore"
       ],
       "copyright": "",

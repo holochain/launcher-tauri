@@ -81,12 +81,11 @@
     <HCGenericDialog
       @confirm="restartLauncher"
       ref="restartDialog"
-      primaryButtonLabel="Restart"
+      :primaryButtonLabel="$t('buttons.restart')"
       :closeOnSideClick="true"
     >
       <div style="margin: 0 30px; max-width: 500px; text-align: center">
-        Do you want to clean up all holochain processes and restart the
-        Holochain Launcher?
+        {{ $t("dialogs.restart") }}
       </div>
     </HCGenericDialog>
     <FactoryReset></FactoryReset>

@@ -3,21 +3,21 @@
   "version": "0.8.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev:ui\" \"sleep 14 && npm run tauri dev\"",
-    "dev:ui": "vue-cli-service serve --watch --mode development --dest src-tauri/target/webpack_dist",
-    "build:ui": "vue-cli-service build --mode production --dest src-tauri/target/webpack_dist",
-    "build": "npm run build:ui && npm run tauri -- build -v",
+    "dev": "vite",
+    "build:ui": "vue-tsc --noEmit && vite build",
+    "build": "npm run tauri -- build -v",
+    "preview": "vite preview",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint",
     "tauri": "tauri",
     "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/LBntYzLvzjh680s/download"
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",
-    "@holochain-open-dev/utils": "^0.0.9",
+    "@holochain-open-dev/utils": "^0.6.2",
     "@holo-host/identicon": "^0.1.0",
-    "@holochain/client": "file:/home/matthias/code/holochain/holochain/holochain-client-js",
+    "@holochain/client": "^0.10.4",
     "@material/mwc-button": "^0.25.1",
+    "@material/mwc-icon-button": "^0.25.1",
     "@material/mwc-circular-progress": "0.25.1",
     "@material/mwc-dialog": "^0.25.1",
     "@material/mwc-fab": "^0.25.1",
@@ -25,35 +25,29 @@
     "@material/mwc-snackbar": "0.25.1",
     "@material/mwc-textarea": "^0.25.1",
     "@material/mwc-textfield": "^0.25.1",
+    "@shoelace-style/shoelace": "^2.0.0-beta.86",
     "@msgpack/msgpack": "^2.7.1",
-    "@tauri-apps/api": "1.2.0",
+    "@tauri-apps/api": "^1.2.0",
     "@webcomponents/scoped-custom-element-registry": "^0.0.5",
     "array-flat-polyfill": "^1.0.1",
     "blob-polyfill": "^5.0.20210201",
     "core-js": "^3.6.5",
     "js-base64": "^3.7.2",
     "lodash-es": "^4.17.21",
-    "vue": "^3.1.5",
+    "vue": "^3.2.45",
     "vue-router": "^4.0.0-0",
+    "vue-i18n": "^9.2.2",
     "vuex": "^4.0.0-0",
     "pretty-bytes": "^6.0.0"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "1.2.1",
-    "@types/jest": "^24.0.19",
+    "@tauri-apps/cli": "1.2.2",
     "@types/lodash-es": "^4.17.6",
+    "@types/node": "^18.7.10",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-plugin-typescript": "~4.5.0",
-    "@vue/cli-plugin-unit-jest": "~4.5.0",
-    "@vue/cli-plugin-vuex": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
+    "@vitejs/plugin-vue": "^4.0.0",
     "@vue/compiler-sfc": "^3.0.0",
-    "@vue/eslint-config-prettier": "^6.0.0",
-    "@vue/eslint-config-typescript": "^7.0.0",
     "@vue/test-utils": "^2.0.0-0",
     "concurrently": "^6.2.1",
     "eslint": "^6.7.2",
@@ -62,17 +56,9 @@
     "lint-staged": "^9.5.0",
     "prettier": "^2.2.1",
     "replace-in-files-cli": "^1.0.0",
-    "typescript": "~4.1.5",
-    "vue-jest": "^5.0.0-0"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,vue,ts,tsx}": [
-      "vue-cli-service lint",
-      "git add"
-    ]
+    "typescript": "^4.6.4",
+    "vite": "^4.0.0",
+    "vue-tsc": "^1.0.11"
   },
   "resolutions": {
     "@tauri-apps/cli": "1.0.0-rc.7"

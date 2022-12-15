@@ -405,7 +405,7 @@ export default defineComponent({
     copyPubKey() {
       const pubKey =
         this.app.webAppInfo.installed_app_info.cell_data[0].cell_id[1];
-      this.writeText(serializeHash(pubKey));
+      this.writeText(serializeHash(new Uint8Array(pubKey)));
       this.showPubKeyTooltip = true;
       setTimeout(() => {
         this.showPubKeyTooltip = false;

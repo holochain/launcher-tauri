@@ -4,8 +4,8 @@ use std::path::PathBuf;
 use url2::Url2;
 
 // NEW_VERSION: Upgrade these two crates so that they refer to the latest version of them
-pub use holochain_conductor_api_0_0_175szc as holochain_conductor_api_latest;
-pub use holochain_types_0_0_175szc as holochain_types_latest;
+pub use holochain_conductor_api_0_0_175 as holochain_conductor_api_latest;
+pub use holochain_types_0_0_175 as holochain_types_latest;
 
 use lair_keystore_manager::versions::LairKeystoreVersion;
 pub use mr_bundle as mr_bundle_latest;
@@ -20,10 +20,8 @@ use version_manager::VersionManager;
 
 
 pub mod v0_0_175;
-pub mod v0_0_175szc;
 
 use v0_0_175::HolochainV0_0_175;
-use v0_0_175szc::HolochainV0_0_175szc;
 
 
 // NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
@@ -57,10 +55,8 @@ impl Into<String> for HdiVersion {
 pub enum HolochainVersion {
   #[serde(rename = "Custom Binary")]
   CustomBinary,
-  #[serde(rename = "0.0.175")]
+  #[serde(rename = "0.0.175-preRC0")]
   V0_0_175,
-  #[serde(rename = "0.0.175-signed-zome-calls")]
-  V0_0_175szc,
 }
 
 impl Into<String> for HolochainVersion {
@@ -91,7 +87,6 @@ impl HolochainVersion {
     // NEW_VERSION: Add the new version to this array
     return vec![
       HolochainVersion::V0_0_175,
-      HolochainVersion::V0_0_175szc,
     ];
   }
 
@@ -101,7 +96,6 @@ impl HolochainVersion {
     match self { // NEW_VERSION assume the latest version for the custom binary
       HolochainVersion::CustomBinary => HolochainVersionManager::HolochainV0_0_175(HolochainV0_0_175),
       HolochainVersion::V0_0_175 => HolochainVersionManager::HolochainV0_0_175(HolochainV0_0_175),
-      HolochainVersion::V0_0_175szc => HolochainVersionManager::HolochainV0_0_175szc(HolochainV0_0_175szc),
     }
   }
 }
@@ -110,5 +104,4 @@ impl HolochainVersion {
 #[enum_dispatch(VersionManager)]
 pub enum HolochainVersionManager {
   HolochainV0_0_175,
-  HolochainV0_0_175szc,
 }

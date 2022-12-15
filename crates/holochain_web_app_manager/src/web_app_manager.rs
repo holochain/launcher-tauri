@@ -173,6 +173,10 @@ impl WebAppManager {
     app_ui_path(&self.environment_path, &app_id)
   }
 
+  pub fn get_app_local_storage_path(&self, app_id: &String) -> PathBuf {
+    app_local_storage_path(&self.environment_path, &app_id)
+  }
+
 
   pub fn kill(self) -> Result<(), String> {
     self.holochain_manager.kill()
@@ -349,6 +353,11 @@ fn app_ui_path(root_path: &PathBuf, app_id: &String) -> PathBuf {
 
 fn conductor_path(root_path: &PathBuf) -> PathBuf {
   root_path.join("conductor")
+}
+
+// path to where localStorage of a given app is stored
+fn app_local_storage_path(root_path: &PathBuf, app_id: &String) -> PathBuf {
+  root_path.join("tauri").join(app_id)
 }
 
 
