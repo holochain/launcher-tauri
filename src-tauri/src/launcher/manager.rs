@@ -426,17 +426,6 @@ impl LauncherManager {
 
     // println!("%*%*%*% INDEX PATH: {:?}", index_path);
 
-    // can be removed once the js-client switched to using window.__HC_LAUNCHER_ENV__ instead
-    let launcher_env = format!(r#"{{
-        "APP_INTERFACE_PORT": {},
-        "ADMIN_INTERFACE_PORT": {},
-        "INSTALLED_APP_ID": "{}"
-      }}"#,
-      manager.holochain_manager.app_interface_port(),
-      manager.holochain_manager.admin_interface_port(),
-      app_id
-    );
-
     let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
       "APP_INTERFACE_PORT": {},
       "ADMIN_INTERFACE_PORT": {},
@@ -469,11 +458,6 @@ impl LauncherManager {
               log::error!("Error reading the path of the UI's index.html: {:?}", e);
             },
           }
-        },
-        "tauri://localhost/.launcher-env.json" => {
-          let mutable_response = response.body_mut();
-          *mutable_response = launcher_env.as_bytes().to_vec();
-          response.set_mimetype(Some(String::from("application/json")));
         },
         _ => {
           if uri.starts_with("tauri://localhost/") {

@@ -1355,6 +1355,7 @@ dependencies = [
  "ident_case",
  "proc-macro2",
  "quote",
+ "strsim 0.10.0",
  "syn",
 ]
 
@@ -2497,6 +2498,56 @@ dependencies = [
 ]
 
 [[package]]
+name = "hdi"
+version = "0.1.10"
+source = "git+https://github.com/holochain/holochain?rev=c6bb672d624a884c57ffe588607ffc06aa2f7c74#c6bb672d624a884c57ffe588607ffc06aa2f7c74"
+dependencies = [
+ "hdk_derive",
+ "holo_hash 0.0.35 (git+https://github.com/holochain/holochain?rev=c6bb672d624a884c57ffe588607ffc06aa2f7c74)",
+ "holochain_integrity_types",
+ "holochain_wasmer_guest",
+ "paste",
+ "serde",
+ "serde_bytes",
+ "tracing",
+ "tracing-core",
+]
+
+[[package]]
+name = "hdk"
+version = "0.0.163"
+source = "git+https://github.com/holochain/holochain?rev=c6bb672d624a884c57ffe588607ffc06aa2f7c74#c6bb672d624a884c57ffe588607ffc06aa2f7c74"
+dependencies = [
+ "getrandom 0.2.8",
+ "hdi",
+ "hdk_derive",
+ "holo_hash 0.0.35 (git+https://github.com/holochain/holochain?rev=c6bb672d624a884c57ffe588607ffc06aa2f7c74)",
+ "holochain_wasmer_guest",
+ "holochain_zome_types",
+ "paste",
+ "serde",
+ "serde_bytes",
+ "thiserror",
+ "tracing",
+ "tracing-core",
+]
+
+[[package]]
+name = "hdk_derive"
+version = "0.0.56"
+source = "git+https://github.com/holochain/holochain?rev=c6bb672d624a884c57ffe588607ffc06aa2f7c74#c6bb672d624a884c57ffe588607ffc06aa2f7c74"
+dependencies = [
+ "darling 0.14.2",
+ "heck 0.4.0",
+ "holochain_integrity_types",
+ "paste",
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "heck"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2566,7 +2617,9 @@ dependencies = [
  "chrono",
  "flate2",
  "futures",
+ "hdk",
  "holochain_manager",
+ "holochain_types",
  "holochain_web_app_manager",
  "lair_keystore_manager",
  "log",
@@ -2950,6 +3003,19 @@ dependencies = [
  "thiserror",
  "wasmer",
  "wasmer-engine",
+]
+
+[[package]]
+name = "holochain_wasmer_guest"
+version = "0.0.82"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62190205552e8235f157becbe66c24c23e190bc1916d87db851da84006bae4b6"
+dependencies = [
+ "holochain_serialized_bytes",
+ "holochain_wasmer_common",
+ "parking_lot 0.12.1",
+ "serde",
+ "tracing",
 ]
 
 [[package]]
@@ -3690,11 +3756,16 @@ version = "0.1.0"
 dependencies = [
  "ascii",
  "async-trait",
+ "holochain_conductor_api",
+ "holochain_types",
+ "holochain_zome_types",
+ "lair_keystore_api",
  "log",
  "serde",
  "serde-enum-str",
  "tauri",
  "thiserror",
+ "url",
  "url2",
 ]
 

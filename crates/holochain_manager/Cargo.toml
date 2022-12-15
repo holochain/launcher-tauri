@@ -6,13 +6,13 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-
 # NEW_VERSION pick right client version
 
 holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="267d19279495f1705a89202b2802980a233471b8" }
 
 
-# NEW_VERSION add latest crates here
+
+# NEW_VERSION add latest crates here # taken from commit instead this time
 
 holochain_conductor_api_0_0_175 = { git = "https://github.com/holochain/holochain", package = "holochain_conductor_api", rev = "c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
 holochain_p2p_0_0_175 = { git = "https://github.com/holochain/holochain", package = "holochain_p2p", rev = "c6bb672d624a884c57ffe588607ffc06aa2f7c74"}

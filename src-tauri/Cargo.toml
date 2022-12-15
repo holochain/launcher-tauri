@@ -19,6 +19,11 @@ holochain_manager = {path = "../crates/holochain_manager"}
 holochain_web_app_manager = {path = "../crates/holochain_web_app_manager"}
 lair_keystore_manager = {path = "../crates/lair_keystore_manager"}
 
+# NEW_VERSION update holochain types
+holochain_types = { package = "holochain_types", git = "https://github.com/holochain/holochain", rev="c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+hdk = { package = "hdk", git = "https://github.com/holochain/holochain", rev="c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+
+
 async-trait = "0.1.52"
 base64 = "0.13.0"
 chrono = {version = "0.4", features = ["serde"] }

@@ -60,7 +60,6 @@ jobs:
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.0.175-x86_64-apple-darwin
 
-
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
       - name: install dependencies (ubuntu only)

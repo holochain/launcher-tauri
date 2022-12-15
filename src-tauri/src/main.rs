@@ -45,6 +45,7 @@ use crate::commands::{
   open_app::open_app_ui,
   password::{initialize_keystore, unlock_and_launch},
   uninstall_app::uninstall_app,
+  sign_zome_call::sign_zome_call,
   storage::get_storage_info,
 };
 use crate::launcher::manager::LauncherManager;
@@ -89,6 +90,7 @@ fn main() {
       restart,
       quit,
       write_config,
+      sign_zome_call,
       setup::logs::log,
     ])
     .setup(|app| {
@@ -112,6 +114,8 @@ fn main() {
           custom_path: None
         },
       };
+
+      println!("Custom path: {:?}", custom_path);
 
       app.manage(custom_path.clone());
 
