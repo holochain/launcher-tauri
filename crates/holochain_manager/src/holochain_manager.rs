@@ -5,7 +5,7 @@ use std::time::SystemTime;
 use std::{fs, time::Duration};
 
 // NEW_VERSION change holochain_types version
-use holochain_client::{AdminWebsocket, AgentPubKey, InstalledAppInfo, InstallAppBundlePayload};
+use holochain_client::{AdminWebsocket, AgentPubKey, InstalledAppInfo, InstallAppPayload};
 use holochain_types_0_0_175::prelude::AppBundleSource;
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
@@ -162,7 +162,7 @@ impl HolochainManager {
       .await
       .map_err(|err| format!("Could not write app bundle to temp file: {}", err))?;
 
-    let payload = InstallAppBundlePayload {
+    let payload = InstallAppPayload {
       source: AppBundleSource::Path(path),
       agent_key,
       installed_app_id: Some(app_id.clone().into()),
@@ -171,7 +171,7 @@ impl HolochainManager {
     };
     self
       .ws
-      .install_app_bundle(payload)
+      .install_app(payload)
       .await
       .map_err(|err| format!("Error install hApp bundle: {:?}", err))?;
 

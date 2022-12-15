@@ -55,7 +55,7 @@ impl Into<String> for HdiVersion {
 pub enum HolochainVersion {
   #[serde(rename = "Custom Binary")]
   CustomBinary,
-  #[serde(rename = "0.0.175")]
+  #[serde(rename = "0.0.175-preRC0")]
   V0_0_175,
 }
 

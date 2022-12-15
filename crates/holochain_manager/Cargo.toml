@@ -9,7 +9,7 @@ version = "0.1.0"
 
 # NEW_VERSION pick right client version
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="7c209684fb783d1c70d0f8b13926b9323a0ae36e" }
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="267d19279495f1705a89202b2802980a233471b8" }
 
 
 # NEW_VERSION add latest crates here

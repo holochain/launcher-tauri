@@ -414,6 +414,15 @@ impl LauncherManager {
     // println!("filetype: {:?}", contents.file_type());
 
 
+    log::error!("Testing app_interface_port...");
+    let test_port = manager.holochain_manager.app_interface_port();
+
+    println!("Test app interface port: {}", test_port);
+
+    log::error!("Testing app_interface_port...");
+    let test_port = manager.holochain_manager.admin_interface_port();
+
+    println!("Test admin interface port: {}", test_port);
 
     // println!("%*%*%*% INDEX PATH: {:?}", index_path);
 
