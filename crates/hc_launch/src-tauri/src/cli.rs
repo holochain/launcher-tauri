@@ -160,16 +160,16 @@ impl HcLaunch {
 
                     launch_tauri(ui_p, local_storage_path, self.watch, passphrase);
                   },
-                  None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc-launch --help` for help."),
+                  None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc launch --help` for help."),
                 }
               },
-              _ => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file."),
+              _ => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file.\nRun `hc launch --help` for help."),
             }
           },
-          None => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file.")
+          None => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file.\nRun `hc launch --help` for help.")
         }
       },
-      None => println!("You need to provide a path that points to either a .webhapp or a .happ file. Auto-detection is not implemented yet.")
+      None => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file. Auto-detection is not implemented yet.\nRun `hc launch --help` for help.")
     }
 
     Ok(())

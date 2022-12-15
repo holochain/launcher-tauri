@@ -15,23 +15,23 @@ path = "src/bin/hc-launch.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.1", features = [] }
+tauri-build = { version = "1.2.1", features = [] }
 
 [dependencies]
 anyhow = "1.0"
 futures = "0.3"
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="253a378d2226ede77c37875ed278a0fed118785b"}
-holochain_cli_sandbox = "0.0.66"
-holochain_types = {package = "holochain_types", git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
-holochain_util = { version = "^0.0.13", features = [ "pw" ] }
-holochain_zome_types = {package = "holochain_zome_types", git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
-holochain_conductor_api = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev="6ad43c07a23c88fcd54869ca6eaa7c2423ee379b"}
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="267d19279495f1705a89202b2802980a233471b8"}
+holochain_cli_sandbox = {package = "holochain_cli_sandbox", git = "https://github.com/holochain/holochain", rev="c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+holochain_types = {package = "holochain_types", git = "https://github.com/holochain/holochain", rev="c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+holochain_util = { package = "holochain_util", git = "https://github.com/holochain/holochain", rev="c6bb672d624a884c57ffe588607ffc06aa2f7c74", features = [ "pw" ] }
+holochain_zome_types = {package = "holochain_zome_types", git = "https://github.com/holochain/holochain", rev="c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+holochain_conductor_api = {package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev="c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
 
 holochain = ">=0.0.175, <0.2"
 
 
-lair_keystore_api = "0.2.2"
+lair_keystore_api = "0.2.3"
 
 
 log = "0.4.14"
