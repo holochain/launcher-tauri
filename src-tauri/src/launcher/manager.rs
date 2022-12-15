@@ -532,11 +532,11 @@ impl LauncherManager {
 
     let a = self.app_handle.clone();
     let l = window_label.clone();
-    window.on_menu_event(move |_| {
-      if let Some(w) = a.get_window(l.as_str()) {
-        w.open_devtools();
-      }
-    });
+    // window.on_menu_event(move |_| {
+    //   if let Some(w) = a.get_window(l.as_str()) {
+    //     w.open_devtools();
+    //   }
+    // });
 
     Ok(())
   }
