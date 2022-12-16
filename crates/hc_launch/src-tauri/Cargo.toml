@@ -21,7 +21,7 @@ tauri-build = { version = "1.2.1", features = [] }
 anyhow = "1.0"
 futures = "0.3"
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="dbd869cd4ee192b250823963d42fc76695d665af"}
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="5c7e6d7871bc79cdfd56efc927e57435a6711908"}
 holochain_cli_sandbox = "0.1.0-beta-rc.0"
 holochain_types = "0.1.0-beta-rc.0"
 holochain_util = { version="0.1.0-beta-rc.0", features = [ "pw" ] }

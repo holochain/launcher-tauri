@@ -1,7 +1,7 @@
 use holochain_manager::{
   config::LaunchHolochainConfig,
   versions::{
-    holochain_conductor_api_latest::InstalledAppInfo,
+    holochain_conductor_api_latest::AppInfo,
     holochain_types_latest::{
       prelude::{AgentPubKey, AppBundle, MembraneProof},
       web_app::WebAppBundle,
@@ -271,8 +271,8 @@ impl WebAppManager {
     Path::new(&ui_folder_path).exists()
   }
 
-  fn allocate_necessary_ports(&mut self, installed_apps: &Vec<InstalledAppInfo>) -> () {
-    let web_apps: Vec<InstalledAppInfo> = installed_apps
+  fn allocate_necessary_ports(&mut self, installed_apps: &Vec<AppInfo>) -> () {
+    let web_apps: Vec<AppInfo> = installed_apps
       .iter()
       .filter(|app| self.is_web_app(app.installed_app_id.clone()))
       .cloned()

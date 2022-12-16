@@ -8,15 +8,15 @@ version = "0.1.0"
 [dependencies]
 # NEW_VERSION pick right client version
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="dbd869cd4ee192b250823963d42fc76695d665af"}
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="5c7e6d7871bc79cdfd56efc927e57435a6711908"}
 
 
 
 # NEW_VERSION add latest crates here # taken from commit instead this time
 
-holochain_conductor_api_0_0_175 = { git = "https://github.com/holochain/holochain", package = "holochain_conductor_api", rev = "c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
-holochain_p2p_0_0_175 = { git = "https://github.com/holochain/holochain", package = "holochain_p2p", rev = "c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
-holochain_types_0_0_175 = { git = "https://github.com/holochain/holochain", package = "holochain_types", rev = "c6bb672d624a884c57ffe588607ffc06aa2f7c74"}
+holochain_conductor_api_0_1_0BetaRc0 = { package = "holochain_conductor_api", version = "0.1.0-beta-rc.0"}
+holochain_p2p_0_1_0BetaRc0 = { package = "holochain_p2p", version = "0.1.0-beta-rc.0"}
+holochain_types_0_1_0BetaRc0 = { package = "holochain_types", version = "0.1.0-beta-rc.0"}
 
 
 mr_bundle = {package = "mr_bundle", version = "0.0.13"}

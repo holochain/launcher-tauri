@@ -5,8 +5,8 @@ use std::time::SystemTime;
 use std::{fs, time::Duration};
 
 // NEW_VERSION change holochain_types version
-use holochain_client::{AdminWebsocket, AgentPubKey, InstalledAppInfo, InstallAppPayload};
-use holochain_types_0_0_175::prelude::AppBundleSource;
+use holochain_client::{AdminWebsocket, AgentPubKey, AppInfo, InstallAppPayload};
+use holochain_types_0_1_0BetaRc0::prelude::AppBundleSource;
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
 
@@ -224,7 +224,7 @@ impl HolochainManager {
     Ok(())
   }
 
-  pub async fn list_apps(&mut self) -> Result<Vec<InstalledAppInfo>, String> {
+  pub async fn list_apps(&mut self) -> Result<Vec<AppInfo>, String> {
     let installed_apps = self
       .ws
       .list_apps(None)
