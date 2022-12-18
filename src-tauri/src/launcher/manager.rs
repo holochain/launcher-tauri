@@ -516,6 +516,7 @@ impl LauncherManager {
 
 
     })
+    .disable_file_drop_handler()
     .data_directory(local_storage_path)
     .initialization_script(launcher_env_command.as_str())
     .inner_size(1000.0, 700.0)

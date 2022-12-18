@@ -47,7 +47,6 @@ pub fn generate_window(
             let mime_type = match mime_guess.first() {
               Some(mime) => Some(mime.essence_str().to_string()),
               None => {
-                log::info!("Could not deterine MIME Type of file '{:?}'", asset_file);
                 None
               }
             };
@@ -63,7 +62,6 @@ pub fn generate_window(
               },
               Err(e) => {
                 println!("### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
-                log::error!("Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
                 let mutable_response = response.body_mut();
                 match read(index_path.clone()) {
                   Ok(index_html) =>  {
@@ -72,7 +70,6 @@ pub fn generate_window(
                   },
                   Err(e) => {
                     println!("### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
-                    log::error!("Error reading the path of the UI's index.html: {:?}", e);
                   },
                 }
               },
@@ -83,6 +80,7 @@ pub fn generate_window(
 
 
     })
+    .disable_file_drop_handler()
     .data_directory(local_storage_path)
     .initialization_script(launcher_env_command.as_str())
     .inner_size(1000.0, 700.0)
