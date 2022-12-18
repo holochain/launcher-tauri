@@ -7,7 +7,7 @@ use std::path::PathBuf;
 
 pub fn generate_window(
   app_handle: &tauri::AppHandle,
-  app_id: &String,
+  _app_id: &String,
   label: String,
   index_path: PathBuf,
   assets_path: PathBuf,

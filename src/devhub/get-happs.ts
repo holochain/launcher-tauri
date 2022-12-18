@@ -3,7 +3,7 @@ import {
   AppWebsocket,
   EntryHash,
   ActionHash,
-  InstalledAppInfo,
+  AppInfo,
 } from "@holochain/client";
 import { Happ, HappRelease } from "./types";
 
@@ -49,7 +49,7 @@ export function filterByHdkVersion(
 
 export async function getAllPublishedApps(
   appWebsocket: AppWebsocket,
-  devhubHapp: InstalledAppInfo
+  devhubHapp: AppInfo
 ): Promise<Array<AppWithReleases>> {
   const cells = devhubCells(devhubHapp);
   const allAppsOutput = await appWebsocket.callZome({
@@ -70,7 +70,7 @@ export async function getAllPublishedApps(
 
 export async function getAppsReleases(
   appWebsocket: AppWebsocket,
-  devhubHapp: InstalledAppInfo,
+  devhubHapp: AppInfo,
   app: ContentAddress<Happ>
 ): Promise<AppWithReleases> {
   const cells = devhubCells(devhubHapp);
@@ -118,7 +118,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(() => r(null), ms));
 
 export async function fetchWebHapp(
   appWebsocket: AppWebsocket,
-  devhubHapp: InstalledAppInfo,
+  devhubHapp: AppInfo,
   name: string,
   happReleaseEntryHash: EntryHash,
   retryCount = 3
@@ -155,7 +155,7 @@ export async function fetchWebHapp(
   return result.payload;
 }
 
-function devhubCells(devhubHapp: InstalledAppInfo) {
+function devhubCells(devhubHapp: AppInfo) {
   const happs = devhubHapp.cell_data.find((c) => c.role_name === "happs");
   const dnarepo = devhubHapp.cell_data.find((c) => c.role_name === "dnarepo");
   const webassets = devhubHapp.cell_data.find(

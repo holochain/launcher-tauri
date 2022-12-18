@@ -1,7 +1,7 @@
 import {
   AgentPubKey,
   AppRoleManifest,
-  InstalledAppInfo,
+  AppInfo,
 } from "@holochain/client";
 
 export interface WebAppInfo {
@@ -118,7 +118,7 @@ export type WebUiInfo =
     };
 
 export interface InstalledWebAppInfo {
-  installed_app_info: InstalledAppInfo;
+  installed_app_info: AppInfo;
   web_ui_info: WebUiInfo;
 }
 

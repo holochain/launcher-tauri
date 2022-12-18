@@ -2621,9 +2621,9 @@ dependencies = [
 
 [[package]]
 name = "holochain"
-version = "0.1.0-beta-rc.0"
+version = "0.1.0-beta-rc.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f7a27bf5a523bea7416a523bc9bc1effd061d8ada473b32e40774b617da59bc"
+checksum = "2186b73f060ef4bcc673093a3718c3148a9e807401a60c6f03f2a4298ea92467"
 dependencies = [
  "anyhow",
  "async-recursion",
@@ -2833,7 +2833,7 @@ dependencies = [
 [[package]]
 name = "holochain_client"
 version = "0.2.0"
-source = "git+https://github.com/holochain/holochain-client-rust?rev=5c7e6d7871bc79cdfd56efc927e57435a6711908#5c7e6d7871bc79cdfd56efc927e57435a6711908"
+source = "git+https://github.com/holochain/holochain-client-rust?rev=808993ce7c54794f4b7163aa06a288bebba4b8b3#808993ce7c54794f4b7163aa06a288bebba4b8b3"
 dependencies = [
  "again",
  "anyhow",
@@ -2850,9 +2850,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_conductor_api"
-version = "0.1.0-beta-rc.0"
+version = "0.1.0-beta-rc.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "626cf6189eedd6e6c78646f37cebb7922c77859fbef68bc871bfbedc51a3c46c"
+checksum = "d47e92eee22077ae0db31d61e8f4284de0018e81857c85e150f3c5b5d7c06758"
 dependencies = [
  "derive_more",
  "directories",

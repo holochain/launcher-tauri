@@ -65,13 +65,13 @@ import { defineComponent, PropType } from "vue";
 import {
   AppWebsocket,
   DnaHash,
-  DnaGossipInfo,
+  NetworkInfo,
   InstalledCell,
 } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 
 import HCProgressBar from "./HCProgressBar.vue";
-import { HolochainId, NetworkInfo } from "../../types";
+import { HolochainId } from "../../types";
 import { serializeHash } from "@holochain-open-dev/utils";
 
 export default defineComponent({

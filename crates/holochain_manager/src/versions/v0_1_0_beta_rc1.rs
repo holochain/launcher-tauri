@@ -2,25 +2,25 @@ use std::{path::PathBuf, sync::Arc};
 use url2::Url2;
 
 // NEW_VERSION: Import the exact same types but from the new crates
-use holochain_conductor_api_0_1_0BetaRc0::{
+use holochain_conductor_api_0_1_0BetaRc1::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_1_0BetaRc0::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
+use holochain_p2p_0_1_0BetaRc1::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
 
 use super::{version_manager::VersionManager, HdkVersion, HdiVersion, common::{proxy_url, boostrap_service}};
 
-pub struct HolochainV0_1_0BetaRc0;
+pub struct HolochainV0_1_0BetaRc1;
 
-impl VersionManager for HolochainV0_1_0BetaRc0 {
+impl VersionManager for HolochainV0_1_0BetaRc1 {
   // NEW_VERSION: Careful! Indicate here which HDK version comes bundled with this Holochain version
   fn hdk_version(&self) -> HdkVersion {
-    HdkVersion::V0_1_0BetaRc0
+    HdkVersion::V0_1_0BetaRc1
   }
 
   // NEW_VERSION: Careful! Indicate here which HDI version comes bundled with this Holochain version
   fn hdi_version(&self) -> HdiVersion {
-    HdiVersion::V0_1_0BetaRc0
+    HdiVersion::V0_1_0BetaRc1
   }
 
   // NEW_VERSION: Duplicate and change whatever config is necessary to change

@@ -21,14 +21,14 @@ tauri-build = { version = "1.2.1", features = [] }
 anyhow = "1.0"
 futures = "0.3"
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="5c7e6d7871bc79cdfd56efc927e57435a6711908"}
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="808993ce7c54794f4b7163aa06a288bebba4b8b3"}
 holochain_cli_sandbox = "0.1.0-beta-rc.0"
 holochain_types = "0.1.0-beta-rc.0"
 holochain_util = { version="0.1.0-beta-rc.0", features = [ "pw" ] }
 holochain_zome_types = "0.1.0-beta-rc.0"
 holochain_conductor_api = "0.1.0-beta-rc.0"
 
-holochain = "0.1.0-beta-rc.0"
+holochain = "0.1.0-beta-rc.1"
 
 
 lair_keystore_api = "0.2.3"

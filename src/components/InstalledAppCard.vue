@@ -278,7 +278,7 @@ import { HolochainAppInfo } from "../types";
 import { serializeHash } from "@holochain-open-dev/utils";
 import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
-import { AppWebsocket, DnaHash, DnaGossipInfo } from "@holochain/client";
+import { AppWebsocket, DnaHash, NetworkInfo } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
@@ -315,7 +315,7 @@ export default defineComponent({
     showMore: boolean;
     showUninstallDialog: boolean;
     showPubKeyTooltip: boolean;
-    gossipInfo: Record<string, DnaGossipInfo>;
+    gossipInfo: Record<string, NetworkInfo>;
     showMainCells: boolean;
     showClonedCells: boolean;
   } {

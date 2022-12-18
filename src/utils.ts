@@ -1,22 +1,22 @@
 import {
   DisabledAppReason,
-  DnaGossipInfo,
-  InstalledAppInfo,
+  NetworkInfo,
+  AppInfo,
 } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 
 import { GossipProgress } from "./types";
 
-export function isAppRunning(app: InstalledAppInfo): boolean {
+export function isAppRunning(app: AppInfo): boolean {
   return (app.status as any) === "running";
 }
-export function isAppDisabled(app: InstalledAppInfo): boolean {
+export function isAppDisabled(app: AppInfo): boolean {
   return Object.keys(app.status).includes("disabled");
 }
-export function isAppPaused(app: InstalledAppInfo): boolean {
+export function isAppPaused(app: AppInfo): boolean {
   return Object.keys(app.status).includes("paused");
 }
-export function getReason(app: InstalledAppInfo): string | undefined {
+export function getReason(app: AppInfo): string | undefined {
   if (isAppRunning(app)) return undefined;
   if (isAppDisabled(app)) {
     const reason = (

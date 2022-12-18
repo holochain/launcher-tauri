@@ -162,7 +162,7 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket, DnaGossipInfo, InstalledCell } from "@holochain/client";
+import { AppWebsocket, NetworkInfo, InstalledCell } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 
@@ -350,13 +350,13 @@ export default defineComponent({
     async getGossipState() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
-      const gossipInfo: DnaGossipInfo[] = await appWs.gossipInfo({
+      const networkInfo: NetworkInfo[] = await appWs.networkInfo({
         dnas: this.cells!.map((cell) => cell.cell_id[0] as Uint8Array),
       });
 
-      gossipInfo.forEach((info, idx) => {
+      networkInfo.forEach((info, idx) => {
         const expectedIncoming =
-          info.total_historical_gossip_throughput.expected_op_bytes.incoming;
+          info.fetch_queue_info.op_bytes_to_fetch;
 
         // In case expected incoming bytes are 0, keep the chached values, otherwise update
         // expectedIncoming

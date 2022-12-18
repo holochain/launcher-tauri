@@ -9,9 +9,7 @@ use holochain_types::prelude::InstalledAppId;
 use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 use tokio::process::Child;
-use tokio::task::JoinHandle;
 
-use crate::error::HcLaunchError;
 use crate::launch_tauri::launch_tauri;
 use crate::utils;
 use holochain_cli_sandbox::cmds::Create;
@@ -271,6 +269,6 @@ pub async fn run(
   }
   holochain_cli_sandbox::save::lock_live(std::env::current_dir()?, &sandbox_path, port).await?;
   println!("Connected successfully to a running holochain");
-  let e = format!("Failed to run holochain at {}", sandbox_path.display());
+  let _e = format!("Failed to run holochain at {}", sandbox_path.display());
   Ok((holochain, lair))
 }
