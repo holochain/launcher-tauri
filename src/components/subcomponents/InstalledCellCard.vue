@@ -140,14 +140,17 @@ export default defineComponent({
         dnas: [getCellId(this.cellInfo)![0]],
       });
 
+      console.log("========================================");
+      console.log("Received NetworkInfo: ", networkInfo);
+
       const expectedIncoming =
-      networkInfo[0].fetch_queue_info.op_bytes_to_fetch;
+        networkInfo[0].fetch_queue_info.op_bytes_to_fetch;
+
+      console.log("expectedIncoming: ", expectedIncoming);
 
       // In case expected incoming bytes are 0, keep the chached values, otherwise update
       // expectedIncoming
-      if (expectedIncoming != 0) {
-        this.incomingIdle = false;
-        this.latestIncomingUpdate = Date.now();
+      if (expectedIncoming && expectedIncoming != 0) {
         // if the expected incoming bytes are larger then the max cached value or there
         // is no cached max value, replace it
         if (
@@ -157,26 +160,33 @@ export default defineComponent({
           this.cachedMaxExpected = expectedIncoming;
           this.maxExceeded = true;
           setTimeout(() => (this.maxExceeded = false), 500);
+
         }
+
+        if (expectedIncoming !== this.expectedIncoming) {
+          this.incomingIdle = false;
+          this.latestIncomingUpdate = Date.now();
+        }
+
+
         // make this call after setting max cached value to ensure it is always <= to it
         this.expectedIncoming = expectedIncoming;
       }
 
-      // If expected incoming is zero, set the progress bar to idle state
-      if (expectedIncoming == 0) {
+      // if expected incoming remains the same for > 10 seconds, set to idle
+      if (new Date().getTime() - this.latestIncomingUpdate > 10000) {
         this.incomingIdle = true;
       }
 
-      // if latest non-zero update to gossip progress is older than 30 seconds, set expected incoming
+      // if latest non-zero update to network info is older than 30 seconds, set expected incoming
       // and max cached expected incoming to undefined again
-      if (new Date().getTime() - this.latestIncomingUpdate > 30000) {
+      if (new Date().getTime() - this.latestIncomingUpdate > 40000) {
         this.expectedIncoming = undefined;
         this.cachedMaxExpected = undefined;
       }
 
-      console.log("========================================");
       console.log(
-        "expectedIncoming: ",
+        "this.expectedIncoming: ",
         this.expectedIncoming ? prettyBytes(this.expectedIncoming!) : undefined
       );
       console.log(
@@ -213,7 +223,7 @@ export default defineComponent({
   padding: 9px 20px 20px 25px;
 }
 
-.highglighted {
+.highlighted {
   font-weight: bold;
   color: #482edf;
 }
