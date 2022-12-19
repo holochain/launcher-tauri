@@ -15,7 +15,7 @@
     </div>
     <div>
       <div style="margin-bottom: 10px" title="Historical Gossip Throughput">
-        Active Peer Synchronizations:
+        Active Peer Synchronization:
       </div>
       <div class="column">
         <!-- active incoming gossip rounds -->

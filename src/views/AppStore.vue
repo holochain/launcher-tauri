@@ -87,7 +87,7 @@
       style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
       title="Full Synchronization with Peers Required to Reliably Download all Apps."
     >
-      App Library Synchronization (incoming):
+      App Library Synchronization:
     </div>
     <div>
       <div v-for="(cell, idx) in provisionedCells" :key="cell[0]" class="column">

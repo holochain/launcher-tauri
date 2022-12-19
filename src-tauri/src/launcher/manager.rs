@@ -496,7 +496,6 @@ impl LauncherManager {
               },
               Err(e) => {
                 println!("\n### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.\n", asset_path, e);
-                log::error!("Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
                 let mutable_response = response.body_mut();
                 match read(index_path.clone()) {
                   Ok(index_html) =>  {
