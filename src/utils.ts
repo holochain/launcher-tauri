@@ -67,6 +67,18 @@ export function getCellId(cellInfo: CellInfo): CellId | undefined {
   return undefined;
 }
 
+export function getCellName(cellInfo: CellInfo): string | undefined {
+  if ("Provisioned" in cellInfo) {
+    return cellInfo.Provisioned.name;
+  }
+  if ("Cloned" in cellInfo) {
+    return cellInfo.Cloned.name;
+  }
+  if ("Stem" in cellInfo) {
+    return cellInfo.Stem.name;
+  }
+}
+
 // GossipProgress will only return anticipated bytes soon so these methods will become obsolete
 export function gossipProgressPercent(progress: GossipProgress | undefined) {
   if (!progress) {

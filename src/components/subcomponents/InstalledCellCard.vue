@@ -1,6 +1,12 @@
 <template>
   <div class="column card">
     <div style="text-align: right; font-weight: 600">{{ roleName }}</div>
+    <div>
+      <span style="margin-right: 47px;">Name:</span>
+      <span style="font-size: 14px;"
+        >{{ getCellName(cellInfo) }}
+      </span>
+    </div>
     <div style="margin-bottom: 15px">
       <span style="margin-right: 20px">Dna Hash:</span>
       <span style="opacity: 0.7; font-family: monospace; font-size: 14px"
@@ -74,7 +80,7 @@ import prettyBytes from "pretty-bytes";
 import HCProgressBar from "./HCProgressBar.vue";
 import { HolochainId } from "../../types";
 import { serializeHash } from "@holochain-open-dev/utils";
-import { getCellId } from "../../utils";
+import { getCellId, getCellName } from "../../utils";
 
 export default defineComponent({
   name: "InstalledCellCard",
@@ -125,6 +131,8 @@ export default defineComponent({
   methods: {
     prettyBytes,
     serializeHash,
+    getCellName,
+    getCellId,
     async getNetworkInfo() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
