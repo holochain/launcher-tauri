@@ -1,3 +1,5 @@
+import { CellInfo } from "@holochain/client";
+import { CellId } from "@holochain/client";
 import {
   DisabledAppReason,
   NetworkInfo,
@@ -47,6 +49,22 @@ export function getReason(app: AppInfo): string | undefined {
       }
     ).paused.reason.error;
   }
+}
+
+export function flattenCells(cell_info: Record<string, CellInfo[]>): [string, CellInfo][] {
+  return Object.entries(cell_info).map(([roleName, cellInfos]) => {
+    return cellInfos.map((CellInfo) => [roleName, CellInfo])
+  }).flat() as any
+}
+
+export function getCellId(cellInfo: CellInfo): CellId | undefined {
+  if ("Provisioned" in cellInfo) {
+    return cellInfo.Provisioned.cell_id;
+  }
+  if ("Cloned" in cellInfo) {
+    return cellInfo.Cloned.cell_id;
+  }
+  return undefined;
 }
 
 // GossipProgress will only return anticipated bytes soon so these methods will become obsolete

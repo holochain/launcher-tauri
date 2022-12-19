@@ -7,6 +7,7 @@ import {
 import { invoke } from "@tauri-apps/api/tauri";
 import { createStore } from "vuex";
 import { flatten, uniq } from "lodash-es";
+import { flattenCells, getCellId } from "../utils";
 
 export interface LauncherAdminState {
   launcherStateInfo: "loading" | LauncherStateInfo;
@@ -343,13 +344,13 @@ export const store = createStore<LauncherAdminState>({
 
       if (!holochainState || holochainState.type === "Error") return [];
 
-      const allCells = flatten(
+      const allCellInfos = flatten(
         holochainState.content.installed_apps.map(
-          (app) => app.installed_app_info.cell_data
+          (app) => flattenCells(app.installed_app_info.cell_info)
+            .filter(([roleName, cellInfo]) => !("Stem" in cellInfo))
         )
       );
-
-      return uniq(allCells.map((c) => new Uint8Array(c.cell_id[1])));
+      return uniq(allCellInfos.map((c) => new Uint8Array(getCellId(c[1])![1])));
     },
     appInterfacePort: (state) => (holochainId: HolochainId) => {
       const stateInfo = state.launcherStateInfo;

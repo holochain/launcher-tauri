@@ -1,10 +1,10 @@
 <template>
   <div class="column card">
-    <div style="text-align: right; font-weight: 600">{{ cell.role_name }}</div>
+    <div style="text-align: right; font-weight: 600">{{ roleName }}</div>
     <div style="margin-bottom: 15px">
       <span style="margin-right: 20px">Dna Hash:</span>
       <span style="opacity: 0.7; font-family: monospace; font-size: 14px"
-        >{{ dnaHashForCell(cell) }}
+        >{{ dnaHashForCell(cellInfo) }}
       </span>
     </div>
     <div>
@@ -67,19 +67,25 @@ import {
   DnaHash,
   NetworkInfo,
   InstalledCell,
+  CellInfo,
 } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 
 import HCProgressBar from "./HCProgressBar.vue";
 import { HolochainId } from "../../types";
 import { serializeHash } from "@holochain-open-dev/utils";
+import { getCellId } from "../../utils";
 
 export default defineComponent({
   name: "InstalledCellCard",
   components: { HCProgressBar },
   props: {
-    cell: {
-      type: Object as PropType<InstalledCell>,
+    cellInfo: {
+      type: Object as PropType<CellInfo>,
+      required: true,
+    },
+    roleName: {
+      type: String,
       required: true,
     },
     holochainId: {
@@ -123,7 +129,7 @@ export default defineComponent({
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       const networkInfo: NetworkInfo[] = await appWs.networkInfo({
-        dnas: [this.cell.cell_id[0]],
+        dnas: [getCellId(this.cellInfo)![0]],
       });
 
       const expectedIncoming =
@@ -182,8 +188,8 @@ export default defineComponent({
         return undefined;
       }
     },
-    dnaHashForCell(cell: InstalledCell) {
-      return serializeHash(new Uint8Array(cell.cell_id[0]))
+    dnaHashForCell(cell: CellInfo) {
+      return serializeHash(new Uint8Array(getCellId(cell)![0]))
     }
   },
 });

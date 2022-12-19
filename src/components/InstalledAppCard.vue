@@ -28,7 +28,7 @@
           title="Your Public Key"
           :class="{ holoIdenticon: !showMore, holoIdenticonMore: showMore }"
           style="position: absolute; top: 78px; left: 78px; cursor: pointer"
-          :hash="app.webAppInfo.installed_app_info.cell_data[0].cell_id[1]"
+          :hash="getPubKey()"
           :size="42"
           @click="copyPubKey()"
         ></HoloIdenticon>
@@ -154,26 +154,27 @@
         > -->
       </div>
 
-      <!-- main cells -->
+      <!-- provisioned cells -->
       <div
         class="row"
         style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
       >
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
-          >Main Cells:</span
+          >Provisioned Cells:</span
         ><span style="display: flex; flex: 1"></span>
         <span
           style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
-          @click="showMainCells = !showMainCells"
-          >{{ showMainCells ? "[Hide]" : "[Show]" }}
+          @click="showProvisionedCells = !showProvisionedCells"
+          >{{ showProvisionedCells ? "[Hide]" : "[Show]" }}
         </span>
       </div>
-      <div v-if="showMainCells" style="margin-left: 140px; margin-right: 20px">
+      <div v-if="showProvisionedCells" style="margin-left: 140px; margin-right: 20px">
         <InstalledCellCard
-          v-for="cell in mainCells"
-          :key="JSON.stringify(cell.cell_id[0])"
+          v-for="[roleName, cellInfo] in provisionedCells"
+          :key="roleName"
           style="margin: 12px 0"
-          :cell="cell"
+          :cellInfo="cellInfo"
+          :roleName="roleName"
           :holochainId="app.holochainId"
         >
         </InstalledCellCard>
@@ -199,10 +200,11 @@
       >
         <div v-if="clonedCells.length > 0">
           <InstalledCellCard
-            v-for="cell in clonedCells"
-            :key="JSON.stringify(cell.cell_id[0])"
+            v-for="[roleName, cellInfo] in clonedCells"
+            :key="roleName"
             style="margin: 12px 0"
-            :cell="cell"
+            :cellInfo="cellInfo"
+            :roleName="roleName"
             :holochainId="app.holochainId"
           >
           </InstalledCellCard>
@@ -276,9 +278,9 @@
 import { defineComponent, PropType } from "vue";
 import { HolochainAppInfo } from "../types";
 import { serializeHash } from "@holochain-open-dev/utils";
-import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
+import { isAppRunning, isAppDisabled, isAppPaused, getReason, flattenCells, getCellId } from "../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
-import { AppWebsocket, DnaHash, NetworkInfo } from "@holochain/client";
+import { AppWebsocket, CellInfo, DnaHash, NetworkInfo } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
@@ -316,7 +318,7 @@ export default defineComponent({
     showUninstallDialog: boolean;
     showPubKeyTooltip: boolean;
     gossipInfo: Record<string, NetworkInfo>;
-    showMainCells: boolean;
+    showProvisionedCells: boolean;
     showClonedCells: boolean;
   } {
     return {
@@ -324,23 +326,20 @@ export default defineComponent({
       showUninstallDialog: false,
       showPubKeyTooltip: false,
       gossipInfo: {},
-      showMainCells: true,
+      showProvisionedCells: true,
       showClonedCells: true,
     };
   },
   emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp"],
   computed: {
-    mainCells() {
-      const allCells = this.app.webAppInfo.installed_app_info.cell_data;
-      return allCells
-        .filter((cell) => !cell.role_name.includes("."))
-        .sort((a, b) => a.role_name.localeCompare(b.role_name));
+    provisionedCells(): [string, CellInfo][] {
+      const provisionedCells = flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
+        .filter(([_roleName, cellInfo]) => "Provisioned" in cellInfo);
+      return provisionedCells
     },
-    clonedCells() {
-      const allCells = this.app.webAppInfo.installed_app_info.cell_data;
-      return allCells
-        .filter((cell) => cell.role_name.includes("."))
-        .sort((a, b) => a.role_name.localeCompare(b.role_name));
+    clonedCells(): [string, CellInfo][] {
+      return flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
+        .filter(([_roleName, cellInfo]) => "Cloned" in cellInfo)
     },
     isSliderOn() {
       return isAppRunning(this.app.webAppInfo.installed_app_info);
@@ -353,6 +352,7 @@ export default defineComponent({
     isAppDisabled,
     isAppPaused,
     writeText,
+    getCellId,
     isAppHeadless(app: HolochainAppInfo) {
       return app.webAppInfo.web_ui_info.type === "Headless";
     },
@@ -404,12 +404,22 @@ export default defineComponent({
     },
     copyPubKey() {
       const pubKey =
-        this.app.webAppInfo.installed_app_info.cell_data[0].cell_id[1];
+        this.getPubKey();
       this.writeText(serializeHash(new Uint8Array(pubKey)));
       this.showPubKeyTooltip = true;
       setTimeout(() => {
         this.showPubKeyTooltip = false;
       }, 1200);
+    },
+    getPubKey() {
+      const cell = Object.values(this.app.webAppInfo.installed_app_info.cell_info)[0]
+        .find((c) => "Provisioned" in c);
+
+      if (!cell || !("Provisioned" in cell)) {
+        throw new Error("no provisioned cell found");
+      }
+
+      return cell.Provisioned.cell_id[1];
     },
   },
 });

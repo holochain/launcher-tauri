@@ -90,7 +90,7 @@
       App Library Synchronization (incoming):
     </div>
     <div>
-      <div v-for="(cell, idx) in cells" :key="cell.role_name" class="column">
+      <div v-for="(cell, idx) in provisionedCells" :key="cell[0]" class="column">
         <div class="row" style="align-items: center">
           <div
             style="
@@ -100,11 +100,11 @@
               text-align: right;
             "
           >
-            {{ cell.role_name }}
+            {{ cell[0] }}
           </div>
           <div style="width: 50%; margin: 0 30px">
             <HCProgressBar
-              v-if="gossipStates[idx]"
+              v-if="networkStates[idx]"
               title="currently ongoing data exchanges with peers"
               :progress="progressRatio(idx)"
               :style="`--height: 10px; --hc-primary-color:${
@@ -133,7 +133,7 @@
             <span :class="{ highglightedText: maxExceeded[idx] }">{{
               prettyBytesLocal(cachedMaxExpected[idx])
             }}</span>
-            | {{ prettyBytesLocal(gossipStates[idx]) }}
+            | {{ prettyBytesLocal(networkStates[idx]) }}
           </div>
         </div>
       </div>
@@ -162,7 +162,7 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket, NetworkInfo, InstalledCell } from "@holochain/client";
+import { AppWebsocket, NetworkInfo, InstalledCell, CellInfo, CellId } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 
@@ -183,6 +183,7 @@ import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
 import { HolochainId } from "../types";
 import prettyBytes from "pretty-bytes";
+import { getCellId } from "../utils";
 
 export default defineComponent({
   name: "AppStore",
@@ -203,8 +204,8 @@ export default defineComponent({
     howToPublishUrl: string;
     holochainId: HolochainId | undefined;
     pollInterval: number | null;
-    cells: InstalledCell[] | undefined;
-    gossipStates: (number | undefined)[];
+    provisionedCells: [string, CellInfo | undefined][] | undefined;
+    networkStates: (number | undefined)[];
     cachedMaxExpected: (number | undefined)[];
     latestGossipUpdates: number[]; // timestamps of the latest non-zero gossipInfo update
     idleStates: boolean[];
@@ -222,8 +223,8 @@ export default defineComponent({
         "https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub",
       holochainId: undefined,
       pollInterval: null,
-      cells: undefined,
-      gossipStates: [undefined, undefined, undefined],
+      provisionedCells: undefined,
+      networkStates: [undefined, undefined, undefined],
       cachedMaxExpected: [undefined, undefined, undefined],
       latestGossipUpdates: [0, 0, 0],
       idleStates: [true, true, true],
@@ -249,9 +250,16 @@ export default defineComponent({
       installed_app_id: `DevHub-${holochainId.content}`,
     });
 
-    this.cells = devhubInfo.cell_data.sort((a, b) =>
-      a.role_name.localeCompare(b.role_name)
-    );
+
+    const allCells = devhubInfo.cell_info;
+    const provisionedCells: [string, CellInfo | undefined][] = Object.entries(allCells).map(([roleName, cellInfos]) => {
+      return [roleName, cellInfos.find((cellInfo) => "Provisioned" in cellInfo)]
+    });
+
+    this.provisionedCells = provisionedCells.sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => {
+      return roleName_a.localeCompare(roleName_b);
+    });
+
 
     let allApps: Array<AppWithReleases>;
     try {
@@ -270,19 +278,14 @@ export default defineComponent({
 
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
-    await this.getGossipState();
+    await this.getNetworkState();
     this.pollInterval = window.setInterval(
-      async () => await this.getGossipState(),
+      async () => await this.getNetworkState(),
       2000
     );
 
     this.loading = false;
   },
-  // computed: {
-  //   synchronizing(): boolean {
-  //     return this.latestGossipUpdates.some((latest) => (Date.now() - latest) < 10000);
-  //   }
-  // },
   methods: {
     async howToPublish() {
       await invoke("open_url_cmd", {
@@ -347,11 +350,12 @@ export default defineComponent({
       this.selectedAppBundlePath = undefined;
       this.hdkVersionForApp = undefined;
     },
-    async getGossipState() {
+    async getNetworkState() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       const networkInfo: NetworkInfo[] = await appWs.networkInfo({
-        dnas: this.cells!.map((cell) => cell.cell_id[0] as Uint8Array),
+        dnas: this.provisionedCells!.filter(([roleName, cellInfo]) => !!cellInfo)
+          .map(([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array),
       });
 
       networkInfo.forEach((info, idx) => {
@@ -372,7 +376,7 @@ export default defineComponent({
             setTimeout(() => (this.maxExceeded[idx] = false), 500);
           }
           // make this call after setting max cached value to ensure it is always <= to it
-          this.gossipStates[idx] = expectedIncoming;
+          this.networkStates[idx] = expectedIncoming;
         }
 
         // If expected incoming is zero, set the progress bar to idle state
@@ -383,7 +387,7 @@ export default defineComponent({
         // if latest non-zero update to gossip progress is older than 30 seconds, set expected incoming
         // and max cached expected incoming to undefined again
         if (new Date().getTime() - this.latestGossipUpdates[idx] > 30000) {
-          this.gossipStates[idx] = undefined;
+          this.networkStates[idx] = undefined;
           this.cachedMaxExpected[idx] = undefined;
         }
       });
@@ -391,15 +395,15 @@ export default defineComponent({
       // if latest updates to gossip progress are older than 30 seconds, set them to undefined again
       this.latestGossipUpdates.forEach((latest, idx) => {
         if (Date.now() - latest > 30000) {
-          this.gossipStates[idx] = undefined;
+          this.networkStates[idx] = undefined;
           this.cachedMaxExpected[idx] = undefined;
         }
       });
     },
     progressRatio(idx: number) {
-      if (this.gossipStates[idx] && this.cachedMaxExpected[idx]) {
+      if (this.networkStates[idx] && this.cachedMaxExpected[idx]) {
         return (
-          (1 - this.gossipStates[idx]! / this.cachedMaxExpected[idx]!) * 100
+          (1 - this.networkStates[idx]! / this.cachedMaxExpected[idx]!) * 100
         );
       } else {
         return undefined;
