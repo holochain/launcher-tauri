@@ -54,10 +54,11 @@
             }`"
             title="max expected bytes | remaining expected bytes"
           >
-            <span :class="{ highlighted: maxExceeded }">{{
+            <span :class="{ highlighted: maxExceeded }">
+            {{ expectedIncoming && cachedMaxExpected ? prettyBytes(cachedMaxExpected - expectedIncoming) : "-" }}
+            | {{
               cachedMaxExpected ? prettyBytes(cachedMaxExpected) : "-"
             }}</span>
-            | {{ expectedIncoming ? prettyBytes(expectedIncoming) : "-" }}
           </div>
         </div>
       </div>
@@ -173,14 +174,19 @@ export default defineComponent({
         this.expectedIncoming = expectedIncoming;
       }
 
-      // if expected incoming remains the same for > 10 seconds, set to idle
+      // if expected incoming remains the same for > 10 seconds, set to idle. Except expectedIncoming
+      // is below 16MB, in this case transmission may already be finished.
       if (new Date().getTime() - this.latestIncomingUpdate > 10000) {
-        this.incomingIdle = true;
+        if (this.expectedIncoming && this.expectedIncoming > 16000000) {
+          this.incomingIdle = false
+        } else {
+          this.incomingIdle = true;
+        }
       }
 
-      // if latest non-zero update to network info is older than 30 seconds, set expected incoming
+      // if latest non-zero update to network info is older than 80 seconds, set expected incoming
       // and max cached expected incoming to undefined again
-      if (new Date().getTime() - this.latestIncomingUpdate > 40000) {
+      if (new Date().getTime() - this.latestIncomingUpdate > 80000) {
         this.expectedIncoming = undefined;
         this.cachedMaxExpected = undefined;
       }
