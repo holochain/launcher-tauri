@@ -74,7 +74,14 @@ pub async fn read_and_prepare_webapp(web_happ_path: &PathBuf, out_path: &PathBuf
     .map_err(|e| format!("Failed to remove ui.zip: {:?}", e))?;
 
   // Writing .happ file
-  app_bundle.write_to_file(out_path.join("happ.happ").as_path()).await
+  let app_id = web_happ_path.as_path().file_stem()
+    .ok_or("Failed to extract filename.")?
+    .to_str()
+    .ok_or("Failed to convert &OsStr of filename to &str.")?;
+
+  let happ_file_name = format!("{}.happ", app_id);
+
+  app_bundle.write_to_file(out_path.join(happ_file_name).as_path()).await
     .map_err(|e| format!("Failed to write .happ file: {:?}", e))?;
 
   Ok(())

@@ -14,7 +14,6 @@ use crate::launch_tauri::launch_tauri;
 use crate::utils;
 use holochain_cli_sandbox::cmds::Create;
 
-// const DEFAULT_APP_ID: &str = "test-app";
 
 #[derive(Debug, StructOpt)]
 /// Helper for launching holochain apps in a holochain-launcher environment for testing and development purposes.
@@ -72,8 +71,12 @@ impl HcLaunch {
                   }
                 };
 
+                // extraxt filename of .webhapp
+                let app_id = p.as_path().file_stem().unwrap().to_str().unwrap();
+                let happ_file_name = format!("{}.happ", app_id);
+
                 // generate agents
-                let happ_path = temp_folder.join("happ.happ");
+                let happ_path = temp_folder.join(happ_file_name);
 
                 // clean existing sandboxes
                 holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
@@ -84,7 +87,7 @@ impl HcLaunch {
                   &self.holochain_path,
                   happ_path,
                   self.create,
-                  String::from("test-app"),
+                  app_id.to_string(),
                 ).await?;
 
                 // spawn tauri windows
@@ -114,11 +117,14 @@ impl HcLaunch {
                 let local_storage_path = temp_folder.join("tauri");
 
                 println!("# hc launch: Launching tauri windows.");
-                launch_tauri(ui_path, local_storage_path, self.watch, passphrase);
+                launch_tauri(ui_path, app_id.to_string(), local_storage_path, self.watch, passphrase);
               }
               "happ" => {
                 match self.ui_path {
                   Some(ui_p) => {
+
+                    // extraxt filename of .happ
+                    let app_id = p.clone().as_path().file_stem().unwrap().to_str().unwrap().to_string();
 
                     // clean existing sandboxes
                     holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
@@ -129,7 +135,7 @@ impl HcLaunch {
                       &self.holochain_path,
                       p,
                       self.create,
-                      String::from("test-app"),
+                      app_id.clone(),
                     ).await?;
 
                     tauri::async_runtime::spawn(async move {
@@ -150,13 +156,14 @@ impl HcLaunch {
                     }
                     println!("# hc launch: Launching tauri windows.");
 
+
                     // generate temp folder for localStorage
                     let temp_dir = tempdir::TempDir::new("hc_launch").unwrap();
                     let temp_folder = temp_dir.path().to_path_buf();
 
                     let local_storage_path = temp_folder.join("tauri");
 
-                    launch_tauri(ui_p, local_storage_path, self.watch, passphrase);
+                    launch_tauri(ui_p, app_id, local_storage_path, self.watch, passphrase);
                   },
                   None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc launch --help` for help."),
                 }

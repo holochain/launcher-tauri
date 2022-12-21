@@ -20,7 +20,7 @@ use lair_keystore_api::{LairClient, ipc_keystore_connect};
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
-pub fn launch_tauri(ui_path: PathBuf, local_storage_path: PathBuf, watch: bool, passphrase: sodoken::BufRead) -> () {
+pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_path: PathBuf, watch: bool, passphrase: sodoken::BufRead) -> () {
   // tauri::async_runtime::set(tokio::runtime::Handle::current());
 
   // build tauri windows
@@ -53,7 +53,6 @@ pub fn launch_tauri(ui_path: PathBuf, local_storage_path: PathBuf, watch: bool, 
       let (windows, ui_path, lair_clients, app) = tokio::task::block_in_place(|| {
         tauri::async_runtime::block_on(async move {
           for tmp_directory_path in dot_hc_content.lines() {
-            let app_id = String::from("test-app");
             let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
 
             let admin_port = match std::fs::read_to_string(dot_hc_live_path) {
