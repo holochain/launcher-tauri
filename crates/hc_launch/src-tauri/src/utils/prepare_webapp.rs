@@ -1,9 +1,23 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 
 use holochain_types::web_app::WebAppBundle;
-use lair_keystore_manager::utils::{path_exists, create_dir_if_necessary};
+
+use crate::error::FileSystemError;
+
+pub fn create_dir_if_necessary(path: &PathBuf) -> Result<(), FileSystemError> {
+  if !path_exists(path) {
+    fs::create_dir(path)?;
+  }
+
+  Ok(())
+}
+
+pub fn path_exists(path: &PathBuf) -> bool {
+  Path::new(path).exists()
+}
+
 
 
 pub async fn read_and_prepare_webapp(web_happ_path: &PathBuf, out_path: &PathBuf) -> Result<(), String> {

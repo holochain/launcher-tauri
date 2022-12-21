@@ -2770,7 +2770,7 @@ dependencies = [
 
 [[package]]
 name = "holochain_cli_launch"
-version = "0.0.3-alpha.1"
+version = "0.0.3-alpha.2"
 dependencies = [
  "anyhow",
  "futures",
@@ -2782,14 +2782,12 @@ dependencies = [
  "holochain_util 0.1.0-beta-rc.0",
  "holochain_zome_types",
  "lair_keystore_api",
- "lair_keystore_manager",
  "log",
  "mime_guess",
  "notify",
  "observability",
  "portpicker",
  "serde",
- "serde_json",
  "structopt",
  "tauri",
  "tauri-build",
