@@ -14,7 +14,7 @@
         position: relative;
       "
     >
-      <img class="halo" src="/img/Holochain_Halo_no_gradient.svg" />
+      <!-- <img class="halo" src="/img/Holochain_Halo_no_gradient.svg" /> -->
       <mwc-circular-progress
         indeterminate
         style="margin-top: 40px; margin-bottom: 40px"

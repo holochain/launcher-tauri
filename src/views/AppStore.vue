@@ -1,6 +1,28 @@
 <template>
   <HCLoading ref="downloading" :text="loadingText" />
 
+  <HCDialog ref="appLibraryFirstEnter" closeOnSideClick>
+    <div
+      class="column"
+      style="padding: 30px; align-items: center; max-width: 600px"
+    >
+      <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
+        Note
+      </div>
+      <div>
+        Holochain is <a href="https://developer.holochain.org/glossary/#peer-to-peer" target="_blank" title="https://developer.holochain.org/glossary/#peer-to-peer">peer-to-peer</a>
+         and the <b>App Library is not optimized for download speed yet.</b><br><br>
+        Before you can download your first app, <b>the App Library needs to get synchronized with other peers in the background.</b>
+        This can take up to 10-20 Minutes depending on the number and size of apps available and the bandwidth of your internet connection.
+        <br><br>
+        You can see the progress of ongoing App Library Synchronizations in the bottom right corner.
+      </div>
+
+      <HCButton style="margin-top: 20px; width: 100px;" @click="$refs.appLibraryFirstEnter.close()">Ok</HCButton>
+    </div>
+
+  </HCDialog>
+
   <div class="column" style="flex: 1">
     <div class="row center-content top-bar">
       <mwc-icon-button
@@ -181,6 +203,8 @@ import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
+import HCDialog from "../components/subcomponents/HCDialog.vue";
+
 import { HolochainId } from "../types";
 import prettyBytes from "pretty-bytes";
 import { getCellId } from "../utils";
@@ -194,6 +218,7 @@ export default defineComponent({
     HCLoading,
     HCSnackbar,
     HCProgressBar,
+    HCDialog
   },
   data(): {
     loadingText: string;
@@ -233,10 +258,25 @@ export default defineComponent({
       downloadFailed: false,
     };
   },
+  // created() {
+  //   // check localStorage to know whether this is the first time entering the App Library
+  //   if (window.localStorage.getItem("appLibraryWarningShown") || true) {
+  //     (this.$refs.appLibraryFirstEnter as typeof HCDialog).open();
+  //   }
+  //   //window.localStorage.setItem("appLibraryWarningShown", "true");
+
+  // },
   beforeUnmount() {
     window.clearInterval(this.pollInterval!);
   },
   async mounted() {
+
+    if (!window.localStorage.getItem("appLibraryWarningShown")) {
+      (this.$refs.appLibraryFirstEnter as typeof HCDialog).open();
+      window.localStorage.setItem("appLibraryWarningShown", "true");
+    }
+
+
     const holochainId = this.$store.getters["holochainIdForDevhub"];
     this.holochainId = holochainId;
 

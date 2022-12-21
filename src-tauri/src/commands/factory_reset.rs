@@ -20,6 +20,12 @@ pub async fn execute_factory_reset(
   }
 
   log::warn!("A factory reset has been requested, initiating...");
+  // clear localStorage (TODO! ideally this would be at a better location on the filesystem and could be deleted
+  // by deleting the corresponding directory)
+  if let Err(e) = window.eval("window.localStorage.clear()") {
+    log::error!("Error clearing localStorage: {:?}", e);
+  }
+
 
   let windows = app_handle.windows();
 
