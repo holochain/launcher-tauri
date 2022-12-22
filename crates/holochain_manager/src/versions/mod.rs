@@ -27,8 +27,8 @@ use v0_1_0_beta_rc1::HolochainV0_1_0BetaRc1;
 // NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HdkVersion {
-  #[serde(rename = "0.1.0-beta-rc.1")]
-  V0_1_0BetaRc1,
+  #[serde(rename = "0.1.0-beta-rc.0")]
+  V0_1_0BetaRc0,
 }
 
 impl Into<String> for HdkVersion {
@@ -40,8 +40,8 @@ impl Into<String> for HdkVersion {
 // NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HdiVersion {
-  #[serde(rename = "0.1.0-beta-rc.1")]
-  V0_1_0BetaRc1,
+  #[serde(rename = "0.2.0-beta-rc.0")]
+  V0_2_0BetaRc0,
 }
 
 impl Into<String> for HdiVersion {

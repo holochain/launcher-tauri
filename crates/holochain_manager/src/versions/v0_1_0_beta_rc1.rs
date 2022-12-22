@@ -15,12 +15,12 @@ pub struct HolochainV0_1_0BetaRc1;
 impl VersionManager for HolochainV0_1_0BetaRc1 {
   // NEW_VERSION: Careful! Indicate here which HDK version comes bundled with this Holochain version
   fn hdk_version(&self) -> HdkVersion {
-    HdkVersion::V0_1_0BetaRc1
+    HdkVersion::V0_1_0BetaRc0
   }
 
   // NEW_VERSION: Careful! Indicate here which HDI version comes bundled with this Holochain version
   fn hdi_version(&self) -> HdiVersion {
-    HdiVersion::V0_1_0BetaRc1
+    HdiVersion::V0_2_0BetaRc0
   }
 
   // NEW_VERSION: Duplicate and change whatever config is necessary to change
