@@ -1,12 +1,14 @@
 [package]
+edition = "2021"
 name = "holochain_cli_launch"
 version = "0.0.3-alpha.3"
 description = "A CLI to launch holochain apps in a Holochain Launcher environment for testing and development purposes."
-authors = ["you"]
-license = ""
-repository = ""
-edition = "2021"
-rust-version = "1.57"
+license-file = "LICENSE_CAL-1.0"
+homepage = "https://developer.holochain.org"
+documentation = "https://docs.rs/holochain_cli_launch"
+repository = "https://github.com/holochain/launcher"
+readme = "../README.md"
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "hc-launch"

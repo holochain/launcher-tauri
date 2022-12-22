@@ -16,7 +16,7 @@ use holochain_cli_sandbox::cmds::Create;
 
 
 #[derive(Debug, StructOpt)]
-/// Helper for launching holochain apps in a holochain-launcher environment for testing and development purposes.
+/// Helper for launching holochain apps in a Holochain Launcher environment for testing and development purposes.
 ///
 pub struct HcLaunch {
   /// Instead of the normal "interactive" passphrase mode,
