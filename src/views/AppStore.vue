@@ -18,7 +18,7 @@
         You can see the progress of ongoing App Library Synchronizations in the bottom right corner.
       </div>
 
-      <HCButton style="margin-top: 20px; width: 100px;" @click="$refs.appLibraryFirstEnter.close()">Ok</HCButton>
+      <HCButton style="margin-top: 20px; width: 100px;" @click="closeNote">Ok</HCButton>
     </div>
 
   </HCDialog>
@@ -456,6 +456,9 @@ export default defineComponent({
         return "-";
       }
     },
+    closeNote() {
+      (this.$refs.appLibraryFirstEnter as typeof HCDialog).close()
+    }
   },
 });
 </script>

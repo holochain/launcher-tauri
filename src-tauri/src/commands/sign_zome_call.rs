@@ -3,7 +3,6 @@ use hdk::prelude::{CellId, ZomeName, FunctionName, CapSecret, ExternIO, Timestam
 use lair_keystore_manager::*;
 use holochain_types::prelude::ZomeCallUnsigned;
 use serde::Deserialize;
-use std::convert::TryInto;
 
 #[derive(Deserialize, Debug)]
 pub struct ZomeCallUnsignedTauri {
@@ -19,7 +18,6 @@ pub struct ZomeCallUnsignedTauri {
 
 #[tauri::command]
 pub async fn sign_zome_call(
-  window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
   // lair_keystore_manager: T<LairKeystoreManager>,
   zome_call_unsigned: ZomeCallUnsignedTauri,

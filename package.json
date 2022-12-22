@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test:unit": "vue-cli-service test:unit",
     "tauri": "tauri",
-    "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/LBntYzLvzjh680s/download"
+    "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/fVc4HLxF0caTpVV/download"
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",

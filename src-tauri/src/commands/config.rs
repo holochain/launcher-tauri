@@ -1,19 +1,12 @@
-use tauri::{api::process::kill_children, Manager};
+use tauri::Manager;
+use crate::launcher::{config::LauncherConfig, error::LauncherError};
 
-use crate::{
-  launcher::{
-    config::LauncherConfig, error::LauncherError, manager::LauncherManager, state::LauncherState,
-  },
-  running_state::RunningState,
-};
 
 #[tauri::command]
 pub async fn write_config(
   window: tauri::Window,
-  state: tauri::State<'_, LauncherState>,
   app_handle: tauri::AppHandle,
   config: LauncherConfig,
-  custom_path: Option<String>,
 ) -> Result<(), LauncherError> {
 
   if window.label() != "admin" {

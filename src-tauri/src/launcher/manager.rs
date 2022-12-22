@@ -212,9 +212,11 @@ impl LauncherManager {
 
     let version_str: String = version.into();
 
+    let admin_window = self.app_handle.get_window("admin").unwrap();
+
     let state = match WebAppManager::launch(version, config, password).await {
       Ok(mut manager) => match version.eq(&HolochainVersion::default()) {
-        true => match install_default_apps_if_necessary(&mut manager).await {
+        true => match install_default_apps_if_necessary(&mut manager, admin_window).await {
           Ok(()) => {
             log::info!("Launched Holochain {}", version_str);
             RunningState::Running(manager)
@@ -437,7 +439,7 @@ impl LauncherManager {
     );
 
 
-    let window = WindowBuilder::new(
+    let _window = WindowBuilder::new(
       &self.app_handle,
       window_label.clone(),
       WindowUrl::App("".into())
@@ -521,17 +523,17 @@ impl LauncherManager {
     .inner_size(1000.0, 700.0)
     .title(app_id)
     .enable_clipboard_access() // TODO! potentially make this optional
-    // .menu(Menu::new().add_submenu(Submenu::new( // removing menu because it overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
-    //   "Settings",
-    //   Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
-    // )))
+    .menu(Menu::new().add_submenu(Submenu::new( // This overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
+      "Settings",
+      Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
+    )))
     // .icon(tauri::Icon::File(icon_path)) // placeholder for when apps come shipped with their custom icons
     // .map_err(|err| format!("Error adding icon: {:?}", err))?
     .build()
     .map_err(|err| format!("Error opening app: {:?}", err))?;
 
-    let a = self.app_handle.clone();
-    let l = window_label.clone();
+    // let a = self.app_handle.clone();
+    // let l = window_label.clone();
     // window.on_menu_event(move |_| {
     //   if let Some(w) = a.get_window(l.as_str()) {
     //     w.open_devtools();
