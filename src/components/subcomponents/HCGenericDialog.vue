@@ -9,10 +9,10 @@
       <div class="row" style="margin-top: 30px">
         <HCButton
           v-if="!hideCancel"
-          style="width: 80px; height: 30px; margin: 4px 6px"
+          style="height: 30px; margin: 4px 6px"
           outlined
           @click="close()"
-          >Cancel</HCButton
+          >{{ $t("buttons.cancel") }}</HCButton
         >
         <HCButton
           style="min-width: 80px; margin: 4px 6px"

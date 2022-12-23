@@ -7,17 +7,22 @@ edition = "2021"
 license = ""
 name = "holochain-launcher"
 repository = ""
-version = "0.7.1"
+version = "0.8.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = {git = "https://github.com/tauri-apps/tauri", rev = "447370fa50a82f8086554086ca9038f4a008a456", features = [] }
+tauri-build = { version = "1.2.1", features = [] }
 
 [dependencies]
 holochain_manager = {path = "../crates/holochain_manager"}
 holochain_web_app_manager = {path = "../crates/holochain_web_app_manager"}
 lair_keystore_manager = {path = "../crates/lair_keystore_manager"}
+
+# NEW_VERSION update holochain types
+holochain_types = { package = "holochain_types", version = "0.1.0-beta-rc.1"}
+hdk = { package = "hdk", version = "0.1.0-beta-rc.1"}
+
 
 async-trait = "0.1.52"
 base64 = "0.13.0"
@@ -35,7 +40,7 @@ serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
 sysinfo = "0.23.5"
-tauri = {version = "1.1.1", features = ["api-all", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored", "system-tray"] }
+tauri = {version = "1.2.1", features = ["api-all", "cli", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored", "system-tray"] }
 thiserror = "1.0.30"
 url2 = "0.0.6"
 mime_guess = "2.0.4"

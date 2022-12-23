@@ -47,9 +47,13 @@ pub async fn launch_holochain_process(
     .write("\n".as_bytes())
     .map_err(|err| LaunchHolochainError::ErrorWritingPassword(format!("{:?}", err)))?;
 
+
+  let mut fatal_error = false;
+
   // this loop will end in still pending when the conductor crashes before being ready
   // read events such as stdout
   while let Some(event) = holochain_rx.recv().await {
+
 
     match event.clone() {
       CommandEvent::Stdout(line) => {
@@ -63,12 +67,11 @@ pub async fn launch_holochain_process(
 
         log::info!("[HOLOCHAIN {}] {}", version, line);
 
-        if line.contains("this is embarrassing") {
-          launch_state = LaunchHolochainProcessState::InitializeConductorError(
-            InitializeConductorError::UnknownError(
-              String::from("Unknown error when trying to initialize conductor. See log file for details.")
-            )
-          );
+        if line.contains("FATAL PANIC PanicInfo") {
+          fatal_error = true;
+        }
+        if line.contains("Well, this is embarrassing") { // This line occurs below FATAL PANIC but may potentially also appear without FATAL PANIC PanicInfo
+          fatal_error = true;
         }
         if line.contains("Could not initialize Conductor from configuration: InterfaceError(WebsocketError(Io(Os { code: 98, kind: AddrInUse, message: \"Address already in use\" })))") {
           launch_state = LaunchHolochainProcessState::InitializeConductorError(
@@ -76,11 +79,22 @@ pub async fn launch_holochain_process(
               String::from("Could not initialize Conductor from configuration: InterfaceError(WebsocketError(Io(Os { code: 98, kind: AddrInUse, message: \"Address already in use\" })))")
             )
           );
+          break;
         }
-        if line.contains("DatabaseError(SqliteError(SqliteFailure(Error { code: NotADatabase, extended_code: 26 }, Some(\"file is not a database\"))))") {
+        if fatal_error == true && line.contains("DatabaseError(SqliteError(SqliteFailure(Error { code: NotADatabase, extended_code: 26 }, Some(\"file is not a database\"))))") {
           launch_state = LaunchHolochainProcessState::InitializeConductorError(
             InitializeConductorError::SqliteError(
               String::from("DatabaseError(SqliteError(SqliteFailure(Error { code: NotADatabase, extended_code: 26 }, Some(\"file is not a database\"))))")
+            )
+          );
+          break;
+        }
+        // if no known error was found between the line saying "FATAL PANIC ..." or "Well, this is embarrassing" and
+        // the line saying "Thank you kindly" it is an unknown error
+        if fatal_error == true && line.contains("Thank you kindly!"){
+          launch_state = LaunchHolochainProcessState::InitializeConductorError(
+            InitializeConductorError::UnknownError(
+              String::from("Unknown error when trying to initialize conductor. See log file for details.")
             )
           );
         }

@@ -3,6 +3,8 @@ use std::path::PathBuf;
 use crate::{error::LairKeystoreError, versions::LairKeystoreVersion};
 use async_trait::async_trait;
 use url2::Url2;
+use holochain_zome_types::ZomeCallUnsigned;
+pub use holochain_conductor_api::ZomeCall;
 
 #[async_trait]
 pub trait LairKeystoreManager: Send + Sync {
@@ -27,6 +29,8 @@ pub trait LairKeystoreManager: Send + Sync {
     Self: Sized;
 
   fn connection_url(&self) -> Url2;
+
+  async fn sign_zome_call(&self, zome_call: ZomeCallUnsigned) -> Result<ZomeCall, LairKeystoreError>;
 
   fn password(&self) -> String;
 }

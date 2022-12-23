@@ -13,8 +13,17 @@
           style="margin: 0 8px; height: 30px; width: 140px"
           >Report Issue</HCButton
         >
-        <HCButton @click="restartLauncher()" style="margin: 0 8px; width: 140px"
+        <HCButton
+          v-if="offerRestart"
+          @click="restartLauncher()"
+          style="margin: 0 8px; width: 140px"
           >Restart</HCButton
+        >
+        <HCButton
+          v-if="offerQuit"
+          @click="quitLauncher()"
+          style="margin: 0 8px; width: 140px"
+          >Quit</HCButton
         >
       </div>
     </div>
@@ -35,6 +44,15 @@ export default defineComponent({
   components: { HCErrorIcon, HCDialog, HCButton },
   props: {
     heading: String,
+    offerRestart: {
+      type: Boolean,
+      required: false,
+    },
+    offerQuit: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   created() {
     this.$nextTick(() => {
@@ -47,6 +65,9 @@ export default defineComponent({
     },
     async restartLauncher() {
       await invoke("restart");
+    },
+    async quitLauncher() {
+      await invoke("quit");
     },
   },
 });

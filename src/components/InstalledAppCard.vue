@@ -28,7 +28,7 @@
           title="Your Public Key"
           :class="{ holoIdenticon: !showMore, holoIdenticonMore: showMore }"
           style="position: absolute; top: 78px; left: 78px; cursor: pointer"
-          :hash="app.webAppInfo.installed_app_info.cell_data[0].cell_id[1]"
+          :hash="getPubKey()"
           :size="42"
           @click="copyPubKey()"
         ></HoloIdenticon>
@@ -116,8 +116,9 @@
             )
           "
           style="margin-right: 29px"
-          :sliderOn="isAppRunning(app.webAppInfo.installed_app_info)"
+          :sliderOn="isSliderOn"
           @click="handleSlider(app)"
+          @keydown.enter="handleSlider(app)"
         />
       </sl-tooltip>
 
@@ -144,64 +145,75 @@
             ? "Custom Binary"
             : app.holochainId.content
         }}</span>
+        <!-- <span style="flex: 1;"></span>
+        <img
+          src="/img/refresh.png"
+          title="Refresh"
+          @click="refresh"
+          style="width: 20px; height: 20px; margin-right: 30px; cursor: pointer;"
+        > -->
       </div>
 
-      <table style="text-align: left; margin-top: 20px; margin-left: 140px">
-        <tr>
-          <th></th>
-          <th>Dna Hash</th>
-        </tr>
-
-        <tr>
-          <th>Main Cells</th>
-          <th></th>
-        </tr>
-
-        <tr
-          style=""
-          v-for="cellData in mainCells"
-          :key="[...cellData.cell_id[0], ...cellData.cell_id[1]]"
+      <!-- provisioned cells -->
+      <div
+        class="row"
+        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+      >
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >Provisioned Cells:</span
+        ><span style="display: flex; flex: 1"></span>
+        <span
+          style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
+          @click="showProvisionedCells = !showProvisionedCells"
+          >{{ showProvisionedCells ? "[Hide]" : "[Show]" }}
+        </span>
+      </div>
+      <div v-if="showProvisionedCells" style="margin-left: 140px; margin-right: 20px">
+        <InstalledCellCard
+          v-for="[roleName, cellInfo] in provisionedCells"
+          :key="roleName"
+          style="margin: 12px 0"
+          :cellInfo="cellInfo"
+          :roleName="roleName"
+          :holochainId="app.holochainId"
         >
-          <td>
-            <span
-              >{{ cellData.role_id.slice(0, 20)
-              }}{{ cellData.role_id.length > 20 ? "..." : "" }}</span
-            >
-          </td>
-          <td>
-            <span
-              style="opacity: 0.7; font-family: monospace; font-size: 14px"
-              >{{ serializeHash(cellData.cell_id[0]) }}</span
-            >
-          </td>
-        </tr>
+        </InstalledCellCard>
+      </div>
 
-        <br />
-        <tr v-if="clonedCells.length > 0">
-          <th>Cloned Cells</th>
-          <th></th>
-        </tr>
+      <!-- cloned cells -->
+      <div
+        class="row"
+        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+      >
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >Cloned Cells:</span
+        ><span style="display: flex; flex: 1"></span>
+        <span
+          style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
+          @click="showClonedCells = !showClonedCells"
+          >{{ showClonedCells ? "[Hide]" : "[Show]" }}
+        </span>
+      </div>
+      <div
+        v-if="showClonedCells"
+        style="margin-left: 140px; margin-right: 20px"
+      >
+        <div v-if="clonedCells.length > 0">
+          <InstalledCellCard
+            v-for="[roleName, cellInfo] in clonedCells"
+            :key="roleName"
+            style="margin: 12px 0"
+            :cellInfo="cellInfo"
+            :roleName="roleName"
+            :holochainId="app.holochainId"
+          >
+          </InstalledCellCard>
+        </div>
 
-        <tr
-          style=""
-          v-for="cellData in clonedCells"
-          :key="[...cellData.cell_id[0], ...cellData.cell_id[1]]"
-        >
-          <td>
-            <span
-              >{{ cellData.role_id.slice(0, 20)
-              }}{{ cellData.role_id.length > 20 ? "..." : "" }}</span
-            >
-          </td>
-          <td>
-            <span
-              style="opacity: 0.7; font-family: monospace; font-size: 14px"
-              >{{ serializeHash(cellData.cell_id[0]) }}</span
-            >
-          </td>
-        </tr>
-      </table>
-
+        <div v-else style="text-align: center; opacity: 0.7">
+          There are no cloned cells in this app.
+        </div>
+      </div>
       <span
         v-if="getReason(app.webAppInfo.installed_app_info)"
         style="margin-top: 16px; margin-left: 140px"
@@ -266,8 +278,10 @@
 import { defineComponent, PropType } from "vue";
 import { HolochainAppInfo } from "../types";
 import { serializeHash } from "@holochain-open-dev/utils";
-import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
+import { isAppRunning, isAppDisabled, isAppPaused, getReason, flattenCells, getCellId } from "../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
+import { AppWebsocket, CellInfo, DnaHash, NetworkInfo } from "@holochain/client";
+import prettyBytes from "pretty-bytes";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
@@ -278,6 +292,7 @@ import ToggleSwitch from "./subcomponents/ToggleSwitch.vue";
 import HCButton from "./subcomponents/HCButton.vue";
 import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
+import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
 
 export default defineComponent({
   name: "InstalledAppCard",
@@ -287,6 +302,7 @@ export default defineComponent({
     HCMoreToggle,
     HCGenericDialog,
     HoloIdenticon,
+    InstalledCellCard,
   },
   props: {
     appIcon: {
@@ -301,22 +317,34 @@ export default defineComponent({
     showMore: boolean;
     showUninstallDialog: boolean;
     showPubKeyTooltip: boolean;
+    gossipInfo: Record<string, NetworkInfo>;
+    showProvisionedCells: boolean;
+    showClonedCells: boolean;
   } {
     return {
       showMore: false,
       showUninstallDialog: false,
       showPubKeyTooltip: false,
+      gossipInfo: {},
+      showProvisionedCells: true,
+      showClonedCells: true,
     };
   },
   emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp"],
   computed: {
-    mainCells() {
-      const allCells = this.app.webAppInfo.installed_app_info.cell_data;
-      return allCells.filter((cell) => !cell.role_id.includes("."));
+    provisionedCells(): [string, CellInfo][] {
+      const provisionedCells = flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
+        .filter(([_roleName, cellInfo]) => "Provisioned" in cellInfo)
+        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
+      return provisionedCells
     },
-    clonedCells() {
-      const allCells = this.app.webAppInfo.installed_app_info.cell_data;
-      return allCells.filter((cell) => cell.role_id.includes("."));
+    clonedCells(): [string, CellInfo][] {
+      return flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
+        .filter(([_roleName, cellInfo]) => "Cloned" in cellInfo)
+        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
+    },
+    isSliderOn() {
+      return isAppRunning(this.app.webAppInfo.installed_app_info);
     },
   },
   methods: {
@@ -326,6 +354,7 @@ export default defineComponent({
     isAppDisabled,
     isAppPaused,
     writeText,
+    getCellId,
     isAppHeadless(app: HolochainAppInfo) {
       return app.webAppInfo.web_ui_info.type === "Headless";
     },
@@ -377,12 +406,22 @@ export default defineComponent({
     },
     copyPubKey() {
       const pubKey =
-        this.app.webAppInfo.installed_app_info.cell_data[0].cell_id[1];
-      this.writeText(serializeHash(pubKey));
+        this.getPubKey();
+      this.writeText(serializeHash(new Uint8Array(pubKey)));
       this.showPubKeyTooltip = true;
       setTimeout(() => {
         this.showPubKeyTooltip = false;
       }, 1200);
+    },
+    getPubKey() {
+      const cell = Object.values(this.app.webAppInfo.installed_app_info.cell_info)[0]
+        .find((c) => "Provisioned" in c);
+
+      if (!cell || !("Provisioned" in cell)) {
+        throw new Error("no provisioned cell found");
+      }
+
+      return cell.Provisioned.cell_id[1];
     },
   },
 });

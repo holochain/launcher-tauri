@@ -1,11 +1,12 @@
-import { HdkVersion } from "@/hdk";
+import { HdkVersion } from "../hdk";
 import {
   AppWebsocket,
   EntryHash,
-  HeaderHash as ActionHash,
-  InstalledAppInfo,
+  ActionHash,
+  AppInfo,
 } from "@holochain/client";
 import { Happ, HappRelease } from "./types";
+import { getCellId } from "../utils";
 
 // corresponds to https://docs.rs/hc_crud_ceps/0.55.0/hc_crud/struct.Entity.html
 export interface Entity<T> {
@@ -49,17 +50,18 @@ export function filterByHdkVersion(
 
 export async function getAllPublishedApps(
   appWebsocket: AppWebsocket,
-  devhubHapp: InstalledAppInfo
+  devhubHapp: AppInfo
 ): Promise<Array<AppWithReleases>> {
   const cells = devhubCells(devhubHapp);
   const allAppsOutput = await appWebsocket.callZome({
     cap_secret: null,
-    cell_id: cells.happs.cell_id,
+    cell_id: getCellId(cells.happs.find((c) => "Provisioned" in c )!)!,
     fn_name: "get_happs_by_tags",
     zome_name: "happ_library",
     payload: ["app-store-ready"],
-    provenance: cells.happs.cell_id[1],
+    provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
   });
+  console.log("@getAllPublishedApps: ", allAppsOutput);
   const allApps: Array<ContentAddress<Happ>> = allAppsOutput.payload;
   const promises = allApps.map((app) =>
     getAppsReleases(appWebsocket, devhubHapp, app)
@@ -70,21 +72,23 @@ export async function getAllPublishedApps(
 
 export async function getAppsReleases(
   appWebsocket: AppWebsocket,
-  devhubHapp: InstalledAppInfo,
+  devhubHapp: AppInfo,
   app: ContentAddress<Happ>
 ): Promise<AppWithReleases> {
   const cells = devhubCells(devhubHapp);
 
   const appReleasesOutput = await appWebsocket.callZome({
     cap_secret: null,
-    cell_id: cells.happs.cell_id,
+    cell_id: getCellId(cells.happs.find((c) => "Provisioned" in c )!)!,
     fn_name: "get_happ_releases",
     zome_name: "happ_library",
     payload: {
       for_happ: app.id,
     },
-    provenance: cells.happs.cell_id[1],
+    provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
   });
+
+  console.log("@getAppsReleases: appReleasesOutput:", appReleasesOutput);
 
   const allReleases: Array<Entity<HappRelease>> = appReleasesOutput.payload;
 
@@ -98,8 +102,11 @@ export async function getAppsReleases(
     }
   );
 
+  console.log("@getAppsReleases: releases: ", releases);
+
   const filteredReleases = releases.filter((r) => !!r.content.gui);
 
+  console.log("@getAppsReleases: filteredReleases: ", filteredReleases);
   return {
     app,
     releases: filteredReleases,
@@ -118,7 +125,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(() => r(null), ms));
 
 export async function fetchWebHapp(
   appWebsocket: AppWebsocket,
-  devhubHapp: InstalledAppInfo,
+  devhubHapp: AppInfo,
   name: string,
   happReleaseEntryHash: EntryHash,
   retryCount = 3
@@ -127,14 +134,14 @@ export async function fetchWebHapp(
 
   const result = await appWebsocket.callZome({
     cap_secret: null,
-    cell_id: cells.happs.cell_id,
+    cell_id: getCellId(cells.happs.find((c) => "Provisioned" in c )!)!,
     fn_name: "get_webhapp_package",
     zome_name: "happ_library",
     payload: {
       name,
       id: happReleaseEntryHash,
     },
-    provenance: cells.happs.cell_id[1],
+    provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
   });
 
   if (result.payload.error) {
@@ -155,12 +162,10 @@ export async function fetchWebHapp(
   return result.payload;
 }
 
-function devhubCells(devhubHapp: InstalledAppInfo) {
-  const happs = devhubHapp.cell_data.find((c) => c.role_id === "happs");
-  const dnarepo = devhubHapp.cell_data.find((c) => c.role_id === "dnarepo");
-  const webassets = devhubHapp.cell_data.find(
-    (c) => c.role_id === "web_assets"
-  );
+function devhubCells(devhubHapp: AppInfo) {
+  const happs = devhubHapp.cell_info["happs"];
+  const dnarepo = devhubHapp.cell_info["dnarepo"];
+  const webassets = devhubHapp.cell_info["web_assets"];
 
   if (!happs || !dnarepo || !webassets) throw new Error("Bad app info");
 

@@ -1,7 +1,7 @@
 import {
   AgentPubKey,
   AppRoleManifest,
-  InstalledAppInfo,
+  AppInfo,
 } from "@holochain/client";
 
 export interface WebAppInfo {
@@ -40,6 +40,7 @@ export type HolochainId =
     }
   | {
       type: "CustomBinary";
+      content: undefined;
     };
 
 export type LaunchTauriSidecarError =
@@ -117,7 +118,7 @@ export type WebUiInfo =
     };
 
 export interface InstalledWebAppInfo {
-  installed_app_info: InstalledAppInfo;
+  installed_app_info: AppInfo;
   web_ui_info: WebUiInfo;
 }
 
@@ -126,3 +127,19 @@ export interface HolochainAppInfo {
   holochainId: HolochainId;
   holochainVersion: HolochainVersion;
 }
+
+export interface GossipProgress {
+  expectedBytes: number;
+  actualBytes: number;
+}
+
+export interface StorageInfo {
+  uis: number;
+  authored: number;
+  cached: number;
+  conductor: number;
+  dht: number;
+  p2p: number;
+  wasm: number;
+}
+

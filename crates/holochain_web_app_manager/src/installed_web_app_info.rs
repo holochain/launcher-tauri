@@ -1,4 +1,4 @@
-use holochain_manager::versions::holochain_conductor_api_latest::InstalledAppInfo;
+use holochain_manager::versions::holochain_conductor_api_latest::AppInfo;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -14,6 +14,6 @@ pub enum WebUiInfo {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct InstalledWebAppInfo {
-  pub installed_app_info: InstalledAppInfo,
+  pub installed_app_info: AppInfo,
   pub web_ui_info: WebUiInfo,
 }

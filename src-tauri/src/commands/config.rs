@@ -1,16 +1,10 @@
-use tauri::{api::process::kill_children, Manager};
+use tauri::Manager;
+use crate::launcher::{config::LauncherConfig, error::LauncherError};
 
-use crate::{
-  launcher::{
-    config::LauncherConfig, error::LauncherError, manager::LauncherManager, state::LauncherState,
-  },
-  running_state::RunningState,
-};
 
 #[tauri::command]
 pub async fn write_config(
   window: tauri::Window,
-  state: tauri::State<'_, LauncherState>,
   app_handle: tauri::AppHandle,
   config: LauncherConfig,
 ) -> Result<(), LauncherError> {
@@ -31,13 +25,7 @@ pub async fn write_config(
     }
   }
 
-  kill_children();
-
-  let manager = LauncherManager::launch(app_handle).await?;
-
-  let mut m = state.lock().await;
-
-  (*m) = RunningState::Running(manager);
+  app_handle.restart();
 
   Ok(())
 }

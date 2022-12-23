@@ -58,21 +58,22 @@ When you are on the `Installed Apps` section, click `Install New App`. This will
 
 Requirements:
 
-- On the zome side, target one of the HDK versions supported by the launcher. 
+- On the zome side, target one of the HDK versions supported by the launcher.
   - Find out which versions are supported in https://github.com/holochain/launcher/releases.
-- On the UI side, target `@holochain/client v0.3.2` (v0.2.x is not going to work).
 
-When your UI is served from the launcher and `AppWebsocket.connect()` or `AdminWebsocket.connect()` are called, the call will be redirected to the actual port in which Holochain is running its interfaces. Also, when the `appWebsocket.appInfo({ installed_app_info: <APP_ID> })` is called, the `APP_ID` parameter is going to be replaced with the actual application ID that is installed in the Launcher.
+The easiest way to create a Holochain web-app is to use holochain's [scaffolding tool](https://docs.rs/holochain_scaffolding_cli/latest/holochain_scaffolding_cli/). If you develop in [nix-shell](https://developer.holochain.org/install/), `hc scaffold` will be readily available to you to call in the command line.
+
+When your UI is served from the launcher and `AppWebsocket.connect()` or `AdminWebsocket.connect()` are called, the call will be redirected to the actual port in which Holochain is running its interfaces. Also, when the `appWebsocket.getAppInfo({ app_id: <APP_ID> })` is called, the `APP_ID` parameter is going to be replaced with the actual application ID that is installed in the Launcher.
 
 For now, the UI still has access to the admin interface, but its usage is discouraged as newer versions of the launcher will block any admin requests not coming from the Holochain Admin UI itself. There will be a call available in `AppWebsocket` that will prompt the user to do an action in the Holochain Admin UI, or similar (To Be Defined).
 
+If you used the scaffolding tool to create your hApp, packaging it for the launcher is as easy as running `npm run package` in the root directory of your project. Otherwise you need to:
 1. Package your happ into a `.happ` file, with `hc app pack`.
 2. Package your UI into a `.zip` file. IMPORTANT: this `.zip` is supposed to contain an `index.html` file in its root level.
 3. Create a Web-hApp manifest with `hc web-app init`.
 4. Set the corrrect locations for the UI `.zip` file and the `.happ` file.
 5. Package your Web-hApp with `hc web-app pack`, and publish it so that other users can download and install it.
 
-See [where](https://github.com/lightningrodlabs/where) for a complete working setup.
 
 ### Publishing a .webhapp to the DevHub
 
@@ -82,18 +83,18 @@ See [where](https://github.com/lightningrodlabs/where) for a complete working se
    - Also input the appropriate "Name" and "Description". These are the details that the participants will see when downloading your application. Make the description short, maybe one or two lines.
 3. Once you have created a new App, click "Upload new bundle".
 4. Set the appropriate "Name" for your release (e.g. v0.0.1). This is the version name that the participants will see when downloading your application.
-5. Select the `.webhapp` for your app and upload it.
-6. Select the HDK appropriate version which your app was compiled for.
-  - Make sure that this is the correct HDK, in the format "0.0.127".
-6. Click "Quick Create" first for each zome, and then for each DNA.
+5. Select the `.webhapp` for your app from the filesystem and upload it.
+6. Select the appropriate HDK version which your app was compiled for.
+  - Make sure that this is the correct HDK, in the format "0.0.163".
+6. Give names and version numbers to all the dna's and zomes click on the respective icon in the top right of them to confirm each.
 7. Click "Save".
-8.  Keep your Launcher open until another Launcher (in another computer) can install the app.
+8.  Keep your Launcher open until another Launcher (on another computer) can install the app.
   - This may take a while (in the order of many minutes). In the future it won't be necessary.
   - This step is necessary for the happ files to sync with other peers in the DHT.
+9. If you get stuck at any point, don't hesitate to ask for help on Holochain's Discord server. You should find an invite link to it on https://developer.holochain.org/.
 
 ## Known issues
 
-- Encryption at rest is not supported yet. It will be enabled when the upstream `rusqlite` crate creates the next release, introducing the option of statically bundling `sqlcipher` in MacOs and in Windows.
 - Only MacOs v10.13 and after are supported at this moment.
 
 ## Data storage

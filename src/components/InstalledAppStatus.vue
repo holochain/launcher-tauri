@@ -16,13 +16,13 @@ import { isAppRunning, isAppDisabled, isAppPaused } from "../utils";
 import { deserializeHash, serializeHash } from "@holochain-open-dev/utils";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import "@shoelace-style/shoelace/dist/components/badge/badge.js";
-import { InstalledAppInfo } from "@holochain/client";
+import { AppInfo } from "@holochain/client";
 
 export default defineComponent({
   name: "InstalledAppStatus",
   props: {
     installedAppInfo: {
-      type: Object as PropType<InstalledAppInfo>,
+      type: Object as PropType<AppInfo>,
       required: true,
     },
   },

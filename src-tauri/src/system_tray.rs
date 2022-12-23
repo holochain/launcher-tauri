@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use holochain_manager::versions::{
-  holochain_conductor_api_latest::InstalledAppInfoStatus, HolochainVersion,
+  holochain_conductor_api_latest::AppInfoStatus, HolochainVersion,
 };
 use holochain_web_app_manager::installed_web_app_info::{InstalledWebAppInfo, WebUiInfo};
 use tauri::{
@@ -85,7 +85,7 @@ pub fn update_system_tray(
 
   for (version, installed_apps) in &all_installed_apps.by_version {
     for app in installed_apps {
-      if let InstalledAppInfoStatus::Running = app.installed_app_info.status {
+      if let AppInfoStatus::Running = app.installed_app_info.status {
         if let WebUiInfo::WebApp { .. } = app.web_ui_info {
           let app_id = app.installed_app_info.installed_app_id.clone();
 
@@ -104,7 +104,7 @@ pub fn update_system_tray(
 
   if let Some(custom_binary_apps) = &all_installed_apps.custom_binary {
     for app in custom_binary_apps {
-      if let InstalledAppInfoStatus::Running = app.installed_app_info.status {
+      if let AppInfoStatus::Running = app.installed_app_info.status {
         if let WebUiInfo::WebApp { .. } = app.web_ui_info {
           let app_id = app.installed_app_info.installed_app_id.clone();
 

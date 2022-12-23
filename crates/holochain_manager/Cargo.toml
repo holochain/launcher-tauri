@@ -6,23 +6,17 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# NEW_VERSION pick right client version
 
-holochain_client = {package="holochain_client", version="0.2.0"}
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="808993ce7c54794f4b7163aa06a288bebba4b8b3"}
 
 
-# NEW_VERSION add latest crates here
-holochain_conductor_api_0_0_162 = {package = "holochain_conductor_api", version = "0.0.59"}
-holochain_p2p_0_0_162 = {package = "holochain_p2p", version = "0.0.56"}
-holochain_types_0_0_162 = {package = "holochain_types", version = "0.0.56"}
-# holochain_client_0_0_162 = {package = "holochain_client", git = "https://github.com/matthme/holochain-client-rust", rev = "8802433d97a2748fa8587c2215acd5d779e756cf"}
 
-holochain_conductor_api_0_0_165 = {package = "holochain_conductor_api", version = "0.0.62"}
-holochain_p2p_0_0_165 = {package = "holochain_p2p", version = "0.0.59"}
-holochain_types_0_0_165 = {package = "holochain_types", version = "0.0.59"}
+# NEW_VERSION add latest crates here # taken from commit instead this time
 
-holochain_conductor_api_0_0_169 = {package = "holochain_conductor_api", version = "0.0.66"}
-holochain_p2p_0_0_169 = {package = "holochain_p2p", version = "0.0.63"}
-holochain_types_0_0_169 = {package = "holochain_types", version = "0.0.63"}
+holochain_conductor_api_0_1_0BetaRc2 = { package = "holochain_conductor_api", version = "0.1.0-beta-rc.2"}
+holochain_p2p_0_1_0BetaRc2 = { package = "holochain_p2p", version = "0.1.0-beta-rc.1"}
+holochain_types_0_1_0BetaRc2 = { package = "holochain_types", version = "0.1.0-beta-rc.1"}
 
 
 mr_bundle = {package = "mr_bundle", version = "0.0.13"}
@@ -37,6 +31,6 @@ portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}
 serde-enum-str = "0.2"
 serde_yaml = "0.8"
-tauri = {version = "1.1.1", features = ["api-all", "system-tray", "native-tls-vendored", "reqwest-native-tls-vendored"]}
+tauri = {version = "1.2.1", features = ["api-all", "system-tray", "native-tls-vendored", "reqwest-native-tls-vendored"]}
 thiserror = "1.0.30"
 url2 = "0.0.6"
