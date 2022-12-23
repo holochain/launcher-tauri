@@ -132,6 +132,7 @@ fn main() {
         .inner_size(1200.0, 900.0)
         .resizable(true)
         .fullscreen(false)
+        .title("Holochain Launcher")
         .initialization_script("window.__HC_LAUNCHER_ENV__ = {}")
         .build()?;
 
