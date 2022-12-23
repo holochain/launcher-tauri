@@ -157,8 +157,9 @@ export default defineComponent({
     };
   },
   async mounted() {
-    this.bootUpSlogan =
-      bootUpSlogans[Math.floor(Math.random() * bootUpSlogans.length)];
+    // this.bootUpSlogan =
+    //   bootUpSlogans[Math.floor(Math.random() * bootUpSlogans.length)];
+    this.bootUpSlogan = "Starting up...";
 
     this.loadingState = undefined;
     await listen("progress-update", (event) => {

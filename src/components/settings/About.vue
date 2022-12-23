@@ -31,7 +31,7 @@
         >
           Holochain v{{ version }}
         </span>
-        <span style="margin-top: 8px"> Lair Keystore v0.2.2 </span>
+        <span style="margin-top: 8px"> Lair Keystore v0.2.3 </span>
       </div>
     </div>
   </HCDialogHeaded>
