@@ -136,7 +136,7 @@ export default defineComponent({
     getCellId,
     async getNetworkInfo() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000, undefined, true);
       const networkInfo: NetworkInfo[] = await appWs.networkInfo({
         dnas: [getCellId(this.cellInfo)![0]],
       });

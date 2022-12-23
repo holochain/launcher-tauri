@@ -184,7 +184,7 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket, NetworkInfo, InstalledCell, CellInfo, CellId } from "@holochain/client";
+import { AppWebsocket, NetworkInfo, CellInfo } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 
@@ -283,8 +283,8 @@ export default defineComponent({
     const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
 
     const port = this.$store.getters["appInterfacePort"](holochainId);
-
-    const appWs = await AppWebsocket.connect(`ws://localhost:${port}`);
+    console.log("### PORT: ", port);
+    const appWs = await AppWebsocket.connect(`ws://localhost:${port}`,undefined , undefined, true);
 
     const devhubInfo = await appWs.appInfo({
       installed_app_id: `DevHub-${holochainId.content}`,
@@ -316,6 +316,10 @@ export default defineComponent({
     );
     this.installableApps = filterByHdkVersion(hdk_versions, allApps);
 
+    console.log("ALL APPS: ", allApps);
+    console.log("FILTERED APPS: ", this.installableApps);
+    console.log("hdk versions: ", hdk_versions);
+
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
     await this.getNetworkState();
@@ -341,7 +345,7 @@ export default defineComponent({
       const holochainId = this.$store.getters["holochainIdForDevhub"];
 
       const port = this.$store.getters["appInterfacePort"](holochainId);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000, undefined, true);
       const devhubInfo = await appWs.appInfo({
         installed_app_id: `DevHub-${holochainId.content}`,
       });
@@ -392,7 +396,7 @@ export default defineComponent({
     },
     async getNetworkState() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000, undefined, true);
       const networkInfo: NetworkInfo[] = await appWs.networkInfo({
         dnas: this.provisionedCells!.filter(([roleName, cellInfo]) => !!cellInfo)
           .map(([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array),

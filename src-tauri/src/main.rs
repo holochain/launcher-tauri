@@ -18,6 +18,7 @@ use tauri::Manager;
 use tauri::RunEvent;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
+use tauri::window::WindowBuilder;
 
 mod commands;
 mod file_system;
@@ -115,13 +116,25 @@ fn main() {
         },
       };
 
-      println!("Custom path: {:?}", custom_path);
+      println!("Custom profile: {:?}", custom_path);
 
       app.manage(custom_path.clone());
 
       if let Err(err) = setup_logs(custom_path.custom_path.clone()) {
         println!("Error setting up the logs: {:?}", err);
       }
+
+      let _admin_window = WindowBuilder::new(
+        app,
+        "admin",
+        tauri::WindowUrl::App("index.html".into())
+      )
+        .inner_size(1200.0, 900.0)
+        .resizable(true)
+        .fullscreen(false)
+        .initialization_script("window.__HC_LAUNCHER_ENV__ = {}")
+        .build()?;
+
 
       let handle = app.handle().clone();
       let launcher_state =

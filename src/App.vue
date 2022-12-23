@@ -127,6 +127,8 @@ export default defineComponent({
     HCGenericDialog,
   },
   mounted() {
+    // define window.__HC_LAUNCHER_ENV__ so that js-client routes zome-call signing to tauri
+    (window as any).__HC_LAUNCHER_ENV__ = {};
     this.$nextTick(async () => {
       const restartDialog = this.$refs.restartDialog as typeof HCGenericDialog;
       await listen("request-restart", () => {

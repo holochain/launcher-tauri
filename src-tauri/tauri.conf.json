@@ -37,7 +37,7 @@
       ],
       "resources": [],
       "externalBin": [
-        "bins/holochain-v0.1.0-beta-rc.1",
+        "bins/holochain-v0.1.0-beta-rc.2",
         "bins/lair-keystore"
       ],
       "copyright": "",
@@ -61,16 +61,7 @@
     "allowlist": {
       "all": true
     },
-    "windows": [
-      {
-        "label": "admin",
-        "title": "Holochain Admin",
-        "width": 1200,
-        "height": 900,
-        "resizable": true,
-        "fullscreen": false
-      }
-    ],
+    "windows": [],
     "security": {
       "csp": null,
       "dangerousDisableAssetCspModification": true

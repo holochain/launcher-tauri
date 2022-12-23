@@ -61,6 +61,7 @@ export async function getAllPublishedApps(
     payload: ["app-store-ready"],
     provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
   });
+  console.log("@getAllPublishedApps: ", allAppsOutput);
   const allApps: Array<ContentAddress<Happ>> = allAppsOutput.payload;
   const promises = allApps.map((app) =>
     getAppsReleases(appWebsocket, devhubHapp, app)
@@ -87,6 +88,8 @@ export async function getAppsReleases(
     provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
   });
 
+  console.log("@getAppsReleases: appReleasesOutput:", appReleasesOutput);
+
   const allReleases: Array<Entity<HappRelease>> = appReleasesOutput.payload;
 
   const releases: Array<ContentAddress<HappRelease>> = allReleases.map(
@@ -99,8 +102,11 @@ export async function getAppsReleases(
     }
   );
 
+  console.log("@getAppsReleases: releases: ", releases);
+
   const filteredReleases = releases.filter((r) => !!r.content.gui);
 
+  console.log("@getAppsReleases: filteredReleases: ", filteredReleases);
   return {
     app,
     releases: filteredReleases,

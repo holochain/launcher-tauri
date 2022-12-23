@@ -8,6 +8,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { createStore } from "vuex";
 import { flatten, uniq } from "lodash-es";
 import { flattenCells, getCellId } from "../utils";
+import { stat } from "fs";
 
 export interface LauncherAdminState {
   launcherStateInfo: "loading" | LauncherStateInfo;
@@ -354,6 +355,8 @@ export const store = createStore<LauncherAdminState>({
     },
     appInterfacePort: (state) => (holochainId: HolochainId) => {
       const stateInfo = state.launcherStateInfo;
+      console.log("Holochain ID requesting launcher state: ", holochainId);
+      console.log("LAUNCHER STATE INFO: ", stateInfo);
 
       if (
         stateInfo === "loading" ||
