@@ -5,7 +5,7 @@ import {
   ActionHash,
   AppInfo,
 } from "@holochain/client";
-import { Happ, HappRelease } from "./types";
+import { HappEntry, HappReleaseEntry } from "./types";
 import { getCellId } from "../utils";
 
 // corresponds to https://docs.rs/hc_crud_ceps/0.55.0/hc_crud/struct.Entity.html
@@ -30,8 +30,8 @@ export interface ContentAddress<C> {
 }
 
 export interface AppWithReleases {
-  app: ContentAddress<Happ>;
-  releases: Array<ContentAddress<HappRelease>>;
+  app: ContentAddress<HappEntry>;
+  releases: Array<ContentAddress<HappReleaseEntry>>;
 }
 
 export function filterByHdkVersion(
@@ -48,7 +48,8 @@ export function filterByHdkVersion(
   return filteredReleases.filter((app) => app.releases.length > 0);
 }
 
-export async function getAllPublishedApps(
+// filtered by the supported hdk versions of that Launcher version
+export async function getAllAppsWithGui(
   appWebsocket: AppWebsocket,
   devhubHapp: AppInfo
 ): Promise<Array<AppWithReleases>> {
@@ -61,19 +62,19 @@ export async function getAllPublishedApps(
     payload: ["app-store-ready"],
     provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
   });
-  console.log("@getAllPublishedApps: ", allAppsOutput);
-  const allApps: Array<ContentAddress<Happ>> = allAppsOutput.payload;
+  console.log("@getAllAppsWithGui: ", allAppsOutput);
+  const allApps: Array<ContentAddress<HappEntry>> = allAppsOutput.payload;
   const promises = allApps.map((app) =>
-    getAppsReleases(appWebsocket, devhubHapp, app)
+    getAppsReleasesWithGui(appWebsocket, devhubHapp, app)
   );
 
   return Promise.all(promises);
 }
 
-export async function getAppsReleases(
+export async function getAppsReleasesWithGui(
   appWebsocket: AppWebsocket,
   devhubHapp: AppInfo,
-  app: ContentAddress<Happ>
+  app: ContentAddress<HappEntry>
 ): Promise<AppWithReleases> {
   const cells = devhubCells(devhubHapp);
 
@@ -90,9 +91,9 @@ export async function getAppsReleases(
 
   console.log("@getAppsReleases: appReleasesOutput:", appReleasesOutput);
 
-  const allReleases: Array<Entity<HappRelease>> = appReleasesOutput.payload;
+  const allReleases: Array<Entity<HappReleaseEntry>> = appReleasesOutput.payload;
 
-  const releases: Array<ContentAddress<HappRelease>> = allReleases.map(
+  const releases: Array<ContentAddress<HappReleaseEntry>> = allReleases.map(
     (entity) => {
       return {
         id: entity.id,
@@ -104,7 +105,7 @@ export async function getAppsReleases(
 
   console.log("@getAppsReleases: releases: ", releases);
 
-  const filteredReleases = releases.filter((r) => !!r.content.gui);
+  const filteredReleases = releases.filter((r) => !!r.content.official_gui);
 
   console.log("@getAppsReleases: filteredReleases: ", filteredReleases);
   return {
@@ -115,7 +116,7 @@ export async function getAppsReleases(
 
 export function getLatestRelease(
   apps: AppWithReleases
-): ContentAddress<HappRelease> {
+): ContentAddress<HappReleaseEntry> {
   return apps.releases.sort(
     (r1, r2) => r2.content.last_updated - r1.content.last_updated
   )[0];
@@ -128,6 +129,7 @@ export async function fetchWebHapp(
   devhubHapp: AppInfo,
   name: string,
   happReleaseEntryHash: EntryHash,
+  guiReleaseEntryHash: EntryHash,
   retryCount = 3
 ): Promise<Uint8Array> {
   const cells = devhubCells(devhubHapp);
@@ -139,7 +141,8 @@ export async function fetchWebHapp(
     zome_name: "happ_library",
     payload: {
       name,
-      id: happReleaseEntryHash,
+      happ_release_id: happReleaseEntryHash,
+      gui_release_id: guiReleaseEntryHash,
     },
     provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
   });
@@ -154,6 +157,7 @@ export async function fetchWebHapp(
         devhubHapp,
         name,
         happReleaseEntryHash,
+        guiReleaseEntryHash,
         retryCount - 1
       );
     }

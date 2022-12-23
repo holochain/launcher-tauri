@@ -193,7 +193,7 @@ import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 
 import {
   AppWithReleases,
-  getAllPublishedApps,
+  getAllAppsWithGui,
   filterByHdkVersion,
   getLatestRelease,
   fetchWebHapp,
@@ -303,7 +303,7 @@ export default defineComponent({
 
     let allApps: Array<AppWithReleases>;
     try {
-      allApps = await getAllPublishedApps(appWs, devhubInfo);
+      allApps = await getAllAppsWithGui(appWs, devhubInfo);
     } catch (e) {
       console.error(e);
       // Catch other errors than being offline
@@ -358,7 +358,8 @@ export default defineComponent({
           appWs,
           devhubInfo,
           app.app.content.title,
-          release.id
+          release.id,
+          release.content.official_gui!, // releases without official_gui have been filtered out earlier
         );
 
         this.selectedAppBundlePath = await invoke("save_app", {
@@ -373,6 +374,8 @@ export default defineComponent({
         });
       } catch (e) {
         console.log(e);
+        console.log((e as any).data);
+        console.log((e as any).data.data);
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
         this.downloadFailed = true;

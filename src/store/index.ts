@@ -355,8 +355,6 @@ export const store = createStore<LauncherAdminState>({
     },
     appInterfacePort: (state) => (holochainId: HolochainId) => {
       const stateInfo = state.launcherStateInfo;
-      console.log("Holochain ID requesting launcher state: ", holochainId);
-      console.log("LAUNCHER STATE INFO: ", stateInfo);
 
       if (
         stateInfo === "loading" ||
