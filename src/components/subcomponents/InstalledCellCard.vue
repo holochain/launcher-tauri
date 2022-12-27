@@ -54,11 +54,10 @@
             }`"
             title="max expected bytes | remaining expected bytes"
           >
-            <span :class="{ highlighted: maxExceeded }">
             {{ expectedIncoming && cachedMaxExpected ? prettyBytes(cachedMaxExpected - expectedIncoming) : "-" }}
-            | {{
-              cachedMaxExpected ? prettyBytes(cachedMaxExpected) : "-"
-            }}</span>
+            | <span :class="{ highlighted: maxExceeded }">
+            {{ cachedMaxExpected ? prettyBytes(cachedMaxExpected) : "-" }}
+            </span>
           </div>
         </div>
       </div>

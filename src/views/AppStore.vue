@@ -152,10 +152,10 @@
             }`"
             title="max expected bytes | remaining expected bytes"
           >
-            <span :class="{ highglightedText: maxExceeded[idx] }">{{
-              prettyBytesLocal(cachedMaxExpected[idx])
-            }}</span>
-            | {{ prettyBytesLocal(networkStates[idx]) }}
+            {{ prettyBytesLocal(byteDiff(idx)) }}
+            | <span :class="{ highglightedText: maxExceeded[idx] }">
+            {{ prettyBytesLocal(cachedMaxExpected[idx]) }}
+            </span>
           </div>
         </div>
       </div>
@@ -232,7 +232,7 @@ export default defineComponent({
     provisionedCells: [string, CellInfo | undefined][] | undefined;
     networkStates: (number | undefined)[];
     cachedMaxExpected: (number | undefined)[];
-    latestGossipUpdates: number[]; // timestamps of the latest non-zero gossipInfo update
+    latestNetworkUpdates: number[]; // timestamps of the latest non-zero gossipInfo update
     idleStates: boolean[];
     maxExceeded: boolean[];
     showProgressIndicator: boolean;
@@ -251,7 +251,7 @@ export default defineComponent({
       provisionedCells: undefined,
       networkStates: [undefined, undefined, undefined],
       cachedMaxExpected: [undefined, undefined, undefined],
-      latestGossipUpdates: [0, 0, 0],
+      latestNetworkUpdates: [0, 0, 0],
       idleStates: [true, true, true],
       maxExceeded: [false, false, false],
       showProgressIndicator: false,
@@ -411,9 +411,7 @@ export default defineComponent({
 
         // In case expected incoming bytes are 0, keep the chached values, otherwise update
         // expectedIncoming
-        if (expectedIncoming != 0) {
-          this.idleStates[idx] = false;
-          this.latestGossipUpdates[idx] = Date.now();
+        if (expectedIncoming && expectedIncoming != 0) {
           // if the expected incoming bytes are larger then the max cached value or there
           // is no cached max value, replace it
           const currentMax = this.cachedMaxExpected[idx];
@@ -422,30 +420,37 @@ export default defineComponent({
             this.maxExceeded[idx] = true;
             setTimeout(() => (this.maxExceeded[idx] = false), 500);
           }
+
+          if (expectedIncoming != this.networkStates[idx]) {
+            this.idleStates[idx] = false;
+            this.latestNetworkUpdates[idx] = Date.now();
+          }
           // make this call after setting max cached value to ensure it is always <= to it
           this.networkStates[idx] = expectedIncoming;
         }
 
-        // If expected incoming is zero, set the progress bar to idle state
-        if (expectedIncoming == 0) {
-          this.idleStates[idx] = true;
+        // if expected incoming remains the same for > 10 seconds, set to idle. Except expectedIncoming
+        // is below 16MB, in this case transmission may already be finished.
+        if (new Date().getTime() - this.latestNetworkUpdates[idx] > 10000) {
+          if (this.networkStates[idx]) {
+            if (this.networkStates[idx]! > 16000000) {
+              this.idleStates[idx] = false
+            }
+          } else {
+            this.idleStates[idx] = true;
+          }
         }
 
-        // if latest non-zero update to gossip progress is older than 30 seconds, set expected incoming
+
+        // if latest non-zero update to gossip progress is older than 80 seconds, set expected incoming
         // and max cached expected incoming to undefined again
-        if (new Date().getTime() - this.latestGossipUpdates[idx] > 30000) {
+        if (new Date().getTime() - this.latestNetworkUpdates[idx] > 80000) {
           this.networkStates[idx] = undefined;
           this.cachedMaxExpected[idx] = undefined;
         }
       });
 
-      // if latest updates to gossip progress are older than 30 seconds, set them to undefined again
-      this.latestGossipUpdates.forEach((latest, idx) => {
-        if (Date.now() - latest > 30000) {
-          this.networkStates[idx] = undefined;
-          this.cachedMaxExpected[idx] = undefined;
-        }
-      });
+
     },
     progressRatio(idx: number) {
       if (this.networkStates[idx] && this.cachedMaxExpected[idx]) {
@@ -461,6 +466,17 @@ export default defineComponent({
         return prettyBytes(input);
       } else {
         return "-";
+      }
+    },
+    byteDiff(idx: number) {
+      const cachedMax = this.cachedMaxExpected[idx] ? this.cachedMaxExpected[idx] : 0;
+      const currentExpected = this.networkStates[idx] ? this.networkStates[idx] : 0;
+      const diff = cachedMax! - currentExpected!;
+
+      if (diff < 0) {
+        return 0;
+      } else {
+        return diff;
       }
     },
     closeNote() {
