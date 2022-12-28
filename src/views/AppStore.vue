@@ -81,7 +81,7 @@
       <span>{{ $t("appStore.noAppsInStore") }}</span>
       <span style="margin-top: 8px"
         ><span
-          style="cursor: pointer; text-decoration: underline"
+          style="cursor: pointer; text-decoration: underline;"
           title="https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub"
           @click="howToPublish()"
           @keydown.enter="howToPublish()"
@@ -90,6 +90,12 @@
         >
         {{ $t("appStore.readThisToPublish") }}</span
       >
+      <HCButton
+        outlined
+        @click="fetchApps()"
+        class="refresh-button"
+        >{{ $t("main.refresh") }}
+      </HCButton>
     </div>
 
     <div v-else class="row" style="flex-wrap: wrap; margin: 16px">
@@ -279,49 +285,7 @@ export default defineComponent({
       window.localStorage.setItem("appLibraryWarningShown", "true");
     }
 
-
-    const holochainId = this.$store.getters["holochainIdForDevhub"];
-    this.holochainId = holochainId;
-
-    const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
-
-    const port = this.$store.getters["appInterfacePort"](holochainId);
-    console.log("### PORT: ", port);
-    const appWs = await AppWebsocket.connect(`ws://localhost:${port}`,undefined , undefined, true);
-
-    const devhubInfo = await appWs.appInfo({
-      installed_app_id: `DevHub-${holochainId.content}-TEST-NETWORK`,
-    });
-
-
-    const allCells = devhubInfo.cell_info;
-    const provisionedCells: [string, CellInfo | undefined][] = Object.entries(allCells).map(([roleName, cellInfos]) => {
-      return [roleName, cellInfos.find((cellInfo) => "Provisioned" in cellInfo)]
-    });
-
-    this.provisionedCells = provisionedCells.sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => {
-      return roleName_a.localeCompare(roleName_b);
-    });
-
-
-    let allApps: Array<AppWithReleases>;
-    try {
-      allApps = await getAllAppsWithGui(appWs, devhubInfo);
-    } catch (e) {
-      console.error(e);
-      // Catch other errors than being offline
-      allApps = [];
-    }
-
-    const { hdk_versions }: { hdk_versions: HdkVersion[] } = await invoke(
-      "get_supported_versions",
-      {}
-    );
-    this.installableApps = filterByHdkVersion(hdk_versions, allApps);
-
-    console.log("ALL APPS: ", allApps);
-    console.log("FILTERED APPS: ", this.installableApps);
-    console.log("hdk versions: ", hdk_versions);
+    await this.fetchApps();
 
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
@@ -330,10 +294,56 @@ export default defineComponent({
       async () => await this.getNetworkState(),
       2000
     );
-
-    this.loading = false;
   },
   methods: {
+    async fetchApps() {
+      this.loading = true;
+
+      const holochainId = this.$store.getters["holochainIdForDevhub"];
+      this.holochainId = holochainId;
+
+      const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
+
+      const port = this.$store.getters["appInterfacePort"](holochainId);
+      console.log("### PORT: ", port);
+      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`,undefined , undefined, true);
+
+      const devhubInfo = await appWs.appInfo({
+        installed_app_id: `DevHub-${holochainId.content}-TEST-NETWORK`,
+      });
+
+
+      const allCells = devhubInfo.cell_info;
+      const provisionedCells: [string, CellInfo | undefined][] = Object.entries(allCells).map(([roleName, cellInfos]) => {
+        return [roleName, cellInfos.find((cellInfo) => "Provisioned" in cellInfo)]
+      });
+
+      this.provisionedCells = provisionedCells.sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => {
+        return roleName_a.localeCompare(roleName_b);
+      });
+
+
+      let allApps: Array<AppWithReleases>;
+      try {
+        allApps = await getAllAppsWithGui(appWs, devhubInfo);
+      } catch (e) {
+        console.error(e);
+        // Catch other errors than being offline
+        allApps = [];
+      }
+
+      const { hdk_versions }: { hdk_versions: HdkVersion[] } = await invoke(
+        "get_supported_versions",
+        {}
+      );
+      this.installableApps = filterByHdkVersion(hdk_versions, allApps);
+
+      this.loading = false;
+
+      console.log("ALL APPS: ", allApps);
+      console.log("FILTERED APPS: ", this.installableApps);
+      console.log("hdk versions: ", hdk_versions);
+    },
     async howToPublish() {
       await invoke("open_url_cmd", {
         url: this.howToPublishUrl,
@@ -540,6 +550,19 @@ export default defineComponent({
 .highglightedText {
   font-weight: bold;
   color: #482edf;
+}
+
+.refresh-button {
+  height: 30px;
+  border-radius: 8px;
+  padding: 0 15px;
+  --hc-primary-color: #2c3e50;
+  opacity: 0.75;
+  margin-top: 30px;
+}
+
+.refresh-button:hover {
+  opacity: 1;
 }
 
 @keyframes bordercolorchange {
