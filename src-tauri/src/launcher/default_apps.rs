@@ -19,11 +19,12 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
     // let version: String = manager.holochain_manager.version.manager().hdi_version().into();
     let version: String = manager.holochain_manager.version.into();
 
-    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { None };
+    // let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { None };
+    let network_seed = Some(String::from("test-network"));
 
     manager
       .install_web_app(
-        format!("DevHub-{}", version),
+        format!("DevHub-{}-TEST-NETWORK", version),
         dev_hub_bundle,
         network_seed,
         HashMap::new(),

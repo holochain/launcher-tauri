@@ -57,11 +57,11 @@ pub fn generate_window(
                 let mutable_response = response.body_mut();
                 *mutable_response = asset;
                 response.set_mimetype(mime_type.clone());
-                println!("\nRequested file: {}", asset_file);
-                println!("Detected mime type: {:?}\n", mime_type);
+                // println!("\nRequested file: {}", asset_file);
+                // println!("Detected mime type: {:?}\n", mime_type);
               },
               Err(e) => {
-                println!("### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
+                // println!("### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.", asset_path, e);
                 let mutable_response = response.body_mut();
                 match read(index_path.clone()) {
                   Ok(index_html) =>  {
@@ -69,7 +69,7 @@ pub fn generate_window(
                     response.set_mimetype(Some(String::from("text/html")));
                   },
                   Err(e) => {
-                    println!("### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+                    // println!("### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
                   },
                 }
               },

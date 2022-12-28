@@ -407,27 +407,6 @@ impl LauncherManager {
     let assets_path = manager.get_app_ui_path(app_id);
     let local_storage_path = manager.get_app_local_storage_path(app_id);
 
-    // println!("local_storage_path: {:?}", local_storage_path);
-
-    // let contents = std::fs::read_dir(local_storage_path.clone()).unwrap().last().unwrap().unwrap();
-
-    // println!("Contents of directory: {:?}", contents);
-    // println!("filename: {:?}", contents.file_name());
-    // println!("filetype: {:?}", contents.file_type());
-
-
-    log::error!("Testing app_interface_port...");
-    let test_port = manager.holochain_manager.app_interface_port();
-
-    println!("Test app interface port: {}", test_port);
-
-    log::error!("Testing app_interface_port...");
-    let test_port = manager.holochain_manager.admin_interface_port();
-
-    println!("Test admin interface port: {}", test_port);
-
-    // println!("%*%*%*% INDEX PATH: {:?}", index_path);
-
     let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
       "APP_INTERFACE_PORT": {},
       "ADMIN_INTERFACE_PORT": {},
@@ -456,8 +435,8 @@ impl LauncherManager {
               response.set_mimetype(Some(String::from("text/html")));
             }, // TODO! Check if there are better ways of dealing with errors here
             Err(e) => {
-              println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
-              log::error!("Error reading the path of the UI's index.html: {:?}", e);
+              // println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+              // log::error!("Error reading the path of the UI's index.html: {:?}", e);
             },
           }
         },
@@ -477,7 +456,7 @@ impl LauncherManager {
               Some(mime) => Some(mime.essence_str().to_string()),
               None => {
                 log::info!("Could not determine MIME Type of file '{:?}'", asset_file);
-                println!("\n### ERROR ### Could not determine MIME Type of file '{:?}'\n", asset_file);
+                // println!("\n### ERROR ### Could not determine MIME Type of file '{:?}'\n", asset_file);
                 None
               }
             };
@@ -493,11 +472,11 @@ impl LauncherManager {
                 let mutable_response = response.body_mut();
                 *mutable_response = asset;
                 response.set_mimetype(mime_type.clone());
-                println!("\nRequested file: {}", asset_file);
-                println!("Detected mime type: {:?}\n", mime_type);
+                // println!("\nRequested file: {}", asset_file);
+                // println!("Detected mime type: {:?}\n", mime_type);
               },
               Err(e) => {
-                println!("\n### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.\n", asset_path, e);
+                // println!("\n### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.\n", asset_path, e);
                 let mutable_response = response.body_mut();
                 match read(index_path.clone()) {
                   Ok(index_html) =>  {
@@ -505,8 +484,8 @@ impl LauncherManager {
                     response.set_mimetype(Some(String::from("text/html")));
                   },
                   Err(e) => {
-                    println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
-                    log::error!("Error reading the path of the UI's index.html: {:?}", e);
+                    // println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+                    // log::error!("Error reading the path of the UI's index.html: {:?}", e);
                   },
                 }
               },
