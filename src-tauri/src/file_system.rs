@@ -68,6 +68,13 @@ fn tauri_data_path() -> PathBuf {
   data_dir().expect("Could not get config dir")
 }
 
+pub fn root_tauri_data_path(custom_path: Option<String>) -> PathBuf {
+  match custom_path {
+    Some(p) => custom_root_path(p).join(component_name("holochain")).join("tauri"),
+    None => tauri_data_path().join(component_name("holochain")).join("tauri")
+  }
+}
+
 pub fn root_holochain_data_path(custom_path: Option<String>) -> PathBuf {
   match custom_path {
     Some(p) => custom_root_path(p).join(component_name("holochain")),

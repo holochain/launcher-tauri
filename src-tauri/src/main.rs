@@ -2,7 +2,7 @@
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
-use file_system::root_holochain_data_path;
+use file_system::{root_holochain_data_path, root_tauri_data_path};
 use futures::lock::Mutex;
 use launcher::error::LauncherError;
 use running_state::RunningState;
@@ -116,7 +116,11 @@ fn main() {
         },
       };
 
+
+
       println!("Custom profile: {:?}", custom_path);
+
+      let local_storage_path = root_tauri_data_path(custom_path.custom_path.clone());
 
       app.manage(custom_path.clone());
 
@@ -130,6 +134,7 @@ fn main() {
         tauri::WindowUrl::App("index.html".into())
       )
         .inner_size(1200.0, 900.0)
+        .data_directory(local_storage_path)
         .resizable(true)
         .fullscreen(false)
         .title("Holochain Launcher")
