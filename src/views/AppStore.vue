@@ -107,7 +107,7 @@
   <div class="progress-indicator" :class="{ highlighted: downloadFailed }">
     <div
       style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
-      title="Full Synchronization with Peers Required to Reliably Download all Apps."
+      title="Full synchronization with peers required to reliably download all apps."
     >
       App Library Synchronization:
     </div>
@@ -150,7 +150,7 @@
             :style="`width: 30%; text-align: center; ${
               idleStates[idx] ? 'opacity: 0.7;' : ''
             }`"
-            title="max expected bytes | remaining expected bytes"
+            title="received bytes | expected bytes"
           >
             {{ prettyBytesLocal(byteDiff(idx)) }}
             | <span :class="{ highglightedText: maxExceeded[idx] }">
@@ -171,10 +171,11 @@
       $emit('go-back');
     "
     @closing-dialog="installClosed()"
+    @error="(e) => showError(e)"
     ref="install-app-dialog"
   ></InstallAppDialog>
   <HCSnackbar
-    labelText="App Library Synchronization not Complete. Please try again later."
+    :labelText="errorText"
     ref="snackbar"
   ></HCSnackbar>
 </template>
@@ -237,6 +238,7 @@ export default defineComponent({
     maxExceeded: boolean[];
     showProgressIndicator: boolean;
     downloadFailed: boolean;
+    errorText: string;
   } {
     return {
       loadingText: "",
@@ -256,6 +258,7 @@ export default defineComponent({
       maxExceeded: [false, false, false],
       showProgressIndicator: false,
       downloadFailed: false,
+      errorText: "Unknown error occured.",
     };
   },
   // created() {
@@ -287,7 +290,7 @@ export default defineComponent({
     const appWs = await AppWebsocket.connect(`ws://localhost:${port}`,undefined , undefined, true);
 
     const devhubInfo = await appWs.appInfo({
-      installed_app_id: `DevHub-${holochainId.content}`,
+      installed_app_id: `DevHub-${holochainId.content}-TEST-NETWORK`,
     });
 
 
@@ -347,39 +350,55 @@ export default defineComponent({
       const port = this.$store.getters["appInterfacePort"](holochainId);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000, undefined, true);
       const devhubInfo = await appWs.appInfo({
-        installed_app_id: `DevHub-${holochainId.content}`,
+        installed_app_id: `DevHub-${holochainId.content}-TEST-NETWORK`,
       });
 
       this.loadingText = "Downloading...";
 
+      let bytes = undefined;
+
       try {
-        console.log("Release: ", release);
-        const bytes = await fetchWebHapp(
+        bytes = await fetchWebHapp(
           appWs,
           devhubInfo,
           app.app.content.title,
           release.id,
           release.content.official_gui!, // releases without official_gui have been filtered out earlier
         );
-
-        this.selectedAppBundlePath = await invoke("save_app", {
-          appBundleBytes: bytes,
-        });
-        this.hdkVersionForApp = release.content.hdk_version;
-        (this.$refs.downloading as typeof HCLoading).close();
-        this.loadingText = "";
-
-        this.$nextTick(() => {
-          (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
-        });
       } catch (e) {
-        console.log(e);
-        console.log((e as any).data);
-        console.log((e as any).data.data);
+        console.log("Error fetching the webhapp: ", e);
+        this.errorText = "App Library Synchronization not Complete. Please try again later.";
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
         this.downloadFailed = true;
         setTimeout(() => (this.downloadFailed = false), 3000);
+      }
+
+      if (bytes) {
+        try {
+          this.selectedAppBundlePath = await invoke("save_app", {
+            appBundleBytes: bytes,
+          });
+          this.hdkVersionForApp = release.content.hdk_version;
+          (this.$refs.downloading as typeof HCLoading).close();
+          this.loadingText = "";
+
+          this.$nextTick(() => {
+            (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
+          });
+        } catch (e) {
+          console.log("Error when decoding and saving webhapp to temp folder: ", e);
+          console.log("Error Payload: ", (e as any).data);
+
+          if ((e as any).data) {
+            this.errorText = `Failed to decode and save webhapp: ${(e as any).data}`;
+          } else {
+            this.errorText = `Failed to decode and save webhapp: ${e}`;
+          }
+
+          (this.$refs as any).snackbar.show();
+          (this.$refs.downloading as typeof HCLoading).close();
+        }
       }
     },
     async selectFromFileSystem() {
@@ -451,6 +470,10 @@ export default defineComponent({
       });
 
 
+    },
+    showError(e: string) {
+      this.errorText = e;
+      (this.$refs as any).snackbar.show();
     },
     progressRatio(idx: number) {
       if (this.networkStates[idx] && this.cachedMaxExpected[idx]) {

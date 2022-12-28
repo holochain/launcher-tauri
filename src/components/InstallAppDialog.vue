@@ -184,6 +184,7 @@ import { AppRoleManifest } from "@holochain/client";
 
 export default defineComponent({
   name: "InstallAppDialog",
+  emits: ["error", "closing-dialog", "app-installed"],
   components: {
     HCDialog,
     HCTextField,
@@ -213,6 +214,7 @@ export default defineComponent({
     supportedHolochains: Array<[string, string]>; // holochain version string as key
     snackbarText: string | undefined;
     appIdInvalid: string | undefined;
+    error: boolean;
   } {
     return {
       showAdvanced: false,
@@ -226,6 +228,7 @@ export default defineComponent({
       snackbarText: undefined,
       supportedHolochains: [],
       appIdInvalid: undefined,
+      error: false,
     };
   },
   computed: {
@@ -240,7 +243,7 @@ export default defineComponent({
       return false;
     },
     isLoadingFile() {
-      if (this.appBundlePath && !this.appInfo) return true;
+      if (this.appBundlePath && !this.appInfo &&!this.error) return true;
       return false;
     },
     allPubKeys() {
@@ -283,26 +286,36 @@ export default defineComponent({
     this.supportedHolochains = supportedHolochains;
 
     if (this.hdkVersionForApp) {
-      // Get Holochain Version
-      const version: HolochainVersion = await invoke("choose_version_for_hdk", {
-        hdkVersion: this.hdkVersionForApp,
-      });
-      this.holochainId = {
-        type: "HolochainVersion",
-        content: version,
-      };
+      try {
+        // Get Holochain Version
+        const version: HolochainVersion = await invoke("choose_version_for_hdk", {
+          hdkVersion: this.hdkVersionForApp,
+        });
+        this.holochainId = {
+          type: "HolochainVersion",
+          content: version,
+        };
+      } catch (e) {
+        console.log("Failed to get holochain version for hdk version: ", e);
+      }
     }
 
-    this.appInfo = (await invoke("get_app_info", {
-      appBundlePath: this.appBundlePath,
-    })) as WebAppInfo;
-    this.appId = this.appInfo.app_name;
+    try {
+      this.appInfo = (await invoke("get_app_info", {
+        appBundlePath: this.appBundlePath,
+      })) as WebAppInfo;
+      this.appId = this.appInfo.app_name;
 
-    this.$nextTick(() => {
-      const appIdField = this.$refs["app-id-field"] as typeof HCTextField;
-      appIdField.value = this.appId as string;
-      this.checkAppIdValidity();
-    });
+      this.$nextTick(() => {
+        const appIdField = this.$refs["app-id-field"] as typeof HCTextField;
+        appIdField.value = this.appId as string;
+        this.checkAppIdValidity();
+      });
+    } catch (e) {
+      this.$emit("error", `Error: ${JSON.stringify(e)}`)
+      console.log("Error getting app info: ", e);
+      this.close();
+    }
   },
   methods: {
     open() {
@@ -404,7 +417,7 @@ export default defineComponent({
         this.$emit("app-installed", this.appId);
       } catch (e) {
         console.log("Error installing the app: ", e);
-        this.showMessage(JSON.stringify(e));
+        this.showMessage(`Error installing app: ${JSON.stringify(e)}`);
         this.installing = false;
         this.$nextTick(() => {
           (this.$refs["app-id-field"] as typeof HCTextField).value = this.appId;

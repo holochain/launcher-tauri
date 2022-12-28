@@ -136,7 +136,7 @@ const messages = {
       howToPublishAnApp: "Eigene App Publizieren",
       selectAppFromFileSystem: "Installiere App aus Datei",
       noAppsInStore:
-        "Es sind noch keine Apps im App Store verfügbar oder die Synchronisierung mit Peers is noch unvollständig.",
+        "Es sind noch keine Apps im App Store verfügbar oder die Synchronisierung mit Peers ist noch unvollständig.",
       readThis: "Lese dies",
       readThisToPublish:
         " um zu lernen, wie man eine Holochain App publiziert.",

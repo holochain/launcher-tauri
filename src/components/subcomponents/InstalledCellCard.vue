@@ -52,7 +52,7 @@
             :style="`width: 25%; text-align: center; ${
               incomingIdle ? 'opacity: 0.7;' : ''
             }`"
-            title="max expected bytes | remaining expected bytes"
+            title="received bytes | expected bytes"
           >
             {{ expectedIncoming && cachedMaxExpected ? prettyBytes(cachedMaxExpected - expectedIncoming) : "-" }}
             | <span :class="{ highlighted: maxExceeded }">
