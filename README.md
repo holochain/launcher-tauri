@@ -95,9 +95,6 @@ If you used the scaffolding tool to create your hApp, packaging it for the launc
 15. Now everything is ready but make sure to keep your Launcher open until another Launcher (on another peer's computer) can install the app (to be safe, wait for about 30 minutes at least).
 16. If you get stuck at any point, don't hesitate to ask for help on Holochain's Discord server. You should find an invite link to it on https://developer.holochain.org/.
 
-## Known issues
-
-- Only MacOs v10.13 and after are supported at this moment.
 
 ## Data storage
 
@@ -118,9 +115,6 @@ Logs can be found at `$DATA_DIR/holochain-launcher/launcher.log`. When reporting
 
 See [Developer Setup](/docs/dev-setup.md).
 
-## Adding a new Holochain version
-
-See [Adding Holochain Version](/docs/adding-holochain-version.md).
 
 ## License
 
