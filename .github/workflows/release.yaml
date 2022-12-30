@@ -91,6 +91,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          projectPath: src-tauri # specifying to prevent action from looking for artifacts in crates/hc_launch/scr-tauri
           tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
           releaseName: "Holochain Launcher v__VERSION__"
           releaseBody: "See assets below to download this version and install."
