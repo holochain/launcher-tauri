@@ -140,13 +140,13 @@ export default defineComponent({
         dnas: [getCellId(this.cellInfo)![0]],
       });
 
-      console.log("========================================");
-      console.log("Received NetworkInfo: ", networkInfo);
+      // console.log("========================================");
+      // console.log("Received NetworkInfo: ", networkInfo);
 
       const expectedIncoming =
         networkInfo[0].fetch_queue_info.op_bytes_to_fetch;
 
-      console.log("expectedIncoming: ", expectedIncoming);
+      // console.log("expectedIncoming: ", expectedIncoming);
 
       // In case expected incoming bytes are 0, keep the chached values, otherwise update
       // expectedIncoming
@@ -190,19 +190,19 @@ export default defineComponent({
         this.cachedMaxExpected = undefined;
       }
 
-      console.log(
-        "this.expectedIncoming: ",
-        this.expectedIncoming ? prettyBytes(this.expectedIncoming!) : undefined
-      );
-      console.log(
-        "cachedMaxExpected: ",
-        this.cachedMaxExpected
-          ? prettyBytes(this.cachedMaxExpected!)
-          : undefined
-      );
-      console.log("incomingIdle: ", this.incomingIdle);
-      console.log("progressRatio(): ", this.progressRatio());
-      console.log("========================================");
+      // console.log(
+      //   "this.expectedIncoming: ",
+      //   this.expectedIncoming ? prettyBytes(this.expectedIncoming!) : undefined
+      // );
+      // console.log(
+      //   "cachedMaxExpected: ",
+      //   this.cachedMaxExpected
+      //     ? prettyBytes(this.cachedMaxExpected!)
+      //     : undefined
+      // );
+      // console.log("incomingIdle: ", this.incomingIdle);
+      // console.log("progressRatio(): ", this.progressRatio());
+      // console.log("========================================");
     },
     progressRatio() {
       if (this.expectedIncoming && this.cachedMaxExpected) {

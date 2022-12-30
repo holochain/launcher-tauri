@@ -305,7 +305,6 @@ export default defineComponent({
       const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
 
       const port = this.$store.getters["appInterfacePort"](holochainId);
-      console.log("### PORT: ", port);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`);
 
       const devhubInfo = await appWs.appInfo({
@@ -340,9 +339,9 @@ export default defineComponent({
 
       this.loading = false;
 
-      console.log("ALL APPS: ", allApps);
-      console.log("FILTERED APPS: ", this.installableApps);
-      console.log("hdk versions: ", hdk_versions);
+      // console.log("ALL APPS: ", allApps);
+      // console.log("FILTERED APPS: ", this.installableApps);
+      // console.log("hdk versions: ", hdk_versions);
     },
     async howToPublish() {
       await invoke("open_url_cmd", {

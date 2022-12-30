@@ -119,7 +119,7 @@ export default defineComponent({
       } else {
         (this.newConfig as any).custom_binary_path = null;
       }
-      console.log("newConfig: ", this.newConfig);
+      // console.log("newConfig: ", this.newConfig);
       await invoke("write_config", { config: this.newConfig });
       window.location.reload();
     },
