@@ -4,7 +4,7 @@
       <div style="color: white; font-size: 56px; margin-bottom: 30px; opacity: 0.9;">
         {{ $t("setup.setup.welcome") }}
       </div>
-      <div style="color: white; margin-bottom: 80px; font-size: 22px; opacity: 0.9; opacity: 0;">
+      <div style="color: white; margin-bottom: 80px; font-size: 24px; opacity: 0.9; max-width: 500px; text-align: center;">
         {{ $t("setup.setup.slogan") }}
       </div>
       <HCButton

@@ -4,8 +4,8 @@ const messages = {
   en: {
     setup: {
       setup: {
-        welcome: "Welcome to Holochain",
-        slogan: "[imagine a catchy slogan here]",
+        welcome: "Holochain Launcher",
+        slogan: "Discover, install and easily manage your Holochain apps",
       },
       login: {
         enterPassword: "Enter password",
@@ -102,8 +102,8 @@ const messages = {
   de: {
     setup: {
       setup: {
-        welcome: "Willkomen bei Holochain",
-        slogan: "[Stell dir hier einen knackigen Slogan vor]",
+        welcome: "Holochain Launcher",
+        slogan: "Entdecke, installiere und verwalte deine Holochain Apps",
       },
       login: {
         enterPassword: "Passwort",
