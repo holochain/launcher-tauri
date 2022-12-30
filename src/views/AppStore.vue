@@ -309,7 +309,7 @@ export default defineComponent({
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`);
 
       const devhubInfo = await appWs.appInfo({
-        installed_app_id: `DevHub-${holochainId.content}-TEST-NETWORK`,
+        installed_app_id: `DevHub-${holochainId.content}`,
       });
 
 
@@ -360,7 +360,7 @@ export default defineComponent({
       const port = this.$store.getters["appInterfacePort"](holochainId);
       const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       const devhubInfo = await appWs.appInfo({
-        installed_app_id: `DevHub-${holochainId.content}-TEST-NETWORK`,
+        installed_app_id: `DevHub-${holochainId.content}`,
       });
 
       this.loadingText = "Downloading...";
