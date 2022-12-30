@@ -306,7 +306,7 @@ export default defineComponent({
 
       const port = this.$store.getters["appInterfacePort"](holochainId);
       console.log("### PORT: ", port);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`,undefined , undefined, true);
+      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`);
 
       const devhubInfo = await appWs.appInfo({
         installed_app_id: `DevHub-${holochainId.content}-TEST-NETWORK`,
@@ -358,7 +358,7 @@ export default defineComponent({
       const holochainId = this.$store.getters["holochainIdForDevhub"];
 
       const port = this.$store.getters["appInterfacePort"](holochainId);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000, undefined, true);
+      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       const devhubInfo = await appWs.appInfo({
         installed_app_id: `DevHub-${holochainId.content}-TEST-NETWORK`,
       });
@@ -428,7 +428,7 @@ export default defineComponent({
     },
     async getNetworkState() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000, undefined, true);
+      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       const networkInfo: NetworkInfo[] = await appWs.networkInfo({
         dnas: this.provisionedCells!.filter(([roleName, cellInfo]) => !!cellInfo)
           .map(([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array),
