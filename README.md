@@ -77,21 +77,23 @@ If you used the scaffolding tool to create your hApp, packaging it for the launc
 
 ### Publishing a .webhapp to the DevHub
 
-1. Open the `DevHub-0.0.x` app in the Holochain Launcher.
-  - In case there are multiple DevHub apps, open the one for the latest version.
-2. Create a new App, **with the tag "app-store-ready"**. Without this tag, the app won't appear in the app library.
-   - Also input the appropriate "Name" and "Description". These are the details that the participants will see when downloading your application. Make the description short, maybe one or two lines.
-3. Once you have created a new App, click "Upload new bundle".
-4. Set the appropriate "Name" for your release (e.g. v0.0.1). This is the version name that the participants will see when downloading your application.
-5. Select the `.webhapp` for your app from the filesystem and upload it.
-6. Select the appropriate HDK version which your app was compiled for.
-  - Make sure that this is the correct HDK, in the format "0.0.163".
-6. Give names and version numbers to all the dna's and zomes click on the respective icon in the top right of them to confirm each.
-7. Click "Save".
-8.  Keep your Launcher open until another Launcher (on another computer) can install the app.
-  - This may take a while (in the order of many minutes). In the future it won't be necessary.
-  - This step is necessary for the happ files to sync with other peers in the DHT.
-9. If you get stuck at any point, don't hesitate to ask for help on Holochain's Discord server. You should find an invite link to it on https://developer.holochain.org/.
+
+1. Open the `DevHub-0.1.0-beta-rc.2` app in the Holochain Launcher.
+2. Click on "Add hApp", then choose a title, subtitle and description for your app and **add the tag "app-store-ready"**. Without this tag, the app won't appear in the app library.
+3. Once you have created a new hApp, click "Upload new bundle".
+4. Enter the HDK version your hApp is written with, then upload the .webhapp file of your app.
+5. You will be prompted to choose names, descriptions and version numbers for your zomes and DNA's. Fill out all necessary fields and create the zomes and DNA's of your hApp, then click on "Continue".
+6. Set the appropriate "Name" for your release (e.g. v0.0.1). This is the version name that participants will see when downloading your application.
+7. Review and save your hApp.
+8. Now you need to upload the GUI (provided your hApp has one) and associate it with the hApp release you just made. Click on "GUIs" in the left panel and then "Add GUI".
+9. Give your GUI a name and a description and save it. No tag is required but make sure to choose a name that let's you disambiguate it from other developers GUI's.
+10. Go to "My GUIs" in the left panel, click on "More info" on the GUI you just added, then "Create new release".
+11. Choose a version number for the GUI and upload your GUI as a zip file in the file drop area and click "save". "Select hApp Releases" is not required.
+12. Go back to "My hApps" in the left panel, then click on "More info" of the hApp you added earlier.
+13. Under "hApp Releases", click on "More info" for the Release you want to add the GUI to, then click on "Edit release".
+14. Click on "Select GUI Release" and select the GUI you just uploaded. THen click on "Save changes".
+15. Now everything is ready but make sure to keep your Launcher open until another Launcher (on another peer's computer) can install the app (to be safe, wait for about 30 minutes at least).
+16. If you get stuck at any point, don't hesitate to ask for help on Holochain's Discord server. You should find an invite link to it on https://developer.holochain.org/.
 
 ## Known issues
 
