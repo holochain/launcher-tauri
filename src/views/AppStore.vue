@@ -23,7 +23,7 @@
 
   </HCDialog>
 
-  <div class="column" style="flex: 1">
+  <div class="column" style="flex: 1; overflow-y: auto;">
     <div class="row center-content top-bar">
       <mwc-icon-button
         icon="arrow_back"
@@ -245,6 +245,7 @@ export default defineComponent({
     showProgressIndicator: boolean;
     downloadFailed: boolean;
     errorText: string;
+    appWebsocket: AppWebsocket | undefined;
   } {
     return {
       loadingText: "",
@@ -265,16 +266,9 @@ export default defineComponent({
       showProgressIndicator: false,
       downloadFailed: false,
       errorText: "Unknown error occured.",
+      appWebsocket: undefined,
     };
   },
-  // created() {
-  //   // check localStorage to know whether this is the first time entering the App Library
-  //   if (window.localStorage.getItem("appLibraryWarningShown") || true) {
-  //     (this.$refs.appLibraryFirstEnter as typeof HCDialog).open();
-  //   }
-  //   //window.localStorage.setItem("appLibraryWarningShown", "true");
-
-  // },
   beforeUnmount() {
     window.clearInterval(this.pollInterval!);
   },
@@ -296,21 +290,25 @@ export default defineComponent({
     );
   },
   methods: {
+    async connectAppWebsocket() {
+      // const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
+      const holochainId = this.$store.getters["holochainIdForDevhub"];
+      this.holochainId = holochainId;
+      // connect to AppWebsocket
+      const port = this.$store.getters["appInterfacePort"](holochainId);
+      this.appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      console.log("connected to AppWebsocket.");
+    },
     async fetchApps() {
       this.loading = true;
 
-      const holochainId = this.$store.getters["holochainIdForDevhub"];
-      this.holochainId = holochainId;
+      if (!this.appWebsocket) {
+        await this.connectAppWebsocket();
+      }
 
-      const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
-
-      const port = this.$store.getters["appInterfacePort"](holochainId);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`);
-
-      const devhubInfo = await appWs.appInfo({
-        installed_app_id: `DevHub-${holochainId.content}`,
+      const devhubInfo = await this.appWebsocket!.appInfo({
+        installed_app_id: `DevHub-${this.holochainId!.content}`,
       });
-
 
       const allCells = devhubInfo.cell_info;
       const provisionedCells: [string, CellInfo | undefined][] = Object.entries(allCells).map(([roleName, cellInfos]) => {
@@ -324,7 +322,7 @@ export default defineComponent({
 
       let allApps: Array<AppWithReleases>;
       try {
-        allApps = await getAllAppsWithGui(appWs, devhubInfo);
+        allApps = await getAllAppsWithGui(this.appWebsocket!, devhubInfo);
       } catch (e) {
         console.error(e);
         // Catch other errors than being offline
@@ -354,12 +352,13 @@ export default defineComponent({
       (this.$refs.downloading as typeof HCLoading).open();
       const release = getLatestRelease(app);
 
-      const holochainId = this.$store.getters["holochainIdForDevhub"];
 
-      const port = this.$store.getters["appInterfacePort"](holochainId);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
-      const devhubInfo = await appWs.appInfo({
-        installed_app_id: `DevHub-${holochainId.content}`,
+      if (!this.appWebsocket) {
+        await this.connectAppWebsocket();
+      }
+
+      const devhubInfo = await this.appWebsocket!.appInfo({
+        installed_app_id: `DevHub-${this.holochainId!.content}`,
       });
 
       this.loadingText = "Downloading...";
@@ -368,7 +367,7 @@ export default defineComponent({
 
       try {
         bytes = await fetchWebHapp(
-          appWs,
+          this.appWebsocket!,
           devhubInfo,
           app.app.content.title,
           release.id,
@@ -426,9 +425,11 @@ export default defineComponent({
       this.hdkVersionForApp = undefined;
     },
     async getNetworkState() {
-      const port = this.$store.getters["appInterfacePort"](this.holochainId);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
-      const networkInfo: NetworkInfo[] = await appWs.networkInfo({
+      if (!this.appWebsocket) {
+        await this.connectAppWebsocket();
+      }
+
+      const networkInfo: NetworkInfo[] = await this.appWebsocket!.networkInfo({
         dnas: this.provisionedCells!.filter(([roleName, cellInfo]) => !!cellInfo)
           .map(([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array),
       });

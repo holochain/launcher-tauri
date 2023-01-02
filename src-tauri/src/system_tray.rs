@@ -15,7 +15,10 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   match event_id.as_str() {
     "quit" => {
       app.exit(0);
-    }
+    },
+    "restart" => {
+      app.app_handle().restart();
+    },
     "show_admin" => {
       let admin_window = app.get_window("admin");
 
@@ -68,6 +71,7 @@ pub fn initial_system_tray() -> SystemTrayMenu {
 pub fn builtin_system_tray() -> Vec<CustomMenuItem> {
   vec![
     CustomMenuItem::new("show_admin".to_string(), "Show Admin"),
+    CustomMenuItem::new("restart".to_string(), "Restart"),
     CustomMenuItem::new("quit".to_string(), "Quit"),
   ]
 }

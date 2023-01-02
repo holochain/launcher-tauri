@@ -1,5 +1,5 @@
 <template>
-  <div class="column" style="flex: 1">
+  <div class="column" style="flex: 1; overflow-y: auto;">
     <div v-if="view.type === 'installedApps'" class="flex-scrollable-parent">
       <div class="flex-scrollable-container">
         <div class="flex-scrollable-y">

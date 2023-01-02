@@ -106,6 +106,7 @@ export default defineComponent({
     incomingIdle: boolean;
     cachedMaxExpected: number | undefined;
     maxExceeded: boolean;
+    appWebsocket: AppWebsocket | undefined;
   } {
     return {
       pollInterval: null,
@@ -114,9 +115,12 @@ export default defineComponent({
       incomingIdle: true,
       cachedMaxExpected: undefined,
       maxExceeded: false,
+      appWebsocket: undefined,
     };
   },
   async created() {
+    const port = this.$store.getters["appInterfacePort"](this.holochainId);
+    this. appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
     await this.getNetworkInfo();
@@ -133,10 +137,18 @@ export default defineComponent({
     serializeHash,
     getCellName,
     getCellId,
-    async getNetworkInfo() {
+    async connectAppWebsocket() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
-      const appWs = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
-      const networkInfo: NetworkInfo[] = await appWs.networkInfo({
+      this. appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      console.log("Connected to AppWebsocket.");
+    },
+    async getNetworkInfo() {
+
+      if (!this.appWebsocket) {
+        await this.connectAppWebsocket();
+      }
+
+      const networkInfo: NetworkInfo[] = await this.appWebsocket!.networkInfo({
         dnas: [getCellId(this.cellInfo)![0]],
       });
 
