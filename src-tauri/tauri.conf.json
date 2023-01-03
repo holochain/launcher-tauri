@@ -10,6 +10,12 @@
     "beforeBuildCommand": "npm run build:ui"
   },
   "tauri": {
+    "pattern": {
+      "use": "isolation",
+      "options": {
+        "dir": "../dist-isolation"
+      }
+    },
     "cli": {
       "description": "Running the Holochain Launcher from the command line",
       "args": [
@@ -59,7 +65,18 @@
       "active": false
     },
     "allowlist": {
-      "all": true
+      "all": false,
+      "app": {
+        "all": true,
+        "hide": false,
+        "show": false
+      },
+      "clipboard": {
+        "writeText": true
+      },
+      "dialog": {
+        "open": true
+      }
     },
     "windows": [],
     "security": {
