@@ -394,10 +394,12 @@ impl LauncherManager {
     // Iterate over the open windows, focus if the app is already open
 
     if let Some(w) = self.app_handle.get_window(window_label.as_str()) {
-      if let Err(err) = w.show() {
-        log::error!("Error showing the window: {:?}", err);
+      if let Err(err) = w.unminimize() {
+        log::error!("Error unminimizing the window: {:?}", err);
       }
-
+      if let Err(err) = w.set_focus() {
+        log::error!("Error setting focus to the window: {:?}", err);
+      }
       return Ok(());
     }
 
