@@ -54,6 +54,9 @@ When you are on the `Installed Apps` section, click `Install New App`. This will
 3. When it's finished installation, the happ will appear in the list of active happs.
 4. Click `Open` in one of the installed apps to open the app.
 
+
+# For Developers
+
 ### Packaging a Web-hApp
 
 Requirements:
