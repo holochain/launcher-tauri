@@ -48,7 +48,7 @@ export function filterByHdkVersion(
   return filteredReleases.filter((app) => app.releases.length > 0);
 }
 
-// filtered by the supported hdk versions of that Launcher version
+// filtered by apps with GUI's
 export async function getAllAppsWithGui(
   appWebsocket: AppWebsocket,
   devhubHapp: AppInfo
