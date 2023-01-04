@@ -59,7 +59,12 @@
       "active": false
     },
     "allowlist": {
-      "all": true
+      "clipboard": {
+        "writeText": true
+      },
+      "dialog": {
+        "open": true
+      }
     },
     "windows": [],
     "security": {
