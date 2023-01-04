@@ -1,7 +1,12 @@
 {
   "tauri": {
     "allowlist": {
-      "all": true
+      "clipboard": {
+        "writeText": true
+      },
+      "dialog": {
+        "open": true
+      }
     },
     "security": {
       "csp": null
