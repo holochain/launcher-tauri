@@ -1,4 +1,4 @@
-
+use tauri::api::process;
 
 
 // restarts the Holochain Launcher
@@ -14,6 +14,7 @@ pub fn restart(
 
   log::warn!("A Restart of the Launcher has been requested, restarting...");
 
+  process::kill_children();
   app_handle.restart();
   Ok(())
 }

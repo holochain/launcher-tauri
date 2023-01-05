@@ -1,3 +1,4 @@
+use tauri::api::process;
 
 // restarts the Holochain Launcher
 #[tauri::command]
@@ -11,7 +12,7 @@ pub fn quit(
   }
 
   log::warn!("Quitting the Launcher has been requested, Quitting...");
-
+  process::kill_children();
   app_handle.exit(0);
   Ok(())
 }
