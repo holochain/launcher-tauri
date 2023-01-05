@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use tauri::api::process;
 
 use holochain_manager::versions::{
   holochain_conductor_api_latest::AppInfoStatus, HolochainVersion,
@@ -14,9 +15,11 @@ use crate::launcher::{state::LauncherState, manager::HolochainId};
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   match event_id.as_str() {
     "quit" => {
+      process::kill_children();
       app.exit(0);
     },
     "restart" => {
+      process::kill_children();
       app.app_handle().restart();
     },
     "show_admin" => {
