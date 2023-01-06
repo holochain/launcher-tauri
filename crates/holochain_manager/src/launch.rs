@@ -71,7 +71,6 @@ pub async fn launch_holochain_process(
         // --------------------------------------
         #[cfg(target_family="windows")]
         if line.contains("websocket_error_from_network=Io") && line.contains("ConnectionReset") {
-          fatal_error = true;
           launch_state = LaunchHolochainProcessState::InitializeConductorError(
             InitializeConductorError::AddressAlreadyInUse(
               String::from("Could not initialize Conductor from configuration: \"Address already in use\"")
