@@ -14,7 +14,8 @@ pub async fn launch_lair_keystore_process(
   let mut envs = HashMap::new();
   envs.insert(String::from("RUST_LOG"), String::from(log_level.as_str()));
 
-  let (mut lair_rx, mut command_child) = Command::new_sidecar("lair-keystore")
+  // NEW_VERSION Check whether lair-keystore version needs to get updated
+  let (mut lair_rx, mut command_child) = Command::new_sidecar("lair-keystore-v0.2.3")
     .or(Err(LairKeystoreError::LaunchChildError(
       LaunchChildError::BinaryNotFound,
     )))?
@@ -67,7 +68,8 @@ pub async fn launch_lair_keystore_process(
     }
   });
 
-  let output = Command::new_sidecar("lair-keystore")
+  // NEW_VERSION Check whether lair-keystore version needs to get updated
+  let output = Command::new_sidecar("lair-keystore-v0.2.3")
     .or(Err(LairKeystoreError::LaunchChildError(
       LaunchChildError::BinaryNotFound,
     )))?

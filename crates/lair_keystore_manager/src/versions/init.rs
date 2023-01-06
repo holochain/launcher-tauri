@@ -11,7 +11,8 @@ pub fn is_initialized(keystore_path: PathBuf) -> bool {
 }
 
 pub async fn initialize(keystore_path: PathBuf, password: String) -> Result<(), LairKeystoreError> {
-  let (mut lair_rx, mut command_child) = Command::new_sidecar("lair-keystore")
+  // NEW_VERSION Check whether lair-keystore version needs to get updated
+  let (mut lair_rx, mut command_child) = Command::new_sidecar("lair-keystore-v0.2.3")
     .or(Err(LairKeystoreError::LaunchChildError(
       LaunchChildError::BinaryNotFound,
     )))?

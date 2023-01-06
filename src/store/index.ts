@@ -142,10 +142,11 @@ export const store = createStore<LauncherAdminState>({
         const error = allHolochains.find((v) => v.type === "Error");
         if (
           error &&
+          error.content.toString().includes("Could not initialize Conductor from configuration") &&
           error.content
             .toString()
             .includes(
-              "InterfaceError(WebsocketError(Io(Os { code: 98, kind: AddrInUse"
+              "Address already in use"
             )
         ) {
           return true;

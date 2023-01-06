@@ -73,7 +73,7 @@ pub async fn launch_holochain_process(
         if line.contains("websocket_error_from_network=Io") && line.contains("ConnectionReset") {
           launch_state = LaunchHolochainProcessState::InitializeConductorError(
             InitializeConductorError::AddressAlreadyInUse(
-              String::from("Could not initialize Conductor from configuration: \"Address already in use\"")
+              String::from("Could not initialize Conductor from configuration: Address already in use")
             )
           );
           break;
@@ -91,10 +91,11 @@ pub async fn launch_holochain_process(
           fatal_error = true;
         }
         #[cfg(target_family="unix")]
-        if line.contains("Could not initialize Conductor from configuration: InterfaceError(WebsocketError(Io(Os") && line.contains("\"Address already in use\"") {
+        if line.contains("Could not initialize Conductor from configuration: InterfaceError(WebsocketError(Io(Os") && line.contains("Address already in use") {
+          println!("###### A D D R E S S    ALREADY IN USE");
           launch_state = LaunchHolochainProcessState::InitializeConductorError(
             InitializeConductorError::AddressAlreadyInUse(
-              String::from("Could not initialize Conductor from configuration: \"Address already in use\"")
+              String::from("Could not initialize Conductor from configuration: Address already in use")
             )
           );
           break;

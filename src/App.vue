@@ -45,7 +45,7 @@
             text-align: center;
             background-color: #9fe09d;
             border-radius: 8px;
-            padding: 10px;
+            padding: 10px 15px;
           "
         >
           To fix it, <strong>quit the Holochain Launcher</strong> and
@@ -57,6 +57,7 @@
               background-color: rgba(0, 0, 0, 0.2);
               padding: 2px 6px;
               border-radius: 5px;
+              white-space: nowrap;
             "
             >holochain-v</span
           > and <span
@@ -66,13 +67,14 @@
               background-color: rgba(0, 0, 0, 0.2);
               padding: 2px 6px;
               border-radius: 5px;
+              white-space: nowrap;
             "
             >lair-keystore-v</span
           >.
         </div>
         <div style="text-align: left; margin-top: 25px">
           You can kill running processes by opening the Task-Manager (Windows,
-          Ctrl+Alt+Delete) or Activity Monitor (MacOs) and search for the
+          Ctrl+Alt+Delete) or Activity Monitor (macOS) and search for the
           corresponding processes.<br />
         </div>
       </div>
