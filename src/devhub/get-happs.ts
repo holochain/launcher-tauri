@@ -5,7 +5,7 @@ import {
   ActionHash,
   AppInfo,
 } from "@holochain/client";
-import { HappEntry, HappReleaseEntry } from "./types";
+import { GUIReleaseEntry, HappEntry, HappReleaseEntry } from "./types";
 import { getCellId } from "../utils";
 
 // corresponds to https://docs.rs/hc_crud_ceps/0.55.0/hc_crud/struct.Entity.html
@@ -23,6 +23,14 @@ export interface EntityType {
   model: string;
 }
 
+export interface GUIReleaseResponsePayload {
+  action: ActionHash;
+  address: EntryHash; // The address of the current entry
+  content: GUIReleaseEntry;
+  id: EntryHash; // The address of the original created entry
+  type: any;
+}
+
 export interface ContentAddress<C> {
   id: EntryHash;
   address: EntryHash;
@@ -31,7 +39,8 @@ export interface ContentAddress<C> {
 
 export interface AppWithReleases {
   app: ContentAddress<HappEntry>;
-  releases: Array<ContentAddress<HappReleaseEntry>>;
+  happReleases: Array<ContentAddress<HappReleaseEntry>>;
+  guiReleases: Array<ContentAddress<GUIReleaseEntry>>;
 }
 
 export function filterByHdkVersion(
@@ -40,12 +49,13 @@ export function filterByHdkVersion(
 ): Array<AppWithReleases> {
   const filteredReleases: Array<AppWithReleases> = apps.map((app) => ({
     app: app.app,
-    releases: app.releases.filter((r) =>
+    happReleases: app.happReleases.filter((r) =>
       hdkVersions.includes(r.content.hdk_version)
     ),
+    guiReleases: app.guiReleases
   }));
 
-  return filteredReleases.filter((app) => app.releases.length > 0);
+  return filteredReleases.filter((app) => app.happReleases.length > 0);
 }
 
 // filtered by apps with GUI's
@@ -107,20 +117,41 @@ export async function getAppsReleasesWithGui(
 
   const filteredReleases = releases.filter((r) => !!r.content.official_gui);
 
+  let guiReleases: Array<GUIReleaseResponsePayload> = []
+
+  await Promise.all(
+    filteredReleases.map(async (release) => {
+      const guiRelease = await appWebsocket.callZome({
+        cap_secret: null,
+        cell_id: getCellId(cells.happs.find((c) => "Provisioned" in c )!)!,
+        fn_name: "get_gui_release",
+        zome_name: "happ_library",
+        payload: {
+          id: release.content.official_gui
+        },
+        provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
+      })
+      guiReleases.push(guiRelease.payload)
+    })
+  )
+
+
   // console.log("@getAppsReleases: filteredReleases: ", filteredReleases);
   return {
     app,
-    releases: filteredReleases,
+    happReleases: filteredReleases,
+    guiReleases,
   };
 }
 
 export function getLatestRelease(
   apps: AppWithReleases
 ): ContentAddress<HappReleaseEntry> {
-  return apps.releases.sort(
+  return apps.happReleases.sort(
     (r1, r2) => r2.content.last_updated - r1.content.last_updated
   )[0];
 }
+
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(() => r(null), ms));
 
@@ -179,3 +210,4 @@ function devhubCells(devhubHapp: AppInfo) {
     webassets,
   };
 }
+

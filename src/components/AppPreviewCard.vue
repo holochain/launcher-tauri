@@ -14,6 +14,15 @@
         <div style="width: 160px">HDK version:</div>
         <div>{{ getLatestRelease(app).content.hdk_version }}</div>
       </div>
+      <div class="row">
+        <div style="width: 160px">hApp version:</div>
+        <div>{{ getLatestRelease(app).content.name }}</div>
+      </div>
+      <div class="row">
+        <div style="width: 160px">UI version:</div>
+        <div v-if="guiVersion">{{ guiVersion }}</div>
+        <div v-else style="font-size: 0.9em; opacity: 0.7;">loading...</div>
+      </div>
       <div style="font-weight: bold; margin-top: 10px">Description:</div>
       {{ app.app.content.description }}
     </div>
@@ -125,17 +134,23 @@ export default defineComponent({
   data(): {
     showDescription: boolean;
     holochainVersion: HolochainVersion | undefined;
+    guiVersion: string | undefined;
   } {
     return {
       showDescription: false,
       holochainVersion: undefined,
+      guiVersion: undefined,
     };
   },
   emits: ["installApp"],
   async mounted() {
+    const latestRelease = getLatestRelease(this.app);
     this.holochainVersion = await invoke("choose_version_for_hdk", {
-      hdkVersion: getLatestRelease(this.app).content.hdk_version,
+      hdkVersion: latestRelease.content.hdk_version,
     });
+    this.guiVersion = this.app.guiReleases.find(
+      (release) => JSON.stringify(release.id) === JSON.stringify(latestRelease.content.official_gui)
+    )?.content.version;
   },
   methods: {
     getLatestRelease,
