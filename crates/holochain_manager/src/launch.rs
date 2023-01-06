@@ -67,20 +67,40 @@ pub async fn launch_holochain_process(
 
         log::info!("[HOLOCHAIN {}] {}", version, line);
 
-        if line.contains("FATAL PANIC PanicInfo") {
+        // Windows error handling:
+        // --------------------------------------
+        #[cfg(target_family="windows")]
+        if line.contains("websocket_error_from_network=Io") && line.contains("ConnectionReset") {
           fatal_error = true;
-        }
-        if line.contains("Well, this is embarrassing") { // This line occurs below FATAL PANIC but may potentially also appear without FATAL PANIC PanicInfo
-          fatal_error = true;
-        }
-        if line.contains("Could not initialize Conductor from configuration: InterfaceError(WebsocketError(Io(Os { code: 98, kind: AddrInUse, message: \"Address already in use\" })))") {
           launch_state = LaunchHolochainProcessState::InitializeConductorError(
             InitializeConductorError::AddressAlreadyInUse(
-              String::from("Could not initialize Conductor from configuration: InterfaceError(WebsocketError(Io(Os { code: 98, kind: AddrInUse, message: \"Address already in use\" })))")
+              String::from("Could not initialize Conductor from configuration: \"Address already in use\"")
             )
           );
           break;
         }
+        // --------------------------------------
+
+        // UNIX error handling:
+        // --------------------------------------
+        #[cfg(target_family="unix")]
+        if line.contains("FATAL PANIC PanicInfo") {
+          fatal_error = true;
+        }
+        #[cfg(target_family="unix")]
+        if line.contains("Well, this is embarrassing") { // This line occurs below FATAL PANIC but may potentially also appear without FATAL PANIC PanicInfo
+          fatal_error = true;
+        }
+        #[cfg(target_family="unix")]
+        if line.contains("Could not initialize Conductor from configuration: InterfaceError(WebsocketError(Io(Os") && line.contains("\"Address already in use\"") {
+          launch_state = LaunchHolochainProcessState::InitializeConductorError(
+            InitializeConductorError::AddressAlreadyInUse(
+              String::from("Could not initialize Conductor from configuration: \"Address already in use\"")
+            )
+          );
+          break;
+        }
+        #[cfg(target_family="unix")]
         if fatal_error == true && line.contains("DatabaseError(SqliteError(SqliteFailure(Error { code: NotADatabase, extended_code: 26 }, Some(\"file is not a database\"))))") {
           launch_state = LaunchHolochainProcessState::InitializeConductorError(
             InitializeConductorError::SqliteError(
@@ -91,6 +111,7 @@ pub async fn launch_holochain_process(
         }
         // if no known error was found between the line saying "FATAL PANIC ..." or "Well, this is embarrassing" and
         // the line saying "Thank you kindly" it is an unknown error
+        #[cfg(target_family="unix")]
         if fatal_error == true && line.contains("Thank you kindly!"){
           launch_state = LaunchHolochainProcessState::InitializeConductorError(
             InitializeConductorError::UnknownError(
@@ -99,6 +120,7 @@ pub async fn launch_holochain_process(
           );
         }
       },
+      // --------------------------------------
       _ => {
         log::info!("[HOLOCHAIN {}] {:?}", version, event);
       },
