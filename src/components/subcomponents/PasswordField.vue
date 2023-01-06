@@ -110,6 +110,7 @@ export default defineComponent({
   all: unset;
   display: flex;
   flex: 1;
+  width: 100%;
 }
 
 /* remove MS Edge's own eye icon */
