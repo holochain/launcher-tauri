@@ -59,6 +59,15 @@
               border-radius: 5px;
             "
             >holochain-v</span
+          > and <span
+            style="
+              font-family: monospace;
+              font-size: 1.1em;
+              background-color: rgba(0, 0, 0, 0.2);
+              padding: 2px 6px;
+              border-radius: 5px;
+            "
+            >lair-keystore-v</span
           >.
         </div>
         <div style="text-align: left; margin-top: 25px">
