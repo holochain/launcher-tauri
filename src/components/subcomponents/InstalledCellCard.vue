@@ -140,7 +140,7 @@ export default defineComponent({
     async connectAppWebsocket() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
       this. appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
-      console.log("Connected to AppWebsocket.");
+      // console.log("Connected to AppWebsocket.");
     },
     async getNetworkInfo() {
 
