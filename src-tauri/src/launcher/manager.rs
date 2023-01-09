@@ -419,6 +419,16 @@ impl LauncherManager {
       app_id
     );
 
+    // listen for anchor clicks to route them to the open_url_cmd command for sanitization and
+    // opennig in system default browser
+    let anchor_event_listener = r#"window.addEventListener("click", (e) => {
+      if (e.target.tagName.toLowerCase() === 'a') {
+        e.preventDefault();
+        window.__TAURI_INVOKE__('open_url_cmd', { 'url': e.target.href } )
+      }
+    });
+    "#;
+
 
     let window_builder = WindowBuilder::new(
       &self.app_handle,
@@ -501,6 +511,7 @@ impl LauncherManager {
     .disable_file_drop_handler()
     .data_directory(local_storage_path)
     .initialization_script(launcher_env_command.as_str())
+    .initialization_script(anchor_event_listener)
     .inner_size(1000.0, 700.0)
     .title(app_id)
     .enable_clipboard_access(); // TODO! potentially make this optional

@@ -37,7 +37,12 @@ pub fn report_issue() -> () {
 #[tauri::command]
 pub fn open_url_cmd(window: tauri::Window, url: String) -> Result<(), String> {
   if window.label() != "admin" {
-    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command."))
+    // sanitize url if the open request does not come from the admin window
+    if url.starts_with("http://") || url.starts_with("https://") {
+      return open_url(url);
+    } else {
+      return Err(String::from("Unauthorized: Accessing resources other than http(s) via anchor tags not allowed in Holochain Launcher windows."))
+    }
   }
 
   open_url(url)
