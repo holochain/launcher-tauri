@@ -16,7 +16,7 @@ The commands to install them should look like below, replacing the version numbe
 ```
 cargo install --version 0.2.3 lair_keystore
 LAIR_PATH=$(which lair-keystore)
-cp $LAIR_PATH src-tauri/bins/lair-keystore-x86_64-apple-darwin
+cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.3-x86_64-apple-darwin
 
 cargo install holochain --version 0.1.0-beta-rc.2 --locked --features db-encryption
 HOLOCHAIN_PATH=$(which holochain)
@@ -31,7 +31,7 @@ cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.1.0-beta-rc.2-x86_64-apple-darwin
 ```
 cargo install --version 0.2.3 lair_keystore
 $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
-Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-x86_64-pc-windows-msvc.exe
+Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.2.3-x86_64-pc-windows-msvc.exe
 
 cargo install holochain --version 0.1.0-beta-rc.2 --locked --features db-encryption
 $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
