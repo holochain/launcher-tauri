@@ -5,7 +5,7 @@
         "writeText": true
       },
       "dialog": {
-        "open": true
+        "all": true
       }
     },
     "security": {
