@@ -420,7 +420,7 @@ impl LauncherManager {
     );
 
 
-    let _window = WindowBuilder::new(
+    let window_builder = WindowBuilder::new(
       &self.app_handle,
       window_label.clone(),
       WindowUrl::App("".into())
@@ -503,15 +503,22 @@ impl LauncherManager {
     .initialization_script(launcher_env_command.as_str())
     .inner_size(1000.0, 700.0)
     .title(app_id)
-    .enable_clipboard_access() // TODO! potentially make this optional
-    .menu(Menu::new().add_submenu(Submenu::new( // This overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
-      "Settings",
-      Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
-    )))
+    .enable_clipboard_access(); // TODO! potentially make this optional
     // .icon(tauri::Icon::File(icon_path)) // placeholder for when apps come shipped with their custom icons
     // .map_err(|err| format!("Error adding icon: {:?}", err))?
-    .build()
-    .map_err(|err| format!("Error opening app: {:?}", err))?;
+
+
+    if cfg!(target_os = "macos") {
+      window_builder.build().map_err(|err| format!("Error opening app: {:?}", err))?;
+    } else {
+      window_builder
+        .menu(Menu::new().add_submenu(Submenu::new( // This overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
+        "Settings",
+        Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
+         )))
+        .build()
+        .map_err(|err| format!("Error opening app: {:?}", err))?;
+    }
 
     // let a = self.app_handle.clone();
     // let l = window_label.clone();

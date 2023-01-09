@@ -8,22 +8,52 @@ pub fn build_menu() -> Menu {
   let config = CustomMenuItem::new("config".to_string(), "Configuration");
   let restart = CustomMenuItem::new("restart".to_string(), "Restart");
   let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+  let version_info = CustomMenuItem::new("about".to_string(), "Version Info");
+  // let report_issue = CustomMenuItem::new("report_issue".to_string(), "Report Issue");
 
+  let menu_submenu = Submenu::new(
+    "Menu",
+    Menu::new()
+      .add_item(version_info.clone())
+      .add_item(open_logs.clone())
+      .add_item(restart.clone())
+      .add_item(quit.clone()),
+  );
   let settings_submenu = Submenu::new(
     "Settings",
     Menu::new()
-      .add_item(factory_reset)
-      .add_item(open_logs)
-      .add_item(config)
-      .add_item(restart)
-      .add_item(quit),
+      .add_item(config.clone())
+      .add_item(factory_reset.clone())
   );
-  let about = CustomMenuItem::new("about".to_string(), "About");
-  let report_issue = CustomMenuItem::new("report_issue".to_string(), "Report Issue");
-  let help_submenu = Submenu::new("Help", Menu::new().add_item(about).add_item(report_issue));
+
+
+
+  // special menu for macOS
+  if cfg!(target_os = "macos") {
+    let launcher_menu_submenu = Submenu::new(
+      "Launcher",
+      Menu::new()
+        .add_item(version_info)
+        .add_item(open_logs)
+        .add_item(restart)
+        .add_item(quit),
+    );
+
+    let settings_submenu_macos = Submenu::new(
+      "Settings",
+      Menu::new()
+        .add_item(config)
+        .add_item(factory_reset)
+    );
+
+    return Menu::os_default("Holochain Launcher")
+      .add_submenu(launcher_menu_submenu)
+      .add_submenu(settings_submenu_macos)
+  }
+
   Menu::new()
+    .add_submenu(menu_submenu)
     .add_submenu(settings_submenu)
-    .add_submenu(help_submenu)
 }
 
 pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
@@ -37,7 +67,7 @@ pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
     "quit" => {
       quit(window.clone(), window.app_handle()).unwrap();
     }
-    "report_issue" => report_issue(),
+    // "report_issue" => report_issue(),
     "open_logs" => {
       logs::open_logs_folder(custom_path.custom_path.clone());
     }
