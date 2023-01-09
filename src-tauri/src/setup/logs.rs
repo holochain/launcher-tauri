@@ -6,8 +6,6 @@ use log4rs::{
   encode::pattern::PatternEncoder,
   Config,
 };
-use tauri::{AppHandle, Manager};
-use tauri::api::shell::open;
 
 use crate::file_system::{logs_folder_path, logs_path};
 
@@ -33,20 +31,8 @@ pub fn log(log: String) -> Result<(), String> {
   Ok(())
 }
 
-pub fn open_logs_folder(app: &AppHandle, custom_path: Option<String>) {
-
-  let logs_path = logs_folder_path(custom_path);
-
-  match logs_path.as_os_str().to_str() {
-    Some(logs_path_str) => {
-      if let Err(err) = open(
-        &app.shell_scope(),
-        logs_path_str,
-        None
-        ){
-        log::error!("Error opening logs folder: {}", err);
-      }
-    },
-    None => log::error!("Failed to convert logs path from OsStr to str")
+pub fn open_logs_folder(custom_path: Option<String>) {
+  if let Err(err) = opener::open(logs_folder_path(custom_path)) {
+    log::error!("Error opening logs folder: {}", err);
   }
 }
