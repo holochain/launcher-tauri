@@ -39,7 +39,7 @@ pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
     }
     "report_issue" => report_issue(),
     "open_logs" => {
-      logs::open_logs_folder(custom_path.custom_path.clone());
+      logs::open_logs_folder(&app_handle, custom_path.custom_path.clone());
     }
     _ => {}
   }
