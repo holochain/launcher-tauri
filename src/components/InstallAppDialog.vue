@@ -67,21 +67,28 @@
       >
       </HCSelect>
       <div class="column" style="width: 100%">
-        <div class="row" style="margin: 20px 0 15px 20px; align-items: center">
+        <div class="row" style="margin: 20px 0 15px 20px;"
+        >
           <div
             @click="showAdvanced = !showAdvanced"
             @keydown.enter="showAdvanced = !showAdvanced"
-            style="
-              text-align: center;
-              font-size: 24px;
-              width: 20px;
-              cursor: pointer;
-            "
+            class="row advanced-button"
+            style="align-items: center;"
             tabindex="0"
           >
-            {{ showAdvanced ? "-" : "+" }}
+            <div
+              style="
+                text-align: center;
+                font-size: 24px;
+                width: 20px;
+                cursor: pointer;
+              "
+            >
+              {{ showAdvanced ? "-" : "+" }}
+            </div>
+            <div style="font-size: 20px; margin-left: 10px">Advanced</div>
           </div>
-          <div style="font-size: 20px; margin-left: 10px">Advanced</div>
+          <span style="display: flex; flex: 1;"></span>
         </div>
       </div>
 
@@ -95,7 +102,7 @@
         />
 
         <HCSelect
-          style="margin: 5px; margin-bottom: 15px; width: 360px"
+          style="margin: 5px; margin-bottom: 15px; width: 360px; display: none;"
           label="Public Key"
           :items="allPubKeys"
           :invalid="holochainId ? undefined : 'Select Holochain version first'"
@@ -439,5 +446,10 @@ export default defineComponent({
   top: -3%;
   position: absolute;
   opacity: 50%;
+}
+
+.advanced-button:hover {
+  opacity: 0.8;
+  cursor: pointer;
 }
 </style>

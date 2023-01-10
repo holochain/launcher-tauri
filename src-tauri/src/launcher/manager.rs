@@ -422,7 +422,7 @@ impl LauncherManager {
     // listen for anchor clicks to route them to the open_url_cmd command for sanitization and
     // opennig in system default browser
     let anchor_event_listener = r#"window.addEventListener("click", (e) => {
-      if (e.target.tagName.toLowerCase() === 'a') {
+      if ((e.target.tagName.toLowerCase() === 'a') && (e.target.href.startsWith('http://') || e.target.href.startsWith('https://'))) {
         e.preventDefault();
         window.__TAURI_INVOKE__('open_url_cmd', { 'url': e.target.href } )
       }
