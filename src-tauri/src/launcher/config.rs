@@ -3,7 +3,7 @@ use log::Level;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, fs};
 
-use crate::file_system::launcher_config_path;
+use crate::file_system::{profile_config_dir, Profile, launcher_config_path};
 
 use super::error::LauncherError;
 
@@ -13,7 +13,7 @@ pub struct LauncherConfig {
   pub custom_binary_path: Option<String>,
 
   pub running_versions: HashSet<HolochainVersion>,
-  custom_path: Option<String>,
+  profile: Profile,
 }
 
 impl Default for LauncherConfig {
@@ -22,32 +22,48 @@ impl Default for LauncherConfig {
       log_level: log::Level::Warn,
       custom_binary_path: None,
       running_versions: HashSet::from([HolochainVersion::default()]),
-      custom_path: None,
+      profile: String::from("default"),
     }
   }
-
 }
 
 
 
 impl LauncherConfig {
-  pub fn new(custom_path: Option<String>) -> Self {
+  pub fn new(profile: Profile) -> Self {
     LauncherConfig {
       log_level: log::Level::Warn,
       custom_binary_path: None,
       running_versions: HashSet::from([HolochainVersion::default()]),
-      custom_path: custom_path,
+      profile: profile,
     }
   }
 
-  pub fn read(custom_path: Option<String>) -> LauncherConfig {
-    match fs::read_to_string(launcher_config_path(custom_path.clone())) {
+  pub fn read(profile: Profile) -> LauncherConfig {
+
+    let config_path = match launcher_config_path(profile.clone()) {
+      Ok(path) => path,
+      Err(e) => {
+        log::error!("Warning: Found no launcher config file at expected path. Generating default config instead.");
+        return LauncherConfig::new(profile.clone());
+      }
+    };
+
+    match fs::read_to_string(config_path) {
       Ok(str) => {
-        serde_yaml::from_str::<LauncherConfig>(str.as_str()).unwrap_or(LauncherConfig::new(custom_path))
+        match serde_yaml::from_str::<LauncherConfig>(str.as_str()){
+          Ok(config) => config,
+          Err(e) => {
+            log::error!("Failed to read launcher config to string: {}. Generating default config instead.", e);
+            LauncherConfig::new(profile)
+          }
+        }
       }
       Err(_) => {
-        let config = LauncherConfig::new(custom_path);
-        config.write().expect("Could not write launcher config");
+        let config = LauncherConfig::new(profile);
+        if let Err(e) = config.write() {
+          log::error!("Failed to write launcher config: {}.", e);
+        }
         config
       }
     }

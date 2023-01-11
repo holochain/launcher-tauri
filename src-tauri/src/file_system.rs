@@ -3,8 +3,12 @@ use std::path::PathBuf;
 use holochain_manager::versions::HolochainVersion;
 use lair_keystore_manager::versions::LairKeystoreVersion;
 
+use crate::launcher::error::LauncherError;
+
 static APP_NAME: &str = "holochain-launcher";
 
+/// Name of the profile
+pub type Profile = String;
 
 
 /// To store things in different locations during development
@@ -31,10 +35,10 @@ fn component_name(name: &str) -> String {
 ///
 /// At the time of writing, ${APP_NAME} = `holochain-launcher`
 ///
-pub fn profile_config_dir(profile: String) -> Result<PathBuf, String> {
+pub fn profile_config_dir(profile: String) -> Result<PathBuf, LauncherError> {
   #[cfg(target_os = "linux")]
   let path = dirs_next::config_dir()
-    .ok_or(String::from("Failed to get profile config dir"))?
+    .ok_or(LauncherError::SystemDirError(String::from("Failed to get profile config dir")))?
     .join(component_name(APP_NAME))
     .join("profiles")
     .join(profile);
@@ -51,7 +55,7 @@ pub fn profile_config_dir(profile: String) -> Result<PathBuf, String> {
 /// * **macOS:** `$HOME/Library/Application Support/${APP_NAME}/profiles/${profile}/${holochain version}`
 /// * **Windows:** `{FOLDERID_RoamingAppData}/${APP_NAME}/profiles/${profile}/${holochain version}`
 ///
-pub fn conductor_config_dir(holochain_version: HolochainVersion, profile: String) -> Result<PathBuf, String> {
+pub fn conductor_config_dir(holochain_version: HolochainVersion, profile: String) -> Result<PathBuf, LauncherError> {
   let version: String = holochain_version.into();
   Ok(profile_config_dir(profile)?.join("holochain").join(version))
 }
@@ -62,7 +66,7 @@ pub fn conductor_config_dir(holochain_version: HolochainVersion, profile: String
 /// * **macOS:** `$HOME/Library/Application Support/${APP_NAME}/profiles/${profile}/config/launcher/launcher-config.yaml`
 /// * **Windows:** `{FOLDERID_RoamingAppData}/${APP_NAME}/profiles/${profile}/config/launcher/launcher-config.yaml`
 ///
-pub fn launcher_config_ath(profile: String) -> Result<PathBuf, String> {
+pub fn launcher_config_path(profile: String) -> Result<PathBuf, LauncherError> {
   Ok(profile_config_dir(profile)?.join("launcher").join("launcher-config.yaml"))
 }
 
@@ -79,7 +83,7 @@ pub fn launcher_config_ath(profile: String) -> Result<PathBuf, String> {
 ///
 /// At the time of writing, ${APP_NAME} = `holochain-launcher`
 ///
-pub fn profile_logs_path(profile: String) -> Result<PathBuf, String> {
+pub fn profile_logs_path(profile: String) -> Result<PathBuf, LauncherError> {
   Ok(profile_logs_dir(profile)?.join("launcher.log"))
 }
 
@@ -126,10 +130,10 @@ pub fn profile_logs_dir(profile: String) -> Result<PathBuf, String> {
 ///
 /// At the time of writing, ${APP_NAME} = `holochain-launcher`
 ///
-pub fn profile_data_dir(profile: String) -> Result<PathBuf, String> {
+pub fn profile_data_dir(profile: String) -> Result<PathBuf, LauncherError> {
   Ok(
     dirs_next::data_dir()
-    .ok_or(String::from("Failed to get profile data dir"))?
+    .ok_or(LauncherError::SystemDirError(String::from("Failed to get profile data dir")))?
     .join(component_name(APP_NAME))
     .join("profiles")
     .join(profile)
