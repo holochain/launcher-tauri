@@ -3,7 +3,7 @@ use std::{fs, io, path::PathBuf};
 use tauri::{api::process::kill_children, Manager};
 
 use crate::{
-  file_system::{root_config_path, root_holochain_data_path, root_lair_path, CustomPath},
+  file_system::{root_config_path, root_holochain_data_path, root_lair_dir, CustomPath},
   launcher::{error::LauncherError, manager::LauncherManager, state::LauncherState},
   running_state::RunningState,
 };
@@ -47,7 +47,7 @@ pub async fn execute_factory_reset(
     log::error!("Could not remove holochain config path: {}", err);
     String::from("Could not remove holochain config path")
   })?;
-  remove_dir_if_exists(root_lair_path(custom_path.clone())).map_err(|err| {
+  remove_dir_if_exists(root_lair_dir(custom_path.clone())).map_err(|err| {
     log::error!("Could not remove lair path: {}", err);
     String::from("Could not remove lair path")
   })?;

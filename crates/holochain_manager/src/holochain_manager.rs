@@ -38,8 +38,8 @@ impl HolochainManager {
     config: LaunchHolochainConfig,
     password: String,
   ) -> Result<Self, LaunchHolochainError> {
-    let conductor_config_path = config.config_environment_path.join("conductor-config.yaml");
-    create_dir_if_necessary(&config.config_environment_path)?;
+    let conductor_config_path = config.conductor_config_dir.join("conductor-config.yaml");
+    create_dir_if_necessary(&config.conductor_config_dir)?;
     create_dir_if_necessary(&config.environment_path)?;
 
     let version_manager = version.manager();
@@ -61,8 +61,10 @@ impl HolochainManager {
       ),
     };
 
-    fs::write(conductor_config_path.clone(), new_conductor_config)
+    fs::write(conductor_config_path.clone(), new_conductor_config.clone())
       .expect("Could not write conductor config");
+
+    println!("Wrote conductor config: {:?}", new_conductor_config);
 
     let command_child = launch_holochain_process(
       config.log_level,

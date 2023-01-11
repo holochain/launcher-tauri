@@ -20,8 +20,8 @@ use holochain_manager::versions::HolochainVersion;
 use holochain_web_app_manager::WebAppManager;
 
 use crate::file_system::{
-  config_environment_path, data_path_for_holochain_version, keystore_data_path, root_config_path,
-  root_holochain_data_path, root_lair_path,
+  conductor_config_dir, holochain_version_data_dir, keystore_data_dir,
+  root_holochain_data_path, root_lair_dir,
 };
 use crate::system_tray::AllInstalledApps;
 use crate::{running_state::RunningState, system_tray::update_system_tray, LauncherState};
@@ -59,11 +59,11 @@ pub struct LauncherManager {
 impl LauncherManager {
   pub async fn launch(app_handle: AppHandle, custom_path: Option<String>) -> Result<Self, LauncherError> {
 
-    create_dir_if_necessary(&root_lair_path(custom_path.clone()))?;
+    create_dir_if_necessary(&root_lair_dir(custom_path.clone()))?;
     create_dir_if_necessary(&root_holochain_data_path(custom_path.clone()))?;
     create_dir_if_necessary(&root_config_path(custom_path.clone()))?;
 
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_2::lair_keystore_version(), custom_path.clone());
+    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_2::lair_keystore_version(), custom_path.clone());
 
     let is_initialized = LairKeystoreManagerV0_2::is_initialized(keystore_path);
 
@@ -108,7 +108,7 @@ impl LauncherManager {
       .emit("progress-update", String::from("Initializing keystore"))
       .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_2::lair_keystore_version(), custom_path.clone());
+    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_2::lair_keystore_version(), custom_path.clone());
 
     LairKeystoreManagerV0_2::initialize(keystore_path, password.clone())
       .await
@@ -125,7 +125,7 @@ impl LauncherManager {
   }
 
   pub async fn launch_keystore(&mut self, password: String, custom_path: Option<String>) -> Result<(), String> {
-    let keystore_path = keystore_data_path(LairKeystoreManagerV0_2::lair_keystore_version(), custom_path.clone());
+    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_2::lair_keystore_version(), custom_path.clone());
     let lair_keystore_manager =
       LairKeystoreManagerV0_2::launch(self.config.log_level, keystore_path, password.clone())
         .await
@@ -180,11 +180,11 @@ impl LauncherManager {
 
     let conductor_config_path = match custom_binary_path.is_some() {
       true => root_config_path(custom_path.clone()).join("custom"),
-      false => config_environment_path(version, custom_path.clone()),
+      false => conductor_config_dir(version, custom_path.clone()),
     };
     let environment_path = match custom_binary_path.is_some() {
       true => root_holochain_data_path(custom_path.clone()).join("custom"),
-      false => data_path_for_holochain_version(version, custom_path.clone()),
+      false => holochain_version_data_dir(version, custom_path.clone()),
     };
 
     let lair_manager = self.get_lair_keystore_manager()?;
@@ -205,7 +205,7 @@ impl LauncherManager {
       log_level: self.config.log_level,
       command,
       admin_port,
-      config_environment_path: conductor_config_path,
+      conductor_config_dir: conductor_config_path,
       environment_path,
       keystore_connection_url,
     };

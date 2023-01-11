@@ -26,7 +26,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "org.holochain.developer",
+      "identifier": "holochain-launcher",
       "icon": [
         "icons/icon.png",
         "icons/icon.ico",
