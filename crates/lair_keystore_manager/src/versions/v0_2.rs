@@ -35,7 +35,6 @@ impl LairKeystoreManager for LairKeystoreManagerV0_2 {
 
   async fn initialize(keystore_path: PathBuf, password: String) -> Result<(), LairKeystoreError> {
     create_dir_if_necessary(&keystore_path)?;
-
     initialize(keystore_path, password).await
   }
 

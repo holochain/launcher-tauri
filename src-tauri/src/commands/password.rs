@@ -1,10 +1,10 @@
-use crate::{launcher::state::LauncherState, file_system::CustomPath};
+use crate::{launcher::state::LauncherState, file_system::Profile};
 
 #[tauri::command]
 pub async fn initialize_keystore(
   window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
-  custom_path: tauri::State<'_, CustomPath>,
+  profile: tauri::State<'_, Profile>,
   password: String,
 ) -> Result<(), String> {
   if window.label() != "admin" {
@@ -18,7 +18,7 @@ pub async fn initialize_keystore(
   let manager = mutex.get_running()?;
 
   manager
-    .initialize_and_launch_keystore(password, custom_path.custom_path.clone())
+    .initialize_keystore_and_launch(password, profile.inner().clone())
     .await?;
 
   Ok(())
@@ -28,7 +28,7 @@ pub async fn initialize_keystore(
 pub async fn unlock_and_launch(
   window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
-  custom_path: tauri::State<'_, CustomPath>,
+  profile: tauri::State<'_, Profile>,
   password: String,
 ) -> Result<(), String> {
   if window.label() != "admin" {
@@ -38,7 +38,7 @@ pub async fn unlock_and_launch(
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
 
-  manager.launch_keystore(password, custom_path.custom_path.clone()).await?;
+  manager.launch_managers(password, profile.inner().clone()).await?;
 
   Ok(())
 }

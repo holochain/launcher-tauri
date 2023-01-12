@@ -11,7 +11,7 @@
     "
   >
     <div class="column" style="margin: 0 20px; max-width: 500px">
-      <span
+      <div
         style="
           font-weight: 600;
           font-size: 1.5em;
@@ -20,59 +20,38 @@
           margin-bottom: 25px;
           margin-top: -10px;
         "
-        >{{ $data.heading }}</span
-      >
-
-      <div v-if="oldFiles" class="column">
-        <span>
-          It seems you have old files from older installations of the launcher.
-          It's recommended that you do a factory reset and start afresh.
-        </span>
-        <span style="margin-top: 8px">
-          This new version of the Launcher already comes with support for
-          multiple versions, so from now on this will not be needed anymore when
-          upgrading from one version of the Launcher to the next.
-        </span>
-
-        <span style="margin-top: 8px">
-          <b
-            >Notice! This will uninstall all the Holochain apps that were
-            installed in this computer, and also remove all previous stored
-            data.
-          </b>
-        </span>
+        >
+        {{ $data.heading }}
       </div>
 
-      <div v-else-if="dbFileTypeError" class="column">
-        <span>
-          It seems that the database of one of your conductors is not recognized
-          properly.
-        </span>
-        <span style="margin-top: 8px">
-          If you haven't changed the database files yourself, this is most
-          probably because the Holochain Launcher switched to encrypting your
-          databases at rest as of version 0.6.0 in order to anticipate the same
-          upcoming change of the official Holochain repository.
-        </span>
-        <span style="margin-top: 8px">
-          Unfortunately, the easiest way to fix this and still use the latest
-          version of the Holochain Launcher is to do a factory reset.
-        </span>
-        <span style="margin-top: 8px">
-          <b>
-            This will uninstall all the Holochain apps that were installed on
-            this computer as well as remove all their previously stored data.
-          </b>
-        </span>
-      </div>
-
-      <span v-else style="margin-top: 8px; text-align: center">
+      <div style="margin-top: 8px; text-align: center">
         {{ $t("dialogs.factoryReset.part1") }}
         <b>{{ $t("dialogs.factoryReset.bold1") }}</b>
         {{ $t("dialogs.factoryReset.part2") }}<br /><br />
         {{ $t("dialogs.factoryReset.part3")
         }}<b>{{ $t("dialogs.factoryReset.bold2") }}</b>
-      </span>
+      </div>
+
+      <div style="margin-top: 40px; margin-left: 20px; text-align: left:">
+        <div style="font-weight: bold;">{{ $t("dialogs.factoryReset.optionalDeletions") }}</div>
+        <div class="row" style="margin-top: 8px;">
+          <ToggleSwitch
+            :sliderOn="deleteLair"
+            @click="() => deleteLair = !deleteLair"
+            @keydown.enter="deleteLair = !deleteLair"
+          />
+          <span style="margin-left: 10px;">{{ $t("dialogs.factoryReset.deleteLair") }}</span>
+        </div>
+        <div class="row" style="margin-top: 5px;">
+          <ToggleSwitch
+            :sliderOn="deleteLogs"
+            @click="() => deleteLogs = !deleteLogs"
+            @keydown.enter="() => deleteLogs = !deleteLogs"
+          />
+          <span style="margin-left: 10px;">{{ $t("dialogs.factoryReset.deleteLogs") }}</span>
+        </div>
+      </div>
+
     </div>
   </HCGenericDialog>
   <HCSnackbar :labelText="snackbarText" ref="snackbar"></HCSnackbar>
@@ -87,16 +66,19 @@ import { listen } from "@tauri-apps/api/event";
 
 import HCGenericDialog from "../components/subcomponents/HCGenericDialog.vue";
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
+import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
 
 export default defineComponent({
   name: "FactoryReset",
-  components: { HCGenericDialog, HCSnackbar },
+  components: { HCGenericDialog, HCSnackbar, ToggleSwitch },
   data(): {
     snackbarText: string | undefined;
     executing: boolean;
     oldFiles: boolean;
     heading: string;
     dbFileTypeError: boolean;
+    deleteLair: boolean;
+    deleteLogs: boolean;
   } {
     return {
       snackbarText: undefined,
@@ -104,6 +86,8 @@ export default defineComponent({
       oldFiles: false,
       heading: "Factory Reset",
       dbFileTypeError: false,
+      deleteLair: false,
+      deleteLogs: false,
     };
   },
   async mounted() {
@@ -140,7 +124,7 @@ export default defineComponent({
     async executeFactoryReset() {
       try {
         this.executing = true;
-        await invoke("execute_factory_reset");
+        await invoke("execute_factory_reset", { deleteLair: this.deleteLair, deleteLogs: this.deleteLogs });
         this.executing = false;
         window.location.reload();
       } catch (e) {

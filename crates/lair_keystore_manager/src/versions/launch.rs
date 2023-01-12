@@ -8,7 +8,7 @@ use crate::error::{LairKeystoreError, LaunchChildError};
 
 pub async fn launch_lair_keystore_process(
   log_level: log::Level,
-  keystore_data_path: PathBuf,
+  keystore_data_dir: PathBuf,
   password: String,
 ) -> Result<Url2, LairKeystoreError> {
   let mut envs = HashMap::new();
@@ -20,7 +20,7 @@ pub async fn launch_lair_keystore_process(
       LaunchChildError::BinaryNotFound,
     )))?
     .args(&["server", "-p"])
-    .current_dir(keystore_data_path.clone())
+    .current_dir(keystore_data_dir.clone())
     .envs(envs.clone())
     .spawn()
     .map_err(|err| {
@@ -74,7 +74,7 @@ pub async fn launch_lair_keystore_process(
       LaunchChildError::BinaryNotFound,
     )))?
     .args(&["url"])
-    .current_dir(keystore_data_path)
+    .current_dir(keystore_data_dir)
     .envs(envs.clone())
     .output()
     .map_err(|err| {

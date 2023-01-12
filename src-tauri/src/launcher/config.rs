@@ -71,8 +71,9 @@ impl LauncherConfig {
 
   pub fn write(&self) -> Result<(), LauncherError> {
     let serde_config = serde_yaml::to_string(&self).expect("Could not serialize launcher config");
+    let config_path = launcher_config_path(self.profile.clone())?;
 
-    fs::write(launcher_config_path(self.custom_path.clone()), serde_config)
+    fs::write(config_path, serde_config)
       .map_err(|err| LauncherError::ConfigError(format!("{}", err)))
   }
 }

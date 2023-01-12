@@ -3,7 +3,7 @@ use std::{fs, io, path::PathBuf};
 use tauri::{api::process::kill_children, Manager};
 
 use crate::{
-  file_system::{profile_config_dir, profile_holochain_data_dir, profile_lair_dir, Profile},
+  file_system::{profile_config_dir, profile_holochain_data_dir, profile_lair_dir, Profile, profile_logs_dir},
   launcher::{error::LauncherError, manager::LauncherManager, state::LauncherState},
   running_state::RunningState,
 };
@@ -14,6 +14,8 @@ pub async fn execute_factory_reset(
   state: tauri::State<'_, LauncherState>,
   profile: tauri::State<'_, Profile>,
   app_handle: tauri::AppHandle,
+  delete_lair: bool,
+  delete_logs: bool,
 ) -> Result<(), String> {
   if window.label() != "admin" {
     return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (E)"))
@@ -45,21 +47,45 @@ pub async fn execute_factory_reset(
 
   let config_dir = profile_config_dir(profile.clone())
     .map_err(|e| format!("Failed to get config dir: {}", e))?;
-  let lair_dir = profile_lair_dir(profile.clone())
-    .map_err(|e| format!("Failed to get lair dir: {}", e))?;
-  let holochain_data_dir = profile_holochain_data_dir(profile.clone())
-    .map_err(|e| format!("Failed to get holochain data dir: {}", e));
 
   remove_dir_if_exists(config_dir).map_err(|err| {
-    log::error!("Could not remove holochain config path: {}", err);
-    String::from("Could not remove holochain config path")
+    log::error!("Could not remove holochain config directory: {}", err);
+    String::from("Could not remove holochain config directory")
   })?;
-  remove_dir_if_exists(lair_dir).map_err(|err| {
-    log::error!("Could not remove lair path: {}", err);
-    String::from("Could not remove lair path")
-  })?;
+
+
+  let holochain_data_dir = profile_holochain_data_dir(profile.clone())
+    .map_err(|e| format!("Failed to get holochain data dir: {}", e))?;
+
   remove_dir_if_exists(holochain_data_dir)
-    .or(Err(String::from("Could not remove holochain data path")))?;
+    .map_err(|err| {
+      log::error!("Could not remove holochain data directory: {}", err);
+      String::from("Could not remove holochain data directory")
+    })?;
+
+
+  if delete_lair == true {
+    let lair_dir = profile_lair_dir(profile.clone())
+      .map_err(|e| format!("Failed to get lair dir: {}", e))?;
+
+    remove_dir_if_exists(lair_dir).map_err(|err| {
+      log::error!("Could not remove lair directory: {}", err);
+      String::from("Could not remove lair directory")
+    })?;
+  }
+
+
+  if delete_logs == true {
+    let logs_dir = profile_logs_dir(profile.clone())
+      .map_err(|e| format!("Failed to get logs dir: {}", e))?;
+
+    remove_dir_if_exists(logs_dir).map_err(|err| {
+      log::error!("Could not remove logs directory: {}", err);
+      String::from("Could not remove logs directory")
+    })?;
+  }
+
+
 
   let manager_launch = LauncherManager::launch(app_handle, profile.clone()).await;
 
