@@ -3,7 +3,7 @@ use std::{fs, io, path::PathBuf};
 use tauri::{api::process::kill_children, Manager};
 
 use crate::{
-  file_system::{root_config_path, root_holochain_data_path, root_lair_dir, CustomPath},
+  file_system::{profile_config_dir, profile_holochain_data_dir, profile_lair_dir, Profile},
   launcher::{error::LauncherError, manager::LauncherManager, state::LauncherState},
   running_state::RunningState,
 };
@@ -12,7 +12,7 @@ use crate::{
 pub async fn execute_factory_reset(
   window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
-  custom_path: tauri::State<'_, CustomPath>,
+  profile: tauri::State<'_, Profile>,
   app_handle: tauri::AppHandle,
 ) -> Result<(), String> {
   if window.label() != "admin" {
@@ -41,20 +41,27 @@ pub async fn execute_factory_reset(
   kill_children();
   log::info!("Stopped children processes");
 
-  let custom_path = custom_path.custom_path.clone();
+  let profile = profile.inner().clone();
 
-  remove_dir_if_exists(root_config_path(custom_path.clone())).map_err(|err| {
+  let config_dir = profile_config_dir(profile.clone())
+    .map_err(|e| format!("Failed to get config dir: {}", e))?;
+  let lair_dir = profile_lair_dir(profile.clone())
+    .map_err(|e| format!("Failed to get lair dir: {}", e))?;
+  let holochain_data_dir = profile_holochain_data_dir(profile.clone())
+    .map_err(|e| format!("Failed to get holochain data dir: {}", e));
+
+  remove_dir_if_exists(config_dir).map_err(|err| {
     log::error!("Could not remove holochain config path: {}", err);
     String::from("Could not remove holochain config path")
   })?;
-  remove_dir_if_exists(root_lair_dir(custom_path.clone())).map_err(|err| {
+  remove_dir_if_exists(lair_dir).map_err(|err| {
     log::error!("Could not remove lair path: {}", err);
     String::from("Could not remove lair path")
   })?;
-  remove_dir_if_exists(root_holochain_data_path(custom_path.clone()))
+  remove_dir_if_exists(holochain_data_dir)
     .or(Err(String::from("Could not remove holochain data path")))?;
 
-  let manager_launch = LauncherManager::launch(app_handle, custom_path.clone()).await;
+  let manager_launch = LauncherManager::launch(app_handle, profile.clone()).await;
 
   let mut maybe_error: Option<LauncherError> = None;
 

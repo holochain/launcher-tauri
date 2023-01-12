@@ -77,6 +77,7 @@ pub fn launcher_config_path(profile: String) -> Result<PathBuf, LauncherError> {
 
 /// Path to log file of a given profile
 ///
+///
 /// * **Linux:** `$XDG_CONFIG_HOME/${APP_NAME}/${profile}/logs/launcher.log` or `$HOME/.config/${APP_NAME}/${profile}/logs/launcher.log`
 /// * **macOS:** `[`home_dir`]`/Library/Logs/${APP_NAME}/${profile}/launcher.log``
 /// * **Windows:** `{FOLDERID_RoamingAppData}/${APP_NAME}/${profile}/logs/launcher.log`
@@ -88,6 +89,9 @@ pub fn profile_logs_path(profile: String) -> Result<PathBuf, LauncherError> {
 }
 
 /// Directory containing logs of a given profile
+///
+/// **Note:** Log dir is not part of config dir on Linux, such that it can be saved
+/// from deletion upon factory reset
 ///
 /// Inspired by here: https://docs.rs/tauri/1.2.3/src/tauri/api/path.rs.html#561
 /// But without being bound to the bundle-identifier
@@ -170,7 +174,7 @@ fn profile_tauri_path(profile: String) -> Result<PathBuf, String> {
 ///
 /// At the time of writing, ${APP_NAME} = `holochain-launcher`
 ///
-pub fn root_holochain_data_dir(profile: String) -> Result<PathBuf, String> {
+pub fn profile_holochain_data_dir(profile: String) -> Result<PathBuf, String> {
   Ok(profile_data_dir(profile)?.join("holochain"))
 }
 
@@ -200,7 +204,7 @@ pub fn holochain_version_data_dir(holochain_version: HolochainVersion, profile: 
 ///
 /// At the time of writing, ${APP_NAME} = `holochain-launcher`
 ///
-pub fn root_lair_dir(profile: String) -> Result<PathBuf, String> {
+pub fn profile_lair_dir(profile: String) -> Result<PathBuf, String> {
   Ok(profile_data_dir(profile)?.join("lair"))
 }
 
@@ -214,6 +218,6 @@ pub fn root_lair_dir(profile: String) -> Result<PathBuf, String> {
 ///
 pub fn keystore_data_dir(lair_keystore_version: LairKeystoreVersion, profile: String) -> Result<PathBuf, String> {
   let version: String = lair_keystore_version.into();
-  Ok(root_lair_dir(profile)?.join(version))
+  Ok(profile_lair_dir(profile)?.join(version))
 }
 

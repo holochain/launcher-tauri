@@ -21,7 +21,7 @@ use holochain_web_app_manager::WebAppManager;
 
 use crate::file_system::{
   conductor_config_dir, holochain_version_data_dir, keystore_data_dir,
-  root_holochain_data_path, root_lair_dir,
+  profile_holochain_data_dir, profile_lair_dir,
 };
 use crate::system_tray::AllInstalledApps;
 use crate::{running_state::RunningState, system_tray::update_system_tray, LauncherState};
@@ -59,8 +59,8 @@ pub struct LauncherManager {
 impl LauncherManager {
   pub async fn launch(app_handle: AppHandle, custom_path: Option<String>) -> Result<Self, LauncherError> {
 
-    create_dir_if_necessary(&root_lair_dir(custom_path.clone()))?;
-    create_dir_if_necessary(&root_holochain_data_path(custom_path.clone()))?;
+    create_dir_if_necessary(&profile_lair_dir(custom_path.clone()))?;
+    create_dir_if_necessary(&profile_holochain_data_dir(custom_path.clone()))?;
     create_dir_if_necessary(&root_config_path(custom_path.clone()))?;
 
     let keystore_path = keystore_data_dir(LairKeystoreManagerV0_2::lair_keystore_version(), custom_path.clone());

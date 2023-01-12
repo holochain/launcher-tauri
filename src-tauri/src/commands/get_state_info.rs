@@ -27,7 +27,7 @@ pub async fn get_state_info(
 
   let state_info = inner_get_state_info(state).await?;
 
-  let config = LauncherConfig::read(custom_path.custom_path.clone());
+  let config = LauncherConfig::read(profile.inner().clone());
 
   Ok(LauncherStateInfo {
     state: state_info,
