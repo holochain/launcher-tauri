@@ -2707,7 +2707,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-launcher"
-version = "0.8.0"
+version = "0.8.0-rc.2"
 dependencies = [
  "async-trait",
  "base64",
