@@ -86,8 +86,8 @@
 //!
 //!
 
-pub mod utils;
 pub mod commands;
-pub mod error;
 pub mod cli;
+pub mod error;
 pub mod launch_tauri;
+pub mod prepare_webapp;
