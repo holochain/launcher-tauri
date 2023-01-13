@@ -24,7 +24,7 @@
         {{ $data.heading }}
       </div>
 
-      <div style="margin-top: 8px; text-align: center">
+      <div style="margin-top: 8px; margin-left: 10px; text-align: left">
         {{ $t("dialogs.factoryReset.part1") }}
         <b>{{ $t("dialogs.factoryReset.bold1") }}</b>
         {{ $t("dialogs.factoryReset.part2") }}<br /><br />
@@ -34,14 +34,6 @@
 
       <div style="margin-top: 40px; margin-left: 20px; text-align: left:">
         <div style="font-weight: bold;">{{ $t("dialogs.factoryReset.optionalDeletions") }}</div>
-        <div class="row" style="margin-top: 8px;">
-          <ToggleSwitch
-            :sliderOn="deleteLair"
-            @click="() => deleteLair = !deleteLair"
-            @keydown.enter="deleteLair = !deleteLair"
-          />
-          <span style="margin-left: 10px;">{{ $t("dialogs.factoryReset.deleteLair") }}</span>
-        </div>
         <div class="row" style="margin-top: 5px;">
           <ToggleSwitch
             :sliderOn="deleteLogs"
@@ -77,7 +69,6 @@ export default defineComponent({
     oldFiles: boolean;
     heading: string;
     dbFileTypeError: boolean;
-    deleteLair: boolean;
     deleteLogs: boolean;
   } {
     return {
@@ -86,7 +77,6 @@ export default defineComponent({
       oldFiles: false,
       heading: "Factory Reset",
       dbFileTypeError: false,
-      deleteLair: false,
       deleteLogs: false,
     };
   },
@@ -124,7 +114,7 @@ export default defineComponent({
     async executeFactoryReset() {
       try {
         this.executing = true;
-        await invoke("execute_factory_reset", { deleteLair: this.deleteLair, deleteLogs: this.deleteLogs });
+        await invoke("execute_factory_reset", { deleteLogs: this.deleteLogs });
         this.executing = false;
         window.location.reload();
       } catch (e) {

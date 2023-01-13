@@ -14,7 +14,6 @@ pub async fn execute_factory_reset(
   state: tauri::State<'_, LauncherState>,
   profile: tauri::State<'_, Profile>,
   app_handle: tauri::AppHandle,
-  delete_lair: bool,
   delete_logs: bool,
 ) -> Result<(), String> {
   if window.label() != "admin" {
@@ -74,18 +73,16 @@ pub async fn execute_factory_reset(
   })?;
 
 
+  let lair_dir = profile_lair_dir(profile.clone())
+    .map_err(|e| format!("Failed to get lair dir: {}", e))?;
+
+  remove_dir_if_exists(lair_dir).map_err(|err| {
+    log::error!("Could not remove lair directory: {}", err);
+    String::from("Could not remove lair directory")
+  })?;
+
+
   // Optional deletions
-
-  if delete_lair == true {
-    let lair_dir = profile_lair_dir(profile.clone())
-      .map_err(|e| format!("Failed to get lair dir: {}", e))?;
-
-    remove_dir_if_exists(lair_dir).map_err(|err| {
-      log::error!("Could not remove lair directory: {}", err);
-      String::from("Could not remove lair directory")
-    })?;
-  }
-
 
   if delete_logs == true {
     let logs_dir = profile_logs_dir(profile.clone())

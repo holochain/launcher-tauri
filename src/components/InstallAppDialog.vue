@@ -107,7 +107,7 @@
           :items="allPubKeys"
           :invalid="holochainId ? undefined : 'Select Holochain version first'"
           @item-selected="reuseAgentPubKey = $event"
-          helper="Optionally chose an already existing public key"
+          helper="Optionally choose an already existing public key"
         >
         </HCSelect>
 
