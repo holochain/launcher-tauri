@@ -165,9 +165,9 @@ pub fn profile_data_dir(profile: String) -> Result<PathBuf, LauncherError> {
 
 /// Directory where localStorage of the admin launcher window is stored
 ///
-/// * **Linux:** `$XDG_DATA_HOME/${APP_NAME}/profiles/${profile}` or `$HOME/.local/share/${APP_NAME}/profiles/${profile}`
-/// * **macOS:** `$HOME/Library/Application Support/${APP_NAME}/profiles/${profile}`
-/// * **Windows:** `{FOLDERID_RoamingAppData}/${APP_NAME}/profiles/${profile}`
+/// * **Linux:** `$XDG_DATA_HOME/${APP_NAME}/profiles/${profile}/tauri` or `$HOME/.local/share/${APP_NAME}/profiles/${profile}/tauri`
+/// * **macOS:** `$HOME/Library/Application Support/${APP_NAME}/profiles/${profile}/tauri`
+/// * **Windows:** `{FOLDERID_RoamingAppData}/${APP_NAME}/profiles/${profile}/tauri`
 ///
 /// At the time of writing, ${APP_NAME} = `holochain-launcher`
 ///

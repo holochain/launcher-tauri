@@ -39,14 +39,14 @@ impl WebAppManager {
   ) -> Result<Self, LaunchWebAppManagerError> {
     let environment_path = config.environment_path.clone();
 
-    let conductor_data_path = environment_path.join("conductor");
-    let ui_data_path = uis_data_path(&environment_path);
+    let conductor_data_path = conductor_dir(&environment_path);
+    let apps_data_dir = apps_data_dir(&environment_path);
 
     config.environment_path = conductor_data_path.clone();
 
     create_dir_if_necessary(&environment_path)?;
     create_dir_if_necessary(&conductor_data_path)?;
-    create_dir_if_necessary(&ui_data_path)?;
+    create_dir_if_necessary(&apps_data_dir)?;
 
     let holochain_manager = HolochainManager::launch(version, config, password)
       .await
@@ -118,8 +118,8 @@ impl WebAppManager {
     app_id: String,
     web_ui_zip_bytes: ResourceBytes,
   ) -> Result<(), String> {
-    let ui_folder_path = app_ui_path(&self.environment_path, &app_id);
-    let ui_zip_path = uis_data_path(&self.environment_path).join(format!("{}.zip", app_id));
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id);
+    let ui_zip_path = apps_data_dir(&self.environment_path).join(format!("{}.zip", app_id));
 
     fs::write(ui_zip_path.clone(), web_ui_zip_bytes).or(Err("Failed to write Web UI Zip file"))?;
 
@@ -131,11 +131,17 @@ impl WebAppManager {
     Ok(())
   }
 
+  /// Uninstalls the UI assets and tauri's localStorage associated to the given app
   fn uninstall_app_ui(&mut self, app_id: String) -> Result<(), String> {
-    let ui_folder_path = app_ui_path(&self.environment_path, &app_id);
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id);
+    let local_storage_path = app_local_storage_dir(&self.environment_path, &app_id);
 
     if Path::new(&ui_folder_path).exists() {
       fs::remove_dir_all(ui_folder_path).or(Err("Failed to remove UI folder"))?;
+    }
+
+    if Path::new(&local_storage_path).exists() {
+      fs::remove_dir_all(local_storage_path).or(Err("Failed to remove app's localStorage folder"))?;
     }
 
     Ok(())
@@ -147,7 +153,7 @@ impl WebAppManager {
   }
 
   fn get_web_ui_info(&self, app_id: String) -> Result<WebUiInfo, String> {
-    let ui_folder_path = app_ui_path(&self.environment_path, &app_id);
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id);
 
     match self.is_web_app(app_id.clone()) {
       true => Ok(WebUiInfo::WebApp {
@@ -166,15 +172,15 @@ impl WebAppManager {
   }
 
   pub fn get_ui_index_path(&self, app_id: &String) -> PathBuf {
-    app_ui_path(&self.environment_path, &app_id).join("index.html")
+    app_assets_dir(&self.environment_path, &app_id).join("index.html")
   }
 
-  pub fn get_app_ui_path(&self, app_id: &String) -> PathBuf {
-    app_ui_path(&self.environment_path, &app_id)
+  pub fn get_app_ui_dir(&self, app_id: &String) -> PathBuf {
+    app_assets_dir(&self.environment_path, &app_id)
   }
 
-  pub fn get_app_local_storage_path(&self, app_id: &String) -> PathBuf {
-    app_local_storage_path(&self.environment_path, &app_id)
+  pub fn get_app_local_storage_dir(&self, app_id: &String) -> PathBuf {
+    app_local_storage_dir(&self.environment_path, &app_id)
   }
 
 
@@ -266,7 +272,7 @@ impl WebAppManager {
   }
 
   fn is_web_app(&self, app_id: String) -> bool {
-    let ui_folder_path = app_ui_path(&self.environment_path, &app_id);
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id);
 
     Path::new(&ui_folder_path).exists()
   }
@@ -311,8 +317,8 @@ impl WebAppManager {
   }
 
   pub fn get_storage_info(&self) -> Result<StorageInfo, String> {
-    let ui_path = uis_data_path(&self.environment_path);
-    let conductor_path = conductor_path(&self.environment_path);
+    let ui_path = apps_data_dir(&self.environment_path);
+    let conductor_path = conductor_dir(&self.environment_path);
     let uis_size = fs_extra::dir::get_size(ui_path)
       .map_err(|e| format!("Failed to get UI directory size: {:?}", e))?;
     let authored_size = fs_extra::dir::get_size(conductor_path.join("authored"))
@@ -343,21 +349,28 @@ impl WebAppManager {
   }
 }
 
-fn uis_data_path(root_path: &PathBuf) -> PathBuf {
-  root_path.join("uis")
+/// Path to the apps folder relative to a root directory
+/// (normally relative to the holochain version's "data directory")
+fn apps_data_dir(root_path: &PathBuf) -> PathBuf {
+  root_path.join("apps")
 }
 
-fn app_ui_path(root_path: &PathBuf, app_id: &String) -> PathBuf {
-  uis_data_path(root_path).join(app_id)
+/// Path where UI assets of the given app are stored, relative
+/// to a root directory (normally relative to the holochain version's "data directory")
+fn app_assets_dir(root_path: &PathBuf, app_id: &String) -> PathBuf {
+  apps_data_dir(root_path).join(app_id).join("assets")
 }
 
-fn conductor_path(root_path: &PathBuf) -> PathBuf {
+/// Path where localStorage of the given app is stored, relative
+/// to a root directory (normally relative to the holochain version's "data directory")
+fn app_local_storage_dir(root_path: &PathBuf, app_id: &String) -> PathBuf {
+  apps_data_dir(root_path).join(app_id).join("tauri")
+}
+
+/// Path where the conductor databases are stored, relative to a root
+/// directory (normally relative to the holochain version's "data directory")
+fn conductor_dir(root_path: &PathBuf) -> PathBuf {
   root_path.join("conductor")
-}
-
-// path to where localStorage of a given app is stored
-fn app_local_storage_path(root_path: &PathBuf, app_id: &String) -> PathBuf {
-  root_path.join("tauri").join(app_id)
 }
 
 

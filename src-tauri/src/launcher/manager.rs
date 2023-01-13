@@ -436,8 +436,8 @@ impl LauncherManager {
     let manager = self.get_web_happ_manager(holochain_id)?;
 
     let index_path = manager.get_ui_index_path(app_id);
-    let assets_path = manager.get_app_ui_path(app_id);
-    let local_storage_path = manager.get_app_local_storage_path(app_id);
+    let assets_path = manager.get_app_ui_dir(app_id);
+    let local_storage_path = manager.get_app_local_storage_dir(app_id);
 
     let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
       "APP_INTERFACE_PORT": {},

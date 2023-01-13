@@ -3,7 +3,7 @@ use std::{fs, io, path::PathBuf};
 use tauri::{api::process::kill_children, Manager};
 
 use crate::{
-  file_system::{profile_config_dir, profile_holochain_data_dir, profile_lair_dir, Profile, profile_logs_dir},
+  file_system::{profile_config_dir, profile_holochain_data_dir, profile_lair_dir, Profile, profile_logs_dir, profile_tauri_dir},
   launcher::{error::LauncherError, manager::LauncherManager, state::LauncherState},
   running_state::RunningState,
 };
@@ -50,7 +50,7 @@ pub async fn execute_factory_reset(
 
   remove_dir_if_exists(config_dir).map_err(|err| {
     log::error!("Could not remove holochain config directory: {}", err);
-    String::from("Could not remove holochain config directory")
+    format!("Could not remove holochain config directory: {}", err)
   })?;
 
 
@@ -60,9 +60,21 @@ pub async fn execute_factory_reset(
   remove_dir_if_exists(holochain_data_dir)
     .map_err(|err| {
       log::error!("Could not remove holochain data directory: {}", err);
-      String::from("Could not remove holochain data directory")
-    })?;
+      format!("Could not remove holochain data directory: {}", err)
+  })?;
 
+
+  let tauri_data_dir = profile_tauri_dir(profile.clone())
+    .map_err(|e| format!("Failed to get tauri data dir: {}", e))?;
+
+  remove_dir_if_exists(tauri_data_dir)
+    .map_err(|err| {
+      log::error!("Could not remove tauri data directory: {}", err);
+      format!("Could not remove tauri data directory: {}", err)
+  })?;
+
+
+  // Optional deletions
 
   if delete_lair == true {
     let lair_dir = profile_lair_dir(profile.clone())
