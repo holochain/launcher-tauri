@@ -447,7 +447,7 @@ impl LauncherManager {
     let window_builder = happ_window_builder(
       &self.app_handle,
       app_id.into(),
-      window_label,
+      window_label.clone(),
       app_id.into(),
       index_path,
       assets_path,
@@ -468,13 +468,21 @@ impl LauncherManager {
     if cfg!(target_os = "macos") {
       window_builder.build().map_err(|err| format!("Error opening app: {:?}", err))?;
     } else {
-      window_builder
+      let window = window_builder
         .menu(Menu::new().add_submenu(Submenu::new( // This overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
         "Settings",
         Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
          )))
         .build()
         .map_err(|err| format!("Error opening app: {:?}", err))?;
+      // Listen to "open-devtools" command
+      let a = self.app_handle.clone();
+      let l = window_label.clone();
+      window.on_menu_event(move |_| {
+        if let Some(w) = a.get_window(l.as_str()) {
+          w.open_devtools();
+        }
+      });
     }
 
     Ok(())
