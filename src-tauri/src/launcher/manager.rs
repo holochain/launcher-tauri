@@ -1,3 +1,4 @@
+use holochain_launcher_utils::window_builder::happ_window_builder;
 use holochain_manager::config::LaunchHolochainConfig;
 use holochain_manager::errors::{LaunchHolochainError, InitializeConductorError};
 use holochain_web_app_manager::error::LaunchWebAppManagerError;
@@ -438,136 +439,51 @@ impl LauncherManager {
     let index_path = manager.get_ui_index_path(app_id);
     let assets_path = manager.get_app_ui_dir(app_id);
     let local_storage_path = manager.get_app_local_storage_dir(app_id);
+    let app_port = manager.holochain_manager.app_interface_port();
+    let admin_port = manager.holochain_manager.admin_interface_port();
+    let window_width = 1000.0;
+    let window_height = 700.0;
 
-    let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
-      "APP_INTERFACE_PORT": {},
-      "ADMIN_INTERFACE_PORT": {},
-      "INSTALLED_APP_ID": "{}"
-    }}"#,
-      manager.holochain_manager.app_interface_port(),
-      manager.holochain_manager.admin_interface_port(),
-      app_id
+    let window_builder = happ_window_builder(
+      &self.app_handle,
+      app_id.into(),
+      window_label.clone(),
+      app_id.into(),
+      index_path,
+      assets_path,
+      local_storage_path,
+      app_port,
+      admin_port,
+      window_width,
+      window_height,
     );
 
-    // listen for anchor clicks to route them to the open_url_cmd command for sanitization and
-    // opennig in system default browser
-    let anchor_event_listener = r#"window.addEventListener("click", (e) => {
-      if ((e.target.tagName.toLowerCase() === 'a') && (e.target.href.startsWith('http://') || e.target.href.startsWith('https://'))) {
-        e.preventDefault();
-        window.__TAURI_INVOKE__('open_url_cmd', { 'url': e.target.href } )
-      }
-    });
-    "#;
-
-
-    let window_builder = WindowBuilder::new(
-      &self.app_handle,
-      window_label.clone(),
-      WindowUrl::App("".into())
-    )
-    .on_web_resource_request(move |request, response| {
-      // println!("£*£*£*£* REQUEST BEFORE {:?}", request);
-      let uri = request.uri();
-      match uri {
-        "tauri://localhost" => {
-          let mutable_response = response.body_mut();
-          match read(index_path.clone()) {
-            Ok(index_html) => {
-              *mutable_response = index_html;
-              response.set_mimetype(Some(String::from("text/html")));
-            }, // TODO! Check if there are better ways of dealing with errors here
-            Err(e) => {
-              // println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
-              // log::error!("Error reading the path of the UI's index.html: {:?}", e);
-            },
-          }
-        },
-        _ => {
-          if uri.starts_with("tauri://localhost/") {
-
-            let mut asset_file = &uri[18..]; // TODO! proper error handling. index may be out of bounds?
-
-            // if uri is exactly "tauri://localhost/" redirect to index.html (otherwise it will try to redirect to the admin window's index.html)
-            if asset_file == "" {
-              asset_file = "index.html";
-            }
-
-            let mime_guess = mime_guess::from_path(asset_file);
-
-            let mime_type = match mime_guess.first() {
-              Some(mime) => Some(mime.essence_str().to_string()),
-              None => {
-                log::info!("Could not determine MIME Type of file '{:?}'", asset_file);
-                // println!("\n### ERROR ### Could not determine MIME Type of file '{:?}'\n", asset_file);
-                None
-              }
-            };
-
-            // println!("%#%#%# ASSEETTT: {:?}", asset_file);
-            // println!("%#%#%# Mime type: {:?}", mime_type);
-
-            // TODO! if files in subfolders are requested, additional logic may be required here to get paths right across platforms
-            let asset_path = assets_path.join(asset_file);
-            // println!("%#%#%# ASSEETTT PATH: {:?}", asset_path);
-            match read(asset_path.clone()) {
-              Ok(asset) => {
-                let mutable_response = response.body_mut();
-                *mutable_response = asset;
-                response.set_mimetype(mime_type.clone());
-                // println!("\nRequested file: {}", asset_file);
-                // println!("Detected mime type: {:?}\n", mime_type);
-              },
-              Err(e) => {
-                // println!("\n### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.\n", asset_path, e);
-                let mutable_response = response.body_mut();
-                match read(index_path.clone()) {
-                  Ok(index_html) =>  {
-                    *mutable_response = index_html;
-                    response.set_mimetype(Some(String::from("text/html")));
-                  },
-                  Err(e) => {
-                    // println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
-                    // log::error!("Error reading the path of the UI's index.html: {:?}", e);
-                  },
-                }
-              },
-            }
-          }
-        }
-      }
-
-
-    })
-    .disable_file_drop_handler()
-    .data_directory(local_storage_path)
-    .initialization_script(launcher_env_command.as_str())
-    .initialization_script(anchor_event_listener)
-    .inner_size(1000.0, 700.0)
-    .title(app_id)
-    .enable_clipboard_access(); // TODO! potentially make this optional
-    // .icon(tauri::Icon::File(icon_path)) // placeholder for when apps come shipped with their custom icons
-    // .map_err(|err| format!("Error adding icon: {:?}", err))?
+    // placeholder for when apps come shipped with their custom icons:
+    //
+    // window_builder
+    //  .icon(tauri::Icon::File(icon_path))
+    //  .map_err(|err| format!("Error adding icon: {:?}", err))?
 
 
     if cfg!(target_os = "macos") {
       window_builder.build().map_err(|err| format!("Error opening app: {:?}", err))?;
     } else {
-      window_builder
+      let window = window_builder
         .menu(Menu::new().add_submenu(Submenu::new( // This overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
         "Settings",
         Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
          )))
         .build()
         .map_err(|err| format!("Error opening app: {:?}", err))?;
+      // Listen to "open-devtools" command
+      let a = self.app_handle.clone();
+      let l = window_label.clone();
+      window.on_menu_event(move |_| {
+        if let Some(w) = a.get_window(l.as_str()) {
+          w.open_devtools();
+        }
+      });
     }
-
-    // let a = self.app_handle.clone();
-    // let l = window_label.clone();
-    // window.on_menu_event(move |_| {
-    //   if let Some(w) = a.get_window(l.as_str()) {
-    //     w.open_devtools();
-    //   }
-    // });
 
     Ok(())
   }

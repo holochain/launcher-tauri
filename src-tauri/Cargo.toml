@@ -16,9 +16,10 @@ version = "0.8.0-rc.2"
 tauri-build = { version = "1.2.1", features = [] }
 
 [dependencies]
-holochain_manager = {path = "../crates/holochain_manager"}
-holochain_web_app_manager = {path = "../crates/holochain_web_app_manager"}
-lair_keystore_manager = {path = "../crates/lair_keystore_manager"}
+holochain_manager = { path = "../crates/holochain_manager" }
+holochain_launcher_utils = { path = "../crates/holochain_launcher_utils" }
+holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
+lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 
 # NEW_VERSION update holochain types
 holochain_types = { package = "holochain_types", version = "0.1.0-beta-rc.1"}

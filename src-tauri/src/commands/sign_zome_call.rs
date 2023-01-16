@@ -4,17 +4,8 @@ use lair_keystore_manager::*;
 use holochain_types::prelude::ZomeCallUnsigned;
 use serde::Deserialize;
 
-#[derive(Deserialize, Debug)]
-pub struct ZomeCallUnsignedTauri {
-  pub provenance: AgentPubKey,
-  pub cell_id: CellId,
-  pub zome_name: ZomeName,
-  pub fn_name: FunctionName,
-  pub cap_secret: Option<CapSecret>,
-  pub payload: ExternIO,
-  pub nonce: [u8; 32],
-  pub expires_at: Timestamp,
-}
+use holochain_launcher_utils::zome_call_signing::ZomeCallUnsignedTauri;
+
 
 #[tauri::command]
 pub async fn sign_zome_call(
@@ -27,17 +18,7 @@ pub async fn sign_zome_call(
   //   () // this function is allowed to be called in any window
   // }
 
-  // convert nonce to byte array [u8, 32], required because nonce seems to have "non-serde" deserialize behavior
-  let zome_call_unsigned_converted = ZomeCallUnsigned {
-    provenance: zome_call_unsigned.provenance,
-    cell_id: zome_call_unsigned.cell_id,
-    zome_name: zome_call_unsigned.zome_name,
-    fn_name: zome_call_unsigned.fn_name,
-    cap_secret: zome_call_unsigned.cap_secret,
-    payload: zome_call_unsigned.payload,
-    nonce: zome_call_unsigned.nonce.into(),
-    expires_at: zome_call_unsigned.expires_at,
-  };
+  let zome_call_unsigned_converted: ZomeCallUnsigned = zome_call_unsigned.into();
 
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;

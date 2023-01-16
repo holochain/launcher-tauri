@@ -57,6 +57,8 @@ pub enum HolochainVersion {
   CustomBinary,
   #[serde(rename = "0.1.0-beta-rc.2")]
   V0_1_0BetaRc2,
+  // !!! ONLY USE MINOR VERSION HERE ONCE BETA 0.1.0 IS OUT since this affects the folder structure, i.e. whether
+  // the same conductor database will be used across holochain bumps
 }
 
 impl Into<String> for HolochainVersion {

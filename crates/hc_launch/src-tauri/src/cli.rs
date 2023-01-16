@@ -11,7 +11,7 @@ use structopt::StructOpt;
 use tokio::process::Child;
 
 use crate::launch_tauri::launch_tauri;
-use crate::utils;
+use crate::prepare_webapp;
 use holochain_cli_sandbox::cmds::Create;
 
 
@@ -63,7 +63,7 @@ impl HcLaunch {
                 let temp_folder = temp_dir.path().to_path_buf();
 
                 // unzip the webhapp, prepare UI etc.
-                match utils::prepare_webapp::read_and_prepare_webapp(&p, &temp_folder).await {
+                match prepare_webapp::read_and_prepare_webapp(&p, &temp_folder).await {
                   Ok(()) => (),
                   Err(e) => {
                     println!("Failed to read and prepare webhapp: {:?}", e);

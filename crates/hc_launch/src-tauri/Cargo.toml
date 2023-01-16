@@ -25,6 +25,7 @@ futures = "0.3"
 
 holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="808993ce7c54794f4b7163aa06a288bebba4b8b3"}
 holochain_cli_sandbox = "0.1.0-beta-rc.0"
+holochain_launcher_utils = { path = "../../holochain_launcher_utils" }
 holochain_types = "0.1.0-beta-rc.1"
 holochain_util = { version="0.1.0-beta-rc.0", features = [ "pw" ] }
 holochain_zome_types = "0.1.0-beta-rc.1"
@@ -46,7 +47,7 @@ tempdir = "0.3.7"
 thiserror = "1.0.22"
 
 serde = { version = "1.0", features = ["derive"] }
-tauri = {version = "1.2.3", features = ["clipboard-write-text", "dialog-open", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored"] }
+tauri = {version = "1.2.3", features = ["clipboard-write-text", "dialog-all", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored"] }
 
 tokio = "1.21.2"
 tracing = "0.1"

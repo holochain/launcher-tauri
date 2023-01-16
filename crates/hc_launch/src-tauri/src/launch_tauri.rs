@@ -4,6 +4,8 @@
 )]
 
 use holochain_client::AdminWebsocket;
+use holochain_launcher_utils::window_builder::happ_window_builder;
+use tauri::{CustomMenuItem, Menu, Submenu};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use tauri::Manager;
@@ -12,15 +14,13 @@ use tauri::Window;
 use tauri::WindowEvent;
 use url::Url;
 
-use crate::utils;
-
 use lair_keystore_api::dependencies::sodoken;
 use lair_keystore_api::{LairClient, ipc_keystore_connect};
 
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
-pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_path: PathBuf, watch: bool, passphrase: sodoken::BufRead) -> () {
+pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf, watch: bool, passphrase: sodoken::BufRead) -> () {
   // tauri::async_runtime::set(tokio::runtime::Handle::current());
 
   // build tauri windows
@@ -63,9 +63,9 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_path: PathBu
               }
             };
 
-            let admin_port_clone = admin_port.clone();
+            let admin_port_string = admin_port.clone();
 
-            let app_port = match get_app_websocket(admin_port_clone).await {
+            let app_port = match get_app_websocket(admin_port_string).await {
               Ok(ws) => ws,
               Err(e) => {
                 println!("ERROR! Error getting app websocket port: {}", e);
@@ -73,33 +73,46 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_path: PathBu
               }
             };
 
-
-            let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
-              "APP_INTERFACE_PORT": {},
-              "ADMIN_INTERFACE_PORT": {},
-              "INSTALLED_APP_ID": "{}"
-            }}"#,
-              app_port,
-              admin_port,
-              app_id.clone(),
-            );
+            let admin_port = match admin_port.trim().parse::<u16>() {
+              Ok(u) => u,
+              Err(e) => {
+                println!("Failed to convert admin port from String to u16: {}", e);
+                panic!("Failed to convert admin port from String to u16: {}", e);
+              }
+            };
 
             let window_label = format!("Agent-{}", app_counter);
 
-            let window = match utils::generate_window::generate_window(
-              &app.handle(),
-              &app_id,
+            let window_width = 1000.0;
+            let window_height = 700.0;
+
+            let app_handle = app.handle();
+
+            let window_builder = happ_window_builder(
+              &app_handle,
+              app_id.clone(),
+              window_label.clone(),
               window_label.clone(),
               ui_path.clone().join("index.html"),
               ui_path.clone(),
-              local_storage_path.clone().join(format!("Agent-{}", app_counter)),
-              launcher_env_command,
-            ) {
-              Ok(window) => window,
-              Err(e) => {
-                println!("ERROR! Failed to build window: {}", e);
-                panic!("Failed to build Window: {:?}", e);
-              }
+              local_storage_dir.clone().join(format!("Agent-{}", app_counter)),
+              app_port,
+              admin_port,
+              window_width,
+              window_height,
+            );
+
+            let window = match window_builder
+              .menu(Menu::new().add_submenu(Submenu::new(
+                "Settings",
+                Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
+              )))
+              .build() {
+                Ok(window) => window,
+                Err(e) => {
+                  println!("ERROR! Failed to build window: {}", e);
+                  panic!("Failed to build Window: {:?}", e);
+                }
             };
 
             let a = app.handle().clone();
