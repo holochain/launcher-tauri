@@ -52,7 +52,7 @@
         "minimumSystemVersion": "",
         "exceptionDomain": "",
         "signingIdentity": null,
-        "entitlements": null
+        "entitlements": "entitlements.plist"
       }
     },
     "updater": {
