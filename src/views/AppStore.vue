@@ -1,7 +1,7 @@
 <template>
   <HCLoading ref="downloading" :text="loadingText" />
 
-  <HCDialog ref="appLibraryFirstEnter" closeOnSideClick>
+  <HCDialog ref="appLibraryFirstEnter">
     <div
       class="column"
       style="padding: 30px; align-items: center; max-width: 600px"
@@ -10,7 +10,7 @@
         Note
       </div>
       <div>
-        Holochain is <a href="https://developer.holochain.org/glossary/#peer-to-peer" target="_blank" title="https://developer.holochain.org/glossary/#peer-to-peer">peer-to-peer</a>
+        Holochain is <span @click="peerToPeer" title="https://developer.holochain.org/glossary/#peer-to-peer" style="color: #0000EE; text-decoration: underline; cursor: pointer;">peer-to-peer</span>
          and the <b>App Library is not optimized for download speed yet.</b><br><br>
         Before you can download your first app, <b>the App Library needs to get synchronized with other peers in the background.</b>
         This can take up to 10-20 Minutes depending on the number and size of apps available and the bandwidth of your internet connection.
@@ -344,6 +344,11 @@ export default defineComponent({
     async howToPublish() {
       await invoke("open_url_cmd", {
         url: this.howToPublishUrl,
+      });
+    },
+    async peerToPeer() {
+      await invoke("open_url_cmd", {
+        url: "https://developer.holochain.org/glossary/#peer-to-peer",
       });
     },
     getLatestRelease,
