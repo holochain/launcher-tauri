@@ -10,7 +10,7 @@ use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 use tokio::process::Child;
 
-use crate::launch_tauri::launch_tauri;
+use crate::launch_tauri::{launch_tauri, UISource};
 use crate::prepare_webapp;
 use holochain_cli_sandbox::cmds::Create;
 
@@ -31,9 +31,10 @@ pub struct HcLaunch {
   /// Path to .webhapp or .happ file to launch. If a .happ file is passed, a UI path must be specified as well via --ui-path
   path: Option<PathBuf>,
 
-  // #[structopt(long)]
-  // /// Port of the UI
-  // ui_port: Option<u16>,
+  #[structopt(long)]
+  /// Port of the UI.
+  ui_port: Option<u16>,
+
   #[structopt(long)]
   /// path to the UI. Required if a .happ file is passed.
   ui_path: Option<PathBuf>,
@@ -52,6 +53,16 @@ impl HcLaunch {
   pub async fn run(self) -> anyhow::Result<()> {
     holochain_util::pw::pw_set_piped(self.piped);
 
+    let maybe_ui_source = match (self.ui_path.clone(), self.ui_port) {
+      (Some(ui_path), None) => Some(UISource::Path(ui_path)),
+      (None, Some(ui_port)) => Some(UISource::Port(ui_port)),
+      (Some(ui_path), Some(ui_port)) => {
+        eprintln!("[hc launch] ERROR: You cannot provide both --ui-path and --ui-port.");
+        panic!("ERROR: Provided both a --ui-path and --ui-port");
+      },
+      (None, None) => None,
+    };
+
     match self.path {
       Some(p) => {
         match p.extension() {
@@ -66,7 +77,7 @@ impl HcLaunch {
                 match prepare_webapp::read_and_prepare_webapp(&p, &temp_folder).await {
                   Ok(()) => (),
                   Err(e) => {
-                    println!("Failed to read and prepare webhapp: {:?}", e);
+                    println!("[hc launch] Failed to read and prepare webhapp: {:?}", e);
                     panic!("Failed to read and prepare webhapp");
                   }
                 };
@@ -82,19 +93,13 @@ impl HcLaunch {
                 holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
 
                 // spawn sandboxes
-                println!("# hc launch: Spawning sandbox conductors.");
+                println!("[hc launch] Spawning sandbox conductors.");
                 let _child_processes = spawn_sandboxes(
                   &self.holochain_path,
                   happ_path,
                   self.create,
                   app_id.to_string(),
                 ).await?;
-
-                // spawn tauri windows
-                let ui_path = match self.ui_path.clone() {
-                  Some(p) => p,
-                  None => temp_folder.join("ui").into(),
-                };
 
                 let passphrase = holochain_util::pw::pw_get()?;
 
@@ -105,10 +110,18 @@ impl HcLaunch {
                   std::process::exit(0);
                 });
 
+
+                // spawn tauri windows
+                let ui_source = match maybe_ui_source {
+                  Some(UISource::Path(path)) => UISource::Path(path),
+                  Some(UISource::Port(port)) => UISource::Port(port),
+                  None => UISource::Path(temp_folder.join("ui").into()),
+                };
+
                 // In case a dedicated ui path is passed, check whether it exists, otherwise wait
                 if let Some(ui_p) = self.ui_path {
                   while !ui_p.exists() {
-                    println!("# hc launch: You specified a dedicated UI path to use instead of the UI of the .webhapp file but this path does not exist (yet). Waiting before launching tauri windows...");
+                    println!("[hc launch] You specified a dedicated UI path to use instead of the UI of the .webhapp file but this path does not exist (yet). Waiting before launching tauri windows...");
                     tokio::time::sleep(std::time::Duration::from_secs(2)).await;
                     // return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
                   }
@@ -116,12 +129,12 @@ impl HcLaunch {
 
                 let local_storage_path = temp_folder.join("tauri");
 
-                println!("# hc launch: Launching tauri windows.");
-                launch_tauri(ui_path, app_id.to_string(), local_storage_path, self.watch, passphrase);
+                println!("[hc launch] Launching tauri windows.");
+                launch_tauri(ui_source, app_id.to_string(), local_storage_path, self.watch, passphrase);
               }
               "happ" => {
-                match self.ui_path {
-                  Some(ui_p) => {
+                match maybe_ui_source {
+                  Some(ui_source) => {
 
                     // extraxt filename of .happ
                     let app_id = p.clone().as_path().file_stem().unwrap().to_str().unwrap().to_string();
@@ -130,7 +143,7 @@ impl HcLaunch {
                     holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
 
                     // spawn sandboxes
-                    println!("# hc launch: Spawning sandbox conductors.");
+                    println!("[hc launch] Spawning sandbox conductors.");
                     let _child_processes = spawn_sandboxes(
                       &self.holochain_path,
                       p,
@@ -148,14 +161,16 @@ impl HcLaunch {
                     let passphrase = holochain_util::pw::pw_get()?;
 
 
-                    // check whether ui path exists
-                    while !ui_p.exists() {
-                      println!("# hc launch: Specified UI path does not exist (yet). Waiting before launching tauri windows...");
-                      tokio::time::sleep(std::time::Duration::from_secs(2)).await;
-                      // return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
+                    // In case a ui path is passed, check whether it exists, otherwise wait
+                    if let Some(ui_p) = self.ui_path {
+                      while !ui_p.exists() {
+                        println!("[hc launch] Specified UI path does not exist (yet). Waiting before launching tauri windows...");
+                        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                        // return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
+                      }
                     }
-                    println!("# hc launch: Launching tauri windows.");
 
+                    println!("[hc launch] Launching tauri windows.");
 
                     // generate temp folder for localStorage
                     let temp_dir = tempdir::TempDir::new("hc_launch").unwrap();
@@ -163,18 +178,18 @@ impl HcLaunch {
 
                     let local_storage_path = temp_folder.join("tauri");
 
-                    launch_tauri(ui_p, app_id, local_storage_path, self.watch, passphrase);
+                    launch_tauri(ui_source, app_id, local_storage_path, self.watch, passphrase);
                   },
-                  None => eprintln!("Error: If you provide a path to a .happ file you also need to specify a path to the UI assets via the --ui-path option.\nRun `hc launch --help` for help."),
+                  None => eprintln!("[hc launch] Error: If you provide a path to a .happ file you also need to specify eithar a path to the UI assets via the --ui-path option or a port to a server running on localhost using --ui-port.\nRun `hc launch --help` for help."),
                 }
               },
-              _ => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file.\nRun `hc launch --help` for help."),
+              _ => eprintln!("[hc launch] Error: You need to provide a path that points to either a .webhapp or a .happ file.\nRun `hc launch --help` for help."),
             }
           },
-          None => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file.\nRun `hc launch --help` for help.")
+          None => eprintln!("[hc launch] Error: You need to provide a path that points to either a .webhapp or a .happ file.\nRun `hc launch --help` for help.")
         }
       },
-      None => eprintln!("Error: You need to provide a path that points to either a .webhapp or a .happ file. Auto-detection is not implemented yet.\nRun `hc launch --help` for help.")
+      None => eprintln!("[hc launch] Error: You need to provide a path that points to either a .webhapp or a .happ file. Auto-detection is not implemented yet.\nRun `hc launch --help` for help.")
     }
 
     Ok(())

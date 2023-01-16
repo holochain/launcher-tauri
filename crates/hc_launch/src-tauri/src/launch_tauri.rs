@@ -5,6 +5,8 @@
 
 use holochain_client::AdminWebsocket;
 use holochain_launcher_utils::window_builder::happ_window_builder;
+use tauri::utils::config::AppUrl;
+use tauri::{WindowBuilder, WindowUrl};
 use tauri::{CustomMenuItem, Menu, Submenu};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -20,11 +22,47 @@ use lair_keystore_api::{LairClient, ipc_keystore_connect};
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
-pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf, watch: bool, passphrase: sodoken::BufRead) -> () {
+pub enum UISource {
+  Path(PathBuf),
+  Port(u16),
+}
+
+impl Clone for UISource{
+  fn clone(&self) -> Self {
+    match self {
+      UISource::Path(p) => UISource::Path(p.clone()),
+      UISource::Port(p) => UISource::Port(p.clone()),
+    }
+  }
+}
+
+pub fn launch_tauri(
+  ui_source: UISource,
+  app_id: String,
+  local_storage_dir: PathBuf,
+  watch: bool,
+  passphrase: sodoken::BufRead
+) -> () {
   // tauri::async_runtime::set(tokio::runtime::Handle::current());
 
+  let mut context = tauri::generate_context!();
+
+  // in case of a localhost port, mutate the context for IPC to be enabled on this URL
+  if let UISource::Port(port) = ui_source {
+    let url = format!("http://localhost:{}", port).parse().unwrap();
+    let window_url = WindowUrl::External(url);
+    context.config_mut().build.dist_dir = AppUrl::Url(window_url.clone());
+    context.config_mut().build.dev_path = AppUrl::Url(window_url.clone());
+  }
+
+  let builder = match ui_source {
+    UISource::Path(_) => tauri::Builder::default(),
+    UISource::Port(port) => tauri::Builder::default()
+    .plugin(tauri_plugin_localhost::Builder::new(port).build())
+  };
+
   // build tauri windows
-  let builder_result = tauri::Builder::default()
+  let builder_result = builder
     .invoke_handler(tauri::generate_handler![
       crate::commands::sign_zome_call::sign_zome_call
     ]) // uncomment when testing with right version
@@ -39,7 +77,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
       let dot_hc_content = match std::fs::read_to_string(dot_hc_path) {
         Ok(p) => p,
         Err(e) => {
-          println!("Failed to read content of .hc file: {}", e);
+          println!("[hc launch] ERROR: Failed to read content of .hc file: {}", e);
           panic!("Failed to read content of .hc file: {}", e);
         }
       };
@@ -50,7 +88,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
 
       let mut app_counter = 0;
 
-      let (windows, ui_path, lair_clients, app) = tokio::task::block_in_place(|| {
+      let (windows, ui_source, lair_clients, app) = tokio::task::block_in_place(|| {
         tauri::async_runtime::block_on(async move {
           for tmp_directory_path in dot_hc_content.lines() {
             let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
@@ -58,7 +96,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
             let admin_port = match std::fs::read_to_string(dot_hc_live_path) {
               Ok(p) => p,
               Err(e) => {
-                println!("Failed to read content of .hc_live file: {}", e);
+                println!("[hc launch] ERROR: Failed to read content of .hc_live file: {}", e);
                 panic!("Failed to read content of .hc_live file: {}", e);
               }
             };
@@ -68,7 +106,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
             let app_port = match get_app_websocket(admin_port_string).await {
               Ok(ws) => ws,
               Err(e) => {
-                println!("ERROR! Error getting app websocket port: {}", e);
+                println!("[hc launch] ERROR:  Failed to get app websocket port: {}", e);
                 panic!("Failed to get app websocket port.");
               }
             };
@@ -76,7 +114,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
             let admin_port = match admin_port.trim().parse::<u16>() {
               Ok(u) => u,
               Err(e) => {
-                println!("Failed to convert admin port from String to u16: {}", e);
+                println!("[hc launch] ERROR: Failed to convert admin port from String to u16: {}", e);
                 panic!("Failed to convert admin port from String to u16: {}", e);
               }
             };
@@ -88,19 +126,37 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
 
             let app_handle = app.handle();
 
-            let window_builder = happ_window_builder(
-              &app_handle,
-              app_id.clone(),
-              window_label.clone(),
-              window_label.clone(),
-              ui_path.clone().join("index.html"),
-              ui_path.clone(),
-              local_storage_dir.clone().join(format!("Agent-{}", app_counter)),
-              app_port,
-              admin_port,
-              window_width,
-              window_height,
-            );
+            let window_builder = match ui_source.clone() {
+              UISource::Path(ui_path) => {
+                happ_window_builder(
+                  &app_handle,
+                  app_id.clone(),
+                  window_label.clone(),
+                  window_label.clone(),
+                  ui_path.clone().join("index.html"),
+                  ui_path.clone(),
+                  local_storage_dir.clone().join(format!("Agent-{}", app_counter)),
+                  app_port,
+                  admin_port,
+                  window_width,
+                  window_height,
+                )
+              },
+              UISource::Port(ui_port) => {
+                localhost_window_builder(
+                  &app_handle,
+                  app_id.clone(),
+                  window_label.clone(),
+                  window_label.clone(),
+                  ui_port,
+                  local_storage_dir.clone().join(format!("Agent-{}", app_counter)),
+                  app_port,
+                  admin_port,
+                  window_width,
+                  window_height
+                )
+              }
+            };
 
             let window = match window_builder
               .menu(Menu::new().add_submenu(Submenu::new(
@@ -110,7 +166,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
               .build() {
                 Ok(window) => window,
                 Err(e) => {
-                  println!("ERROR! Failed to build window: {}", e);
+                  println!("[hc launch] ERROR: Failed to build window: {}", e);
                   panic!("Failed to build Window: {:?}", e);
                 }
             };
@@ -136,7 +192,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
             let connection_url = match read_lair_yaml(PathBuf::from(tmp_directory_path)) {
               Some(url) => url,
               None => {
-                println!("ERROR: No connectionUrl found in lair-keystore-config.yaml");
+                println!("[hc launch] ERROR: No connectionUrl found in lair-keystore-config.yaml");
                 panic!("No connectionUrl found in lair-keystore-config.yaml")
               }
             };
@@ -148,7 +204,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
               match ipc_keystore_connect(connection_url.clone(), passphrase.clone()).await {
                 Ok(client) => client,
                 Err(e) => {
-                  println!("Failed to connect to lair client: {:?}", e);
+                  println!("[hc launch] ERROR: Failed to connect to lair client: {:?}", e);
                   panic!("Failed to connect to lair client");
                 }
               };
@@ -158,16 +214,16 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
             app_counter += 1;
           }
 
-          (windows, ui_path, lair_clients, app)
+          (windows, ui_source, lair_clients, app)
         })
       });
 
       app.manage(lair_clients);
 
       // watch for file changes in the UI folder if requested
-      match watch {
-        true => {
-          println!("Watching file changes in folder {:?}", ui_path.as_path());
+      match (watch, ui_source) {
+        (true, UISource::Path(ui_path)) => {
+          println!("[hc launch] Watching file changes in folder {:?}", ui_path.as_path());
 
           let _watch_handle = std::thread::spawn(move || {
             let (tx_watcher, rx_watcher) = std::sync::mpsc::channel();
@@ -180,7 +236,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
             match watcher.watch(ui_path.as_path(), RecursiveMode::Recursive) {
               Ok(()) => (),
               Err(e) => {
-                println!("Failed to watch: {:?}", e);
+                println!("[hc launch] ERROR: Failed to watch: {:?}", e);
                 panic!("Failed to watch.");
               }
             };
@@ -193,13 +249,13 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
                     window.eval("location.reload()").unwrap();
                   }
                 }
-                Err(e) => println!("watch error: {:?}", e),
+                Err(e) => println!("[hc launch] ERROR: watch error: {:?}", e),
               }
             }
           });
-        }
-
-        false => (),
+        },
+        (true, UISource::Port(_port)) => println!("[hc launch] WARNING: The --watch flag has no effect if the UI is served from localhost."),
+        _ => (),
       }
 
       // // release app ports
@@ -207,7 +263,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
 
       Ok(())
     })
-    .build(tauri::generate_context!());
+    .build(context);
 
   match builder_result {
     Ok(builder) => {
@@ -217,7 +273,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
         }
       });
     }
-    Err(e) => eprintln!("Error building tauri windows: {:?}", e),
+    Err(e) => eprintln!("[hc launch] ERROR: Failed to build tauri windows: {:?}", e),
   }
 
   // .run(tauri::generate_context!())
@@ -260,7 +316,7 @@ fn read_lair_yaml(path: PathBuf) -> Option<String> {
   ) {
     Ok(content) => content,
     Err(e) => {
-      println!("Failed to read lair-keystore-config.yaml: {:?}", e);
+      println!("[hc launch] ERROR: Failed to read lair-keystore-config.yaml: {:?}", e);
       panic!("Failed to read lair-keystore-config.yaml");
     }
   };
@@ -274,3 +330,64 @@ fn read_lair_yaml(path: PathBuf) -> Option<String> {
 
   None
 }
+
+
+
+
+/// Creates a tauri WindowBuilder object with all the methods shared between
+/// holochain launcher and hc_launch already applied to it.
+pub fn localhost_window_builder<'a>(
+  app_handle: &'a tauri::AppHandle,
+  app_id: String,
+  window_label: String, // label used by tauri internally to distinguish different windows
+  window_title: String, // label shown on the top bar of the window
+  ui_port: u16, // port to the localhost server serving the assets
+  local_storage_path: PathBuf,
+  app_port: u16,
+  admin_port: u16,
+  width: f64,
+  height: f64,
+) -> WindowBuilder<'a> {
+
+  let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
+    "APP_INTERFACE_PORT": {},
+    "ADMIN_INTERFACE_PORT": {},
+    "INSTALLED_APP_ID": "{}"
+  }}"#,
+    app_port,
+    admin_port,
+    app_id
+  );
+
+  // listen for anchor clicks to route them to the open_url_cmd command for sanitization and
+  // opennig in system default browser
+  let anchor_event_listener = r#"window.addEventListener("click", (e) => {
+    if ((e.target.tagName.toLowerCase() === 'a') && (e.target.href.startsWith('http://') || e.target.href.startsWith('https://'))) {
+      e.preventDefault();
+      window.__TAURI_INVOKE__('open_url_cmd', { 'url': e.target.href } )
+    }
+  });
+  "#;
+
+  let url = format!("http://localhost:{}", ui_port).parse().unwrap();
+  let window_url = WindowUrl::External(url);
+
+  WindowBuilder::new(
+    app_handle,
+    window_label.clone(),
+    window_url
+  )
+  .disable_file_drop_handler()
+  .data_directory(local_storage_path)
+  .initialization_script(launcher_env_command.as_str())
+  .initialization_script(anchor_event_listener)
+  .inner_size(width, height)
+  .title(window_title)
+
+}
+
+
+
+
+
+
