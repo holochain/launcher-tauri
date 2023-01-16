@@ -2929,8 +2929,14 @@ dependencies = [
 name = "holochain_launcher_utils"
 version = "0.0.1"
 dependencies = [
+ "holochain_client",
+ "holochain_conductor_api",
+ "holochain_types",
+ "holochain_zome_types",
+ "lair_keystore_api",
  "log",
  "mime_guess",
+ "serde",
  "tauri",
 ]
 
@@ -4104,6 +4110,7 @@ dependencies = [
  "ascii",
  "async-trait",
  "holochain_conductor_api",
+ "holochain_launcher_utils",
  "holochain_types",
  "holochain_zome_types",
  "lair_keystore_api",
