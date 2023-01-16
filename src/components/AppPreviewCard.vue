@@ -61,7 +61,7 @@
           </div>
         </div>
 
-        <div class="column">
+        <div class="column" style="overflow: hidden;">
           <div
             style="
               font-size: 25px;
@@ -69,8 +69,9 @@
               margin-right: 15px;
               margin-bottom: 8px;
               line-height: 115%;
-              word-break: break-all;
+              word-break: normal;
             "
+            :title="app.app.content.title"
           >
             {{ app.app.content.title }}
           </div>
@@ -102,7 +103,7 @@
       <span style="display: flex; flex: 1"></span>
       <HCButton
         class="install-btn"
-        style="border-radius: 12px; margin: 8px"
+        style="border-radius: 12px; margin: 12px;"
         @click="$emit('installApp')"
         >Install</HCButton
       >
@@ -160,13 +161,16 @@ export default defineComponent({
 
 <style scoped>
 .card {
-  width: 340px;
-  height: 220px;
+  width: 370px;
+  height: 240px;
   background: white;
   border-radius: 15px;
   box-shadow: 0 0px 5px #9b9b9b;
 }
 
+.install-btn {
+
+}
 .install-btn:hover {
   background-color: #674df9;
 }

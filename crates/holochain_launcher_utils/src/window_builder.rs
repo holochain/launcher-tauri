@@ -15,8 +15,6 @@ pub fn happ_window_builder<'a>(
   local_storage_path: PathBuf,
   app_port: u16,
   admin_port: u16,
-  width: f64,
-  height: f64,
 ) -> WindowBuilder<'a> {
 
   let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
@@ -116,7 +114,6 @@ pub fn happ_window_builder<'a>(
   .data_directory(local_storage_path)
   .initialization_script(launcher_env_command.as_str())
   .initialization_script(anchor_event_listener)
-  .inner_size(width, height)
   .title(window_title)
 
 }

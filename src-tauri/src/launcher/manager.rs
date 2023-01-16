@@ -441,10 +441,8 @@ impl LauncherManager {
     let local_storage_path = manager.get_app_local_storage_dir(app_id);
     let app_port = manager.holochain_manager.app_interface_port();
     let admin_port = manager.holochain_manager.admin_interface_port();
-    let window_width = 1000.0;
-    let window_height = 700.0;
 
-    let window_builder = happ_window_builder(
+    let mut window_builder = happ_window_builder(
       &self.app_handle,
       app_id.into(),
       window_label.clone(),
@@ -454,9 +452,9 @@ impl LauncherManager {
       local_storage_path,
       app_port,
       admin_port,
-      window_width,
-      window_height,
     );
+
+    window_builder = window_builder.maximized(true);
 
     // placeholder for when apps come shipped with their custom icons:
     //

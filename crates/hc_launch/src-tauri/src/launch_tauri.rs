@@ -88,7 +88,7 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
 
             let app_handle = app.handle();
 
-            let window_builder = happ_window_builder(
+            let mutwindow_builder = happ_window_builder(
               &app_handle,
               app_id.clone(),
               window_label.clone(),
@@ -98,9 +98,9 @@ pub fn launch_tauri(ui_path: PathBuf, app_id: String, local_storage_dir: PathBuf
               local_storage_dir.clone().join(format!("Agent-{}", app_counter)),
               app_port,
               admin_port,
-              window_width,
-              window_height,
             );
+
+            window_builer = window_builder.inner_size(window_width, window_height);
 
             let window = match window_builder
               .menu(Menu::new().add_submenu(Submenu::new(

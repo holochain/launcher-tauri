@@ -64,8 +64,6 @@ impl HolochainManager {
     fs::write(conductor_config_path.clone(), new_conductor_config.clone())
       .expect("Could not write conductor config");
 
-    println!("Wrote conductor config: {:?}", new_conductor_config);
-
     let command_child = launch_holochain_process(
       config.log_level,
       version,
