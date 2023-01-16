@@ -2,7 +2,7 @@
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
-use file_system::{root_holochain_data_path, root_tauri_data_path};
+use file_system::{profile_holochain_data_dir, profile_tauri_dir};
 use futures::lock::Mutex;
 use launcher::error::LauncherError;
 use running_state::RunningState;
@@ -55,12 +55,11 @@ use crate::menu::build_menu;
 use crate::menu::handle_menu_event;
 use crate::setup::logs::setup_logs;
 use crate::system_tray::handle_system_tray_event;
-use crate::file_system::CustomPath;
+use crate::file_system::Profile;
 
 
 
 fn main() {
-
 
   let builder_result = tauri::Builder::default()
     .menu(build_menu())
@@ -96,35 +95,33 @@ fn main() {
     ])
     .setup(|app| {
 
-      // reading custom path from cli
+      // reading profile from cli
       let cli_matches = app.get_cli_matches()?;
-      let custom_path: CustomPath = match cli_matches.args.get("profile") {
+      let profile: Profile = match cli_matches.args.get("profile") {
         Some(data) => match data.value.clone() {
-          Value::String(path) => CustomPath {
-            custom_path: Some(path),
+          Value::String(profile) => {
+            if profile == "default" {
+              eprintln!("Error: The name 'default' is not allowed for a profile.");
+              panic!("Error: The name 'default' is not allowed for a profile.");
+            }
+            profile
           },
           _ => {
             // println!("ERROR: Value passed to --profile option could not be interpreted as string.");
-            CustomPath {
-              custom_path: None
-            }
+            String::from("default")
             // panic!("Value passed to --profile option could not be interpreted as string.")
           }
         },
-        None => CustomPath {
-          custom_path: None
-        },
+        None => String::from("default")
       };
 
+      println!("Selected profile: {:?}", profile);
 
+      let local_storage_path = profile_tauri_dir(profile.clone())?;
 
-      println!("Custom profile: {:?}", custom_path);
+      app.manage(profile.clone());
 
-      let local_storage_path = root_tauri_data_path(custom_path.custom_path.clone());
-
-      app.manage(custom_path.clone());
-
-      if let Err(err) = setup_logs(custom_path.custom_path.clone()) {
+      if let Err(err) = setup_logs(profile.clone()) {
         println!("Error setting up the logs: {:?}", err);
       }
 
@@ -145,7 +142,7 @@ fn main() {
 
       let handle = app.handle().clone();
       let launcher_state =
-        tauri::async_runtime::block_on(async move { launch_manager(handle, custom_path.custom_path).await });
+        tauri::async_runtime::block_on(async move { launch_manager(handle, profile).await });
 
       app.manage(Arc::new(Mutex::new(launcher_state)));
 
@@ -165,12 +162,19 @@ fn main() {
   }
 }
 
-async fn launch_manager(app_handle: AppHandle, custom_path: Option<String>) -> RunningState<LauncherManager, LauncherError> {
-  if Path::new(&root_holochain_data_path(custom_path.clone()).join("conductor")).exists() {
+async fn launch_manager(app_handle: AppHandle, profile: Profile) -> RunningState<LauncherManager, LauncherError> {
+  let holochain_dir = match profile_holochain_data_dir(profile.clone()) {
+    Ok(dir) => dir,
+    Err(e) => {
+      log::error!("Failed to get holochain data dir when trying to launch the LauncherManager: {}", e);
+      return RunningState::Error(e)
+    }
+  };
+  if Path::new(&holochain_dir.join("conductor")).exists() {
     return RunningState::Error(LauncherError::OldFilesExist);
   }
 
-  let manager_launch = LauncherManager::launch(app_handle, custom_path).await;
+  let manager_launch = LauncherManager::launch(app_handle, profile).await;
 
   match manager_launch {
     Ok(launcher_manager) => {

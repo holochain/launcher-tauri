@@ -17,4 +17,6 @@ pub enum LauncherError {
   ErrorLaunching(String),
   #[error("Unauthorized: `{0}`")]
   Unauthorized(String),
+  #[error("Failed to get system directory: `{0}`")]
+  SystemDirError(String)
 }

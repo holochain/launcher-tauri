@@ -12,15 +12,14 @@ use crate::{
       HolochainInfo, HolochainState, LauncherState, LauncherStateInfo, RunningHolochainsStateInfo,
     },
   },
-  running_state::RunningState,
-  file_system::CustomPath,
+  running_state::RunningState, file_system::Profile,
 };
 
 #[tauri::command]
 pub async fn get_state_info(
   window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
-  custom_path: tauri::State<'_, CustomPath>,
+  profile: tauri::State<'_, Profile>,
 ) -> Result<LauncherStateInfo, LauncherError> {
   if window.label() != "admin" {
     return Err(LauncherError::Unauthorized("Attempted to call an unauthorized tauri command. (G)".into()))
@@ -28,7 +27,7 @@ pub async fn get_state_info(
 
   let state_info = inner_get_state_info(state).await?;
 
-  let config = LauncherConfig::read(custom_path.custom_path.clone());
+  let config = LauncherConfig::read(profile.inner().clone());
 
   Ok(LauncherStateInfo {
     state: state_info,

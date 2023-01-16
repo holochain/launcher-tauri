@@ -1,6 +1,6 @@
 use crate::{commands::open_app::report_issue, setup::logs, quit};
 use tauri::{CustomMenuItem, Manager, Menu, Submenu, Window, Wry};
-use crate::file_system::CustomPath;
+use crate::file_system::Profile;
 
 pub fn build_menu() -> Menu {
   let factory_reset = CustomMenuItem::new("factory_reset".to_string(), "Factory Reset");
@@ -58,7 +58,7 @@ pub fn build_menu() -> Menu {
 
 pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
   let app_handle = window.app_handle();
-  let custom_path = app_handle.state::<CustomPath>();
+  let profile = app_handle.state::<Profile>();
   match event_id {
     "factory_reset" => window.emit("request-factory-reset", ()).unwrap(),
     "config" => window.emit("open-config", ()).unwrap(),
@@ -69,7 +69,7 @@ pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
     }
     // "report_issue" => report_issue(),
     "open_logs" => {
-      logs::open_logs_folder(custom_path.custom_path.clone());
+      logs::open_logs_folder(profile.inner().clone());
     }
     _ => {}
   }

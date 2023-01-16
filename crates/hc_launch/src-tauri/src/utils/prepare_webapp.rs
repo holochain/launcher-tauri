@@ -8,7 +8,7 @@ use crate::error::FileSystemError;
 
 pub fn create_dir_if_necessary(path: &PathBuf) -> Result<(), FileSystemError> {
   if !path_exists(path) {
-    fs::create_dir(path)?;
+    fs::create_dir_all(path)?;
   }
 
   Ok(())
