@@ -4,7 +4,7 @@
 )]
 
 use holochain_client::AdminWebsocket;
-use holochain_launcher_utils::window_builder::happ_window_builder;
+use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
 use tauri::utils::config::AppUrl;
 use tauri::{WindowBuilder, WindowUrl};
 use tauri::{CustomMenuItem, Menu, Submenu};
@@ -22,19 +22,6 @@ use lair_keystore_api::{LairClient, ipc_keystore_connect};
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
-pub enum UISource {
-  Path(PathBuf),
-  Port(u16),
-}
-
-impl Clone for UISource{
-  fn clone(&self) -> Self {
-    match self {
-      UISource::Path(p) => UISource::Path(p.clone()),
-      UISource::Port(p) => UISource::Port(p.clone()),
-    }
-  }
-}
 
 pub fn launch_tauri(
   ui_source: UISource,
@@ -133,8 +120,7 @@ pub fn launch_tauri(
                   app_id.clone(),
                   window_label.clone(),
                   window_label.clone(),
-                  ui_path.clone().join("index.html"),
-                  ui_path.clone(),
+                  UISource::Path(ui_path.clone()),
                   local_storage_dir.clone().join(format!("Agent-{}", app_counter)),
                   app_port,
                   admin_port,
@@ -143,12 +129,12 @@ pub fn launch_tauri(
                 )
               },
               UISource::Port(ui_port) => {
-                localhost_window_builder(
+                happ_window_builder(
                   &app_handle,
                   app_id.clone(),
                   window_label.clone(),
                   window_label.clone(),
-                  ui_port,
+                  UISource::Port(ui_port),
                   local_storage_dir.clone().join(format!("Agent-{}", app_counter)),
                   app_port,
                   admin_port,
@@ -330,64 +316,6 @@ fn read_lair_yaml(path: PathBuf) -> Option<String> {
 
   None
 }
-
-
-
-
-/// Creates a tauri WindowBuilder object with all the methods shared between
-/// holochain launcher and hc_launch already applied to it.
-pub fn localhost_window_builder<'a>(
-  app_handle: &'a tauri::AppHandle,
-  app_id: String,
-  window_label: String, // label used by tauri internally to distinguish different windows
-  window_title: String, // label shown on the top bar of the window
-  ui_port: u16, // port to the localhost server serving the assets
-  local_storage_path: PathBuf,
-  app_port: u16,
-  admin_port: u16,
-  width: f64,
-  height: f64,
-) -> WindowBuilder<'a> {
-
-  let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
-    "APP_INTERFACE_PORT": {},
-    "ADMIN_INTERFACE_PORT": {},
-    "INSTALLED_APP_ID": "{}"
-  }}"#,
-    app_port,
-    admin_port,
-    app_id
-  );
-
-  // listen for anchor clicks to route them to the open_url_cmd command for sanitization and
-  // opennig in system default browser
-  let anchor_event_listener = r#"window.addEventListener("click", (e) => {
-    if ((e.target.tagName.toLowerCase() === 'a') && (e.target.href.startsWith('http://') || e.target.href.startsWith('https://'))) {
-      e.preventDefault();
-      window.__TAURI_INVOKE__('open_url_cmd', { 'url': e.target.href } )
-    }
-  });
-  "#;
-
-  let url = format!("http://localhost:{}", ui_port).parse().unwrap();
-  let window_url = WindowUrl::External(url);
-
-  WindowBuilder::new(
-    app_handle,
-    window_label.clone(),
-    window_url
-  )
-  .disable_file_drop_handler()
-  .data_directory(local_storage_path)
-  .initialization_script(launcher_env_command.as_str())
-  .initialization_script(anchor_event_listener)
-  .inner_size(width, height)
-  .title(window_title)
-
-}
-
-
-
 
 
 

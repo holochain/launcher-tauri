@@ -1,4 +1,4 @@
-use holochain_launcher_utils::window_builder::happ_window_builder;
+use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
 use holochain_manager::config::LaunchHolochainConfig;
 use holochain_manager::errors::{LaunchHolochainError, InitializeConductorError};
 use holochain_web_app_manager::error::LaunchWebAppManagerError;
@@ -9,13 +9,9 @@ use lair_keystore_manager::LairKeystoreManager;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;
-use sysinfo::{System, SystemExt};
 use tauri::api::process::Command;
 use tauri::{AppHandle, Manager};
-use tauri::{window::WindowBuilder, WindowUrl};
 use tauri::{CustomMenuItem, Menu, Submenu};
-
-use std::fs::{read};
 
 use holochain_manager::versions::HolochainVersion;
 use holochain_web_app_manager::WebAppManager;
@@ -436,7 +432,6 @@ impl LauncherManager {
 
     let manager = self.get_web_happ_manager(holochain_id)?;
 
-    let index_path = manager.get_ui_index_path(app_id);
     let assets_path = manager.get_app_ui_dir(app_id);
     let local_storage_path = manager.get_app_local_storage_dir(app_id);
     let app_port = manager.holochain_manager.app_interface_port();
@@ -449,8 +444,7 @@ impl LauncherManager {
       app_id.into(),
       window_label.clone(),
       app_id.into(),
-      index_path,
-      assets_path,
+      UISource::Path(assets_path),
       local_storage_path,
       app_port,
       admin_port,

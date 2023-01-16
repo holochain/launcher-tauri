@@ -5,12 +5,13 @@
 use holochain_cli_sandbox::calls::{attach_app_interface, AddAppWs};
 use holochain_cli_sandbox::run::run_async;
 use holochain_cli_sandbox::CmdRunner;
+use holochain_launcher_utils::window_builder::UISource;
 use holochain_types::prelude::InstalledAppId;
 use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 use tokio::process::Child;
 
-use crate::launch_tauri::{launch_tauri, UISource};
+use crate::launch_tauri::launch_tauri;
 use crate::prepare_webapp;
 use holochain_cli_sandbox::cmds::Create;
 
