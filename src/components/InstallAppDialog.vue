@@ -70,7 +70,7 @@
           placeholder="Network Seed"
           label="Network Seed (Optional)"
           style="margin: 5px; margin-bottom: 25px; width: 360px"
-          helper="Only peers entering the same network seed will be part of the same app"
+          helper="Peers with the same network are part of the same network"
           ref="network-seed-field"
       />
       <div class="column" style="width: 100%">
