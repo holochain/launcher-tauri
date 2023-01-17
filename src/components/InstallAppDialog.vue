@@ -60,12 +60,19 @@
       />
       <HCSelect
         v-if="!hdkVersionForApp"
-        style="margin: 5px; width: 360px"
+        style="margin: 5px; margin-bottom: 15px; width: 360px"
         label="Holochain Version*"
         :items="supportedHolochains"
         @item-selected="handleHolochainIdSelected($event)"
       >
       </HCSelect>
+      <HCTextField
+          placeholder="Network Seed"
+          label="Network Seed (Optional)"
+          style="margin: 5px; margin-bottom: 25px; width: 360px"
+          helper="Only peers entering the same network seed will be part of the same app"
+          ref="network-seed-field"
+      />
       <div class="column" style="width: 100%">
         <div class="row" style="margin: 20px 0 15px 20px;"
         >
@@ -93,13 +100,6 @@
       </div>
 
       <div v-show="showAdvanced" class="column" style="align-items: center">
-        <HCTextField
-          placeholder="Network Seed"
-          label="Network Seed"
-          style="margin: 5px; margin-bottom: 15px; width: 360px"
-          helper="Change it to create a new network"
-          ref="network-seed-field"
-        />
 
         <HCSelect
           style="margin: 5px; margin-bottom: 15px; width: 360px; display: none;"
