@@ -7,7 +7,7 @@ edition = "2021"
 license = ""
 name = "holochain-launcher"
 repository = ""
-version = "0.8.0-rc.2"
+version = "0.8.0"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -22,8 +22,8 @@ holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
 lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 
 # NEW_VERSION update holochain types
-holochain_types = { package = "holochain_types", version = "0.1.0-beta-rc.1"}
-hdk = { package = "hdk", version = "0.1.0-beta-rc.1"}
+holochain_types = { package = "holochain_types", version = "0.1.0-beta-rc.2"}
+hdk = { package = "hdk", version = "0.1.0-beta-rc.2"}
 
 
 async-trait = "0.1.52"

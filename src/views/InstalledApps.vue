@@ -8,9 +8,9 @@
           DevHub
         </div>
         <div>
-          The DevHub is the place where <span style="font-weight: bold; white-space: nowrap;">app developers</span> can upload their apps such that they appear in the App Library.<br><br>
-          If you want to instead install another app, click on the <span style="font-weight: bold; white-space: nowrap;">"Install New App"</span> Button in the bottom right corner of the main window
-          which will lead you to the <span style="font-weight: bold; white-space: nowrap;">App Library</span>.
+          DevHub is the place where <span style="font-weight: bold; white-space: nowrap;">app developers</span> can upload their apps such that they appear in the App Library.<br><br>
+          If you instead want to install other apps, click on the <span style="font-weight: bold; white-space: nowrap;">"Install New App"</span> button in the bottom right corner of the
+          main window. It will lead you to the <span style="font-weight: bold; white-space: nowrap;">App Library</span>.
         </div>
 
         <div class="row" style="margin-top: 30px; margin-bottom: 10px; margin-left: 50px; width: 100%;">
