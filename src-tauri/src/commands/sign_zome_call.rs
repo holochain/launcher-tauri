@@ -1,8 +1,6 @@
 use crate::launcher::state::LauncherState;
-use hdk::prelude::{CellId, ZomeName, FunctionName, CapSecret, ExternIO, Timestamp, AgentPubKey};
 use lair_keystore_manager::*;
 use holochain_types::prelude::ZomeCallUnsigned;
-use serde::Deserialize;
 
 use holochain_launcher_utils::zome_call_signing::ZomeCallUnsignedTauri;
 

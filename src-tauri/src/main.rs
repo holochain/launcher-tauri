@@ -130,7 +130,7 @@ fn main() {
         "admin",
         tauri::WindowUrl::App("index.html".into())
       )
-        .inner_size(1200.0, 900.0)
+        .inner_size(1200.0, 880.0)
         .data_directory(local_storage_path)
         .resizable(true)
         .fullscreen(false)

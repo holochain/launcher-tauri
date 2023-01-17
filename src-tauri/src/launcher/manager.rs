@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use std::path::Path;
 use sysinfo::{System, SystemExt};
 use tauri::api::process::Command;
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, PhysicalSize};
 use tauri::{window::WindowBuilder, WindowUrl};
 use tauri::{CustomMenuItem, Menu, Submenu};
 
@@ -442,7 +442,7 @@ impl LauncherManager {
     let app_port = manager.holochain_manager.app_interface_port();
     let admin_port = manager.holochain_manager.admin_interface_port();
 
-    let mut window_builder = happ_window_builder(
+    let window_builder = happ_window_builder(
       &self.app_handle,
       app_id.into(),
       window_label.clone(),
@@ -454,7 +454,8 @@ impl LauncherManager {
       admin_port,
     );
 
-    window_builder = window_builder.maximized(true);
+    // needs to be removed in order for set_size() to work apparently
+    // window_builder = window_builder.maximized(true);
 
     // placeholder for when apps come shipped with their custom icons:
     //
@@ -462,9 +463,13 @@ impl LauncherManager {
     //  .icon(tauri::Icon::File(icon_path))
     //  .map_err(|err| format!("Error adding icon: {:?}", err))?
 
+    // factor of the monitor size to which the window shall be scaled
+    let scaling_factor = 0.8;
+    println!("Scaling factor: {}", scaling_factor);
 
     if cfg!(target_os = "macos") {
-      window_builder.build().map_err(|err| format!("Error opening app: {:?}", err))?;
+      let window = window_builder.build().map_err(|err| format!("Error opening app: {:?}", err))?;
+      set_window_size(window, scaling_factor);
     } else {
       let window = window_builder
         .menu(Menu::new().add_submenu(Submenu::new( // This overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
@@ -481,9 +486,35 @@ impl LauncherManager {
           w.open_devtools();
         }
       });
+      set_window_size(window, scaling_factor);
     }
 
     Ok(())
   }
 
+}
+
+
+
+fn set_window_size(window: tauri::window::Window, scaling_factor: f64) -> () {
+    // set window to 80% of the monitor size if possible
+    match window.current_monitor() {
+      Ok(maybe_monitor) => {
+        println!("maybe_monitor: {:?}", maybe_monitor);
+        if let Some(monitor) = maybe_monitor {
+          let size = monitor.size();
+          let new_width = (scaling_factor * size.width as f64) as u32;
+          let new_height = (scaling_factor * size.height as f64) as u32;
+
+          let new_size = PhysicalSize::new(new_width, new_height);
+          println!("new_size: {:?}", new_size);
+
+          match window.set_size(new_size) {
+            Ok(()) => (),
+            Err(e) => log::error!("Failed to set window size: {:?}", e)
+          };
+        }
+      },
+      Err(e) => log::error!("Failed to get monitor option: {:?}", e),
+    };
 }
