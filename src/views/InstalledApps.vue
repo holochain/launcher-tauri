@@ -1,4 +1,34 @@
 <template>
+  <HCDialog ref="devHubDevsOnlyWarning">
+      <div
+        class="column"
+        style="padding: 30px; align-items: center; max-width: 500px"
+      >
+        <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
+          DevHub
+        </div>
+        <div>
+          The DevHub is the place where <span style="font-weight: bold; white-space: nowrap;">app developers</span> can upload their apps such that they appear in the App Library.<br><br>
+          If you want to instead install another app, click on the <span style="font-weight: bold; white-space: nowrap;">"Install New App"</span> Button in the bottom right corner of the main window
+          which will lead you to the <span style="font-weight: bold; white-space: nowrap;">App Library</span>.
+        </div>
+
+        <div class="row" style="margin-top: 30px; margin-bottom: 10px; margin-left: 50px; width: 100%;">
+          <ToggleSwitch
+            :sliderOn="ignoreDevHubWaring"
+            @click="() => ignoreDevHubWaring = !ignoreDevHubWaring"
+            @keydown.enter="() => ignoreDevHubWaring = !ignoreDevHubWaring"
+          />
+          <span style="margin-left: 10px;">Don't show this message anymore.</span>
+        </div>
+
+        <div class="row" style="margin-top: 20px;">
+          <HCButton style="height: 30px; margin: 4px 6px;" outlined @click="closeDevHubNote">Cancel</HCButton>
+          <HCButton style="margin: 4px 6px;" @click="handleOpenDevHub">Open DevHub</HCButton>
+        </div>
+      </div>
+    </HCDialog>
+
   <div
     v-if="isLoading()"
     style="flex: 1; display: flex; align-items: center; justify-content: center"
@@ -40,11 +70,11 @@
       >
         <InstalledAppsList
           :installedApps="$store.getters[`allApps`]"
-          @open-app="openApp($event)"
-          @disable-app="disableApp($event)"
-          @enable-app="enableApp($event)"
-          @start-app="startApp($event)"
-          @uninstall-app="uninstallApp($event)"
+          @openApp="openApp($event)"
+          @disableApp="disableApp($event)"
+          @enableApp="enableApp($event)"
+          @startApp="startApp($event)"
+          @uninstallApp="uninstallApp($event)"
         />
       </div>
       <HCButton
@@ -79,17 +109,25 @@ import { invoke } from "@tauri-apps/api/tauri";
 import InstalledAppsList from "../components/InstalledAppsList.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
+import HCDialog from "../components/subcomponents/HCDialog.vue";
+import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
 
 export default defineComponent({
   name: "InstalledApps",
-  components: { InstalledAppsList, HCButton, HCSnackbar },
+  components: { InstalledAppsList, HCButton, HCSnackbar, HCDialog, ToggleSwitch },
   data(): {
     snackbarText: string | undefined;
     reportIssueUrl: string;
+    showDevHubDevsOnlyWarning: boolean;
+    devHubAppInfo: HolochainAppInfo | undefined;
+    ignoreDevHubWaring: boolean;
   } {
     return {
       snackbarText: undefined,
       reportIssueUrl: "https://github.com/holochain/launcher/issues/new",
+      showDevHubDevsOnlyWarning: false,
+      devHubAppInfo: undefined,
+      ignoreDevHubWaring: false,
     };
   },
   async created() {
@@ -99,7 +137,40 @@ export default defineComponent({
     isLoading() {
       return this.$store.state.launcherStateInfo === "loading";
     },
+    closeDevHubNote() {
+      if (this.ignoreDevHubWaring) {
+        window.localStorage.setItem("ignoreDevHubDevsOnlyWarning", "true");
+      }
+      (this.$refs["devHubDevsOnlyWarning"] as typeof HCDialog).close();
+    },
+    async handleOpenDevHub() {
+      if (this.ignoreDevHubWaring) {
+        window.localStorage.setItem("ignoreDevHubDevsOnlyWarning", "true");
+      }
+      const appId = this.devHubAppInfo!.webAppInfo.installed_app_info.installed_app_id;
+      (this.$refs["devHubDevsOnlyWarning"] as typeof HCDialog).close();
+      try {
+        await invoke("open_app_ui", { appId, holochainId: this.devHubAppInfo!.holochainId });
+        this.showMessage(`App ${appId} opened`);
+      } catch (e) {
+        const error = `Error opening app ${appId}: ${JSON.stringify(e)}`;
+        this.showMessage(error);
+        await invoke("log", {
+          log: error,
+        });
+      }
+    },
     async openApp(app: HolochainAppInfo) {
+      // if the DevHub is requested to be opened, show a warning dialog that
+      // this is intended for developers
+
+      if ((app.webAppInfo.installed_app_info.installed_app_id == `DevHub-${app.holochainId.content}`)
+       && (!window.localStorage.ignoreDevHubDevsOnlyWarning)) {
+        this.devHubAppInfo = app;
+        (this.$refs["devHubDevsOnlyWarning"] as typeof HCDialog).open();
+        return;
+      }
+
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
       try {
         await invoke("open_app_ui", { appId, holochainId: app.holochainId });
