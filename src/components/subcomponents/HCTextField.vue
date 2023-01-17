@@ -114,5 +114,7 @@ export default defineComponent({
   margin-top: -1px;
   font-size: 13px;
   color: rgba(59, 61, 115, 0.5);
+  line-height: 14px;
+  margin-top: 2px;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <HCDialog ref="dialog" @closing="$emit('closing-dialog')">
+  <HCDialog ref="dialog" @closing="$emit('closing-dialog')" :prohibit-escape="showNetworkSeedInfo">
     <div
       v-if="isLoadingFile"
       class="column"
@@ -66,14 +66,25 @@
         @item-selected="handleHolochainIdSelected($event)"
       >
       </HCSelect>
-      <HCTextField
-          placeholder="Network Seed (Optional)"
-          label="Network Seed (Optional)"
-          title="If in doubt, leave this blank"
-          style="margin: 5px; margin-bottom: 25px; width: 360px"
-          helper="Peers with the same network seed are part of the same network"
-          ref="network-seed-field"
-      />
+      <div class="row" style="align-items: flex-start;">
+        <HCTextField
+            placeholder="Network Seed (Optional)"
+            label="Network Seed (Optional)"
+            title="If in doubt, leave this blank"
+            style="margin: 5px; margin-bottom: 25px; width: 325px;"
+            helper="Peers with the same network seed are part of the same network"
+            ref="network-seed-field"
+        />
+        <img
+          @mouseover="openNetworkSeedInfo"
+          @mouseleave="closeNetworkSeedInfo"
+          @keydown.enter="openNetworkSeedInfo"
+          @keydown.esc="closeNetworkSeedInfo"
+          tabindex="0"
+          src="/img/info_icon.svg"
+          style="width: 27px; cursor: pointer; margin-top: 18px; margin-left: 3px; margin-right: 5px; opacity: 0.9;"
+        >
+      </div>
       <div class="column" style="width: 100%">
         <div class="row" style="margin: 20px 0 15px 20px;"
         >
@@ -160,6 +171,16 @@
     </div>
   </HCDialog>
 
+  <div class="info-popup row" v-if="showNetworkSeedInfo">
+    <img src="/img/info_icon.svg" style="opacity: 0.9; width: 40px;">
+    <div style="margin: 0 15px;">
+      If you enter a network seed, you create a unique app instance with its
+      own network and data store. If in doubt, leave this field blank to join
+      the app's public network. Make sure that others who want to collaborate
+      with you enter the same network seed!
+    </div>
+  </div>
+
   <HCSnackbar
     :timeoutMs="10000"
     :labelText="snackbarText"
@@ -223,6 +244,7 @@ export default defineComponent({
     snackbarText: string | undefined;
     appIdInvalid: string | undefined;
     error: boolean;
+    showNetworkSeedInfo: boolean;
   } {
     return {
       showAdvanced: false,
@@ -237,6 +259,7 @@ export default defineComponent({
       supportedHolochains: [],
       appIdInvalid: undefined,
       error: false,
+      showNetworkSeedInfo: false,
     };
   },
   computed: {
@@ -326,6 +349,13 @@ export default defineComponent({
     }
   },
   methods: {
+    openNetworkSeedInfo() {
+      this.showNetworkSeedInfo = true;
+    },
+    closeNetworkSeedInfo() {
+      // Called with a lag to make sure the escape key is still blocked on the main dialog
+      window.setTimeout(() => this.showNetworkSeedInfo = false, 50);
+    },
     open() {
       (this.$refs.dialog as typeof HCDialog).open();
     },
@@ -452,5 +482,21 @@ export default defineComponent({
 .advanced-button:hover {
   opacity: 0.8;
   cursor: pointer;
+}
+
+.info-popup {
+  align-items: flex-start;
+  border-radius: 12px;
+  background-color: white;
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  padding: 17px;
+  max-width: 600px;
+  margin: 0; /*reset some browser centering*/
+  border: 4px solid var(--hc-primary-color);
+  box-shadow: 0 0px 5px #9b9b9b;
+  overflow-y: auto;
+  z-index: 10000;
 }
 </style>
