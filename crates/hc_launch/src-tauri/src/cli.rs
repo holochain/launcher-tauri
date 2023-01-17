@@ -57,7 +57,7 @@ impl HcLaunch {
     let maybe_ui_source = match (self.ui_path.clone(), self.ui_port) {
       (Some(ui_path), None) => Some(UISource::Path(ui_path)),
       (None, Some(ui_port)) => Some(UISource::Port(ui_port)),
-      (Some(ui_path), Some(ui_port)) => {
+      (Some(_ui_path), Some(_ui_port)) => {
         eprintln!("[hc launch] ERROR: You cannot provide both --ui-path and --ui-port.");
         panic!("ERROR: Provided both a --ui-path and --ui-port");
       },

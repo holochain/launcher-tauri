@@ -6,7 +6,7 @@
 use holochain_client::AdminWebsocket;
 use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
 use tauri::utils::config::AppUrl;
-use tauri::{WindowBuilder, WindowUrl};
+use tauri::WindowUrl;
 use tauri::{CustomMenuItem, Menu, Submenu};
 use std::collections::HashMap;
 use std::path::PathBuf;
