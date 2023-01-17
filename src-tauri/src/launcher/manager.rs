@@ -460,7 +460,6 @@ impl LauncherManager {
 
     // factor of the monitor size to which the window shall be scaled
     let scaling_factor = 0.8;
-    println!("Scaling factor: {}", scaling_factor);
 
     if cfg!(target_os = "macos") {
       let window = window_builder.build().map_err(|err| format!("Error opening app: {:?}", err))?;
@@ -495,14 +494,12 @@ fn set_window_size(window: tauri::window::Window, scaling_factor: f64) -> () {
     // set window to 80% of the monitor size if possible
     match window.current_monitor() {
       Ok(maybe_monitor) => {
-        println!("maybe_monitor: {:?}", maybe_monitor);
         if let Some(monitor) = maybe_monitor {
           let size = monitor.size();
           let new_width = (scaling_factor * size.width as f64) as u32;
           let new_height = (scaling_factor * size.height as f64) as u32;
 
           let new_size = PhysicalSize::new(new_width, new_height);
-          println!("new_size: {:?}", new_size);
 
           match window.set_size(new_size) {
             Ok(()) => (),
