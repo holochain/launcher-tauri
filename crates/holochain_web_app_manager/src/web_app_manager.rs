@@ -84,8 +84,12 @@ impl WebAppManager {
       .await
       .or(Err("Failed to resolve Web UI"))?;
 
+
+    // Assuming only one single default UI per app at the moment.
+    let default_ui_name = String::from("default");
+
     // Install app UI in folder
-    self.install_app_ui(app_id.clone(), web_ui_zip_bytes.to_vec())?;
+    self.install_app_ui(app_id.clone(), web_ui_zip_bytes.to_vec(), &default_ui_name)?;
 
     // Install app in conductor manager
     if let Err(err) = self
@@ -99,7 +103,7 @@ impl WebAppManager {
       )
       .await
     {
-      self.uninstall_app_ui(app_id)?;
+      self.uninstall_app_ui(app_id, &default_ui_name)?;
 
       return Err(err);
     }
@@ -117,9 +121,9 @@ impl WebAppManager {
     &mut self,
     app_id: String,
     web_ui_zip_bytes: ResourceBytes,
+    ui_name: &String
   ) -> Result<(), String> {
-    // assuming there may be multiple UI's per happ at some point, install it to the "default" folder
-    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id).join("default");
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, ui_name);
     let ui_zip_path = apps_data_dir(&self.environment_path).join(format!("{}.zip", app_id));
 
     fs::write(ui_zip_path.clone(), web_ui_zip_bytes).or(Err("Failed to write Web UI Zip file"))?;
@@ -133,9 +137,10 @@ impl WebAppManager {
   }
 
   /// Uninstalls the UI assets and tauri's localStorage associated to the given app
-  fn uninstall_app_ui(&mut self, app_id: String) -> Result<(), String> {
-    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id).join("default");
-    let local_storage_path = app_local_storage_dir(&self.environment_path, &app_id);
+  fn uninstall_app_ui(&mut self, app_id: String, ui_name: &String) -> Result<(), String> {
+
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, ui_name);
+    let local_storage_path = app_local_storage_dir(&self.environment_path, &app_id, ui_name);
 
     if Path::new(&ui_folder_path).exists() {
       fs::remove_dir_all(ui_folder_path).or(Err("Failed to remove UI folder"))?;
@@ -153,8 +158,8 @@ impl WebAppManager {
     Ok(())
   }
 
-  fn get_web_ui_info(&self, app_id: String) -> Result<WebUiInfo, String> {
-    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id).join("default");
+  fn get_web_ui_info(&self, app_id: String, ui_name: &String) -> Result<WebUiInfo, String> {
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, ui_name);
 
     match self.is_web_app(app_id.clone()) {
       true => Ok(WebUiInfo::WebApp {
@@ -172,12 +177,12 @@ impl WebAppManager {
     }
   }
 
-  pub fn get_app_assets_dir(&self, app_id: &String) -> PathBuf {
-    app_assets_dir(&self.environment_path, &app_id)
+  pub fn get_app_assets_dir(&self, app_id: &String, ui_name: &String) -> PathBuf {
+    app_assets_dir(&self.environment_path, &app_id, ui_name)
   }
 
-  pub fn get_app_local_storage_dir(&self, app_id: &String) -> PathBuf {
-    app_local_storage_dir(&self.environment_path, &app_id)
+  pub fn get_app_local_storage_dir(&self, app_id: &String, ui_name: &String) -> PathBuf {
+    app_local_storage_dir(&self.environment_path, &app_id, ui_name)
   }
 
 
@@ -218,7 +223,10 @@ impl WebAppManager {
         err
       })?;
 
-    self.uninstall_app_ui(app_id)?;
+    // Assuming only one single default UI per app at the moment.
+    let default_ui_name = String::from("default");
+
+    self.uninstall_app_ui(app_id, &default_ui_name)?;
 
     self.on_running_apps_changed().await?;
 
@@ -254,10 +262,13 @@ impl WebAppManager {
 
     self.allocate_necessary_ports(&installed_apps);
 
+    // Assuming only one single default UI per app at the moment.
+    let default_ui_name = String::from("default");
+
     let installed_web_apps = installed_apps
       .into_iter()
       .map(|installed_app| {
-        let web_ui_info = self.get_web_ui_info(installed_app.installed_app_id.clone())?;
+        let web_ui_info = self.get_web_ui_info(installed_app.installed_app_id.clone(), &default_ui_name)?;
         Ok(InstalledWebAppInfo {
           installed_app_info: installed_app,
           web_ui_info,
@@ -269,7 +280,9 @@ impl WebAppManager {
   }
 
   fn is_web_app(&self, app_id: String) -> bool {
-    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id).join("default");
+    // Assuming only one single default UI per app at the moment.
+    let default_ui_name = String::from("default");
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, &default_ui_name);
 
     Path::new(&ui_folder_path).exists()
   }
@@ -352,16 +365,25 @@ fn apps_data_dir(root_path: &PathBuf) -> PathBuf {
   root_path.join("apps")
 }
 
-/// Path where UI assets of the given app are stored, relative
+
+/// Path where things related to a specific UI of the given app are stored, relative
 /// to a root directory (normally relative to the holochain version's "data directory")
-fn app_assets_dir(root_path: &PathBuf, app_id: &String) -> PathBuf {
-  apps_data_dir(root_path).join(app_id).join("assets")
+fn app_ui_dir(root_path: &PathBuf, app_id: &String, ui_name: &String) -> PathBuf {
+  apps_data_dir(root_path).join(app_id).join("uis").join(ui_name)
 }
 
-/// Path where localStorage of the given app is stored, relative
+/// Path where UI assets of the given app are stored, relative
 /// to a root directory (normally relative to the holochain version's "data directory")
-fn app_local_storage_dir(root_path: &PathBuf, app_id: &String) -> PathBuf {
-  apps_data_dir(root_path).join(app_id).join("tauri")
+fn app_assets_dir(root_path: &PathBuf, app_id: &String, ui_name: &String) -> PathBuf {
+  app_ui_dir(root_path, app_id, ui_name).join("assets")
+}
+
+
+/// Path where localStorage of the given app UI is stored, relative
+/// to a root directory (normally relative to the holochain version's "data directory")
+/// ui_name is the name of the UI assuming that there may be more than one UI per app
+fn app_local_storage_dir(root_path: &PathBuf, app_id: &String, ui_name: &String) -> PathBuf {
+  app_ui_dir(root_path, app_id, ui_name).join("tauri")
 }
 
 /// Path where the conductor databases are stored, relative to a root

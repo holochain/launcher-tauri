@@ -433,8 +433,9 @@ impl LauncherManager {
     let manager = self.get_web_happ_manager(holochain_id)?;
 
     // assuming at some point there may be multiple UI's for the same happ, open the "default" folder for now
-    let assets_path = manager.get_app_assets_dir(app_id).join("default");
-    let local_storage_path = manager.get_app_local_storage_dir(app_id);
+    let ui_name = String::from("default");
+    let assets_path = manager.get_app_assets_dir(app_id, &ui_name);
+    let local_storage_path = manager.get_app_local_storage_dir(app_id, &ui_name);
     let app_port = manager.holochain_manager.app_interface_port();
     let admin_port = manager.holochain_manager.admin_interface_port();
 
