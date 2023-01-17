@@ -121,7 +121,7 @@ pub fn profile_logs_dir(profile: String) -> Result<PathBuf, LauncherError> {
     .ok_or(LauncherError::SystemDirError(String::from("Failed to get home dir")))?
     .join("Library/Logs")
     .join(APP_NAME)
-    .join(profiles)
+    .join("profiles")
     .join(profile);
 
   #[cfg(not(target_os = "macos"))]
