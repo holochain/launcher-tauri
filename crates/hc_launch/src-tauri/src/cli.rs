@@ -35,7 +35,7 @@ pub struct HcLaunch {
   path: Option<PathBuf>,
 
   #[structopt(long)]
-  /// Port pointing to a localhost server that serves your assets.\n
+  /// Port pointing to a localhost server that serves your assets.
   /// NOTE: This is only meant for development purposes! Apps can behave differently when
   /// served from a localhost server than when actually running in the Holochain Launcher.
   /// Use the --ui-path flag pointing to your built and bundled files instead or directly pass
