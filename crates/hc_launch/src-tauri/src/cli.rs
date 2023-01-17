@@ -29,11 +29,17 @@ pub struct HcLaunch {
   #[structopt(long, env = "HC_HOLOCHAIN_PATH", default_value = "holochain")]
   holochain_path: PathBuf,
 
-  /// Path to .webhapp or .happ file to launch. If a .happ file is passed, a UI path must be specified as well via --ui-path
+  /// Path to .webhapp or .happ file to launch. If a .happ file is passed, either
+  /// a UI path must be specified via --ui-path or a port pointing to a localhost
+  /// server via --ui-port.
   path: Option<PathBuf>,
 
   #[structopt(long)]
-  /// Port of the UI.
+  /// Port pointing to a localhost server that serves your assets.\n
+  /// NOTE: This is only meant for development purposes! Apps can behave differently when
+  /// served from a localhost server than when actually running in the Holochain Launcher.
+  /// Use the --ui-path flag pointing to your built and bundled files instead or directly pass
+  /// the packaged .webhapp to test the actual behavior of your hApp in the Holochain Launcher.
   ui_port: Option<u16>,
 
   #[structopt(long)]
@@ -59,10 +65,20 @@ impl HcLaunch {
       (None, Some(ui_port)) => Some(UISource::Port(ui_port)),
       (Some(_ui_path), Some(_ui_port)) => {
         eprintln!("[hc launch] ERROR: You cannot provide both --ui-path and --ui-port.");
-        panic!("ERROR: Provided both a --ui-path and --ui-port");
+        panic!("ERROR: Provided both --ui-path and --ui-port");
       },
       (None, None) => None,
     };
+
+    if let Some(_port) = self.ui_port {
+      println!("\n[hc launch] ------ WARNING ------");
+      println!(r#"[hc launch] You are running hc launch pointing to a localhost server. This is meant for development purposes
+[hc launch] only as apps can behave differently than when actually running in the Holochain Launcher.
+[hc launch] To test the real behavior, use --ui-path instead and point to a folder with your built and bundled files
+[hc launch] or pass an already packaged .webhapp as an argument."#);
+      println!("[hc launch] ---------------------\n");
+
+    }
 
     match self.path {
       Some(p) => {
