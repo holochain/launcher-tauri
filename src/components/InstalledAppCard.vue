@@ -72,9 +72,9 @@
       >
         <div
           :class="{
-            running: isAppRunning(app.webAppInfo.installed_app_info),
+            running: isAppRunningOrPaused(app.webAppInfo.installed_app_info),
             stopped: isAppDisabled(app.webAppInfo.installed_app_info),
-            paused: isAppPaused(app.webAppInfo.installed_app_info),
+            // paused: isAppPaused(app.webAppInfo.installed_app_info),
           }"
           class="app-status"
           style="margin-right: 29px"
@@ -84,7 +84,7 @@
 
       <div
         v-if="
-          isAppRunning(app.webAppInfo.installed_app_info) && !isAppHeadless(app)
+          isAppRunningOrPaused(app.webAppInfo.installed_app_info) && !isAppHeadless(app)
         "
         style="display: flex"
       >
@@ -104,7 +104,7 @@
         hoist
         placement="top"
         :content="
-          isAppRunning(app.webAppInfo.installed_app_info)
+          isAppRunningOrPaused(app.webAppInfo.installed_app_info)
             ? 'Disable App'
             : 'Start App'
         "
@@ -264,7 +264,7 @@
         </HCButton>
         <HCButton
           style="--hc-primary-color: #008704"
-          v-if="isAppPaused(app.webAppInfo.installed_app_info)"
+          v-if="never(app.webAppInfo.installed_app_info)"
           @click="startApp(app)"
           outlined
           >Start
@@ -280,7 +280,7 @@ import { HolochainAppInfo } from "../types";
 import { serializeHash } from "@holochain-open-dev/utils";
 import { isAppRunning, isAppDisabled, isAppPaused, getReason, flattenCells, getCellId } from "../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
-import { AppWebsocket, CellInfo, DnaHash, NetworkInfo } from "@holochain/client";
+import { AppInfo, AppWebsocket, CellInfo, DnaHash, NetworkInfo } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
@@ -344,7 +344,7 @@ export default defineComponent({
         .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
     },
     isSliderOn() {
-      return isAppRunning(this.app.webAppInfo.installed_app_info);
+      return this.isAppRunningOrPaused(this.app.webAppInfo.installed_app_info);
     },
   },
   methods: {
@@ -376,13 +376,14 @@ export default defineComponent({
       this.$emit("uninstallApp", app);
     },
     getAppStatus(app: HolochainAppInfo) {
-      if (isAppRunning(app.webAppInfo.installed_app_info)) {
+      if (this.isAppRunningOrPaused(app.webAppInfo.installed_app_info)) {
         return "Running";
       }
       if (isAppDisabled(app.webAppInfo.installed_app_info)) {
         return "Disabled";
       }
       if (isAppPaused(app.webAppInfo.installed_app_info)) {
+        // should not be called as long as isAppRunningOrPaused workaround is in place
         return "Paused";
       }
       return "Unknown State";
@@ -394,11 +395,12 @@ export default defineComponent({
       return installedAppId !== `DevHub-${holochainId.content}`;
     },
     async handleSlider(app: HolochainAppInfo) {
-      if (isAppRunning(app.webAppInfo.installed_app_info)) {
+      if (this.isAppRunningOrPaused(app.webAppInfo.installed_app_info)) {
         await this.disableApp(app);
       } else if (isAppDisabled(app.webAppInfo.installed_app_info)) {
         await this.enableApp(app);
       } else if (isAppPaused(app.webAppInfo.installed_app_info)) {
+        // should not be called as long as isAppRunningOrPaused workaround is in place
         await this.startApp(app);
       } else {
         throw new Error("Unknown App state.");
@@ -423,6 +425,16 @@ export default defineComponent({
 
       return cell.Provisioned.cell_id[1];
     },
+    // This is a workaround as long as there are issues with app status updates
+    // and app status while offline (https://github.com/holochain/holochain/issues/1580)
+    isAppRunningOrPaused(appInfo: AppInfo) {
+      return isAppRunning(appInfo) || isAppPaused(appInfo)
+    },
+    // This is used for the workaround as long as there are issues with app status updates
+    // and app status while offline (https://github.com/holochain/holochain/issues/1580)
+    never(_appInfo: AppInfo) {
+      return false
+    }
   },
 });
 </script>
