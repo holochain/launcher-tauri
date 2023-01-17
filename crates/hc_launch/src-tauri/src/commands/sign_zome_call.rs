@@ -1,10 +1,7 @@
-use holochain_client::AgentPubKey;
 use holochain_types::prelude::ZomeCallUnsigned;
-use holochain_zome_types::{Signature};
 use holochain_conductor_api::ZomeCall;
 use lair_keystore_api::LairClient;
 use std::collections::HashMap;
-use serde::Deserialize;
 use holochain_launcher_utils::zome_call_signing::{ZomeCallUnsignedTauri, sign_zome_call_with_client};
 
 use crate::error::HcLaunchError;
