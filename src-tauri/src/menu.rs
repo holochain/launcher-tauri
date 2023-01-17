@@ -1,4 +1,4 @@
-use crate::{commands::open_app::report_issue, setup::logs, quit};
+use crate::{setup::logs, quit};
 use tauri::{CustomMenuItem, Manager, Menu, Submenu, Window, Wry};
 use crate::file_system::Profile;
 

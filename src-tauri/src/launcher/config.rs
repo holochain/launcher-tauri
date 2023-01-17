@@ -3,7 +3,7 @@ use log::Level;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, fs};
 
-use crate::file_system::{profile_config_dir, Profile, launcher_config_path};
+use crate::file_system::{Profile, launcher_config_path};
 
 use super::error::LauncherError;
 
@@ -44,7 +44,7 @@ impl LauncherConfig {
     let config_path = match launcher_config_path(profile.clone()) {
       Ok(path) => path,
       Err(e) => {
-        log::error!("Warning: Found no launcher config file at expected path. Generating default config instead.");
+        log::error!("Warning: Found no launcher config file at expected path: {:?}.\nGenerating default config instead.", e);
         return LauncherConfig::new(profile.clone());
       }
     };

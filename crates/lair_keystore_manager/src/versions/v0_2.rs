@@ -3,7 +3,6 @@ use lair_keystore_api::prelude::*;
 use lair_keystore_api::ipc_keystore::*;
 use holochain_types::prelude::ZomeCallUnsigned;
 use holochain_conductor_api::ZomeCall;
-use holochain_zome_types::Signature;
 use holochain_launcher_utils::zome_call_signing::sign_zome_call_with_client;
 
 use async_trait::async_trait;

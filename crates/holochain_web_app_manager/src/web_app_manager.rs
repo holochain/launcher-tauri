@@ -171,10 +171,6 @@ impl WebAppManager {
     }
   }
 
-  pub fn get_ui_index_path(&self, app_id: &String) -> PathBuf {
-    app_assets_dir(&self.environment_path, &app_id).join("index.html")
-  }
-
   pub fn get_app_ui_dir(&self, app_id: &String) -> PathBuf {
     app_assets_dir(&self.environment_path, &app_id)
   }
