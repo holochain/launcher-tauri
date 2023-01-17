@@ -144,6 +144,8 @@ pub fn launch_tauri(
               }
             };
 
+            window_builer = window_builder.inner_size(window_width, window_height);
+
             let window = match window_builder
               .menu(Menu::new().add_submenu(Submenu::new(
                 "Settings",

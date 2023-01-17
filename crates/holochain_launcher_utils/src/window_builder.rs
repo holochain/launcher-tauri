@@ -28,8 +28,6 @@ pub fn happ_window_builder<'a>(
   local_storage_path: PathBuf,
   app_port: u16,
   admin_port: u16,
-  width: f64,
-  height: f64,
 ) -> WindowBuilder<'a> {
 
   let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
