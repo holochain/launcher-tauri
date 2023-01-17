@@ -118,7 +118,8 @@ impl WebAppManager {
     app_id: String,
     web_ui_zip_bytes: ResourceBytes,
   ) -> Result<(), String> {
-    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id);
+    // assuming there may be multiple UI's per happ at some point, install it to the "default" folder
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id).join("default");
     let ui_zip_path = apps_data_dir(&self.environment_path).join(format!("{}.zip", app_id));
 
     fs::write(ui_zip_path.clone(), web_ui_zip_bytes).or(Err("Failed to write Web UI Zip file"))?;
@@ -133,7 +134,7 @@ impl WebAppManager {
 
   /// Uninstalls the UI assets and tauri's localStorage associated to the given app
   fn uninstall_app_ui(&mut self, app_id: String) -> Result<(), String> {
-    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id);
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id).join("default");
     let local_storage_path = app_local_storage_dir(&self.environment_path, &app_id);
 
     if Path::new(&ui_folder_path).exists() {
@@ -153,7 +154,7 @@ impl WebAppManager {
   }
 
   fn get_web_ui_info(&self, app_id: String) -> Result<WebUiInfo, String> {
-    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id);
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id).join("default");
 
     match self.is_web_app(app_id.clone()) {
       true => Ok(WebUiInfo::WebApp {
@@ -171,7 +172,7 @@ impl WebAppManager {
     }
   }
 
-  pub fn get_app_ui_dir(&self, app_id: &String) -> PathBuf {
+  pub fn get_app_assets_dir(&self, app_id: &String) -> PathBuf {
     app_assets_dir(&self.environment_path, &app_id)
   }
 
@@ -268,7 +269,7 @@ impl WebAppManager {
   }
 
   fn is_web_app(&self, app_id: String) -> bool {
-    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id);
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id).join("default");
 
     Path::new(&ui_folder_path).exists()
   }

@@ -139,7 +139,6 @@ pub fn happ_window_builder<'a>(
     .data_directory(local_storage_path)
     .initialization_script(launcher_env_command.as_str())
     .initialization_script(anchor_event_listener)
-    .inner_size(width, height)
     .title(window_title)
 
 }

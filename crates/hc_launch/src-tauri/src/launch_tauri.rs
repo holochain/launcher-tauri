@@ -113,7 +113,7 @@ pub fn launch_tauri(
 
             let app_handle = app.handle();
 
-            let window_builder = match ui_source.clone() {
+            let mut window_builder = match ui_source.clone() {
               UISource::Path(ui_path) => {
                 happ_window_builder(
                   &app_handle,
@@ -124,8 +124,6 @@ pub fn launch_tauri(
                   local_storage_dir.clone().join(format!("Agent-{}", app_counter)),
                   app_port,
                   admin_port,
-                  window_width,
-                  window_height,
                 )
               },
               UISource::Port(ui_port) => {
@@ -138,13 +136,11 @@ pub fn launch_tauri(
                   local_storage_dir.clone().join(format!("Agent-{}", app_counter)),
                   app_port,
                   admin_port,
-                  window_width,
-                  window_height
                 )
               }
             };
 
-            window_builer = window_builder.inner_size(window_width, window_height);
+            window_builder = window_builder.inner_size(window_width, window_height);
 
             let window = match window_builder
               .menu(Menu::new().add_submenu(Submenu::new(

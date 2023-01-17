@@ -69,6 +69,7 @@
       <HCTextField
           placeholder="Network Seed"
           label="Network Seed (Optional)"
+          title="leave it empty to join the public network"
           style="margin: 5px; margin-bottom: 25px; width: 360px"
           helper="Peers with the same network seed are part of the same network"
           ref="network-seed-field"
