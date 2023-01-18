@@ -119,7 +119,7 @@ pub fn profile_logs_dir(profile: String) -> Result<PathBuf, LauncherError> {
   let path = dirs_next::home_dir()
     .ok_or(LauncherError::SystemDirError(String::from("Failed to get home dir")))?
     .join("Library/Logs")
-    .join(APP_NAME)
+    .join(component_name(APP_NAME))
     .join("profiles")
     .join(profile);
 
