@@ -230,6 +230,12 @@ export default defineComponent({
     hdkVersionForApp: {
       type: String,
     },
+    happReleaseHash: {
+      type: String,
+    },
+    guiReleaseHash: {
+      type: String,
+    },
   },
   data(): {
     showAdvanced: boolean;
@@ -438,6 +444,9 @@ export default defineComponent({
       try {
         this.installing = true;
 
+        console.log("@InstallAppDialog: guiReleaseHash: ", this.guiReleaseHash);
+        console.log("@InstallAppDialog: happReleaseHash: ", this.happReleaseHash);
+
         await invoke("install_app", {
           appId,
           appBundlePath: this.appBundlePath,
@@ -445,6 +454,8 @@ export default defineComponent({
           networkSeed,
           reuseAgentPubKey: this.reuseAgentPubKey,
           holochainId: this.holochainId,
+          happReleaseHash: this.happReleaseHash,
+          guiReleaseHash: this.guiReleaseHash,
         });
 
         this.installing = false;

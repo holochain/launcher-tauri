@@ -28,6 +28,8 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
         network_seed,
         HashMap::new(),
         None,
+        None,
+        None,
       )
       .await?;
   }

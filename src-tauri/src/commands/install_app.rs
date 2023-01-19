@@ -19,6 +19,8 @@ pub async fn install_app(
   network_seed: Option<String>,
   membrane_proofs: HashMap<String, Vec<u8>>,
   reuse_agent_pub_key: Option<AgentPubKey>,
+  happ_release_hash: Option<String>,
+  gui_release_hash: Option<String>,
 ) -> Result<(), String> {
   if window.label() != "admin" {
     return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (I)"))
@@ -50,6 +52,8 @@ pub async fn install_app(
           network_seed,
           converted_membrane_proofs,
           reuse_agent_pub_key,
+          happ_release_hash,
+          gui_release_hash,
         )
         .await?;
     }
@@ -64,6 +68,7 @@ pub async fn install_app(
           network_seed,
           converted_membrane_proofs,
           reuse_agent_pub_key,
+          happ_release_hash,
         )
         .await?;
     }
