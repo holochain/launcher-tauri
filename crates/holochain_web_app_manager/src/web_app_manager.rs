@@ -301,6 +301,8 @@ impl WebAppManager {
     Ok(())
   }
 
+  /// This uninstalls the happ from the conductor as well as all UI's and
+  /// localStorage related to that happ from the filesystem
   pub async fn uninstall_app(&mut self, app_id: String) -> Result<(), String> {
     self
       .holochain_manager
@@ -311,10 +313,7 @@ impl WebAppManager {
         err
       })?;
 
-    // Assuming only one single default UI per app at the moment.
-    let default_ui_name = String::from("default");
-
-    self.uninstall_app_ui(app_id, &default_ui_name)?;
+    self.uninstall_app_data(app_id)?;
 
     self.on_running_apps_changed().await?;
 
@@ -450,11 +449,17 @@ impl WebAppManager {
   /// Stores the hash of a happ release of the given hApp to the filesystem
   /// EntryHash must be passed as a base64 string
   pub fn store_happ_release_hash(&self, hash: String, app_id: &String) -> Result<(), String> {
-    let dot_happrelease_path = app_data_dir(&self.environment_path, app_id).join(".happrelease");
+
+    let app_data_dir = app_data_dir(&self.environment_path, app_id);
+
+    create_dir_if_necessary(&app_data_dir)
+      .map_err(|e| format!("Failed to create app's data directory before storing happ release hash: {:?}", e))?;
+
+    let dot_happrelease_path = app_data_dir.join(".happrelease");
     // if there is already a .happrelease file, store its contents to a .happrelease.previous file in order to be able
     // to revert upgrades if necessary
     if dot_happrelease_path.exists() {
-      let dot_happrelease_dot_previous_path = app_data_dir(&self.environment_path, app_id).join(".happrelease.previous");
+      let dot_happrelease_dot_previous_path = app_data_dir.join(".happrelease.previous");
       std::fs::rename(dot_happrelease_path.clone(), dot_happrelease_dot_previous_path)
         .map_err(|e| format!("Failed to rename .happrelease file to .happrelease.previous file: {:?}", e))?;
     }
@@ -468,7 +473,12 @@ impl WebAppManager {
   /// Stores the hash of a gui release of the given hApp to the filesystem
   /// EntryHash must be passed as a base64 string
   pub fn store_gui_release_hash(&self, hash: String, app_id: &String, ui_name: &String) -> Result<(), String> {
-    let dot_guirelease_path = app_ui_dir(&self.environment_path, app_id, ui_name).join(".guirelease");
+
+    let app_gui_dir = app_ui_dir(&self.environment_path, app_id, ui_name);
+    create_dir_if_necessary(&app_gui_dir)
+      .map_err(|e| format!("Failed to create app's data directory before storing happ release hash: {:?}", e))?;
+
+    let dot_guirelease_path = app_gui_dir.join(".guirelease");
     // if there is already a .guirelease file, store its contents to a .guirelease.previous file in order to be able
     // to revert upgrades if necessary
     if dot_guirelease_path.exists() {
