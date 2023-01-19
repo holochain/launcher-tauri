@@ -356,7 +356,7 @@ export default defineComponent({
     writeText,
     getCellId,
     isAppHeadless(app: HolochainAppInfo) {
-      return app.webAppInfo.web_ui_info.type === "Headless";
+      return app.webAppInfo.web_uis.default.type === "Headless";
     },
     requestUninstall() {
       (this.$refs["uninstall-app-dialog"] as typeof HCGenericDialog).open();

@@ -103,7 +103,7 @@
         "
       >
         <InstalledAppCard
-          v-if="app.webAppInfo.web_ui_info.type !== 'Headless'"
+          v-if="app.webAppInfo.web_uis.default.type !== 'Headless'"
           style="margin: 5px; display: flex; flex: 1"
           :app="app"
           @openApp="$emit('openApp', $event)"
@@ -155,7 +155,7 @@
         "
       >
         <InstalledAppCard
-          v-if="app.webAppInfo.web_ui_info.type === 'Headless'"
+          v-if="app.webAppInfo.web_uis.default.type === 'Headless'"
           style="margin: 5px; display: flex; flex: 1"
           :app="app"
           @openApp="$emit('openApp', $event)"
@@ -270,6 +270,9 @@ import HCSelectCard from "./subcomponents/HCSelectCard.vue";
 import StackedChart from "./subcomponents/StackedChart.vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import prettyBytes from "pretty-bytes";
+import { getHappReleasesByEntryHashes } from "../devhub/get-happs";
+import { AppWebsocket } from "@holochain/client";
+
 
 export default defineComponent({
   name: "InstalledAppsList",
@@ -321,6 +324,22 @@ export default defineComponent({
         );
       })
     );
+
+    const holochainId = this.$store.getters["holochainIdForDevhub"];
+    // connect to AppWebsocket
+    const port = this.$store.getters["appInterfacePort"](holochainId);
+    const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+    const devhubAppInfo = await appWebsocket.appInfo({
+        installed_app_id: `DevHub-${holochainId.content}`,
+    });
+
+    // check for GUI updates
+    const allApps: Array<HolochainAppInfo> = this.$store.getters["allApps"];
+    const allHappReleaseHashes = allApps.map((app) => app.webAppInfo.happ_release_hash);
+    const happReleaseHashes = await getHappReleasesByEntryHashes(appWebsocket, devhubAppInfo, allHappReleaseHashes);
+
+    console.log("@InstalledAppsList: happReleaseHashes: ", happReleaseHashes);
+
   },
   computed: {
     sortedApps() {
@@ -357,12 +376,12 @@ export default defineComponent({
     },
     noHeadlessApps(): boolean {
       return !this.sortedApps.some(
-        (app) => app.webAppInfo.web_ui_info.type === "Headless"
+        (app) => app.webAppInfo.web_uis.default.type === "Headless"
       );
     },
     noWebApps(): boolean {
       return this.sortedApps.every(
-        (app) => app.webAppInfo.web_ui_info.type === "Headless"
+        (app) => app.webAppInfo.web_uis.default.type === "Headless"
       );
     },
     noHolochainVersions(): boolean {
@@ -385,7 +404,7 @@ export default defineComponent({
     prettyBytes,
     isAppRunning,
     isAppHeadless(app: HolochainAppInfo) {
-      return app.webAppInfo.web_ui_info.type === "Headless";
+      return app.webAppInfo.web_uis.default.type === "Headless";
     },
     storageFractions(holochainVersion: string) {
       const storageInfo: StorageInfo = this.storageInfos[holochainVersion];

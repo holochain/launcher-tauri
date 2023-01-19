@@ -238,9 +238,11 @@ impl WebAppManager {
   fn get_web_ui_info(&self, app_id: String, ui_name: &String) -> Result<WebUiInfo, String> {
     let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, ui_name);
 
+    let gui_release_hash = self.get_gui_release_hash(&app_id, ui_name);
+
     match self.is_web_app(app_id.clone()) {
       true => Ok(WebUiInfo::WebApp {
-        path_to_web_app: ui_folder_path,
+        path_to_ui: ui_folder_path,
         app_ui_port: self
           .allocated_ports
           .get(&app_id)
@@ -249,6 +251,7 @@ impl WebAppManager {
             app_id,
           ))?
           .clone(),
+        gui_release_hash,
       }),
       false => Ok(WebUiInfo::Headless),
     }
@@ -356,9 +359,16 @@ impl WebAppManager {
       .into_iter()
       .map(|installed_app| {
         let web_ui_info = self.get_web_ui_info(installed_app.installed_app_id.clone(), &default_ui_name)?;
+        // Currently only 1 UI supported
+        let mut web_uis = HashMap::new();
+        web_uis.insert(default_ui_name.clone(), web_ui_info);
+
+        let happ_release_hash = self.get_happ_release_hash(&installed_app.installed_app_id);
+
         Ok(InstalledWebAppInfo {
           installed_app_info: installed_app,
-          web_ui_info,
+          happ_release_hash,
+          web_uis,
         })
       })
       .collect::<Result<Vec<InstalledWebAppInfo>, String>>()?;
@@ -492,6 +502,22 @@ impl WebAppManager {
 
     std::fs::write(dot_guirelease_path, hash)
       .map_err(|e| format!("Failed to write GUI release hash to .guirelease file: {:?}", e))
+  }
+
+  /// Reads the happ release hash of an app
+  pub fn get_happ_release_hash(&self, app_id: &String) -> Option<String> {
+    match fs::read_to_string(app_data_dir(&self.environment_path, app_id).join(".happrelease")) {
+      Ok(s) => Some(s),
+      Err(_) => None,
+    }
+  }
+
+  /// Reads the gui release hash of an app UI
+  pub fn get_gui_release_hash(&self, app_id: &String, ui_name: &String) -> Option<String> {
+    match fs::read_to_string(app_ui_dir(&self.environment_path, app_id, ui_name).join(".guirelease")) {
+      Ok(s) => Some(s),
+      Err(_) => None,
+    }
   }
 
 }

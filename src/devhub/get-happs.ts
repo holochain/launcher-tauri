@@ -4,6 +4,7 @@ import {
   EntryHash,
   ActionHash,
   AppInfo,
+  EntryHashB64,
 } from "@holochain/client";
 import { GUIReleaseEntry, HappEntry, HappReleaseEntry } from "./types";
 import { getCellId } from "../utils";
@@ -211,3 +212,35 @@ function devhubCells(devhubHapp: AppInfo) {
   };
 }
 
+
+
+/**
+ * Gets the happ releases corresponding to the passed entry hashes
+ *
+ * @param happReleaseEntryHash
+ */
+export async function getHappReleasesByEntryHashes(
+  appWebsocket: AppWebsocket,
+  devhubHapp: AppInfo,
+  happReleaseEntryHashes: Array<EntryHashB64 | undefined>
+) {
+  const cells = devhubCells(devhubHapp);
+  const happReleases = await Promise.all(happReleaseEntryHashes.map( async (entryHash) => {
+    if (entryHash) {
+      await appWebsocket.callZome({
+        cap_secret: null,
+        cell_id: getCellId(cells.happs.find((c) => "Provisioned" in c )!)!,
+        fn_name: "get_happ_release",
+        zome_name: "happ_library",
+        payload: {
+          id: entryHash,
+        },
+        provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
+      })
+    } else {
+      undefined
+    }
+  }));
+  console.log("##### happ Releases for all installed apps: ", happReleases);
+
+}

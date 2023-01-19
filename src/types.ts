@@ -115,11 +115,13 @@ export type WebUiInfo =
       type: "WebApp";
       path_to_web_app: string;
       app_ui_port: number;
+      gui_release_hash: string | undefined;
     };
 
 export interface InstalledWebAppInfo {
   installed_app_info: AppInfo;
-  web_ui_info: WebUiInfo;
+  happ_release_hash: string | undefined;
+  web_uis: Record<string, WebUiInfo>;
 }
 
 export interface HolochainAppInfo {
