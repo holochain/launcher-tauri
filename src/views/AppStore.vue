@@ -171,10 +171,11 @@
   <InstallAppDialog
     v-if="selectedAppBundlePath"
     :appBundlePath="selectedAppBundlePath"
-    :hdkVersionForApp="hdkVersionForApp"
+    :holochainSelection="holochainSelection"
     :happReleaseHash="selectedHappReleaseHash"
     :guiReleaseHash="selectedGuiReleaseHash"
     @app-installed="
+      holochainSelection = true;
       installClosed();
       $emit('go-back');
     "
@@ -203,7 +204,6 @@ import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 import {
   AppWithReleases,
   getAllAppsWithGui,
-  filterByHdkVersion,
   getLatestRelease,
   fetchWebHapp,
 } from "../devhub/get-happs";
@@ -234,9 +234,9 @@ export default defineComponent({
     loading: boolean;
     installableApps: Array<AppWithReleases>;
     selectedAppBundlePath: string | undefined;
-    hdkVersionForApp: HdkVersion | undefined;
     howToPublishUrl: string;
     holochainId: HolochainId | undefined;
+    holochainSelection: boolean;
     pollInterval: number | null;
     provisionedCells: [string, CellInfo | undefined][] | undefined;
     networkStates: (number | undefined)[];
@@ -256,10 +256,10 @@ export default defineComponent({
       loading: true,
       installableApps: [],
       selectedAppBundlePath: undefined,
-      hdkVersionForApp: undefined,
       howToPublishUrl:
         "https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub",
       holochainId: undefined,
+      holochainSelection: true,
       pollInterval: null,
       provisionedCells: undefined,
       networkStates: [undefined, undefined, undefined],
@@ -339,7 +339,7 @@ export default defineComponent({
         "get_supported_versions",
         {}
       );
-      this.installableApps = filterByHdkVersion(hdk_versions, allApps);
+      this.installableApps = allApps;
 
       this.loading = false;
 
@@ -359,6 +359,8 @@ export default defineComponent({
     },
     getLatestRelease,
     async saveApp(app: AppWithReleases) {
+      // if downloading, always take holochain version of DevHub
+      this.holochainSelection = false;
       this.loadingText = "Connecting with DevHub";
       (this.$refs.downloading as typeof HCLoading).open();
       const release = getLatestRelease(app);
@@ -404,7 +406,7 @@ export default defineComponent({
           this.selectedAppBundlePath = await invoke("save_app", {
             appBundleBytes: bytes,
           });
-          this.hdkVersionForApp = release.content.hdk_version;
+          // this.hdkVersionForApp = release.content.hdk_version;
           this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
           this.selectedGuiReleaseHash = encodeHashToBase64(guiReleaseHash);
           (this.$refs.downloading as typeof HCLoading).close();
@@ -441,7 +443,7 @@ export default defineComponent({
     },
     installClosed() {
       this.selectedAppBundlePath = undefined;
-      this.hdkVersionForApp = undefined;
+      // this.hdkVersionForApp = undefined;
     },
     async getNetworkState() {
       if (!this.appWebsocket) {

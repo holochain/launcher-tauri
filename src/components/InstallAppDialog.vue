@@ -59,7 +59,7 @@
         ref="app-id-field"
       />
       <HCSelect
-        v-if="!hdkVersionForApp"
+        v-if="holochainSelection"
         style="margin: 5px; margin-bottom: 15px; width: 360px"
         label="Holochain Version*"
         :items="supportedHolochains"
@@ -227,8 +227,8 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    hdkVersionForApp: {
-      type: String,
+    holochainSelection: {
+      type: Boolean,
     },
     happReleaseHash: {
       type: String,
@@ -322,18 +322,11 @@ export default defineComponent({
 
     this.supportedHolochains = supportedHolochains;
 
-    if (this.hdkVersionForApp) {
+    if (!this.holochainSelection) {
       try {
-        // Get Holochain Version
-        const version: HolochainVersion = await invoke("choose_version_for_hdk", {
-          hdkVersion: this.hdkVersionForApp,
-        });
-        this.holochainId = {
-          type: "HolochainVersion",
-          content: version,
-        };
+        this.holochainId = this.$store.getters["holochainIdForDevhub"];
       } catch (e) {
-        console.log("Failed to get holochain version for hdk version: ", e);
+        console.log("Failed to get holochain version: ", e);
       }
     }
 
