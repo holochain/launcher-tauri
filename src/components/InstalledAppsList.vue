@@ -1,4 +1,42 @@
 <template>
+
+  <HCGenericDialog
+    @confirm="updateGui"
+    ref="updateGuiDialog"
+    :primaryButtonLabel="$t('buttons.install')"
+    :closeOnSideClick="true"
+  >
+  <div class="column" style="padding: 0 30px; align-items: flex-start; max-width: 500px;">
+    <div style="width: 100%; text-align: center; font-weight: 600; font-size: 27px; margin-bottom: 25px">
+      {{ $t("dialogs.guiUpdate.title") }}
+    </div>
+    <div style="margin-bottom: 15px;">
+      {{ $t("dialogs.guiUpdate.mainText") }}:
+    </div>
+    <div>
+      <span style="font-weight: bold; margin-right: 15px;">{{ $t("dialogs.guiUpdate.version") }}:</span>{{ selectedGuiUpdate ? selectedGuiUpdate.version : "loading..." }}
+    </div>
+    <div style="font-weight: bold;">
+      {{ $t("dialogs.guiUpdate.changelog") }}:
+    </div>
+    <div style="background: rgb(217,217,217); border-radius: 8px; padding: 10px; max-height: 200px; overflow-y: auto;">
+      {{ selectedGuiUpdate ? selectedGuiUpdate.changelog : "loading..." }}
+    </div>
+    <div style="margin-top: 20px;">
+      {{ $t("dialogs.guiUpdate.question") }}
+    </div>
+  </div>
+
+  </HCGenericDialog>
+
+  <HCLoading ref="downloading" :text="loadingText" />
+
+  <HCSnackbar
+    :labelText="errorText"
+    ref="snackbar"
+  ></HCSnackbar>
+
+
   <div
     style="
       display: flex;
@@ -110,6 +148,7 @@
           @uninstallApp="$emit('uninstall-app', $event)"
           @disableApp="$emit('disable-app', $event)"
           @enableApp="$emit('enable-app', $event)"
+          @updateGui="openUpdateGuiDialog($event)"
         />
       </div>
     </div>
@@ -263,15 +302,20 @@ import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
 
-import { HolochainAppInfo, HolochainId, StorageInfo } from "../types";
-import { isAppRunning } from "../utils";
+import { HolochainAppInfo, HolochainAppInfoExtended, HolochainId, StorageInfo } from "../types";
+import { getCellId, isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
 import HCSelectCard from "./subcomponents/HCSelectCard.vue";
 import StackedChart from "./subcomponents/StackedChart.vue";
+import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
+import HCLoading from "./subcomponents/HCLoading.vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import prettyBytes from "pretty-bytes";
-import { getHappReleasesByEntryHashes } from "../devhub/get-happs";
-import { AppWebsocket } from "@holochain/client";
+import HCSnackbar from "./subcomponents/HCSnackbar.vue";
+import { devhubCells, getHappReleasesByEntryHashes, fetchGui } from "../devhub/get-happs";
+import { AppInfo, AppWebsocket, decodeHashFromBase64, encodeHashToBase64, EntryHash } from "@holochain/client";
+import { GUIReleaseEntry, HappReleaseEntry } from "../devhub/types";
+import { ActionTypes } from "../store/actions";
 
 
 export default defineComponent({
@@ -280,6 +324,9 @@ export default defineComponent({
     InstalledAppCard,
     HCSelectCard,
     StackedChart,
+    HCGenericDialog,
+    HCLoading,
+    HCSnackbar,
   },
   props: {
     installedApps: {
@@ -288,6 +335,8 @@ export default defineComponent({
     },
   },
   data(): {
+    appWebsocket: AppWebsocket | undefined;
+    devhubAppInfo: AppInfo | undefined;
     sortOptions: [string, string][];
     sortOption: string | undefined;
     selectedHolochainVersion: string;
@@ -297,8 +346,16 @@ export default defineComponent({
     storageInfos: Record<string, StorageInfo>;
     refreshing: boolean;
     refreshTimeout: number | null;
+    extendedAppInfos: Array<HolochainAppInfoExtended> | undefined;
+    selectedApp: HolochainAppInfoExtended | undefined;
+    selectedGuiUpdate: GUIReleaseEntry | undefined;
+    selectedGuiUpdateHash: EntryHash | undefined;
+    loadingText: string;
+    errorText: string;
   } {
     return {
+      appWebsocket: undefined,
+      devhubAppInfo: undefined,
       sortOptions: [
         ["name", "name"],
         ["name descending", "name descending"],
@@ -312,6 +369,12 @@ export default defineComponent({
       storageInfos: {},
       refreshing: false,
       refreshTimeout: null,
+      extendedAppInfos: undefined,
+      selectedApp: undefined,
+      selectedGuiUpdate: undefined,
+      selectedGuiUpdateHash: undefined,
+      loadingText: "",
+      errorText: "Unknown error occured",
     };
   },
   emits: ["openApp", "uninstall-app", "enable-app", "disable-app"],
@@ -329,21 +392,27 @@ export default defineComponent({
     // connect to AppWebsocket
     const port = this.$store.getters["appInterfacePort"](holochainId);
     const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+    this.appWebsocket = appWebsocket;
     const devhubAppInfo = await appWebsocket.appInfo({
         installed_app_id: `DevHub-${holochainId.content}`,
     });
+    this.devhubAppInfo = devhubAppInfo;
 
-    // check for GUI updates
-    const allApps: Array<HolochainAppInfo> = this.$store.getters["allApps"];
-    const allHappReleaseHashes = allApps.map((app) => app.webAppInfo.happ_release_hash);
-    const happReleaseHashes = await getHappReleasesByEntryHashes(appWebsocket, devhubAppInfo, allHappReleaseHashes);
-
-    console.log("@InstalledAppsList: happReleaseHashes: ", happReleaseHashes);
+    await this.checkForUiUpdates();
 
   },
   computed: {
     sortedApps() {
-      let sortedAppList = this.installedApps;
+      // if extended happ releases are not yet fetched from the DevHub to include potential
+      // GUI updates, just return installedApps with guiUpdateAvailable undefined
+      let sortedAppList: Array<HolochainAppInfoExtended> = this.extendedAppInfos ? this.extendedAppInfos : this.installedApps.map((app) => {
+        return {
+          webAppInfo: app.webAppInfo,
+          holochainId: app.holochainId,
+          holochainVersion: app.holochainVersion,
+          guiUpdateAvailable: undefined,
+        }
+      });
 
       if (this.selectedHolochainVersion !== "All Versions") {
         sortedAppList = sortedAppList.filter(
@@ -371,6 +440,8 @@ export default defineComponent({
           )
         );
       }
+
+      console.log("### Sorted apps list: ", sortedAppList);
 
       return sortedAppList;
     },
@@ -405,6 +476,62 @@ export default defineComponent({
     isAppRunning,
     isAppHeadless(app: HolochainAppInfo) {
       return app.webAppInfo.web_uis.default.type === "Headless";
+    },
+    async checkForUiUpdates() {
+
+      // check for GUI updates
+      const allApps: Array<HolochainAppInfo> = this.$store.getters["allApps"];
+      const allHappReleaseHashes = allApps.map((app) => app.webAppInfo.happ_release_hash ? decodeHashFromBase64(app.webAppInfo.happ_release_hash) : undefined);
+      console.log("@InstalledAppsList: allHappReleaseHashes from store's allApps: ", allHappReleaseHashes);
+      const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByEntryHashes(this.appWebsocket!, this.devhubAppInfo!, allHappReleaseHashes);
+
+      console.log("@InstalledAppsList: happReleaseHashes: ", happReleases);
+
+      // compare with existing
+
+      const extendedAppInfos: Array<HolochainAppInfoExtended> = allApps.map((appInfo: HolochainAppInfo, idx) => {
+
+        const isGuiUpdateAvailable = (appInfo.webAppInfo.web_uis.default.type === "WebApp" && happReleases[idx]?.official_gui)
+          ? appInfo.webAppInfo.web_uis.default.gui_release_hash != encodeHashToBase64(happReleases[idx]?.official_gui!)
+          : false
+
+        return {
+          webAppInfo: appInfo.webAppInfo,
+          holochainId: appInfo.holochainId,
+          holochainVersion: appInfo.holochainVersion,
+          guiUpdateAvailable: isGuiUpdateAvailable ? happReleases[idx]?.official_gui : undefined,
+        }
+      });
+
+      console.log("@InstalledAppsLlist: extendedAppInfos: ", extendedAppInfos);
+
+      this.extendedAppInfos = extendedAppInfos;
+    },
+    async openUpdateGuiDialog(app: HolochainAppInfoExtended) {
+      this.selectedApp = app;
+
+      console.log("Gui release hash @openUpdateGuiDialog: ", app.guiUpdateAvailable);
+      (this.$refs.updateGuiDialog as typeof HCGenericDialog).open();
+
+      if (this.appWebsocket && this.devhubAppInfo) {
+          const cells = devhubCells(this.devhubAppInfo);
+          const guiReleaseResponse = await this.appWebsocket?.callZome({
+          cap_secret: null,
+          cell_id: getCellId(cells.happs.find((c) => "Provisioned" in c )!)!,
+          fn_name: "get_gui_release",
+          zome_name: "happ_library",
+          payload: {
+            id: app.guiUpdateAvailable,
+          },
+          provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
+        });
+
+        this.selectedGuiUpdate = guiReleaseResponse.payload.content;
+        console.log("Got GUI Release: ", guiReleaseResponse.payload.content);
+      } else {
+        alert!("Error: AppWebsocket or DevHub AppInfo undefined.")
+        this.selectedGuiUpdate = undefined;
+      }
     },
     storageFractions(holochainVersion: string) {
       const storageInfo: StorageInfo = this.storageInfos[holochainVersion];
@@ -460,7 +587,57 @@ export default defineComponent({
       } else {
         return "?";
       }
-    }
+    },
+    async updateGui() {
+      this.loadingText = "Connecting with DevHub";
+      (this.$refs.downloading as typeof HCLoading).open();
+
+      this.loadingText = "Downloading...";
+
+      let bytes = undefined;
+
+      try {
+        bytes = await fetchGui(
+          this.appWebsocket!,
+          this.devhubAppInfo!,
+          this.selectedGuiUpdate!.web_asset_id,
+        );
+      } catch (e) {
+        console.error("Error fetching the UI: ", e);
+        this.errorText = `Error fetching the UI: ${e}`;
+        (this.$refs.snackbar as typeof HCSnackbar).show();
+        (this.$refs.downloading as typeof HCLoading).close();
+      }
+
+      this.loadingText = "Installing...";
+
+      if (bytes) {
+        try {
+          await invoke("update_default_ui", {
+            holochainId: this.selectedApp!.holochainId,
+            appId: this.selectedApp!.webAppInfo.installed_app_info.installed_app_id,
+            uiZipBytes: bytes,
+            guiReleaseHash: encodeHashToBase64(this.selectedApp!.guiUpdateAvailable!),
+          });
+          this.loadingText = "";
+          (this.$refs.downloading as typeof HCLoading).close();
+          (this.$refs.updateGuiDialog as typeof HCGenericDialog).close();
+          this.selectedGuiUpdate = undefined;
+          this.selectedGuiUpdateHash = undefined;
+
+          // to remove the update button:
+          await this.$store.dispatch(ActionTypes.fetchStateInfo);
+          window.setTimeout(() => this.checkForUiUpdates(), 500);
+        } catch (e) {
+          console.error("Error updating the UI: ", e);
+          this.errorText = `Error updating the UI: ${e}`;
+
+          (this.$refs as any).snackbar.show();
+          (this.$refs.downloading as typeof HCLoading).close();
+          this.loadingText = "";
+        }
+      }
+    },
   },
 });
 </script>

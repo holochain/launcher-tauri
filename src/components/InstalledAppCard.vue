@@ -21,6 +21,7 @@
         height: 120px;
       "
     >
+    <!-- App Logo with Holo Identicon -->
       <div style="position: relative">
         <!-- assumes same agent pub key for all cells (just taking the first one) -->
         <div v-show="showPubKeyTooltip" class="tooltip">Copied!</div>
@@ -49,7 +50,11 @@
           </div>
         </div>
       </div>
+      <!-- ------------- -->
 
+
+
+      <!-- Installed App Id -->
       <div
         style="
           display: flex;
@@ -63,7 +68,36 @@
       >
         {{ app.webAppInfo.installed_app_info.installed_app_id }}
       </div>
+      <!-- ---------------- -->
 
+      <!-- GUI update available Icon -->
+      <div
+        v-if="
+          app.guiUpdateAvailable
+        "
+        style="display: flex"
+      >
+        <sl-tooltip class="tooltip" hoist placement="top" content="New UI available">
+          <!-- <img
+            tabindex="0"
+            style="margin-right: 29px; width: 24px; cursor: pointer"
+            src="/img/Open_App.svg"
+            @click="$emit('openApp', app)"
+            v-on:keyup.enter="$emit('openApp', app)"
+          /> -->
+          <div
+            @click="$emit('updateGui', app)"
+            @keypress.enter="$emit('updateGui', app)"
+            tabindex="0"
+            class="update-button"
+          >
+            Update
+          </div>
+        </sl-tooltip>
+      </div>
+      <!-- -------------------- -->
+
+      <!-- App status indicator -->
       <sl-tooltip
         style="--show-delay: 500"
         hoist
@@ -81,7 +115,9 @@
           tabindex="0"
         ></div>
       </sl-tooltip>
+      <!-- ----------------- -->
 
+      <!-- Open App Icon Button -->
       <div
         v-if="
           isAppRunning(app.webAppInfo.installed_app_info) && !isAppHeadless(app)
@@ -98,7 +134,9 @@
           />
         </sl-tooltip>
       </div>
+      <!-- ------------------- -->
 
+      <!-- Disable/enable switch -->
       <sl-tooltip
         class="tooltip"
         hoist
@@ -121,7 +159,9 @@
           @keydown.enter="handleSlider(app)"
         />
       </sl-tooltip>
+      <!-- ------------------- -->
 
+      <!-- Triple dot icon to show app details -->
       <sl-tooltip class="tooltip" hoist placement="top" content="App Details">
         <HCMoreToggle
           @toggle="showMore = !showMore"
@@ -129,8 +169,12 @@
           tabindex="0"
         />
       </sl-tooltip>
+      <!-- ------------------- -->
     </div>
 
+
+
+    <!-------------- App details --------------->
     <div
       v-if="showMore"
       class="column"
@@ -276,12 +320,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { HolochainAppInfo } from "../types";
-import { serializeHash } from "@holochain-open-dev/utils";
+import { HolochainAppInfo, HolochainAppInfoExtended } from "../types";
 import { isAppRunning, isAppDisabled, isAppPaused, getReason, flattenCells, getCellId } from "../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
-import { AppWebsocket, CellInfo, DnaHash, NetworkInfo } from "@holochain/client";
-import prettyBytes from "pretty-bytes";
+import { CellInfo, encodeHashToBase64, NetworkInfo } from "@holochain/client";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
@@ -309,7 +351,7 @@ export default defineComponent({
       type: String,
     },
     app: {
-      type: Object as PropType<HolochainAppInfo>,
+      type: Object as PropType<HolochainAppInfoExtended>,
       required: true,
     },
   },
@@ -330,7 +372,7 @@ export default defineComponent({
       showClonedCells: true,
     };
   },
-  emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp"],
+  emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp", "updateGui"],
   computed: {
     provisionedCells(): [string, CellInfo][] {
       const provisionedCells = flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
@@ -348,7 +390,7 @@ export default defineComponent({
     },
   },
   methods: {
-    serializeHash,
+    encodeHashToBase64,
     getReason,
     isAppRunning,
     isAppDisabled,
@@ -407,7 +449,7 @@ export default defineComponent({
     copyPubKey() {
       const pubKey =
         this.getPubKey();
-      this.writeText(serializeHash(new Uint8Array(pubKey)));
+      this.writeText(encodeHashToBase64(new Uint8Array(pubKey)));
       this.showPubKeyTooltip = true;
       setTimeout(() => {
         this.showPubKeyTooltip = false;
@@ -512,4 +554,20 @@ export default defineComponent({
   /* border: 2px solid #482edf; */
   padding: 1px 7px;
 }
+
+.update-button {
+  font-weight: bold;
+  color: black;
+  cursor: pointer;
+  border: 2px solid black;
+  border-radius: 4px;
+  padding: 0 5px;
+  margin-right: 29px;
+  opacity: 0.85;
+}
+
+.update-button:hover {
+  opacity: 0.6;
+}
+
 </style>

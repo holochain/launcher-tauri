@@ -2,6 +2,7 @@ import {
   AgentPubKey,
   AppRoleManifest,
   AppInfo,
+  EntryHash,
 } from "@holochain/client";
 
 export interface WebAppInfo {
@@ -129,6 +130,14 @@ export interface HolochainAppInfo {
   holochainId: HolochainId;
   holochainVersion: HolochainVersion;
 }
+
+export interface HolochainAppInfoExtended {
+  webAppInfo: InstalledWebAppInfo;
+  holochainId: HolochainId;
+  holochainVersion: HolochainVersion;
+  guiUpdateAvailable: EntryHash | undefined; // gui release entry hash if there is known to be a new gui release available in the DevHub
+}
+
 
 export interface GossipProgress {
   expectedBytes: number;

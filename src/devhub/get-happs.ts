@@ -5,6 +5,7 @@ import {
   ActionHash,
   AppInfo,
   EntryHashB64,
+  decodeHashFromBase64,
 } from "@holochain/client";
 import { GUIReleaseEntry, HappEntry, HappReleaseEntry } from "./types";
 import { getCellId } from "../utils";
@@ -198,7 +199,7 @@ export async function fetchWebHapp(
   return result.payload;
 }
 
-function devhubCells(devhubHapp: AppInfo) {
+export function devhubCells(devhubHapp: AppInfo) {
   const happs = devhubHapp.cell_info["happs"];
   const dnarepo = devhubHapp.cell_info["dnarepo"];
   const webassets = devhubHapp.cell_info["web_assets"];
@@ -222,12 +223,13 @@ function devhubCells(devhubHapp: AppInfo) {
 export async function getHappReleasesByEntryHashes(
   appWebsocket: AppWebsocket,
   devhubHapp: AppInfo,
-  happReleaseEntryHashes: Array<EntryHashB64 | undefined>
+  happReleaseEntryHashes: Array<EntryHash | undefined>
 ) {
+
   const cells = devhubCells(devhubHapp);
   const happReleases = await Promise.all(happReleaseEntryHashes.map( async (entryHash) => {
     if (entryHash) {
-      await appWebsocket.callZome({
+      return appWebsocket.callZome({
         cap_secret: null,
         cell_id: getCellId(cells.happs.find((c) => "Provisioned" in c )!)!,
         fn_name: "get_happ_release",
@@ -238,9 +240,62 @@ export async function getHappReleasesByEntryHashes(
         provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
       })
     } else {
-      undefined
+      return undefined;
     }
   }));
-  console.log("##### happ Releases for all installed apps: ", happReleases);
 
+  return happReleases.map((response) => {
+    if (response) {
+      return response.payload.content;
+    } else {
+      return undefined;
+    }
+  });
+}
+
+
+/**
+ * Fetches a GUI from the DevHub
+ * @param appWebsocket
+ * @param devhubHapp
+ * @param name
+ * @param happReleaseEntryHash
+ * @param guiReleaseEntryHash
+ * @param retryCount
+ * @returns
+ */
+export async function fetchGui(
+  appWebsocket: AppWebsocket,
+  devhubHapp: AppInfo,
+  webAssetEntryHash: EntryHash,
+  retryCount = 3
+): Promise<Uint8Array> {
+  const cells = devhubCells(devhubHapp);
+
+  const result = await appWebsocket.callZome({
+    cap_secret: null,
+    cell_id: getCellId(cells.happs.find((c) => "Provisioned" in c )!)!,
+    fn_name: "get_webasset",
+    zome_name: "happ_library",
+    payload: {
+      id: webAssetEntryHash,
+    },
+    provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
+  });
+
+  if (result.payload.error) {
+    if (retryCount === 0) {
+      throw new Error(result.payload.error);
+    } else {
+      await sleep(1000);
+      return fetchGui(
+        appWebsocket,
+        devhubHapp,
+        webAssetEntryHash,
+        retryCount - 1
+      );
+    }
+  }
+
+  return result.payload.content.bytes;
 }

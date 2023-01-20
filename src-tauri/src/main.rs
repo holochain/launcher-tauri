@@ -48,6 +48,7 @@ use crate::commands::{
   uninstall_app::uninstall_app,
   sign_zome_call::sign_zome_call,
   storage::get_storage_info,
+  update_default_ui::update_default_ui,
 };
 use crate::launcher::manager::LauncherManager;
 use crate::launcher::state::LauncherState;
@@ -91,6 +92,7 @@ fn main() {
       quit,
       write_config,
       sign_zome_call,
+      update_default_ui,
       setup::logs::log,
     ])
     .setup(|app| {

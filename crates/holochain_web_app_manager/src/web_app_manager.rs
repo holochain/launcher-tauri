@@ -200,7 +200,7 @@ impl WebAppManager {
   }
 
   /// Uninstalls the UI assets and tauri's localStorage associated to the given app
-  fn uninstall_app_ui(&mut self, app_id: String, ui_name: &String) -> Result<(), String> {
+  fn _uninstall_app_ui(&mut self, app_id: String, ui_name: &String) -> Result<(), String> {
 
     let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, ui_name);
     let local_storage_path = app_local_storage_dir(&self.environment_path, &app_id, ui_name);
