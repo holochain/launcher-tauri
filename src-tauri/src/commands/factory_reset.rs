@@ -63,16 +63,6 @@ pub async fn execute_factory_reset(
   })?;
 
 
-  let tauri_data_dir = profile_tauri_dir(profile.clone())
-    .map_err(|e| format!("Failed to get tauri data dir: {}", e))?;
-
-  remove_dir_if_exists(tauri_data_dir)
-    .map_err(|err| {
-      log::error!("Could not remove tauri data directory: {}", err);
-      format!("Could not remove tauri data directory: {}", err)
-  })?;
-
-
   let lair_dir = profile_lair_dir(profile.clone())
     .map_err(|e| format!("Failed to get lair dir: {}", e))?;
 
@@ -80,6 +70,22 @@ pub async fn execute_factory_reset(
     log::error!("Could not remove lair directory: {}", err);
     String::from("Could not remove lair directory")
   })?;
+
+
+  if cfg!(not(target_os="windows")) {
+    let tauri_data_dir = profile_tauri_dir(profile.clone())
+      .map_err(|e| format!("Failed to get tauri data dir: {}", e))?;
+
+    remove_dir_if_exists(tauri_data_dir)
+      .map_err(|err| {
+        log::error!("Could not remove tauri data directory: {}", err);
+        format!("Could not remove tauri data directory: {}", err)
+    })?;
+  } else {
+    // On Windows, deleting the tauri directory throws an ose error 32, so instead just clear localStorage in the window
+    window.eval("window.localStorage.clear()")
+      .map_err(|e| format!("Failed to clear localStorage in admin window: {}", e))?;
+  }
 
 
   // Optional deletions
