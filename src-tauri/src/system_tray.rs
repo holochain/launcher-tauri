@@ -93,7 +93,7 @@ pub fn update_system_tray(
   for (version, installed_apps) in &all_installed_apps.by_version {
     for app in installed_apps {
       if let AppInfoStatus::Running = app.installed_app_info.status {
-        if let WebUiInfo::WebApp { .. } = app.web_ui_info {
+        if let Some(WebUiInfo::WebApp { .. }) = app.web_uis.get(&String::from("default")) {
           let app_id = app.installed_app_info.installed_app_id.clone();
 
           menu = menu.add_item(CustomMenuItem::new(
@@ -112,7 +112,7 @@ pub fn update_system_tray(
   if let Some(custom_binary_apps) = &all_installed_apps.custom_binary {
     for app in custom_binary_apps {
       if let AppInfoStatus::Running = app.installed_app_info.status {
-        if let WebUiInfo::WebApp { .. } = app.web_ui_info {
+        if let Some(WebUiInfo::WebApp { .. }) = app.web_uis.get(&String::from("default")) {
           let app_id = app.installed_app_info.installed_app_id.clone();
 
           menu = menu.add_item(CustomMenuItem::new(

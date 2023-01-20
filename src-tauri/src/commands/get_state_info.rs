@@ -61,6 +61,7 @@ async fn inner_get_state_info(
         {
           Ok(holochain_manager) => {
             let running_state = get_holochain_state(holochain_manager).await;
+            println!("Got running state: {:?}", running_state);
             holochain_manager_states.insert(holochain_version.clone(), running_state);
           }
           Err(err) => {
@@ -90,14 +91,14 @@ async fn inner_get_state_info(
   }
 }
 
-async fn get_holochain_state(holochain_manager: &mut WebAppManager) -> HolochainState {
-  match holochain_manager.list_apps().await {
+async fn get_holochain_state(web_app_manager: &mut WebAppManager) -> HolochainState {
+  match web_app_manager.list_apps().await {
     Ok(installed_apps) => RunningState::Running(HolochainInfo {
       installed_apps,
-      app_interface_port: holochain_manager.app_interface_port(),
-      admin_interface_port: holochain_manager.admin_interface_port(),
-      hdi_version: holochain_manager.holochain_manager.version.manager().hdi_version(),
-      hdk_version: holochain_manager.holochain_manager.version.manager().hdk_version(),
+      app_interface_port: web_app_manager.app_interface_port(),
+      admin_interface_port: web_app_manager.admin_interface_port(),
+      hdi_version: web_app_manager.holochain_manager.version.manager().hdi_version(),
+      hdk_version: web_app_manager.holochain_manager.version.manager().hdk_version(),
     }),
     Err(err) => RunningState::Error(format!("Could not fetch installed apps: {}", err)),
   }

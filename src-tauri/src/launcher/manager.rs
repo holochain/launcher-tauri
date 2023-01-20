@@ -385,9 +385,9 @@ impl LauncherManager {
     };
 
     for version in versions {
-      if let Ok(manager) = self.get_web_happ_manager(HolochainId::HolochainVersion(version.clone()))
+      if let Ok(web_app_manager) = self.get_web_happ_manager(HolochainId::HolochainVersion(version.clone()))
       {
-        let running_apps = manager.list_apps().await?;
+        let running_apps = web_app_manager.list_apps().await?;
 
         all_installed_apps
           .by_version
@@ -397,8 +397,8 @@ impl LauncherManager {
 
     if let Some(m) = &mut self.custom_binary_manager {
       match m.get_running() {
-        Ok(manager) => {
-          let running_apps = manager.list_apps().await?;
+        Ok(web_app_manager) => {
+          let running_apps = web_app_manager.list_apps().await?;
 
           all_installed_apps.custom_binary = Some(running_apps);
         }

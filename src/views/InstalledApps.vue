@@ -19,7 +19,7 @@
             @click="() => ignoreDevHubWaring = !ignoreDevHubWaring"
             @keydown.enter="() => ignoreDevHubWaring = !ignoreDevHubWaring"
           />
-          <span style="margin-left: 10px;">Don't show this message anymore.</span>
+          <span style="margin-left: 10px;">Don't show this message again.</span>
         </div>
 
         <div class="row" style="margin-top: 20px;">

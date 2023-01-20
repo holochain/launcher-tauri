@@ -172,6 +172,8 @@
     v-if="selectedAppBundlePath"
     :appBundlePath="selectedAppBundlePath"
     :hdkVersionForApp="hdkVersionForApp"
+    :happReleaseHash="selectedHappReleaseHash"
+    :guiReleaseHash="selectedGuiReleaseHash"
     @app-installed="
       installClosed();
       $emit('go-back');
@@ -191,7 +193,7 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket, NetworkInfo, CellInfo } from "@holochain/client";
+import { AppWebsocket, NetworkInfo, CellInfo, EntryHashB64, encodeHashToBase64 } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 
@@ -246,6 +248,8 @@ export default defineComponent({
     downloadFailed: boolean;
     errorText: string;
     appWebsocket: AppWebsocket | undefined;
+    selectedHappReleaseHash: EntryHashB64 | undefined;
+    selectedGuiReleaseHash: EntryHashB64 | undefined;
   } {
     return {
       loadingText: "",
@@ -267,6 +271,8 @@ export default defineComponent({
       downloadFailed: false,
       errorText: "Unknown error occured.",
       appWebsocket: undefined,
+      selectedHappReleaseHash: undefined,
+      selectedGuiReleaseHash: undefined,
     };
   },
   beforeUnmount() {
@@ -368,6 +374,12 @@ export default defineComponent({
 
       this.loadingText = "Downloading...";
 
+      const happReleaseHash = release.id;
+      const guiReleaseHash = release.content.official_gui!;  // releases without official_gui have been filtered out earlier
+
+      console.log("@AppStore: happReleaseHash: ", happReleaseHash);
+      console.log("@AppStore: guiReleaseHash: ", guiReleaseHash);
+
       let bytes = undefined;
 
       try {
@@ -375,8 +387,8 @@ export default defineComponent({
           this.appWebsocket!,
           devhubInfo,
           app.app.content.title,
-          release.id,
-          release.content.official_gui!, // releases without official_gui have been filtered out earlier
+          happReleaseHash,
+          guiReleaseHash!, // releases without official_gui have been filtered out earlier
         );
       } catch (e) {
         console.log("Error fetching the webhapp: ", e);
@@ -393,6 +405,8 @@ export default defineComponent({
             appBundleBytes: bytes,
           });
           this.hdkVersionForApp = release.content.hdk_version;
+          this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
+          this.selectedGuiReleaseHash = encodeHashToBase64(guiReleaseHash);
           (this.$refs.downloading as typeof HCLoading).close();
           this.loadingText = "";
 

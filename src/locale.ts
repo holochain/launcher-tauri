@@ -55,6 +55,8 @@ const messages = {
       quit: "Quit",
       getStarted: "Get started",
       letsGo: "Let's Go!",
+      update: "Update",
+      install: "Install",
     },
     dialogs: {
       restart:
@@ -99,6 +101,14 @@ const messages = {
         optionalDeletions: "Optional:",
         deleteLair: "Delete Private Keys",
         deleteLogs: "Delete Logs"
+      },
+      guiUpdate: {
+        title: "UI Update",
+        mainText: "There's a new UI available for this app",
+        changelog: "changelog",
+        version: "version",
+        publishedAt: "published",
+        question: "Would you like to install it?",
       },
     },
   },
@@ -156,6 +166,8 @@ const messages = {
       quit: "Beenden",
       getStarted: "Loslegen",
       letsGo: "Let's Go!",
+      update: "Update",
+      install: "Installieren",
     },
     dialogs: {
       restart:
@@ -201,6 +213,14 @@ const messages = {
         deleteLair: "Private Schlüssel löschen",
         deleteLogs: "Log Dateien löschen",
       },
+      guiUpdate: {
+        title: "UI Update",
+        mainText: "Es ist ein neues UI verfügbar für diese app",
+        changelog: "Änderungen",
+        version: "Version",
+        publishedAt: "Publiziert",
+        question: "Möchtest du es installieren?",
+      }
     },
   },
 };

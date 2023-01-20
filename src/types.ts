@@ -2,6 +2,7 @@ import {
   AgentPubKey,
   AppRoleManifest,
   AppInfo,
+  EntryHash,
 } from "@holochain/client";
 
 export interface WebAppInfo {
@@ -115,11 +116,13 @@ export type WebUiInfo =
       type: "WebApp";
       path_to_web_app: string;
       app_ui_port: number;
+      gui_release_hash: string | undefined;
     };
 
 export interface InstalledWebAppInfo {
   installed_app_info: AppInfo;
-  web_ui_info: WebUiInfo;
+  happ_release_hash: string | undefined;
+  web_uis: Record<string, WebUiInfo>;
 }
 
 export interface HolochainAppInfo {
@@ -127,6 +130,14 @@ export interface HolochainAppInfo {
   holochainId: HolochainId;
   holochainVersion: HolochainVersion;
 }
+
+export interface HolochainAppInfoExtended {
+  webAppInfo: InstalledWebAppInfo;
+  holochainId: HolochainId;
+  holochainVersion: HolochainVersion;
+  guiUpdateAvailable: EntryHash | undefined; // gui release entry hash if there is known to be a new gui release available in the DevHub
+}
+
 
 export interface GossipProgress {
   expectedBytes: number;
