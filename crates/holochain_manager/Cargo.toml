@@ -8,7 +8,7 @@ version = "0.1.0"
 [dependencies]
 # NEW_VERSION pick right client version
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="a4d34c0e558040893e50942116401067bb3434aa"}
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="796c9912620550cde30e5d14ab6b9e686741e4c8"}
 
 
 

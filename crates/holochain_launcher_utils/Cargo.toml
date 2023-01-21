@@ -13,7 +13,7 @@ categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="a4d34c0e558040893e50942116401067bb3434aa"}
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="796c9912620550cde30e5d14ab6b9e686741e4c8"}
 
 holochain_conductor_api = "0.1.0-beta-rc.2"
 holochain_types = "0.1.0-beta-rc.1"
