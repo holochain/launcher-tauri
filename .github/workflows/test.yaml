@@ -48,4 +48,4 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - name: install holochain_cli_launch to make sure it compiles
-        run: cargo install --path ./crates/hc_launch/src-tauri
+        run: cargo install --path crates/hc_launch/src-tauri
