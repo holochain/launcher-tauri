@@ -32,7 +32,7 @@ use crate::commands::choose_version::get_supported_versions;
 use crate::commands::open_app::open_url_cmd;
 use crate::commands::open_app::report_issue_cmd;
 use crate::commands::save_app::save_app;
-use crate::commands::start_app::start_app;
+// use crate::commands::start_app::start_app;
 use crate::commands::restart::restart;
 use crate::commands::quit::quit;
 use crate::commands::{
@@ -86,7 +86,7 @@ fn main() {
       uninstall_app,
       get_app_info,
       open_url_cmd,
-      start_app,
+      // start_app,
       execute_factory_reset,
       restart,
       quit,

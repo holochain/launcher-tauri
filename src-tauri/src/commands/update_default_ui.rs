@@ -1,4 +1,5 @@
 use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile};
+use mr_bundle::ResourceBytes;
 
 #[tauri::command]
 pub async fn update_default_ui(
@@ -29,7 +30,7 @@ pub async fn update_default_ui(
     .await?
     .update_app_ui(
       app_id.clone(),
-      ui_zip_bytes,
+      ResourceBytes::from(ui_zip_bytes),
       &default_ui_name,
       gui_release_hash,
     )?;

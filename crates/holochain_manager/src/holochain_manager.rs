@@ -204,15 +204,15 @@ impl HolochainManager {
     Ok(())
   }
 
-  pub async fn start_app(&mut self, app_id: String) -> Result<(), String> {
-    self
-      .ws
-      .start_app(app_id.into())
-      .await
-      .map_err(|err| format!("Error starting app: {:?}", err))?;
+  // pub async fn start_app(&mut self, app_id: String) -> Result<(), String> {
+  //   self
+  //     .ws
+  //     .start_app(app_id.into())
+  //     .await
+  //     .map_err(|err| format!("Error starting app: {:?}", err))?;
 
-    Ok(())
-  }
+  //   Ok(())
+  // }
 
   pub async fn disable_app(&mut self, app_id: String) -> Result<(), String> {
     self

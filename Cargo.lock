@@ -2581,7 +2581,7 @@ dependencies = [
  "holochain_state",
  "holochain_test_wasm_common",
  "holochain_types",
- "holochain_util 0.1.0-beta-rc.0",
+ "holochain_util",
  "holochain_wasm_test_utils",
  "holochain_wasmer_host",
  "holochain_websocket",
@@ -2594,7 +2594,7 @@ dependencies = [
  "lazy_static",
  "matches",
  "mockall",
- "mr_bundle 0.1.0-beta-rc.2",
+ "mr_bundle",
  "must_future",
  "nanoid 0.3.0",
  "num_cpus",
@@ -2651,7 +2651,7 @@ dependencies = [
  "log",
  "log4rs",
  "mime_guess",
- "mr_bundle 0.0.8",
+ "mr_bundle",
  "open",
  "opener",
  "portpicker",
@@ -2709,7 +2709,7 @@ dependencies = [
  "holochain_conductor_api",
  "holochain_launcher_utils",
  "holochain_types",
- "holochain_util 0.1.0-beta-rc.0",
+ "holochain_util",
  "holochain_zome_types",
  "lair_keystore_api",
  "log",
@@ -2744,7 +2744,7 @@ dependencies = [
  "holochain_conductor_api",
  "holochain_p2p",
  "holochain_types",
- "holochain_util 0.1.0-beta-rc.0",
+ "holochain_util",
  "holochain_websocket",
  "nanoid 0.3.0",
  "observability",
@@ -2873,7 +2873,7 @@ dependencies = [
  "holochain_types",
  "lair_keystore_manager",
  "log",
- "mr_bundle 0.1.0-beta-rc.2",
+ "mr_bundle",
  "portpicker",
  "serde",
  "serde-enum-str",
@@ -2898,7 +2898,7 @@ dependencies = [
  "holochain_keystore",
  "holochain_serialized_bytes 0.0.51",
  "holochain_types",
- "holochain_util 0.1.0-beta-rc.0",
+ "holochain_util",
  "holochain_zome_types",
  "kitsune_p2p",
  "kitsune_p2p_types",
@@ -2985,7 +2985,7 @@ dependencies = [
  "getrandom 0.2.8",
  "holo_hash",
  "holochain_serialized_bytes 0.0.51",
- "holochain_util 0.1.0-beta-rc.0",
+ "holochain_util",
  "holochain_zome_types",
  "kitsune_p2p",
  "lazy_static",
@@ -3039,7 +3039,7 @@ dependencies = [
  "holochain_serialized_bytes 0.0.51",
  "holochain_sqlite",
  "holochain_types",
- "holochain_util 0.1.0-beta-rc.0",
+ "holochain_util",
  "holochain_zome_types",
  "kitsune_p2p",
  "mockall",
@@ -3092,14 +3092,14 @@ dependencies = [
  "holochain_keystore",
  "holochain_serialized_bytes 0.0.51",
  "holochain_sqlite",
- "holochain_util 0.1.0-beta-rc.0",
+ "holochain_util",
  "holochain_zome_types",
  "isotest",
  "itertools 0.10.5",
  "kitsune_p2p_dht",
  "lazy_static",
  "mockall",
- "mr_bundle 0.1.0-beta-rc.2",
+ "mr_bundle",
  "must_future",
  "nanoid 0.3.0",
  "observability",
@@ -3120,21 +3120,6 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
-]
-
-[[package]]
-name = "holochain_util"
-version = "0.0.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fbc012cbf805d0b2999b63b8c3348c46fe9be48fa5cb967144bcbd809d542ab0"
-dependencies = [
- "cfg-if 0.1.10",
- "derive_more",
- "dunce",
- "futures",
- "num_cpus",
- "once_cell",
- "tokio",
 ]
 
 [[package]]
@@ -3162,7 +3147,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51d213dc5bec43abf739117a3281435ab166483800252d605b2ae767327c2598"
 dependencies = [
  "holochain_types",
- "holochain_util 0.1.0-beta-rc.0",
+ "holochain_util",
  "strum",
  "strum_macros 0.18.0",
  "toml",
@@ -4548,26 +4533,6 @@ checksum = "7843ec2de400bcbc6a6328c958dc38e5359da6e93e72e37bc5246bf1ae776389"
 
 [[package]]
 name = "mr_bundle"
-version = "0.0.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f34d268674965bf67ad64e3abd1eb6ad2bbc25e7164e08c432c739eca4f46396"
-dependencies = [
- "bytes",
- "derive_more",
- "either",
- "flate2",
- "futures",
- "holochain_util 0.0.8",
- "reqwest",
- "rmp-serde 0.15.5",
- "serde",
- "serde_bytes",
- "serde_derive",
- "thiserror",
-]
-
-[[package]]
-name = "mr_bundle"
 version = "0.1.0-beta-rc.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73afd2d6ab80ff49e091ed9935633f0af021e1154931e6536aeb8fd08707e43c"
@@ -4578,7 +4543,7 @@ dependencies = [
  "either",
  "flate2",
  "futures",
- "holochain_util 0.1.0-beta-rc.0",
+ "holochain_util",
  "reqwest",
  "rmp-serde 0.15.5",
  "serde",
