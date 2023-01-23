@@ -2762,7 +2762,7 @@ dependencies = [
 [[package]]
 name = "holochain_client"
 version = "0.2.0"
-source = "git+https://github.com/holochain/holochain-client-rust?rev=796c9912620550cde30e5d14ab6b9e686741e4c8#796c9912620550cde30e5d14ab6b9e686741e4c8"
+source = "git+https://github.com/matthme/holochain-client-rust?rev=62dda3d0df62774f3c10215c6e14e3834e965526#62dda3d0df62774f3c10215c6e14e3834e965526"
 dependencies = [
  "again",
  "anyhow",
