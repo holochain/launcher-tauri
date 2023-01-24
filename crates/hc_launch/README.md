@@ -34,5 +34,5 @@ echo pass | hc-launch --piped -n 2 path/to/my/app.happ --ui-path path/to/my/ui/a
 
 ## Documentation
 
-Documentation is on [https://docs.rs/holochain_cli_launch].
+Documentation is on https://docs.rs/holochain_cli_launch
 

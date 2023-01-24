@@ -5,5 +5,5 @@ Library containing shared utils of Holochain Launcher and `holochain_cli_launch`
 
 ## Documentation
 
-Documentation is on [https://docs.rs/holochain_launcher_utils].
+Documentation is on https://docs.rs/holochain_launcher_utils
 
