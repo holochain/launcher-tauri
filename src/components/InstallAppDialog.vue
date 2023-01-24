@@ -192,9 +192,9 @@
 import { defineComponent } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import { ActionTypes } from "../store/actions";
-import { serializeHash } from "@holochain-open-dev/utils";
 import { flatten, uniq } from "lodash-es";
 import { toUint8Array } from "js-base64";
+import { encodeHashToBase64 } from "@holochain/client";
 
 import HCButton from "./subcomponents/HCButton.vue";
 import HCDialog from "./subcomponents/HCDialog.vue";
@@ -293,7 +293,7 @@ export default defineComponent({
       const allPubKeys: [string, string | undefined][] = [
         ["Generate New Public Key (default)", undefined],
       ];
-      uniq(pubkeys.map(serializeHash)).forEach((pubKey) => {
+      uniq(pubkeys.map(encodeHashToBase64)).forEach((pubKey) => {
         allPubKeys.push([pubKey, pubKey]);
       });
 
@@ -410,7 +410,7 @@ export default defineComponent({
         };
       }
     },
-    serializeHash,
+    encodeHashToBase64,
     pathToFilename(path: string) {
       const components = path.split("/");
       return components[components.length - 1];

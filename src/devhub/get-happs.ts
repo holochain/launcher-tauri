@@ -4,8 +4,6 @@ import {
   EntryHash,
   ActionHash,
   AppInfo,
-  EntryHashB64,
-  decodeHashFromBase64,
 } from "@holochain/client";
 import { GUIReleaseEntry, HappEntry, HappReleaseEntry } from "./types";
 import { getCellId } from "../utils";

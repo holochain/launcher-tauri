@@ -70,16 +70,14 @@ import { defineComponent, PropType } from "vue";
 
 import {
   AppWebsocket,
-  DnaHash,
   NetworkInfo,
-  InstalledCell,
   CellInfo,
+  encodeHashToBase64,
 } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 
 import HCProgressBar from "./HCProgressBar.vue";
 import { HolochainId } from "../../types";
-import { serializeHash } from "@holochain-open-dev/utils";
 import { getCellId, getCellName } from "../../utils";
 
 export default defineComponent({
@@ -134,7 +132,7 @@ export default defineComponent({
   },
   methods: {
     prettyBytes,
-    serializeHash,
+    encodeHashToBase64,
     getCellName,
     getCellId,
     async connectAppWebsocket() {
@@ -224,7 +222,7 @@ export default defineComponent({
       }
     },
     dnaHashForCell(cell: CellInfo) {
-      return serializeHash(new Uint8Array(getCellId(cell)![0]))
+      return encodeHashToBase64(new Uint8Array(getCellId(cell)![0]))
     }
   },
 });

@@ -457,13 +457,13 @@ export default defineComponent({
     },
     getPubKey() {
       const cell = Object.values(this.app.webAppInfo.installed_app_info.cell_info)[0]
-        .find((c) => "Provisioned" in c);
+        .find((c) => "provisioned" in c);
 
-      if (!cell || !("Provisioned" in cell)) {
+      if (!cell || !("provisioned" in cell)) {
         throw new Error("no provisioned cell found");
       }
 
-      return cell.Provisioned.cell_id[1];
+      return cell.provisioned.cell_id[1];
     },
   },
 });
