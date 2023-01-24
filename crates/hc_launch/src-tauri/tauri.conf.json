@@ -1,4 +1,7 @@
 {
+  "build": {
+    "distDir": "./dist"
+  },
   "tauri": {
     "allowlist": {
       "clipboard": {
