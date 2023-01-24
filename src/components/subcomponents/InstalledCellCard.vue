@@ -160,9 +160,9 @@ export default defineComponent({
 
       // console.log("expectedIncoming: ", expectedIncoming);
 
-      // In case expected incoming bytes are 0, keep the chached values, otherwise update
+      // In case expected incoming bytes are undefined, keep the chached values, otherwise update
       // expectedIncoming
-      if (expectedIncoming && expectedIncoming != 0) {
+      if (expectedIncoming) {
         // if the expected incoming bytes are larger then the max cached value or there
         // is no cached max value, replace it
         if (
