@@ -8,8 +8,7 @@ version = "0.1.0"
 [dependencies]
 # NEW_VERSION pick right client version
 
-holochain_client = { git = "https://github.com/matthme/holochain-client-rust", rev="62dda3d0df62774f3c10215c6e14e3834e965526"}
-
+holochain_client = "0.3.0"
 
 
 # NEW_VERSION add latest crates here # taken from commit instead this time

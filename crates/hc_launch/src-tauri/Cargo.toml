@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "holochain_cli_launch"
-version = "0.0.7"
+version = "0.0.8"
 description = "A CLI to launch holochain apps in a Holochain Launcher environment for testing and development purposes."
 license-file = "LICENSE_CAL-1.0"
 homepage = "https://developer.holochain.org"
@@ -23,7 +23,7 @@ tauri-build = { version = "1.2.1", features = [] }
 anyhow = "1.0"
 futures = "0.3"
 
-holochain_client = { git = "https://github.com/matthme/holochain-client-rust", rev="62dda3d0df62774f3c10215c6e14e3834e965526"}
+holochain_client = "0.3.0"
 holochain_cli_sandbox = "0.1.0-beta-rc.0"
 holochain_launcher_utils = { path = "../../holochain_launcher_utils" }
 holochain_types = "0.1.0-beta-rc.3"
