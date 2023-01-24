@@ -376,13 +376,13 @@ export default defineComponent({
   computed: {
     provisionedCells(): [string, CellInfo][] {
       const provisionedCells = flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
-        .filter(([_roleName, cellInfo]) => "Provisioned" in cellInfo)
+        .filter(([_roleName, cellInfo]) => "provisioned" in cellInfo)
         .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
       return provisionedCells
     },
     clonedCells(): [string, CellInfo][] {
       return flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
-        .filter(([_roleName, cellInfo]) => "Cloned" in cellInfo)
+        .filter(([_roleName, cellInfo]) => "cloned" in cellInfo)
         .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
     },
     isSliderOn() {
