@@ -2,7 +2,7 @@
 name = "holochain_launcher_utils"
 version = "0.0.1"
 edition = "2021"
-description = "Shared utils used by Holochain Launcher and the hc_launch CLI"
+description = "Shared utils used by Holochain Launcher and the hc launch CLI (holochain_cli_launch)"
 license-file = "LICENSE_CAL-1.0"
 homepage = "https://developer.holochain.org"
 documentation = "https://docs.rs/holochain_launcher_utils"

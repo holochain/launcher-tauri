@@ -1,6 +1,6 @@
 # holochain_launcher_utils
 
-Library containing shared utils of Holochain Launcher and the `hc_launch` cli. Attempts to make sure that shared functionality between the two is held in sync.
+Library containing shared utils of Holochain Launcher and `holochain_cli_launch`. Attempts to make sure that shared functionality between the two is held in sync.
 
 
 ## Documentation
