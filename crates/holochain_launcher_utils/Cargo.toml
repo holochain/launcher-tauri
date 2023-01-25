@@ -2,7 +2,7 @@
 name = "holochain_launcher_utils"
 version = "0.0.1"
 edition = "2021"
-description = "Shared utils used by Holochain Launcher and the hc_launch CLI"
+description = "Shared utils used by Holochain Launcher and the hc launch CLI (holochain_cli_launch)"
 license-file = "LICENSE_CAL-1.0"
 homepage = "https://developer.holochain.org"
 documentation = "https://docs.rs/holochain_launcher_utils"
@@ -13,7 +13,7 @@ categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", rev="a4d34c0e558040893e50942116401067bb3434aa"}
+holochain_client = "0.3.0"
 
 holochain_conductor_api = "0.1.0-beta-rc.2"
 holochain_types = "0.1.0-beta-rc.1"

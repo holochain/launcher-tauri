@@ -32,7 +32,7 @@
           </div>
           <div style="width: 60%; margin: 0 30px">
             <HCProgressBar
-              v-if="expectedIncoming"
+              v-if="(expectedIncoming || expectedIncoming === 0) && cachedMaxExpected"
               title="currently ongoing data exchanges with peers"
               :progress="progressRatio()"
               :style="`--height: 10px; --hc-primary-color:${
@@ -54,7 +54,7 @@
             }`"
             title="received bytes | expected bytes"
           >
-            {{ expectedIncoming && cachedMaxExpected ? prettyBytes(cachedMaxExpected - expectedIncoming) : "-" }}
+            {{ ((expectedIncoming || expectedIncoming === 0) && cachedMaxExpected) ? prettyBytes(cachedMaxExpected - expectedIncoming) : "-" }}
             | <span :class="{ highlighted: maxExceeded }">
             {{ cachedMaxExpected ? prettyBytes(cachedMaxExpected) : "-" }}
             </span>
@@ -70,16 +70,14 @@ import { defineComponent, PropType } from "vue";
 
 import {
   AppWebsocket,
-  DnaHash,
   NetworkInfo,
-  InstalledCell,
   CellInfo,
+  encodeHashToBase64,
 } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 
 import HCProgressBar from "./HCProgressBar.vue";
 import { HolochainId } from "../../types";
-import { serializeHash } from "@holochain-open-dev/utils";
 import { getCellId, getCellName } from "../../utils";
 
 export default defineComponent({
@@ -134,7 +132,7 @@ export default defineComponent({
   },
   methods: {
     prettyBytes,
-    serializeHash,
+    encodeHashToBase64,
     getCellName,
     getCellId,
     async connectAppWebsocket() {
@@ -158,21 +156,21 @@ export default defineComponent({
       const expectedIncoming =
         networkInfo[0].fetch_queue_info.op_bytes_to_fetch;
 
-      // console.log("expectedIncoming: ", expectedIncoming);
+      console.log("expectedIncoming: ", expectedIncoming);
 
-      // In case expected incoming bytes are 0, keep the chached values, otherwise update
+      // In case expected incoming bytes are undefined, keep the chached values, otherwise update
       // expectedIncoming
-      if (expectedIncoming && expectedIncoming != 0) {
+      if (expectedIncoming || expectedIncoming === 0) {
+        console.log("expectedIncoming inside: ", expectedIncoming);
         // if the expected incoming bytes are larger then the max cached value or there
         // is no cached max value, replace it
         if (
-          !this.cachedMaxExpected ||
+          (!this.cachedMaxExpected && this.cachedMaxExpected !== 0) ||
           expectedIncoming > this.cachedMaxExpected
         ) {
           this.cachedMaxExpected = expectedIncoming;
           this.maxExceeded = true;
           setTimeout(() => (this.maxExceeded = false), 500);
-
         }
 
         if (expectedIncoming !== this.expectedIncoming) {
@@ -188,7 +186,7 @@ export default defineComponent({
       // if expected incoming remains the same for > 10 seconds, set to idle. Except expectedIncoming
       // is below 16MB, in this case transmission may already be finished.
       if (new Date().getTime() - this.latestIncomingUpdate > 10000) {
-        if (this.expectedIncoming && this.expectedIncoming > 16000000) {
+        if ((this.expectedIncoming || this.expectedIncoming === 0) && this.expectedIncoming > 16000000) {
           this.incomingIdle = false
         } else {
           this.incomingIdle = true;
@@ -202,29 +200,33 @@ export default defineComponent({
         this.cachedMaxExpected = undefined;
       }
 
-      // console.log(
-      //   "this.expectedIncoming: ",
-      //   this.expectedIncoming ? prettyBytes(this.expectedIncoming!) : undefined
-      // );
-      // console.log(
-      //   "cachedMaxExpected: ",
-      //   this.cachedMaxExpected
-      //     ? prettyBytes(this.cachedMaxExpected!)
-      //     : undefined
-      // );
-      // console.log("incomingIdle: ", this.incomingIdle);
-      // console.log("progressRatio(): ", this.progressRatio());
-      // console.log("========================================");
+      console.log("========================================");
+      console.log(
+        "this.expectedIncoming: ",
+        this.expectedIncoming
+      );
+      console.log(
+        "cachedMaxExpected: ",
+        this.cachedMaxExpected
+      );
+      console.log("incomingIdle: ", this.incomingIdle);
+      console.log("progressRatio(): ", this.progressRatio());
+      console.log("========================================");
     },
     progressRatio() {
-      if (this.expectedIncoming && this.cachedMaxExpected) {
+      console.log("@progressRatio: this.expectedIncoming", this.expectedIncoming);
+      console.log("@progressRatio: this.cachedMaxExpected", this.cachedMaxExpected);
+
+      if ((this.expectedIncoming || this.expectedIncoming === 0) && this.cachedMaxExpected) {
+        console.log("@progressRatio: ratio",(1 - this.expectedIncoming / this.cachedMaxExpected) * 100);
         return (1 - this.expectedIncoming / this.cachedMaxExpected) * 100;
       } else {
+        console.log("@progressRatio: NO PROGRESS RATIO CALCULATED!!");
         return undefined;
       }
     },
     dnaHashForCell(cell: CellInfo) {
-      return serializeHash(new Uint8Array(getCellId(cell)![0]))
+      return encodeHashToBase64(new Uint8Array(getCellId(cell)![0]))
     }
   },
 });

@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.8.0",
+  "version": "0.8.995",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -9,13 +9,12 @@
     "preview": "vite preview",
     "test:unit": "vue-cli-service test:unit",
     "tauri": "tauri",
-    "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/ruWc5v4orFEIf4B/download"
+    "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/UcbdVC9ZnZ9t4he/download"
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",
-    "@holochain-open-dev/utils": "^0.6.2",
     "@holo-host/identicon": "^0.1.0",
-    "@holochain/client": "^0.11.13",
+    "@holochain/client": "^0.11.15",
     "@material/mwc-button": "^0.25.1",
     "@material/mwc-icon-button": "^0.25.1",
     "@material/mwc-circular-progress": "0.25.1",

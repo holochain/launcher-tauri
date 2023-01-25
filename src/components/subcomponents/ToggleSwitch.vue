@@ -39,7 +39,7 @@ export default defineComponent({
 
 .switch input {
   opacity: 0;
-  width: 0;
+  width: 40px;
   height: 0;
 }
 

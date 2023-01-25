@@ -11,7 +11,7 @@ pub mod quit;
 pub mod restart;
 pub mod save_app;
 pub mod sign_zome_call;
-pub mod start_app;
+// pub mod start_app;
 pub mod storage;
 pub mod uninstall_app;
 pub mod update_default_ui;

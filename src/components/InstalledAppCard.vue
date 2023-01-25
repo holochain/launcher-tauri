@@ -24,15 +24,18 @@
     <!-- App Logo with Holo Identicon -->
       <div style="position: relative">
         <!-- assumes same agent pub key for all cells (just taking the first one) -->
-        <div v-show="showPubKeyTooltip" class="tooltip">Copied!</div>
-        <HoloIdenticon
-          title="Your Public Key"
-          :class="{ holoIdenticon: !showMore, holoIdenticonMore: showMore }"
-          style="position: absolute; top: 78px; left: 78px; cursor: pointer"
-          :hash="getPubKey()"
-          :size="42"
-          @click="copyPubKey()"
-        ></HoloIdenticon>
+        <!-- <div v-show="showPubKeyTooltip" class="tooltip">Copied!</div> -->
+        <sl-tooltip class="tooltip" hoist placement="top" :content="showPubKeyTooltip ? 'Copied' : 'Your Public Key'">
+          <HoloIdenticon
+            :class="{ holoIdenticon: !showMore, holoIdenticonMore: showMore }"
+            style="position: absolute; top: 78px; left: 78px; cursor: pointer"
+            :hash="getPubKey()"
+            :size="42"
+            tabindex="0"
+            @click="copyPubKey()"
+            @keypress.enter="copyPubKey()"
+          ></HoloIdenticon>
+        </sl-tooltip>
 
         <img
           v-if="appIcon"
@@ -376,13 +379,13 @@ export default defineComponent({
   computed: {
     provisionedCells(): [string, CellInfo][] {
       const provisionedCells = flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
-        .filter(([_roleName, cellInfo]) => "Provisioned" in cellInfo)
+        .filter(([_roleName, cellInfo]) => "provisioned" in cellInfo)
         .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
       return provisionedCells
     },
     clonedCells(): [string, CellInfo][] {
       return flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
-        .filter(([_roleName, cellInfo]) => "Cloned" in cellInfo)
+        .filter(([_roleName, cellInfo]) => "cloned" in cellInfo)
         .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
     },
     isSliderOn() {
@@ -457,13 +460,13 @@ export default defineComponent({
     },
     getPubKey() {
       const cell = Object.values(this.app.webAppInfo.installed_app_info.cell_info)[0]
-        .find((c) => "Provisioned" in c);
+        .find((c) => "provisioned" in c);
 
-      if (!cell || !("Provisioned" in cell)) {
+      if (!cell || !("provisioned" in cell)) {
         throw new Error("no provisioned cell found");
       }
 
-      return cell.Provisioned.cell_id[1];
+      return cell.provisioned.cell_id[1];
     },
   },
 });

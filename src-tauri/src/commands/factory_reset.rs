@@ -3,7 +3,7 @@ use std::{fs, io, path::PathBuf};
 use tauri::{api::process::kill_children, Manager};
 
 use crate::{
-  file_system::{profile_config_dir, profile_holochain_data_dir, profile_lair_dir, Profile, profile_logs_dir, profile_tauri_dir},
+  file_system::{profile_config_dir, profile_holochain_data_dir, profile_lair_dir, Profile, profile_logs_dir, profile_tauri_dir, holochain_version_data_dir},
   launcher::{error::LauncherError, manager::LauncherManager, state::LauncherState},
   running_state::RunningState,
 };
@@ -15,6 +15,7 @@ pub async fn execute_factory_reset(
   profile: tauri::State<'_, Profile>,
   app_handle: tauri::AppHandle,
   delete_logs: bool,
+  delete_all_holochain_versions: bool,
 ) -> Result<(), String> {
   if window.label() != "admin" {
     return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (E)"))
@@ -44,6 +45,7 @@ pub async fn execute_factory_reset(
 
   let profile = profile.inner().clone();
 
+  // remove config files
   let config_dir = profile_config_dir(profile.clone())
     .map_err(|e| format!("Failed to get config dir: {}", e))?;
 
@@ -53,14 +55,33 @@ pub async fn execute_factory_reset(
   })?;
 
 
-  let holochain_data_dir = profile_holochain_data_dir(profile.clone())
-    .map_err(|e| format!("Failed to get holochain data dir: {}", e))?;
+  // remove holochain data
+  if delete_all_holochain_versions == true {
+    let holochain_data_dir = profile_holochain_data_dir(profile.clone())
+      .map_err(|e| format!("Failed to get holochain data dir: {}", e))?;
 
-  remove_dir_if_exists(holochain_data_dir)
-    .map_err(|err| {
-      log::error!("Could not remove holochain data directory: {}", err);
-      format!("Could not remove holochain data directory: {}", err)
-  })?;
+    remove_dir_if_exists(holochain_data_dir)
+      .map_err(|err| {
+        log::error!("Could not remove holochain data directory: {}", err);
+        format!("Could not remove holochain data directory: {}", err)
+    })?;
+  } else {
+    let mut mutex = (*state).lock().await;
+    let launcher_manager = mutex.get_running()?;
+    for (version, state) in &launcher_manager.holochain_managers {
+      let holochain_version_data_dir = holochain_version_data_dir(version, profile.clone())
+        .map_err(|e| {
+          log::error!("Failed to get data directory of holochain version {:?} during factory reset: {:?}", version, e);
+          format!("Failed to get data directory of holochain version {:?} during factory reset: {:?}", version, e)
+        })?;
+
+      remove_dir_if_exists(holochain_version_data_dir)
+        .map_err(|err| {
+          log::error!("Could not remove data directory of holochain version {:?}: {:?}", version, err);
+          format!("Could not remove data directory of holochain version {:?}: {:?}", version, err)
+      })?;
+    }
+  }
 
 
   let lair_dir = profile_lair_dir(profile.clone())

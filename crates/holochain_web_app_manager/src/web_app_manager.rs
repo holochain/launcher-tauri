@@ -106,7 +106,7 @@ impl WebAppManager {
     }
 
     // Install app UI in folder
-    self.install_app_ui(app_id.clone(), web_ui_zip_bytes.to_vec(), &default_ui_name, gui_release_hash)?;
+    self.install_app_ui(app_id.clone(), web_ui_zip_bytes.into_owned(), &default_ui_name, gui_release_hash)?;
 
     // Install app in conductor manager
     if let Err(err) = self
@@ -151,7 +151,7 @@ impl WebAppManager {
     let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, ui_name);
     let ui_zip_path = apps_data_dir(&self.environment_path).join(format!("{}.zip", app_id));
 
-    fs::write(ui_zip_path.clone(), web_ui_zip_bytes).or(Err("Failed to write Web UI Zip file"))?;
+    fs::write(ui_zip_path.clone(), web_ui_zip_bytes.into_inner()).or(Err("Failed to write Web UI Zip file"))?;
 
     let file = File::open(ui_zip_path.clone()).or(Err("Failed to read Web UI Zip file"))?;
     unzip_file(file, ui_folder_path)?;
@@ -323,13 +323,13 @@ impl WebAppManager {
     Ok(())
   }
 
-  pub async fn start_app(&mut self, app_id: String) -> Result<(), String> {
-    self.holochain_manager.start_app(app_id.clone()).await?;
+  // pub async fn start_app(&mut self, app_id: String) -> Result<(), String> {
+  //   self.holochain_manager.start_app(app_id.clone()).await?;
 
-    self.on_running_apps_changed().await?;
+  //   self.on_running_apps_changed().await?;
 
-    Ok(())
-  }
+  //   Ok(())
+  // }
 
   pub async fn enable_app(&mut self, app_id: String) -> Result<(), String> {
     self.holochain_manager.enable_app(app_id.clone()).await?;

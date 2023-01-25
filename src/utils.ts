@@ -58,24 +58,24 @@ export function flattenCells(cell_info: Record<string, CellInfo[]>): [string, Ce
 }
 
 export function getCellId(cellInfo: CellInfo): CellId | undefined {
-  if ("Provisioned" in cellInfo) {
-    return cellInfo.Provisioned.cell_id;
+  if ("provisioned" in cellInfo) {
+    return cellInfo.provisioned.cell_id;
   }
-  if ("Cloned" in cellInfo) {
-    return cellInfo.Cloned.cell_id;
+  if ("cloned" in cellInfo) {
+    return cellInfo.cloned.cell_id;
   }
   return undefined;
 }
 
 export function getCellName(cellInfo: CellInfo): string | undefined {
-  if ("Provisioned" in cellInfo) {
-    return cellInfo.Provisioned.name;
+  if ("provisioned" in cellInfo) {
+    return cellInfo.provisioned.name;
   }
-  if ("Cloned" in cellInfo) {
-    return cellInfo.Cloned.name;
+  if ("cloned" in cellInfo) {
+    return cellInfo.cloned.name;
   }
-  if ("Stem" in cellInfo) {
-    return cellInfo.Stem.name;
+  if ("stem" in cellInfo) {
+    return cellInfo.stem.name;
   }
 }
 

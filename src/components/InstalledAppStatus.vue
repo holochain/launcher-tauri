@@ -13,10 +13,9 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { isAppRunning, isAppDisabled, isAppPaused } from "../utils";
-import { deserializeHash, serializeHash } from "@holochain-open-dev/utils";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import "@shoelace-style/shoelace/dist/components/badge/badge.js";
-import { AppInfo } from "@holochain/client";
+import { AppInfo} from "@holochain/client";
 
 export default defineComponent({
   name: "InstalledAppStatus",
@@ -27,8 +26,6 @@ export default defineComponent({
     },
   },
   methods: {
-    deserializeHash,
-    serializeHash,
     isAppRunning,
     isAppDisabled,
     isAppPaused,

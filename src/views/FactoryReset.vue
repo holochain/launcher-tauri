@@ -40,7 +40,16 @@
             @click="() => deleteLogs = !deleteLogs"
             @keydown.enter="() => deleteLogs = !deleteLogs"
           />
-          <span style="margin-left: 10px;">{{ $t("dialogs.factoryReset.deleteLogs") }}</span>
+          <div style="margin-left: 10px;">{{ $t("dialogs.factoryReset.deleteLogs") }}</div>
+        </div>
+
+        <div class="row" style="margin-top: 5px;">
+          <ToggleSwitch
+            :sliderOn="deleteAllHolochainVersions"
+            @click="() => deleteAllHolochainVersions = !deleteAllHolochainVersions"
+            @keydown.enter="() => deleteAllHolochainVersions = !deleteAllHolochainVersions"
+          />
+          <div style="margin-left: 10px;">{{ $t("dialogs.factoryReset.deleteAllHolochainVersions") }}</div>
         </div>
       </div>
 
@@ -70,6 +79,7 @@ export default defineComponent({
     heading: string;
     dbFileTypeError: boolean;
     deleteLogs: boolean;
+    deleteAllHolochainVersions: boolean;
   } {
     return {
       snackbarText: undefined,
@@ -78,6 +88,7 @@ export default defineComponent({
       heading: "Factory Reset",
       dbFileTypeError: false,
       deleteLogs: false,
+      deleteAllHolochainVersions: false,
     };
   },
   async mounted() {
@@ -114,7 +125,7 @@ export default defineComponent({
     async executeFactoryReset() {
       try {
         this.executing = true;
-        await invoke("execute_factory_reset", { deleteLogs: this.deleteLogs });
+        await invoke("execute_factory_reset", { deleteLogs: this.deleteLogs, deleteAllHolochainVersions: this.deleteAllHolochainVersions });
         this.executing = false;
         window.location.reload();
       } catch (e) {

@@ -19,7 +19,7 @@
     <div style="font-weight: bold;">
       {{ $t("dialogs.guiUpdate.changelog") }}:
     </div>
-    <div style="background: rgb(217,217,217); border-radius: 8px; padding: 10px; max-height: 200px; overflow-y: auto;">
+    <div style="background: rgb(217,217,217); border-radius: 8px; padding: 10px; width: 480px; min-height: 100px; max-height: 200px; overflow-y: auto; margin-top: 5px;">
       {{ selectedGuiUpdate ? selectedGuiUpdate.changelog : "loading..." }}
     </div>
     <div style="margin-top: 20px;">
@@ -483,7 +483,7 @@ export default defineComponent({
       const allApps: Array<HolochainAppInfo> = this.$store.getters["allApps"];
       const allHappReleaseHashes = allApps.map((app) => app.webAppInfo.happ_release_hash ? decodeHashFromBase64(app.webAppInfo.happ_release_hash) : undefined);
       console.log("@InstalledAppsList: allHappReleaseHashes from store's allApps: ", allHappReleaseHashes);
-      const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByEntryHashes(this.appWebsocket!, this.devhubAppInfo!, allHappReleaseHashes);
+      const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByEntryHashes((this.appWebsocket! as AppWebsocket), this.devhubAppInfo!, allHappReleaseHashes);
 
       console.log("@InstalledAppsList: happReleaseHashes: ", happReleases);
 
@@ -517,13 +517,13 @@ export default defineComponent({
           const cells = devhubCells(this.devhubAppInfo);
           const guiReleaseResponse = await this.appWebsocket?.callZome({
           cap_secret: null,
-          cell_id: getCellId(cells.happs.find((c) => "Provisioned" in c )!)!,
+          cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
           fn_name: "get_gui_release",
           zome_name: "happ_library",
           payload: {
             id: app.guiUpdateAvailable,
           },
-          provenance: getCellId(cells.happs.find((c) => "Provisioned" in c )!)![1],
+          provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
         });
 
         this.selectedGuiUpdate = guiReleaseResponse.payload.content;
@@ -598,7 +598,7 @@ export default defineComponent({
 
       try {
         bytes = await fetchGui(
-          this.appWebsocket!,
+          this.appWebsocket! as AppWebsocket,
           this.devhubAppInfo!,
           this.selectedGuiUpdate!.web_asset_id,
         );

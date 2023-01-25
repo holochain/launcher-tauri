@@ -6,7 +6,7 @@ use std::{fs, time::Duration};
 
 // NEW_VERSION change holochain_types version
 use holochain_client::{AdminWebsocket, AgentPubKey, AppInfo, InstallAppPayload};
-use holochain_types_0_1_0BetaRc3::prelude::AppBundleSource;
+use holochain_types_0_1_0BetaRc4::prelude::AppBundleSource;
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
 
@@ -204,15 +204,15 @@ impl HolochainManager {
     Ok(())
   }
 
-  pub async fn start_app(&mut self, app_id: String) -> Result<(), String> {
-    self
-      .ws
-      .start_app(app_id.into())
-      .await
-      .map_err(|err| format!("Error starting app: {:?}", err))?;
+  // pub async fn start_app(&mut self, app_id: String) -> Result<(), String> {
+  //   self
+  //     .ws
+  //     .start_app(app_id.into())
+  //     .await
+  //     .map_err(|err| format!("Error starting app: {:?}", err))?;
 
-    Ok(())
-  }
+  //   Ok(())
+  // }
 
   pub async fn disable_app(&mut self, app_id: String) -> Result<(), String> {
     self

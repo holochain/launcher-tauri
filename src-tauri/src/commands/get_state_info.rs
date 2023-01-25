@@ -61,7 +61,6 @@ async fn inner_get_state_info(
         {
           Ok(holochain_manager) => {
             let running_state = get_holochain_state(holochain_manager).await;
-            println!("Got running state: {:?}", running_state);
             holochain_manager_states.insert(holochain_version.clone(), running_state);
           }
           Err(err) => {

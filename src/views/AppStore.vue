@@ -132,7 +132,7 @@
           </div>
           <div style="width: 50%; margin: 0 30px">
             <HCProgressBar
-              v-if="networkStates[idx]"
+              v-if="(networkStates[idx] || networkStates[idx] === 0) && cachedMaxExpected[idx]"
               title="currently ongoing data exchanges with peers"
               :progress="progressRatio(idx)"
               :style="`--height: 10px; --hc-primary-color:${
@@ -318,7 +318,7 @@ export default defineComponent({
 
       const allCells = devhubInfo.cell_info;
       const provisionedCells: [string, CellInfo | undefined][] = Object.entries(allCells).map(([roleName, cellInfos]) => {
-        return [roleName, cellInfos.find((cellInfo) => "Provisioned" in cellInfo)]
+        return [roleName, cellInfos.find((cellInfo) => "provisioned" in cellInfo)]
       });
 
       this.provisionedCells = provisionedCells.sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => {
@@ -328,7 +328,7 @@ export default defineComponent({
 
       let allApps: Array<AppWithReleases>;
       try {
-        allApps = await getAllAppsWithGui(this.appWebsocket!, devhubInfo);
+        allApps = await getAllAppsWithGui((this.appWebsocket! as AppWebsocket), devhubInfo);
       } catch (e) {
         console.error(e);
         // Catch other errors than being offline
@@ -386,7 +386,7 @@ export default defineComponent({
 
       try {
         bytes = await fetchWebHapp(
-          this.appWebsocket!,
+          this.appWebsocket! as AppWebsocket,
           devhubInfo,
           app.app.content.title,
           happReleaseHash,
@@ -459,13 +459,13 @@ export default defineComponent({
         const expectedIncoming =
           info.fetch_queue_info.op_bytes_to_fetch;
 
-        // In case expected incoming bytes are 0, keep the chached values, otherwise update
+        // In case expected incoming bytes are undefined, keep the chached values, otherwise update
         // expectedIncoming
-        if (expectedIncoming && expectedIncoming != 0) {
+      if (expectedIncoming || expectedIncoming === 0) {
           // if the expected incoming bytes are larger then the max cached value or there
           // is no cached max value, replace it
           const currentMax = this.cachedMaxExpected[idx];
-          if (!currentMax || expectedIncoming > currentMax) {
+          if ((!currentMax && currentMax !== 0) || expectedIncoming > currentMax) {
             this.cachedMaxExpected[idx] = expectedIncoming;
             this.maxExceeded[idx] = true;
             setTimeout(() => (this.maxExceeded[idx] = false), 500);
@@ -482,7 +482,7 @@ export default defineComponent({
         // if expected incoming remains the same for > 10 seconds, set to idle. Except expectedIncoming
         // is below 16MB, in this case transmission may already be finished.
         if (new Date().getTime() - this.latestNetworkUpdates[idx] > 10000) {
-          if (this.networkStates[idx]) {
+          if (this.networkStates[idx] || this.networkStates[idx] === 0) {
             if (this.networkStates[idx]! > 16000000) {
               this.idleStates[idx] = false
             }
@@ -507,7 +507,7 @@ export default defineComponent({
       (this.$refs as any).snackbar.show();
     },
     progressRatio(idx: number) {
-      if (this.networkStates[idx] && this.cachedMaxExpected[idx]) {
+      if ((this.networkStates[idx] || this.networkStates[idx] === 0) && this.cachedMaxExpected[idx]) {
         return (
           (1 - this.networkStates[idx]! / this.cachedMaxExpected[idx]!) * 100
         );
@@ -516,7 +516,7 @@ export default defineComponent({
       }
     },
     prettyBytesLocal(input: number | undefined) {
-      if (input) {
+      if (input || input === 0) {
         return prettyBytes(input);
       } else {
         return "-";
