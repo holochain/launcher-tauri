@@ -19,7 +19,7 @@
     <div style="font-weight: bold;">
       {{ $t("dialogs.guiUpdate.changelog") }}:
     </div>
-    <div style="background: rgb(217,217,217); border-radius: 8px; padding: 10px; max-height: 200px; overflow-y: auto;">
+    <div style="background: rgb(217,217,217); border-radius: 8px; padding: 10px; width: 480px; min-height: 100px; max-height: 200px; overflow-y: auto; margin-top: 5px;">
       {{ selectedGuiUpdate ? selectedGuiUpdate.changelog : "loading..." }}
     </div>
     <div style="margin-top: 20px;">

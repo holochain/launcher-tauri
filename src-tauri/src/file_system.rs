@@ -198,8 +198,8 @@ pub fn profile_holochain_data_dir(profile: String) -> Result<PathBuf, LauncherEr
 ///
 /// At the time of writing, ${APP_NAME} = `holochain-launcher`
 ///
-pub fn holochain_version_data_dir(holochain_version: HolochainVersion, profile: String) -> Result<PathBuf, LauncherError> {
-  let version: String = holochain_version.into();
+pub fn holochain_version_data_dir(holochain_version: &HolochainVersion, profile: String) -> Result<PathBuf, LauncherError> {
+  let version: String = holochain_version.clone().into();
   Ok(profile_holochain_data_dir(profile)?.join(version))
 }
 

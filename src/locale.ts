@@ -100,7 +100,8 @@ const messages = {
         executing: "Executing...",
         optionalDeletions: "Optional:",
         deleteLair: "Delete Private Keys",
-        deleteLogs: "Delete Logs"
+        deleteLogs: "Delete Logs",
+        deleteAllHolochainVersions: "(not recommended) Delete data of ALL Holochain versions. This includes Holochain versions that are or were used by other versions of the Holochain Launcher."
       },
       guiUpdate: {
         title: "UI Update",
@@ -212,6 +213,7 @@ const messages = {
         optionalDeletions: "Optional:",
         deleteLair: "Private Schlüssel löschen",
         deleteLogs: "Log Dateien löschen",
+        deleteAllHolochainVersions: "(Nicht empfohlen) Daten ALLER Holochain Versionen löschen. Dies beinhaltet Holochain Versionen, die von anderen Versionen des Holochain Launcher verwendet werden oder wurden."
       },
       guiUpdate: {
         title: "UI Update",

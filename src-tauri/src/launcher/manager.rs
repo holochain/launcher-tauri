@@ -205,7 +205,7 @@ impl LauncherManager {
       true => profile_holochain_data_dir(profile.clone())
         .map_err(|e| format!("Failed to get profile's holochain data dir: {}", e))?
         .join("custom"),
-      false => holochain_version_data_dir(version, profile.clone())
+      false => holochain_version_data_dir(&version, profile.clone())
         .map_err(|e| format!("Failed to get profile's holochain version data dir: {}", e))?
       ,
     };
