@@ -415,8 +415,8 @@ impl LauncherManager {
 
 
   pub fn open_app(&mut self, holochain_id: HolochainId, app_id: &String) -> Result<(), String> {
-    let mut window_label = app_id.clone().replace("-", "--").replace(" ", "-").replace(".", "_");
-    window_label.push_str("---EXTERNAL"); // !! this line is required for security reasons, to unambiguously differentiate the this window from the admin window
+
+    let window_label = derive_window_label(&app_id);
 
     // Iterate over the open windows, focus if the app is already open
 
@@ -510,4 +510,11 @@ fn set_window_size(window: tauri::window::Window, scaling_factor: f64) -> () {
       },
       Err(e) => log::error!("Failed to get monitor option: {:?}", e),
     };
+}
+
+
+pub fn derive_window_label(app_id: &String) -> String {
+  let mut window_label = app_id.clone().replace("-", "--").replace(" ", "-").replace(".", "_");
+  window_label.push_str("---EXTERNAL"); // !! this line is required for security reasons, to unambiguously differentiate this window from the admin window !!
+  window_label
 }
