@@ -13,7 +13,7 @@ holochain_types = { package = "holochain_types", version = "0.1.0-beta-rc.3"}
 holochain_conductor_api = {package = "holochain_conductor_api", version = "0.1.0-beta-rc.4"}
 holochain_zome_types = {package = "holochain_zome_types", version = "0.1.0-beta-rc.3"}
 
-holochain_launcher_utils = { path = "../holochain_launcher_utils" }
+holochain_launcher_utils = "0.0.1"
 
 ascii = "1.0.0"
 async-trait = "0.1.52"
