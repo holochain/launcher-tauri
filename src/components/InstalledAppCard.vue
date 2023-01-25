@@ -24,15 +24,18 @@
     <!-- App Logo with Holo Identicon -->
       <div style="position: relative">
         <!-- assumes same agent pub key for all cells (just taking the first one) -->
-        <div v-show="showPubKeyTooltip" class="tooltip">Copied!</div>
-        <HoloIdenticon
-          title="Your Public Key"
-          :class="{ holoIdenticon: !showMore, holoIdenticonMore: showMore }"
-          style="position: absolute; top: 78px; left: 78px; cursor: pointer"
-          :hash="getPubKey()"
-          :size="42"
-          @click="copyPubKey()"
-        ></HoloIdenticon>
+        <!-- <div v-show="showPubKeyTooltip" class="tooltip">Copied!</div> -->
+        <sl-tooltip class="tooltip" hoist placement="top" :content="showPubKeyTooltip ? 'Copied' : 'Your Public Key'">
+          <HoloIdenticon
+            :class="{ holoIdenticon: !showMore, holoIdenticonMore: showMore }"
+            style="position: absolute; top: 78px; left: 78px; cursor: pointer"
+            :hash="getPubKey()"
+            :size="42"
+            tabindex="0"
+            @click="copyPubKey()"
+            @keypress.enter="copyPubKey()"
+          ></HoloIdenticon>
+        </sl-tooltip>
 
         <img
           v-if="appIcon"
