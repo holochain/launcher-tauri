@@ -5,15 +5,15 @@
       class="column"
       style="flex: 1; overflow-y: auto; padding: 20px"
     >
-      <div style="font-weight: bold">Compatibility:</div>
-      <div v-if="holochainVersion" class="row">
+      <div style="font-weight: bold">Version details:</div>
+      <!-- <div v-if="holochainVersion" class="row">
         <div style="width: 160px">Holochain version:</div>
         <div>{{ holochainVersion }}</div>
       </div>
       <div class="row">
         <div style="width: 160px">HDK version:</div>
         <div>{{ getLatestRelease(app).content.hdk_version }}</div>
-      </div>
+      </div> -->
       <div class="row">
         <div style="width: 160px">hApp version:</div>
         <div>{{ getLatestRelease(app).content.name }}</div>
@@ -146,9 +146,10 @@ export default defineComponent({
   emits: ["installApp"],
   async mounted() {
     const latestRelease = getLatestRelease(this.app);
-    this.holochainVersion = await invoke("choose_version_for_hdk", {
-      hdkVersion: latestRelease.content.hdk_version,
-    });
+    // 1:1 mapping of holochain version to hdk verison is removed
+    // this.holochainVersion = await invoke("choose_version_for_hdk", {
+    //   hdkVersion: latestRelease.content.hdk_version,
+    // });
     this.guiVersion = this.app.guiReleases.find(
       (release) => JSON.stringify(release.id) === JSON.stringify(latestRelease.content.official_gui)
     )?.content.version;
