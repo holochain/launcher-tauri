@@ -165,7 +165,7 @@ export default defineComponent({
         // if the expected incoming bytes are larger then the max cached value or there
         // is no cached max value, replace it
         if (
-          !this.cachedMaxExpected ||
+          (!this.cachedMaxExpected && this.cachedMaxExpected !== 0) ||
           expectedIncoming > this.cachedMaxExpected
         ) {
           this.cachedMaxExpected = expectedIncoming;

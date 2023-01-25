@@ -465,7 +465,7 @@ export default defineComponent({
           // if the expected incoming bytes are larger then the max cached value or there
           // is no cached max value, replace it
           const currentMax = this.cachedMaxExpected[idx];
-          if (!currentMax || expectedIncoming > currentMax) {
+          if ((!currentMax && currentMax !== 0) || expectedIncoming > currentMax) {
             this.cachedMaxExpected[idx] = expectedIncoming;
             this.maxExceeded[idx] = true;
             setTimeout(() => (this.maxExceeded[idx] = false), 500);
