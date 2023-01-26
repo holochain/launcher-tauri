@@ -137,7 +137,7 @@
       <div class="row">
         <HCButton
           outlined
-          style="width: 70px; height: 30px; margin-right: 10px"
+          style="height: 30px; margin-right: 10px"
           @click="
             step = 1;
             firstPassword = undefined;
@@ -145,15 +145,14 @@
             repeatedPassword = undefined;
           "
         >
-          Back
+          {{ $t("buttons.back") }}
         </HCButton>
 
         <HCButton
           @click="initialize()"
           :disabled="!backupConfirmed || passwordsDontMatch"
-          style="width: 70px"
         >
-          Let's Go!
+          {{ $t("buttons.letsGo") }}
         </HCButton>
       </div>
     </div>
