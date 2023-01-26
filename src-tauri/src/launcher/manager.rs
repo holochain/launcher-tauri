@@ -460,13 +460,15 @@ impl LauncherManager {
     //  .map_err(|err| format!("Error adding icon: {:?}", err))?
 
     // factor of the monitor size to which the window shall be scaled
-    let scaling_factor = 0.8;
+    let _scaling_factor = 0.8;
 
     if cfg!(target_os = "macos") {
-      let window = window_builder.build().map_err(|err| format!("Error opening app: {:?}", err))?;
-      set_window_size(window, scaling_factor);
+      let _window = window_builder.maximized(true).build().map_err(|err| format!("Error opening app: {:?}", err))?;
+      // removing this for now since it behaves inconsistently
+      // set_window_size(window, scaling_factor);
     } else {
       let window = window_builder
+        .maximized(true)
         .menu(Menu::new().add_submenu(Submenu::new( // This overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
         "Settings",
         Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
@@ -481,7 +483,9 @@ impl LauncherManager {
           w.open_devtools();
         }
       });
-      set_window_size(window, scaling_factor);
+
+      // removing this for now because it behaves inconsistently
+      // set_window_size(window, scaling_factor);
     }
 
     Ok(())
@@ -491,11 +495,12 @@ impl LauncherManager {
 
 
 
-fn set_window_size(window: tauri::window::Window, scaling_factor: f64) -> () {
+fn _set_window_size(window: tauri::window::Window, scaling_factor: f64) -> () {
     // set window to 80% of the monitor size if possible
     match window.current_monitor() {
       Ok(maybe_monitor) => {
         if let Some(monitor) = maybe_monitor {
+
           let size = monitor.size();
           let new_width = (scaling_factor * size.width as f64) as u32;
           let new_height = (scaling_factor * size.height as f64) as u32;
