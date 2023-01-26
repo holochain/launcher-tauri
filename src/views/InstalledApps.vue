@@ -192,10 +192,18 @@ export default defineComponent({
         this.showMessage(`Disabled ${appId}`);
       } catch (e) {
         const error = `Disable app ${appId} failed: ${JSON.stringify(e)}`;
-        this.showMessage(error);
+
+        // if disabling "purportedly" fails due to being offline, ignore the error.
+        if (error.includes("failed to lookup address information: Temporary failure in name resolution")) {
+          this.showMessage(`Disabled ${appId}`);
+        } else {
+          this.showMessage(error);
+        }
         await invoke("log", {
           log: error,
         });
+
+        await this.$store.dispatch(ActionTypes.fetchStateInfo);
       }
     },
     async enableApp(app: HolochainAppInfo) {
@@ -215,20 +223,33 @@ export default defineComponent({
       }
     },
     async startApp(app: HolochainAppInfo) {
+      console.log("@InstalledApps: RECEIVED REQUEST TO START APP.");
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
+      console.log("@InstalledApps: @startApp: appId: ", appId);
 
+      // StartApp is not available anymore in conductor API since 0.1.0-beta-rc.4: https://github.com/holochain/holochain/blob/develop/crates/holochain_conductor_api/CHANGELOG.md#010-beta-rc4
+      // instead disable app followed by enable app:
       try {
-        await invoke("start_app", { appId, holochainId: app.holochainId });
+        console.log("@InstalledApps: @startApp: disabling app.");
+
+        await invoke("disable_app", { appId, holochainId: app.holochainId });
+        console.log("@InstalledApps: @startApp: app disabled, enabling app.");
+
+        await invoke("enable_app", { appId, holochainId: app.holochainId });
+        console.log("@InstalledApps: @startApp: app enabled.");
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
         this.showMessage(`Started ${appId}`);
       } catch (e) {
         const error = `Start app ${appId} failed: ${JSON.stringify(e)}`;
+        console.error(error);
         this.showMessage(error);
         await invoke("log", {
           log: error,
         });
+
+        await this.$store.dispatch(ActionTypes.fetchStateInfo);
       }
     },
     async uninstallApp(app: HolochainAppInfo) {

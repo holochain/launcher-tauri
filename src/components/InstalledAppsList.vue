@@ -148,6 +148,7 @@
           @uninstallApp="$emit('uninstall-app', $event)"
           @disableApp="$emit('disable-app', $event)"
           @enableApp="$emit('enable-app', $event)"
+          @startApp="$emit('startApp', $event)"
           @updateGui="openUpdateGuiDialog($event)"
         />
       </div>
@@ -377,7 +378,7 @@ export default defineComponent({
       errorText: "Unknown error occured",
     };
   },
-  emits: ["openApp", "uninstall-app", "enable-app", "disable-app"],
+  emits: ["openApp", "uninstall-app", "enable-app", "disable-app", "startApp"],
   async mounted() {
     await Promise.all(
       this.installedApps.map(async (app) => {

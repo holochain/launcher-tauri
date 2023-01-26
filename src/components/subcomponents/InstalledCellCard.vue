@@ -156,12 +156,12 @@ export default defineComponent({
       const expectedIncoming =
         networkInfo[0].fetch_queue_info.op_bytes_to_fetch;
 
-      console.log("expectedIncoming: ", expectedIncoming);
+      // console.log("expectedIncoming: ", expectedIncoming);
 
       // In case expected incoming bytes are undefined, keep the chached values, otherwise update
       // expectedIncoming
       if (expectedIncoming || expectedIncoming === 0) {
-        console.log("expectedIncoming inside: ", expectedIncoming);
+        // console.log("expectedIncoming inside: ", expectedIncoming);
         // if the expected incoming bytes are larger then the max cached value or there
         // is no cached max value, replace it
         if (
@@ -200,28 +200,28 @@ export default defineComponent({
         this.cachedMaxExpected = undefined;
       }
 
-      console.log("========================================");
-      console.log(
-        "this.expectedIncoming: ",
-        this.expectedIncoming
-      );
-      console.log(
-        "cachedMaxExpected: ",
-        this.cachedMaxExpected
-      );
-      console.log("incomingIdle: ", this.incomingIdle);
-      console.log("progressRatio(): ", this.progressRatio());
-      console.log("========================================");
+      // console.log("========================================");
+      // console.log(
+      //   "this.expectedIncoming: ",
+      //   this.expectedIncoming
+      // );
+      // console.log(
+      //   "cachedMaxExpected: ",
+      //   this.cachedMaxExpected
+      // );
+      // console.log("incomingIdle: ", this.incomingIdle);
+      // console.log("progressRatio(): ", this.progressRatio());
+      // console.log("========================================");
     },
     progressRatio() {
-      console.log("@progressRatio: this.expectedIncoming", this.expectedIncoming);
-      console.log("@progressRatio: this.cachedMaxExpected", this.cachedMaxExpected);
+      // console.log("@progressRatio: this.expectedIncoming", this.expectedIncoming);
+      // console.log("@progressRatio: this.cachedMaxExpected", this.cachedMaxExpected);
 
       if ((this.expectedIncoming || this.expectedIncoming === 0) && this.cachedMaxExpected) {
-        console.log("@progressRatio: ratio",(1 - this.expectedIncoming / this.cachedMaxExpected) * 100);
+        // console.log("@progressRatio: ratio",(1 - this.expectedIncoming / this.cachedMaxExpected) * 100);
         return (1 - this.expectedIncoming / this.cachedMaxExpected) * 100;
       } else {
-        console.log("@progressRatio: NO PROGRESS RATIO CALCULATED!!");
+        // console.log("@progressRatio: NO PROGRESS RATIO CALCULATED!!");
         return undefined;
       }
     },

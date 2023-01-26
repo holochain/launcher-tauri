@@ -76,12 +76,14 @@ button {
 
 .btn:disabled {
   background-color: #d7d7e3;
+  cursor: default;
 }
 
 .outlined:disabled {
   background-color: transparent;
   color: #d7d7e3;
   border: 2px solid #d7d7e3;
+  cursor: default;
 }
 
 .outlined:focus-visible {

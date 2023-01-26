@@ -43,11 +43,11 @@ export function getReason(app: AppInfo): string | undefined {
       }`;
     }
   } else {
-    return (
+    return `You may be offline:\n\n${(
       app.status as unknown as {
         paused: { reason: { error: string } };
       }
-    ).paused.reason.error;
+    ).paused.reason.error}`;
   }
 }
 

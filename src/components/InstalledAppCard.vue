@@ -109,9 +109,9 @@
       >
         <div
           :class="{
-            running: isAppRunning(app.webAppInfo.installed_app_info),
+            running: isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info),
             stopped: isAppDisabled(app.webAppInfo.installed_app_info),
-            paused: isAppPaused(app.webAppInfo.installed_app_info),
+            paused: false,
           }"
           class="app-status"
           style="margin-right: 29px"
@@ -123,7 +123,7 @@
       <!-- Open App Icon Button -->
       <div
         v-if="
-          isAppRunning(app.webAppInfo.installed_app_info) && !isAppHeadless(app)
+          (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) && !isAppHeadless(app)
         "
         style="display: flex"
       >
@@ -147,7 +147,7 @@
         :content="
           isAppRunning(app.webAppInfo.installed_app_info)
             ? 'Disable App'
-            : 'Start App'
+            : 'Enable App'
         "
       >
         <ToggleSwitch
@@ -294,6 +294,7 @@
           style="--hc-primary-color: #dd821a"
           v-if="
             !isAppDisabled(app.webAppInfo.installed_app_info) &&
+            !isAppPaused(app.webAppInfo.installed_app_info) &&
             isAppUninstallable(
               app.webAppInfo.installed_app_info.installed_app_id
             )
@@ -310,11 +311,12 @@
           >Enable
         </HCButton>
         <HCButton
-          style="--hc-primary-color: #008704"
-          v-if="isAppPaused(app.webAppInfo.installed_app_info)"
+          style="--hc-primary-color: #008704;"
+          v-if="false"
           @click="startApp(app)"
           outlined
-          >Start
+          :disabled="startingApp ? true : false"
+          >{{ startingApp ? "Starting..." : "Start"}}
         </HCButton>
       </div>
     </div>
@@ -365,6 +367,7 @@ export default defineComponent({
     gossipInfo: Record<string, NetworkInfo>;
     showProvisionedCells: boolean;
     showClonedCells: boolean;
+    startingApp: boolean;
   } {
     return {
       showMore: false,
@@ -373,6 +376,7 @@ export default defineComponent({
       gossipInfo: {},
       showProvisionedCells: true,
       showClonedCells: true,
+      startingApp: false,
     };
   },
   emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp", "updateGui"],
@@ -389,7 +393,7 @@ export default defineComponent({
         .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
     },
     isSliderOn() {
-      return isAppRunning(this.app.webAppInfo.installed_app_info);
+      return (isAppRunning(this.app.webAppInfo.installed_app_info) || isAppPaused(this.app.webAppInfo.installed_app_info));
     },
   },
   methods: {
@@ -415,20 +419,23 @@ export default defineComponent({
     },
     async startApp(app: HolochainAppInfo) {
       this.$emit("startApp", app);
+      this.startingApp = true;
     },
     async uninstallApp(app: HolochainAppInfo) {
       this.showUninstallDialog = false;
       this.$emit("uninstallApp", app);
     },
     getAppStatus(app: HolochainAppInfo) {
-      if (isAppRunning(app.webAppInfo.installed_app_info)) {
+      if (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) {
         return "Running";
       }
       if (isAppDisabled(app.webAppInfo.installed_app_info)) {
         return "Disabled";
       }
+      // Currently this won't be called as paused and running are conflated both into running
+      // because app status is not getting updated: https://github.com/holochain/holochain/issues/1580#issuecomment-1377471698
       if (isAppPaused(app.webAppInfo.installed_app_info)) {
-        return "Paused";
+        return "Offline/Paused";
       }
       return "Unknown State";
     },
@@ -439,11 +446,13 @@ export default defineComponent({
       return installedAppId !== `DevHub-${holochainId.content}`;
     },
     async handleSlider(app: HolochainAppInfo) {
-      if (isAppRunning(app.webAppInfo.installed_app_info)) {
+      if (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) {
         await this.disableApp(app);
       } else if (isAppDisabled(app.webAppInfo.installed_app_info)) {
         await this.enableApp(app);
       } else if (isAppPaused(app.webAppInfo.installed_app_info)) {
+        // Currently this won't be called as paused and running are conflated both into running
+        // because app status is not getting updated: https://github.com/holochain/holochain/issues/1580#issuecomment-1377471698
         await this.startApp(app);
       } else {
         throw new Error("Unknown App state.");
