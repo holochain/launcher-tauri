@@ -287,7 +287,7 @@
             )
           "
           outlined
-          >Uninstall
+          >{{ $t("buttons.uninstall") }}
         </HCButton>
 
         <HCButton
@@ -301,22 +301,21 @@
           "
           outlined
           @click="disableApp(app)"
-          >Disable
+          >{{ $t("buttons.disable") }}
         </HCButton>
         <HCButton
           style="--hc-primary-color: #008704"
           v-if="isAppDisabled(app.webAppInfo.installed_app_info)"
           @click="enableApp(app)"
           outlined
-          >Enable
+          >{{ $t("buttons.enable") }}
         </HCButton>
         <HCButton
           style="--hc-primary-color: #008704;"
           v-if="false"
           @click="startApp(app)"
           outlined
-          :disabled="startingApp ? true : false"
-          >{{ startingApp ? "Starting..." : "Start"}}
+          >{{ $t("buttons.start") }}
         </HCButton>
       </div>
     </div>
@@ -367,7 +366,6 @@ export default defineComponent({
     gossipInfo: Record<string, NetworkInfo>;
     showProvisionedCells: boolean;
     showClonedCells: boolean;
-    startingApp: boolean;
   } {
     return {
       showMore: false,
@@ -376,7 +374,6 @@ export default defineComponent({
       gossipInfo: {},
       showProvisionedCells: true,
       showClonedCells: true,
-      startingApp: false,
     };
   },
   emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp", "updateGui"],
@@ -419,7 +416,6 @@ export default defineComponent({
     },
     async startApp(app: HolochainAppInfo) {
       this.$emit("startApp", app);
-      this.startingApp = true;
     },
     async uninstallApp(app: HolochainAppInfo) {
       this.showUninstallDialog = false;

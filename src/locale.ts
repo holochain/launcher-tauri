@@ -57,6 +57,10 @@ const messages = {
       letsGo: "Let's Go!",
       update: "Update",
       install: "Install",
+      uninstall: "Uninstall",
+      enable: "Enable",
+      disable: "Disable",
+      start: "Start",
     },
     dialogs: {
       restart:
@@ -169,6 +173,10 @@ const messages = {
       letsGo: "Let's Go!",
       update: "Update",
       install: "Installieren",
+      uninstall: "Deinstallieren",
+      enable: "Einschalten",
+      disable: "Ausschalten",
+      start: "Starten",
     },
     dialogs: {
       restart:
