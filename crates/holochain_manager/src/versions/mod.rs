@@ -92,6 +92,22 @@ impl HolochainVersion {
     ];
   }
 
+  /// Gets the minor version number, e.g. "0.1" if the full version number is "0.1.0"
+  pub fn minor_version(&self) -> String {
+    match self {
+      HolochainVersion::CustomBinary => String::from("custom"),
+      _ => {
+        let version_string = self.to_string();
+        let mut rsplit: Vec<&str> = version_string.rsplit(".").collect();
+        let mut minor_version = String::from("");
+        minor_version.push_str(rsplit.pop().unwrap());
+        minor_version.push_str(".");
+        minor_version.push_str(rsplit.pop().unwrap());
+        minor_version
+      }
+    }
+  }
+
   pub fn manager(&self) -> HolochainVersionManager {
     // NEW_VERSION: Create a new version manager, duplicating one of the files in this folder
     // Then, import and add the new version manager here

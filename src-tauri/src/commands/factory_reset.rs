@@ -68,7 +68,7 @@ pub async fn execute_factory_reset(
   } else {
     let mut mutex = (*state).lock().await;
     let launcher_manager = mutex.get_running()?;
-    for (version, state) in &launcher_manager.holochain_managers {
+    for (version, _state) in &launcher_manager.holochain_managers {
       let holochain_version_data_dir = holochain_version_data_dir(version, profile.clone())
         .map_err(|e| {
           log::error!("Failed to get data directory of holochain version {:?} during factory reset: {:?}", version, e);
