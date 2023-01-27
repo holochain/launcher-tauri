@@ -1,5 +1,6 @@
 use tauri::Manager;
 use crate::launcher::{config::LauncherConfig, error::LauncherError};
+use tauri::api::process;
 
 
 #[tauri::command]
@@ -25,6 +26,7 @@ pub async fn write_config(
     }
   }
 
+  process::kill_children();
   app_handle.restart();
 
   Ok(())
