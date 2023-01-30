@@ -138,6 +138,7 @@ input.password-input::-ms-reveal {
   display: table;
   width: -moz-fit-content;
   padding: 0;
+  cursor: pointer;
 }
 
 .disabled {
