@@ -154,7 +154,7 @@ export default defineComponent({
       // console.log("Received NetworkInfo: ", networkInfo);
 
       const expectedIncoming =
-        networkInfo[0].fetch_queue_info.op_bytes_to_fetch;
+        networkInfo[0].fetch_pool_info.op_bytes_to_fetch;
 
       // console.log("expectedIncoming: ", expectedIncoming);
 

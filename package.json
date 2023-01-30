@@ -14,7 +14,7 @@
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",
     "@holo-host/identicon": "^0.1.0",
-    "@holochain/client": "^0.11.15",
+    "@holochain/client": "file:/home/matthias/code/holochain/holochain/holochain-client-js",
     "@material/mwc-button": "^0.25.1",
     "@material/mwc-icon-button": "^0.25.1",
     "@material/mwc-circular-progress": "0.25.1",

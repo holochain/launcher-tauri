@@ -457,7 +457,7 @@ export default defineComponent({
 
       networkInfo.forEach((info, idx) => {
         const expectedIncoming =
-          info.fetch_queue_info.op_bytes_to_fetch;
+          info.fetch_pool_info.op_bytes_to_fetch;
 
         // In case expected incoming bytes are undefined, keep the chached values, otherwise update
         // expectedIncoming
