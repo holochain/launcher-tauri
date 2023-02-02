@@ -439,7 +439,7 @@ impl LauncherManager {
     let app_port = manager.holochain_manager.app_interface_port();
     let admin_port = manager.holochain_manager.admin_interface_port();
 
-    let window_builder = happ_window_builder(
+    let mut window_builder = happ_window_builder(
       &self.app_handle,
       app_id.into(),
       window_label.clone(),
@@ -453,6 +453,9 @@ impl LauncherManager {
     // needs to be removed in order for set_size() to work apparently
     // window_builder = window_builder.maximized(true);
 
+    // set window size to 80% of a common screen resolution of 1920 x 1080.
+    window_builder = window_builder.inner_size(1584.0, 864.0);
+
     // placeholder for when apps come shipped with their custom icons:
     //
     // window_builder
@@ -463,12 +466,11 @@ impl LauncherManager {
     let _scaling_factor = 0.8;
 
     if cfg!(target_os = "macos") {
-      let _window = window_builder.maximized(true).build().map_err(|err| format!("Error opening app: {:?}", err))?;
+      let _window = window_builder.build().map_err(|err| format!("Error opening app: {:?}", err))?;
       // removing this for now since it behaves inconsistently
       // set_window_size(window, scaling_factor);
     } else {
       let window = window_builder
-        .maximized(true)
         .menu(Menu::new().add_submenu(Submenu::new( // This overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
         "Settings",
         Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
