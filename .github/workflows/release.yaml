@@ -85,7 +85,8 @@ jobs:
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
-      - name: build the app
+      - name: build the app (macOS and Linux)
+        if: matrix.platform == 'ubuntu-18.04' || matrix.platform == 'macos-10.15'
         run: npm run build -- --verbose
       - uses: tauri-apps/tauri-action@v0
         env:
@@ -97,9 +98,28 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
         with:
-          projectPath: src-tauri # specifying to prevent action from looking for artifacts in crates/hc_launch/scr-tauri
+          projectPath: src-tauri # specifying to prevent action from looking for artifacts in crates/hc_launch/src-tauri
           tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
           releaseName: "Holochain Launcher v__VERSION__"
-          releaseBody: "See assets below to download this version and install."
+          releaseBody: "See assets below to download and install this version."
+          releaseDraft: true
+          prerelease: true
+
+
+      - name: build and sign the app (Windows)
+        if: matrix.platform == 'windows-2019'
+        run: |
+          npm run build -- --verbose
+          mv "packaging/Output/${{ env.PRODUCT_NAME }}.msi" ${{ env.ARTIFACTS_PATH }}/
+          dotnet tool install --global AzureSignTool
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v "${{ env.ARTIFACTS_PATH }}/${{ env.PRODUCT_NAME }}.msi"
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: src-tauri # specifying to prevent action from looking for artifacts in crates/hc_launch/src-tauri
+          tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
+          releaseName: "Holochain Launcher v__VERSION__"
+          releaseBody: "See assets below to download and install this version."
           releaseDraft: true
           prerelease: true
