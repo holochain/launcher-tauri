@@ -30,7 +30,7 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
         window.set_focus().unwrap();
       } else {
         let r = WindowBuilder::new(app, "admin", WindowUrl::App("index.html".into()))
-          .inner_size(1000.0, 700.0)
+          .inner_size(1200.0, 880.0)
           .title("Holochain Admin")
           .build();
 
