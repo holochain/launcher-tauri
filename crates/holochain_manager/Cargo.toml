@@ -13,9 +13,9 @@ holochain_client = "0.3.0"
 
 # NEW_VERSION add latest crates here # taken from commit instead this time
 
-holochain_conductor_api_0_1_0 = { package = "holochain_conductor_api", version = "0.1.0"}
-holochain_p2p_0_1_0 = { package = "holochain_p2p", version = "0.1.0"}
-holochain_types_0_1_0 = { package = "holochain_types", version = "0.1.0"}
+holochain_conductor_api_0_1_3 = { package = "holochain_conductor_api", version = "0.1.3"}
+holochain_p2p_0_1_3 = { package = "holochain_p2p", version = "0.1.3"}
+holochain_types_0_1_3 = { package = "holochain_types", version = "0.1.3"}
 
 
 mr_bundle = {package = "mr_bundle", version = "0.1.0"}
