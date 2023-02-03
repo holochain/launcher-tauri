@@ -111,7 +111,7 @@ jobs:
           npm run build -- --verbose
           dotnet tool install --global AzureSignTool
           AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.8.997_x64_en-US.msi"
-      - uses:  matthme/tauri-action-ev-signing/.github/workflows/
+      - uses: matthme/tauri-action-ev-signing@dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
