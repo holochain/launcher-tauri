@@ -5,7 +5,7 @@
         <div class="flex-scrollable-y">
           <InstalledApps
             @open-app-store="view = { type: 'appStore' }"
-            style="display: flex; margin: 24px; margin-bottom: 50px"
+            style="display: flex; margin: 24px; margin-bottom: 50px;"
           ></InstalledApps>
         </div>
       </div>

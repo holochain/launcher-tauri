@@ -70,7 +70,7 @@
     </div>
 
     <div v-if="loading" class="column center-content" style="flex: 1">
-      <mwc-circular-progress indeterminate></mwc-circular-progress>
+      <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"></LoadingDots>
     </div>
 
     <div
@@ -200,6 +200,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
+import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
 import {
   AppWithReleases,
@@ -227,7 +228,8 @@ export default defineComponent({
     HCLoading,
     HCSnackbar,
     HCProgressBar,
-    HCDialog
+    HCDialog,
+    LoadingDots,
   },
   data(): {
     loadingText: string;

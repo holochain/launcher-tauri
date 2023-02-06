@@ -454,7 +454,7 @@ impl LauncherManager {
     // window_builder = window_builder.maximized(true);
 
     // set window size to 80% of a common screen resolution of 1920 x 1080.
-    window_builder = window_builder.inner_size(1584.0, 756.0);
+    window_builder = window_builder.inner_size(1536.0, 864.0);
 
     // placeholder for when apps come shipped with their custom icons:
     //

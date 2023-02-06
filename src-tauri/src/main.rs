@@ -38,7 +38,7 @@ use crate::commands::quit::quit;
 use crate::commands::{
   choose_version::choose_version_for_hdk,
   config::write_config,
-  enable_app::{disable_app, enable_app},
+  enable_app::{disable_app, enable_app, delete_clone},
   factory_reset::execute_factory_reset,
   get_app_info::get_app_info,
   get_state_info::get_state_info,
@@ -81,6 +81,7 @@ fn main() {
       save_app,
       enable_app,
       disable_app,
+      delete_clone,
       choose_version_for_hdk,
       get_supported_versions,
       uninstall_app,

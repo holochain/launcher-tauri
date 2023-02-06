@@ -3,7 +3,7 @@ use holochain_manager::{
   versions::{
     holochain_conductor_api_latest::AppInfo,
     holochain_types_latest::{
-      prelude::{AgentPubKey, AppBundle, MembraneProof},
+      prelude::{AgentPubKey, AppBundle, MembraneProof, CellId},
       web_app::WebAppBundle,
     },
     mr_bundle_latest::ResourceBytes,
@@ -341,6 +341,14 @@ impl WebAppManager {
 
   pub async fn disable_app(&mut self, app_id: String) -> Result<(), String> {
     self.holochain_manager.disable_app(app_id.clone()).await?;
+
+    self.on_running_apps_changed().await?;
+
+    Ok(())
+  }
+
+  pub async fn delete_clone(&mut self, app_id: String, cell_id: CellId) -> Result<(), String> {
+    self.holochain_manager.delete_clone(app_id, cell_id).await?;
 
     self.on_running_apps_changed().await?;
 

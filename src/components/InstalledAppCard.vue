@@ -3,7 +3,7 @@
     @confirm="uninstallApp(app)"
     closeOnSideClick
     ref="uninstall-app-dialog"
-    primaryButtonLabel="Uninstall"
+    :primaryButtonLabel="$t('buttons.uninstall')"
     ><div style="text-align: center">
       Are you sure you want to uninstall this App? This will irrevocably delete
       all data stored in it.
@@ -227,7 +227,7 @@
         </InstalledCellCard>
       </div>
 
-      <!-- cloned cells -->
+      <!-- enabled cloned cells -->
       <div
         class="row"
         style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
@@ -245,11 +245,10 @@
         v-if="showClonedCells"
         style="margin-left: 140px; margin-right: 20px"
       >
-        <div v-if="clonedCells.length > 0">
+        <div v-if="enabledClonedCells.length > 0">
           <InstalledCellCard
-            v-for="[roleName, cellInfo] in clonedCells"
+            v-for="[roleName, cellInfo] in enabledClonedCells"
             :key="roleName"
-            style="margin: 12px 0"
             :cellInfo="cellInfo"
             :roleName="roleName"
             :holochainId="app.holochainId"
@@ -261,6 +260,46 @@
           There are no cloned cells in this app.
         </div>
       </div>
+
+
+      <!-- disabled cloned cells -->
+      <div
+        class="row"
+        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+      >
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >Disabled Cloned Cells:</span
+        ><span style="display: flex; flex: 1"></span>
+        <span
+          style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
+          @click="showClonedCells = !showClonedCells"
+          >{{ showClonedCells ? "[Hide]" : "[Show]" }}
+        </span>
+      </div>
+      <div
+        v-if="showClonedCells"
+        style="margin-left: 140px; margin-right: 20px"
+      >
+        <div v-if="disabledClonedCells.length > 0">
+          <DisabledCloneCard
+            v-for="[roleName, cellInfo] in disabledClonedCells"
+            :key="roleName"
+            style="margin: 12px 0;"
+            :cellInfo="cellInfo"
+            :roleName="roleName"
+            :holochainId="app.holochainId"
+            :appId="app.webAppInfo.installed_app_info.installed_app_id"
+          >
+          </DisabledCloneCard>
+        </div>
+
+        <div v-else style="text-align: center; opacity: 0.7">
+          There are no disabled cloned cells in this app.
+        </div>
+      </div>
+
+
+
       <span
         v-if="getReason(app.webAppInfo.installed_app_info)"
         style="margin-top: 16px; margin-left: 140px"
@@ -327,7 +366,7 @@ import { defineComponent, PropType } from "vue";
 import { HolochainAppInfo, HolochainAppInfoExtended } from "../types";
 import { isAppRunning, isAppDisabled, isAppPaused, getReason, flattenCells, getCellId } from "../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
-import { CellInfo, encodeHashToBase64, NetworkInfo } from "@holochain/client";
+import { CellInfo, CellType, ClonedCell, encodeHashToBase64, NetworkInfo } from "@holochain/client";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
@@ -339,6 +378,8 @@ import HCButton from "./subcomponents/HCButton.vue";
 import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
 import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
+import DisabledCloneCard from "./subcomponents/DisabledCloneCard.vue";
+
 
 export default defineComponent({
   name: "InstalledAppCard",
@@ -349,6 +390,7 @@ export default defineComponent({
     HCGenericDialog,
     HoloIdenticon,
     InstalledCellCard,
+    DisabledCloneCard,
   },
   props: {
     appIcon: {
@@ -384,9 +426,16 @@ export default defineComponent({
         .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
       return provisionedCells
     },
-    clonedCells(): [string, CellInfo][] {
+    enabledClonedCells(): [string, CellInfo][] {
       return flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
         .filter(([_roleName, cellInfo]) => "cloned" in cellInfo)
+        .filter(([_roleName, cellInfo]) => (cellInfo as { [CellType.Cloned]: ClonedCell }).cloned.enabled)
+        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
+    },
+    disabledClonedCells(): [string, CellInfo][] {
+      return flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
+        .filter(([_roleName, cellInfo]) => "cloned" in cellInfo)
+        .filter(([_roleName, cellInfo]) => !(cellInfo as { [CellType.Cloned]: ClonedCell }).cloned.enabled)
         .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
     },
     isSliderOn() {

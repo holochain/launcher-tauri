@@ -1,101 +1,101 @@
 <template>
   <HCDialog ref="devHubDevsOnlyWarning">
-      <div
-        class="column"
-        style="padding: 30px; align-items: center; max-width: 500px"
-      >
-        <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
-          DevHub
-        </div>
-        <div>
-          DevHub is the place where <span style="font-weight: bold; white-space: nowrap;">app developers</span> can upload their apps such that they appear in the App Library.<br><br>
-          If you instead want to install other apps, click on the <span style="font-weight: bold; white-space: nowrap;">"Install New App"</span> button in the bottom right corner of the
-          main window. It will lead you to the <span style="font-weight: bold; white-space: nowrap;">App Library</span>.
-        </div>
-
-        <div class="row" style="margin-top: 30px; margin-bottom: 10px; margin-left: 50px; width: 100%;">
-          <ToggleSwitch
-            :sliderOn="ignoreDevHubWaring"
-            @click="() => ignoreDevHubWaring = !ignoreDevHubWaring"
-            @keydown.enter="() => ignoreDevHubWaring = !ignoreDevHubWaring"
-          />
-          <span style="margin-left: 10px;">Don't show this message again.</span>
-        </div>
-
-        <div class="row" style="margin-top: 20px;">
-          <HCButton style="height: 30px; margin: 4px 6px;" outlined @click="closeDevHubNote">Cancel</HCButton>
-          <HCButton style="margin: 4px 6px;" @click="handleOpenDevHub">Open DevHub</HCButton>
-        </div>
+    <div
+      class="column"
+      style="padding: 30px; align-items: center; max-width: 500px"
+    >
+      <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
+        DevHub
       </div>
-    </HCDialog>
+      <div>
+        DevHub is the place where <span style="font-weight: bold; white-space: nowrap;">app developers</span> can upload their apps such that they appear in the App Library.<br><br>
+        If you instead want to install other apps, click on the <span style="font-weight: bold; white-space: nowrap;">"Install New App"</span> button in the bottom right corner of the
+        main window. It will lead you to the <span style="font-weight: bold; white-space: nowrap;">App Library</span>.
+      </div>
+
+      <div class="row" style="margin-top: 30px; margin-bottom: 10px; margin-left: 50px; width: 100%;">
+        <ToggleSwitch
+          :sliderOn="ignoreDevHubWaring"
+          @click="() => ignoreDevHubWaring = !ignoreDevHubWaring"
+          @keydown.enter="() => ignoreDevHubWaring = !ignoreDevHubWaring"
+        />
+        <span style="margin-left: 10px;">Don't show this message again.</span>
+      </div>
+
+      <div class="row" style="margin-top: 20px;">
+        <HCButton style="height: 30px; margin: 4px 6px;" outlined @click="closeDevHubNote">Cancel</HCButton>
+        <HCButton style="margin: 4px 6px;" @click="handleOpenDevHub">Open DevHub</HCButton>
+      </div>
+    </div>
+  </HCDialog>
+
+
+
+  <div class="row center-content top-bar" style="position: sticky; top: 0; z-index: 1">
+    <img
+      src="/img/Square284x284Logo.png"
+      style="height: 42px; margin-left: 11px"
+    />
+    <span style="font-size: 1.5em; margin-left: 13px">{{
+      $t("main.installedApps")
+    }}</span>
+    <span style="display: flex; flex: 1"></span>
+    <HCButton
+      style="
+        margin-left: 8px;
+        margin-right: 12px;
+        height: 40px;
+        border-radius: 8px;
+        padding: 0 20px;
+      "
+      :title="reportIssueUrl"
+      @click="reportIssue()"
+    >
+      <div class="row center-content">
+        <span style="margin-left: 5px">{{ $t("main.reportIssue") }}</span>
+      </div>
+    </HCButton>
+  </div>
 
   <div
     v-if="isLoading()"
-    style="flex: 1; display: flex; align-items: center; justify-content: center"
+    class="column center-content" style="flex: 1; height: calc(100vh - 64px);"
   >
-    <mwc-circular-progress indeterminate></mwc-circular-progress>
+    <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"></LoadingDots>
   </div>
 
-  <div v-else>
-    <div style="display: flex; flex: 1; flex-direction: column">
-      <div class="row top-bar" style="position: sticky; top: 0; z-index: 1">
-        <img
-          src="/img/Square284x284Logo.png"
-          style="height: 42px; margin-left: 11px"
-        />
-        <span style="font-size: 1.5em; margin-left: 13px">{{
-          $t("main.installedApps")
-        }}</span>
-        <span style="display: flex; flex: 1"></span>
-        <HCButton
-          style="
-            margin-left: 8px;
-            margin-right: 12px;
-            height: 40px;
-            border-radius: 8px;
-            padding: 0 20px;
-          "
-          :title="reportIssueUrl"
-          @click="reportIssue()"
-        >
-          <div class="row center-content">
-            <span style="margin-left: 5px">{{ $t("main.reportIssue") }}</span>
-          </div>
-        </HCButton>
-      </div>
+  <div
+    v-else
+    class="column"
+    style="flex: 1; align-items: center; padding: 0 50px; margin-top: 20px"
+  >
+    <InstalledAppsList
+      :installedApps="$store.getters[`allApps`]"
+      @openApp="openApp($event)"
+      @disableApp="disableApp($event)"
+      @enableApp="enableApp($event)"
+      @startApp="startApp($event)"
+      @uninstallApp="uninstallApp($event)"
+    />
+  </div>
 
-      <div
-        class="column"
-        style="flex: 1; align-items: center; padding: 0 50px; margin-top: 20px"
-      >
-        <InstalledAppsList
-          :installedApps="$store.getters[`allApps`]"
-          @openApp="openApp($event)"
-          @disableApp="disableApp($event)"
-          @enableApp="enableApp($event)"
-          @startApp="startApp($event)"
-          @uninstallApp="uninstallApp($event)"
-        />
-      </div>
-      <HCButton
-        tabindex="0"
-        @click="$emit('open-app-store')"
-        class="btn-install"
-        style="
-          font-family: Poppins;
-          margin: 16px;
-          height: 54px;
-          position: absolute;
-          right: 0;
-          bottom: 0;
-        "
-        ><div class="row center-content" style="font-size: 18px">
-          <mwc-icon style="margin-right: 10px; font-size: 26px">add</mwc-icon
-          >{{ $t("main.installNewApp") }}
-        </div>
-      </HCButton>
+  <HCButton
+    tabindex="0"
+    @click="$emit('open-app-store')"
+    class="btn-install"
+    style="
+      font-family: Poppins;
+      margin: 16px;
+      height: 54px;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+    "
+    ><div class="row center-content" style="font-size: 18px">
+      <mwc-icon style="margin-right: 10px; font-size: 26px">add</mwc-icon
+      >{{ $t("main.installNewApp") }}
     </div>
-  </div>
+  </HCButton>
 
   <HCSnackbar leading :labelText="snackbarText" ref="snackbar"></HCSnackbar>
 </template>
@@ -111,10 +111,11 @@ import HCButton from "../components/subcomponents/HCButton.vue";
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import HCDialog from "../components/subcomponents/HCDialog.vue";
 import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
+import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
 export default defineComponent({
   name: "InstalledApps",
-  components: { InstalledAppsList, HCButton, HCSnackbar, HCDialog, ToggleSwitch },
+  components: { InstalledAppsList, HCButton, HCSnackbar, HCDialog, ToggleSwitch, LoadingDots },
   data(): {
     snackbarText: string | undefined;
     reportIssueUrl: string;
