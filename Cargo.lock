@@ -7294,8 +7294,6 @@ dependencies = [
 [[package]]
 name = "tao"
 version = "0.15.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac8e6399427c8494f9849b58694754d7cc741293348a6836b6c8d2c5aa82d8e6"
 dependencies = [
  "bitflags",
  "cairo-rs",
@@ -7338,6 +7336,13 @@ dependencies = [
  "windows-implement",
  "x11-dl",
 ]
+
+[[package]]
+name = "tao"
+version = "0.15.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac8e6399427c8494f9849b58694754d7cc741293348a6836b6c8d2c5aa82d8e6"
+replace = "tao 0.15.8"
 
 [[package]]
 name = "tar"
@@ -9230,7 +9235,7 @@ dependencies = [
  "serde_json",
  "sha2 0.10.6",
  "soup2",
- "tao",
+ "tao 0.15.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror",
  "url 2.3.1",
  "webkit2gtk",
