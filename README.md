@@ -78,41 +78,60 @@ If you used the scaffolding tool to create your hApp, packaging it for the launc
 5. Package your Web-hApp with `hc web-app pack`, and publish it so that other users can download and install it.
 
 
-### Publishing a .webhapp to the DevHub
+### Publishing and Updating an App to the DevHub
 
+#### Publishing your app
 
-1. Open the `DevHub-0.1.0-beta-rc.2` app in the Holochain Launcher.
+1. Open the `DevHub-0.1.3` app in the Holochain Launcher.
 2. Click on "Add hApp", then choose a title, subtitle and description for your app and **add the tag "app-store-ready"**. Without this tag, the app won't appear in the app library.
-3. Once you have created a new hApp, click "Upload new bundle".
-4. Enter the HDK version your hApp is written with, then upload the .webhapp file of your app.
-5. You will be prompted to choose names, descriptions and version numbers for your zomes and DNA's. Fill out all necessary fields and create the zomes and DNA's of your hApp, then click on "Continue".
-6. Set the appropriate "Name" for your release (e.g. v0.0.1). This is the version name that participants will see when downloading your application.
+3. Once you have created the new hApp, click on "Upload Bundle".
+4. If your app has an accompanying web UI, upload the `.webhapp` file of your app, if it's a headless app, upload the `.happ` file of your app.
+5. You will be prompted to choose names, descriptions and version numbers for your zomes and DNA's. Fill out all necessary fields and create the zomes and DNA's of your hApp.
+6. On the same page still, you can also give a name and version number to the UI that comes with the `.webhapp` file if it's a web app. The UI will be stored separately from the `.happ` file such that you may later associate a new "official UI" to the same happ release. You will be able to associate any UI of *anyone* to your happ release so **make sure to choose a unique enough name for the UI such that you will still recognize it amongst all other UI's**.
+7. Click on "Continue" and then set the appropriate "Name" for your release (e.g. v0.0.1, **this is the version name that participants will see when downloading your application**) as well as a changelog.
 7. Review and save your hApp.
-8. Now you need to upload the GUI (provided your hApp has one) and associate it with the hApp release you just made. Click on "GUIs" in the left panel and then "Add GUI".
-9. Give your GUI a name and a description and save it. No tag is required but make sure to choose a name that let's you disambiguate it from other developers GUI's.
-10. Go to "My GUIs" in the left panel, click on "More info" on the GUI you just added, then "Create new release".
-11. Choose a version number for the GUI and upload your GUI as a zip file in the file drop area and click "save". "Select hApp Releases" is not required.
-12. Go back to "My hApps" in the left panel, then click on "More info" of the hApp you added earlier.
-13. Under "hApp Releases", click on "More info" for the Release you want to add the GUI to, then click on "Edit release".
-14. Click on "Select GUI Release" and select the GUI you just uploaded. THen click on "Save changes".
-15. Now everything is ready but make sure to keep your Launcher open until another Launcher (on another peer's computer) can install the app (to be safe, wait for about 30 minutes at least).
-16. If you get stuck at any point, don't hesitate to ask for help on Holochain's Discord server. You should find an invite link to it on https://developer.holochain.org/.
+8. Your app should now appear in the App Library.
+9. Now everything is ready locally but make sure to keep your Launcher open until another Launcher (on another peer's computer) can install the app. To be safe, wait for about 30 minutes at least.
+
+If you get stuck at any point, don't hesitate to ask for help on Holochain's Discord server. You should find an invite link to it on https://developer.holochain.org/.
+
+#### Updating the UI of your Web App
+Provided that you already created a happ release as described just above, you can always update the UI associated with it. To do so, follow these steps:
+1. Click on "My GUIs" in the left side panel of the DevHub
+2. In the list, select the UI that you want to update by clicking on "More Info"
+3. Click on "Create new release"
+4. Add a version number for that UI, as well as a changelog that describes the changes this new UI comes with. People updating to the latest UI of your app will see this text displayed before confirming to update.
+5. Upload your updated web assets as a `.zip` file. Optionally you can explicitly specify hApp releases that this UI is compatible with. Then click on "Save".
+6. Now go to "My hApps" in the left side panel of the DevHub and select the hApp you want to update the UI for by clicking on "More Info".
+7. Under "hApp Releases", select the happ release of that happ that you want to update the UI for by clicking again on "More Info".
+8. Click on "Edit release".
+9. Click on "Select GUI Release" and select the GUI release you just created earlier and click on "Finish".
+10. Click on "Save Changes".
+11. The UI of your app should now be updated and after (re)starting the Launcher, people will see the option to update the UI in case they already have your app installed.
+12. Again, to make sure your uploads get gossiped in the network, keep your Launcher open until another Launcher (on another peer's computer) can install the app. To be safe, wait for about 30 minutes at least.
+
+
+If you get stuck at any point, don't hesitate to ask for help on Holochain's Discord server. You should find an invite link to it on https://developer.holochain.org/.
 
 
 ## Data storage
 
-The Holochain Launcher uses the same config and data locations as the main `holochain` and `lair-keystore` processes. These locations are:
+The Holochain Launcher stores data in different places on the file system, depending on the platform:
 
-- Configuration: `$CONFIG_DIR/holochain`.
-  - In Ubuntu this is `$HOME/.config/holochain`.
-- Data: `$DATA_DIR/holochain` and `$DATA_DIR/lair`.
-  - In Ubuntu this is `$HOME/.local/share/holochain` and `$HOME/.local/share/lair`.
+- Configuration:
+  - Windows: `{FOLDERID_RoamingAppData}/holochain-launcher`
+  - macOS: `$HOME/Library/Application Support/holochain-launcher`
+  - Linux: `$HOME/.config/holochain-launcher`.
+- Data:
+  - Windows: `{FOLDERID_RoamingAppData}/holochain-launcher`
+  - macOS: `$HOME/Library/Application Support/holochain-launcher`
+  - Linux: `$XDG_DATA_HOME/holochain-launcher` or `$HOME/.local/share/holochain-launcher`
+- Logs:
+  - Windows: `{FOLDERID_RoamingAppData}/holochain-launcher/profiles/${profile}/logs`
+  - macOS: `$HOME/Library/Logs/holochain-launcher`
+  - Linux: `$XDG_DATA_HOME/holochain-launcher/profiles/${profile}/logs` or `$HOME/.local/share/holochain-launcher/profiles/${profile}/logs`
 
-To reset the launcher, you can execute a factory reset in the `Holochain Admin` window > `Settings` menu > `Factory Reset`.
-
-### Logs
-
-Logs can be found at `$DATA_DIR/holochain-launcher/launcher.log`. When reporting issues, please attach the contents of this file.
+To reset the launcher, you can execute a factory reset in the `Holochain Admin` window via `Settings` > `Factory Reset`.
 
 ## Developer Setup
 
