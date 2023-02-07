@@ -45,7 +45,8 @@ jobs:
         run: npm install && npm run build
 
   holochain_cli_launch:
-    fail-fast: false
+    strategy:
+      fail-fast: false
       matrix:
         platform: [macos-latest, ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
