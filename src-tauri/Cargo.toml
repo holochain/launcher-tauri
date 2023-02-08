@@ -17,7 +17,7 @@ tauri-build = { version = "1.2.1", features = [] }
 
 [dependencies]
 holochain_manager = { path = "../crates/holochain_manager" }
-holochain_launcher_utils = "0.0.2"
+holochain_launcher_utils = "0.0.3"
 holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
 lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 

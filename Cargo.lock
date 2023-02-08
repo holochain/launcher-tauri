@@ -2643,7 +2643,7 @@ dependencies = [
  "dirs-next",
  "futures",
  "hdk",
- "holochain_launcher_utils 0.0.2",
+ "holochain_launcher_utils 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "holochain_manager",
  "holochain_types",
  "holochain_web_app_manager",
@@ -2707,7 +2707,7 @@ dependencies = [
  "holochain_cli_sandbox",
  "holochain_client",
  "holochain_conductor_api",
- "holochain_launcher_utils 0.0.2",
+ "holochain_launcher_utils 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "holochain_types",
  "holochain_util",
  "holochain_zome_types",
@@ -2865,9 +2865,7 @@ dependencies = [
 
 [[package]]
 name = "holochain_launcher_utils"
-version = "0.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "154af4424987efd7cd93e412a502c450d0b3364f683a6fad3dc64736be520e68"
+version = "0.0.3"
 dependencies = [
  "holochain_client",
  "holochain_conductor_api",
@@ -2883,6 +2881,8 @@ dependencies = [
 [[package]]
 name = "holochain_launcher_utils"
 version = "0.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "612090482fd152060cde833d34751ea4a81fc7b0ceee30ebbcfe84b677b2d762"
 dependencies = [
  "holochain_client",
  "holochain_conductor_api",
