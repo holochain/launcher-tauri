@@ -111,7 +111,7 @@ impl HcLaunch {
 
                 // spawn sandboxes
                 println!("[hc launch] Spawning sandbox conductors.");
-                let _child_processes = spawn_sandboxes(
+                let child_processes = spawn_sandboxes(
                   &self.holochain_path,
                   happ_path,
                   self.create,
@@ -123,7 +123,14 @@ impl HcLaunch {
                 tauri::async_runtime::spawn(async move {
                   tokio::signal::ctrl_c().await.unwrap();
                   holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
+                  println!("Released ports.");
                   temp_dir.close().unwrap();
+                  // killing child processes
+                  for (mut holochain_process, mut lair_process) in child_processes {
+                    holochain_process.start_kill().unwrap();
+                    lair_process.start_kill().unwrap();
+                  }
+                  println!("Killed holochain processes, press Ctrl+C to quit.");
                   std::process::exit(0);
                 });
 
@@ -169,7 +176,6 @@ impl HcLaunch {
                     ).await?;
 
                     tauri::async_runtime::spawn(async move {
-                      // This stuff is never being called :/
                       tokio::signal::ctrl_c().await.unwrap();
                       holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
                       std::process::exit(0);

@@ -2643,7 +2643,7 @@ dependencies = [
  "dirs-next",
  "futures",
  "hdk",
- "holochain_launcher_utils 0.0.1",
+ "holochain_launcher_utils 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "holochain_manager",
  "holochain_types",
  "holochain_web_app_manager",
