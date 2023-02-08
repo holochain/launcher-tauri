@@ -1,6 +1,6 @@
 [package]
 name = "holochain_launcher_utils"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2021"
 description = "Shared utils used by Holochain Launcher and the hc launch CLI (holochain_cli_launch)"
 license-file = "LICENSE_CAL-1.0"
@@ -15,9 +15,9 @@ categories = ["command-line-utilities", "development-tools"]
 
 holochain_client = "0.3.0"
 
-holochain_conductor_api = "0.1.0"
-holochain_types = "0.1.0"
-holochain_zome_types = "0.1.0"
+holochain_conductor_api = "0.1.3"
+holochain_types = "0.1.3"
+holochain_zome_types = "0.1.1"
 
 lair_keystore_api = "0.2.3"
 
