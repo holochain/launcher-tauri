@@ -41,7 +41,22 @@ pub fn happ_window_builder<'a>(
   );
 
   // listen for anchor clicks to route them to the open_url_cmd command for sanitization and
-  // opennig in system default browser
+  // openig in system default browser. For macOS additionaly display a message when data is being
+  // attempted to be downloaded via an anchor tag
+  #[cfg(target_os = "macos")]
+  let anchor_event_listener = r#"window.addEventListener("click", (e) => {
+    if ((e.target.tagName.toLowerCase() === 'a') && (e.target.href.startsWith('http://') || e.target.href.startsWith('https://'))) {
+      e.preventDefault();
+      window.__TAURI_INVOKE__('open_url_cmd', { 'url': e.target.href } )
+    }
+    if ((e.target.tagName.toLowerCase() === 'a') && (e.target.href.startsWith('data:'))) {
+      e.preventDefault();
+      alert("We use Tauri to securely display Holochain apps. For macOS, downloading files is currently not supported. For more information, visit https://github.com/tauri-apps/tauri/issues/4633");
+    }
+  });
+  "#;
+
+  #[cfg(not(target_os = "macos"))]
   let anchor_event_listener = r#"window.addEventListener("click", (e) => {
     if ((e.target.tagName.toLowerCase() === 'a') && (e.target.href.startsWith('http://') || e.target.href.startsWith('https://'))) {
       e.preventDefault();
