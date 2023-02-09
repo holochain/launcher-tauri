@@ -45,22 +45,34 @@ pub fn happ_window_builder<'a>(
   // attempted to be downloaded via an anchor tag
   #[cfg(target_os = "macos")]
   let anchor_event_listener = r#"window.addEventListener("click", (e) => {
-    if ((e.target.tagName.toLowerCase() === 'a') && (e.target.href.startsWith('http://') || e.target.href.startsWith('https://'))) {
-      e.preventDefault();
-      window.__TAURI_INVOKE__('open_url_cmd', { 'url': e.target.href } )
-    }
-    if ((e.target.tagName.toLowerCase() === 'a') && (e.target.href.startsWith('data:'))) {
-      e.preventDefault();
-      alert("We use Tauri to securely display Holochain apps. For macOS, downloading files is currently not supported. For more information, visit https://github.com/tauri-apps/tauri/issues/4633");
+    // in case of anchor tags within shadow DOM
+    const maybeHref = e.composedPath()[0].href;
+
+    if (maybeHref) {
+      // alert(`Got composed path with href: ${maybeHref}`);
+      if ( (maybeHref.startsWith('http://') || maybeHref.startsWith('https://')) && !(maybeHref.includes("tauri.localhost")) ) {
+        e.preventDefault();
+        window.__TAURI_INVOKE__('open_url_cmd', { 'url': maybeHref } )
+      }
+
+      if (maybeHref.startsWith('data:')) {
+        e.preventDefault();
+        alert("We use Tauri to securely display Holochain apps. For macOS, downloading files is currently not supported. For more information, visit https://github.com/tauri-apps/tauri/issues/4633");
+      }
     }
   });
   "#;
 
   #[cfg(not(target_os = "macos"))]
   let anchor_event_listener = r#"window.addEventListener("click", (e) => {
-    if ((e.target.tagName.toLowerCase() === 'a') && (e.target.href.startsWith('http://') || e.target.href.startsWith('https://'))) {
-      e.preventDefault();
-      window.__TAURI_INVOKE__('open_url_cmd', { 'url': e.target.href } )
+    const maybeHref = e.composedPath()[0].href;
+
+    if (maybeHref) {
+      // alert(`Got composed path with href: ${maybeHref}`);
+      if ( (maybeHref.startsWith('http://') || maybeHref.startsWith('https://')) && !(maybeHref.includes("tauri.localhost")) ) {
+        e.preventDefault();
+        window.__TAURI_INVOKE__('open_url_cmd', { 'url': maybeHref } )
+      }
     }
   });
   "#;
