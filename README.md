@@ -2,7 +2,7 @@
 
 A cross-platform executable that launches a local Holochain conductor, and lets you install and run Holochain apps.
 
-> Feedback is immensely welcome in the [issues section](https://github.com/holochain/launcher/issues).
+> Feedback is more than welcome in the [issues section](https://github.com/holochain/launcher/issues).
 
 ## Installing the Launcher
 
@@ -11,14 +11,14 @@ A cross-platform executable that launches a local Holochain conductor, and lets 
 
 ## Updating Launcher
 
-If you already have Launcher installed and would like to update to a new version of the Holochain Launcher, go to the [Releases page](https://github.com/holochain/launcher/releases) and download the appropriate executable for your platform.
+If you already have the Launcher installed and would like to update to a new version of the Holochain Launcher, go to the [Releases page](https://github.com/holochain/launcher/releases) and download the appropriate executable for your platform.
 
 ### Windows
 
 1. Double click the downloaded `.msi` file
 2. On the Windows SmartScreen pop up, click on Run Anyway
 3. Run through the setup process without changing the Destination Folder
-4. The setup process will request to close applications that are using files that need to be updated. This will include the Old Holochain Launcher as well, if it is currently open
+4. The setup process will request to close applications that are using files that need to be updated. This will include the old Holochain Launcher as well, if it is currently open
 5. Click Ok at this step, to proceed with the setup
 6. Open Launcher once installation is complete
 
@@ -39,7 +39,7 @@ The first time you start the Holochain Launcher, it will ask you to set up a pas
 
 WARNING! If you lose this password, you will also lose access any data from your Holochain applications, as there is no password recovery mechanism.
 
-### Installing a hApp
+### Installing a Holochain App (hApp)
 
 When you are on the `Installed Apps` section, click `Install New App`. This will bring up the `App Store`, from which you can:
 
@@ -47,40 +47,39 @@ When you are on the `Installed Apps` section, click `Install New App`. This will
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;or
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.b) Select Application from the FileSystem`.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.b) Select Application from the FileSystem.
 
-2. Set a unique `AppId` for the app, and click install, it may take a while.
+2. Set a unique `AppId` for the app, and click install. It may take a while.
    > This AppId only needs to be unique inside your Holochain Launcher, it doesn't affect other users.
-3. When it's finished installation, the happ will appear in the list of active happs.
-4. Click `Open` in one of the installed apps to open the app.
+3. When the installation is finished, the happ will appear in the list of active happs.
+4. Click on the icon that says "Open App" when hovering over it to open the app in a new window.
 
 
 # For Developers
 
-### Packaging a Web-hApp
+### Packaging a Web hApp
 
 Requirements:
 
-- On the zome side, target one of the HDK versions supported by the launcher.
-  - Find out which versions are supported in https://github.com/holochain/launcher/releases.
+The Holochain Launcher is currently using a `0.1.X` version of Holochain. Use an HDK and HDI version that is compatible with it.
 
 The easiest way to create a Holochain web-app is to use holochain's [scaffolding tool](https://docs.rs/holochain_scaffolding_cli/latest/holochain_scaffolding_cli/). If you develop in [nix-shell](https://developer.holochain.org/install/), `hc scaffold` will be readily available to you to call in the command line.
 
 When your UI is served from the launcher and `AppWebsocket.connect()` or `AdminWebsocket.connect()` are called, the call will be redirected to the actual port in which Holochain is running its interfaces. Also, when the `appWebsocket.getAppInfo({ app_id: <APP_ID> })` is called, the `APP_ID` parameter is going to be replaced with the actual application ID that is installed in the Launcher.
 
-For now, the UI still has access to the admin interface, but its usage is discouraged as newer versions of the launcher will block any admin requests not coming from the Holochain Admin UI itself. There will be a call available in `AppWebsocket` that will prompt the user to do an action in the Holochain Admin UI, or similar (To Be Defined).
+For now, the UI still has access to the admin interface, but *its usage is discouraged* as newer versions of the Launcher will block any admin requests not coming from the Holochain Admin UI itself. There will be a call available in `AppWebsocket` that will prompt the user to do an action in the Holochain Admin UI, or similar (to be defined).
 
 If you used the scaffolding tool to create your hApp, packaging it for the launcher is as easy as running `npm run package` in the root directory of your project. Otherwise you need to:
 1. Package your happ into a `.happ` file, with `hc app pack`.
-2. Package your UI into a `.zip` file. IMPORTANT: this `.zip` is supposed to contain an `index.html` file in its root level.
+2. Package your UI into a `.zip` file. IMPORTANT: this `.zip` is supposed to contain an `index.html` file at its root level.
 3. Create a Web-hApp manifest with `hc web-app init`.
 4. Set the corrrect locations for the UI `.zip` file and the `.happ` file.
-5. Package your Web-hApp with `hc web-app pack`, and publish it so that other users can download and install it.
+5. Package your Web-hApp with `hc web-app pack`, and publish it so that other users can download and install it or simply share it with your friends.
 
 
 ### Publishing and Updating an App in the DevHub
 
-In order for your app to appear in the App Library within the Holochain Launcher, you need to publish it to the DevHub, which is itseld a Holochain app. Currently, the DevHub is installed by default in the Holochain Launcher.
+In order for your app to appear in the App Library within the Holochain Launcher, you need to publish it to the DevHub, which is itself a Holochain app. Currently, the DevHub is installed by default in the Holochain Launcher.
 
 #### Publishing your app
 
@@ -89,8 +88,8 @@ In order for your app to appear in the App Library within the Holochain Launcher
 3. Once you have created the new hApp, click on "Upload Bundle".
 4. If your app has an accompanying web UI, upload the `.webhapp` file of your app, if it's a headless app, upload the `.happ` file of your app.
 5. You will be prompted to choose names, descriptions and version numbers for your zomes and DNA's. Fill out all necessary fields and create the zomes and DNA's of your hApp.
-6. On the same page still, you can also give a name and version number to the UI that comes with the `.webhapp` file if it's a web app. The UI will be stored separately from the `.happ` file such that you may later associate a new "official UI" to the same happ release. You will be able to associate any UI of *anyone* to your happ release so **make sure to choose a unique enough name for the UI such that you will still recognize it amongst all other UI's**.
-7. Click on "Continue" and then set the appropriate "Name" for your release (e.g. v0.0.1, **this is the version name that participants will see when downloading your application**) as well as a changelog.
+6. On the same page still, you can also give a name and version number to the UI that comes with the `.webhapp` file if it's a web app. The UI will be stored separately from the `.happ` file such that you may later associate a new "official UI" to the same happ release. You will be able to associate any UI of *anyone* to your happ release so *make sure to choose a unique enough name for the UI such that you will still recognize it amongst all other UI's*.
+7. Click on "Continue" and then set the appropriate "Name" for your release (e.g. v0.0.1, *this is the version name that participants will see when downloading your application*) as well as a changelog.
 7. Review and save your hApp.
 8. Your app should now appear in the App Library.
 9. Now everything is ready locally but make sure to keep your Launcher open until another Launcher (on another peer's computer) can install the app. To be safe, wait for about 30 minutes at least.
@@ -138,6 +137,9 @@ To reset the launcher, you can execute a factory reset in the `Holochain Admin` 
 ## Developer Setup
 
 See [Developer Setup](/docs/dev-setup.md).
+
+## Final Note
+Have fun, it's peer-to-peer!
 
 
 ## License
