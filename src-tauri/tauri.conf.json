@@ -64,6 +64,9 @@
       },
       "dialog": {
         "all": true
+      },
+      "shell": {
+        "open": true
       }
     },
     "windows": [],
