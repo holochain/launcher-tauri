@@ -78,7 +78,9 @@ If you used the scaffolding tool to create your hApp, packaging it for the launc
 5. Package your Web-hApp with `hc web-app pack`, and publish it so that other users can download and install it.
 
 
-### Publishing and Updating an App to the DevHub
+### Publishing and Updating an App in the DevHub
+
+In order for your app to appear in the App Library within the Holochain Launcher, you need to publish it to the DevHub, which is itseld a Holochain app. Currently, the DevHub is installed by default in the Holochain Launcher.
 
 #### Publishing your app
 

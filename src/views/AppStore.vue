@@ -82,7 +82,7 @@
       <span style="margin-top: 8px"
         ><span
           style="cursor: pointer; text-decoration: underline;"
-          title="https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub"
+          title="https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-devhub"
           @click="howToPublish()"
           @keydown.enter="howToPublish()"
           tabindex="0"
@@ -259,7 +259,7 @@ export default defineComponent({
       installableApps: [],
       selectedAppBundlePath: undefined,
       howToPublishUrl:
-        "https://github.com/holochain/launcher#publishing-a-webhapp-to-the-devhub",
+        "https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-devhub",
       holochainId: undefined,
       holochainSelection: true,
       pollInterval: null,
