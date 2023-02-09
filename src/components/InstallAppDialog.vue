@@ -437,8 +437,8 @@ export default defineComponent({
       try {
         this.installing = true;
 
-        console.log("@InstallAppDialog: guiReleaseHash: ", this.guiReleaseHash);
-        console.log("@InstallAppDialog: happReleaseHash: ", this.happReleaseHash);
+        // console.log("@InstallAppDialog: guiReleaseHash: ", this.guiReleaseHash);
+        // console.log("@InstallAppDialog: happReleaseHash: ", this.happReleaseHash);
 
         await invoke("install_app", {
           appId,

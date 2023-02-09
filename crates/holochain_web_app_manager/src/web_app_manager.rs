@@ -92,7 +92,7 @@ impl WebAppManager {
     // Assuming only one single default UI per app at the moment.
     let default_ui_name = String::from("default");
 
-    println!("Installing webhapp. Hashes: {:?}, {:?}", happ_release_hash, gui_release_hash);
+    // println!("Installing webhapp. Hashes: {:?}, {:?}", happ_release_hash, gui_release_hash);
 
     // Try to write hashes first so if that fails, don't even install the app
     match (happ_release_hash, gui_release_hash.clone()) {
@@ -482,7 +482,7 @@ impl WebAppManager {
         .map_err(|e| format!("Failed to rename .happrelease file to .happrelease.previous file: {:?}", e))?;
     }
 
-    println!("Storing happ release hash to the following path: {:?}", dot_happrelease_path);
+    // println!("Storing happ release hash to the following path: {:?}", dot_happrelease_path);
 
     std::fs::write(dot_happrelease_path, hash)
       .map_err(|e| format!("Failed to write happ release hash to .happrelease file: {:?}", e))
@@ -506,7 +506,7 @@ impl WebAppManager {
         .map_err(|e| format!("Failed to rename .guirelease file to .guirelease.previous file: {:?}", e))?;
     }
 
-    println!("Storing GUI release hash to the following path: {:?}", dot_guirelease_path);
+    // println!("Storing GUI release hash to the following path: {:?}", dot_guirelease_path);
 
     std::fs::write(dot_guirelease_path, hash)
       .map_err(|e| format!("Failed to write GUI release hash to .guirelease file: {:?}", e))

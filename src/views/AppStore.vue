@@ -381,8 +381,8 @@ export default defineComponent({
       const happReleaseHash = release.id;
       const guiReleaseHash = release.content.official_gui!;  // releases without official_gui have been filtered out earlier
 
-      console.log("@AppStore: happReleaseHash: ", happReleaseHash);
-      console.log("@AppStore: guiReleaseHash: ", guiReleaseHash);
+      // console.log("@AppStore: happReleaseHash: ", happReleaseHash);
+      // console.log("@AppStore: guiReleaseHash: ", guiReleaseHash);
 
       let bytes = undefined;
 

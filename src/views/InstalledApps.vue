@@ -224,20 +224,20 @@ export default defineComponent({
       }
     },
     async startApp(app: HolochainAppInfo) {
-      console.log("@InstalledApps: RECEIVED REQUEST TO START APP.");
+      // console.log("@InstalledApps: RECEIVED REQUEST TO START APP.");
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
-      console.log("@InstalledApps: @startApp: appId: ", appId);
+      // console.log("@InstalledApps: @startApp: appId: ", appId);
 
       // StartApp is not available anymore in conductor API since 0.1.0-beta-rc.4: https://github.com/holochain/holochain/blob/develop/crates/holochain_conductor_api/CHANGELOG.md#010-beta-rc4
       // instead disable app followed by enable app:
       try {
-        console.log("@InstalledApps: @startApp: disabling app.");
+        // console.log("@InstalledApps: @startApp: disabling app.");
 
         await invoke("disable_app", { appId, holochainId: app.holochainId });
-        console.log("@InstalledApps: @startApp: app disabled, enabling app.");
+        // console.log("@InstalledApps: @startApp: app disabled, enabling app.");
 
         await invoke("enable_app", { appId, holochainId: app.holochainId });
-        console.log("@InstalledApps: @startApp: app enabled.");
+        // console.log("@InstalledApps: @startApp: app enabled.");
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 

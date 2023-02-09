@@ -442,8 +442,6 @@ export default defineComponent({
         );
       }
 
-      console.log("### Sorted apps list: ", sortedAppList);
-
       return sortedAppList;
     },
     noHeadlessApps(): boolean {
@@ -483,10 +481,10 @@ export default defineComponent({
       // check for GUI updates
       const allApps: Array<HolochainAppInfo> = this.$store.getters["allApps"];
       const allHappReleaseHashes = allApps.map((app) => app.webAppInfo.happ_release_hash ? decodeHashFromBase64(app.webAppInfo.happ_release_hash) : undefined);
-      console.log("@InstalledAppsList: allHappReleaseHashes from store's allApps: ", allHappReleaseHashes);
+      // console.log("@InstalledAppsList: allHappReleaseHashes from store's allApps: ", allHappReleaseHashes);
       const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByEntryHashes((this.appWebsocket! as AppWebsocket), this.devhubAppInfo!, allHappReleaseHashes);
 
-      console.log("@InstalledAppsList: happReleaseHashes: ", happReleases);
+      // console.log("@InstalledAppsList: happReleaseHashes: ", happReleases);
 
       // compare with existing
 
@@ -504,14 +502,14 @@ export default defineComponent({
         }
       });
 
-      console.log("@InstalledAppsLlist: extendedAppInfos: ", extendedAppInfos);
+      // console.log("@InstalledAppsLlist: extendedAppInfos: ", extendedAppInfos);
 
       this.extendedAppInfos = extendedAppInfos;
     },
     async openUpdateGuiDialog(app: HolochainAppInfoExtended) {
       this.selectedApp = app;
 
-      console.log("Gui release hash @openUpdateGuiDialog: ", app.guiUpdateAvailable);
+      // console.log("Gui release hash @openUpdateGuiDialog: ", app.guiUpdateAvailable);
       (this.$refs.updateGuiDialog as typeof HCGenericDialog).open();
 
       if (this.appWebsocket && this.devhubAppInfo) {
@@ -528,7 +526,7 @@ export default defineComponent({
         });
 
         this.selectedGuiUpdate = guiReleaseResponse.payload.content;
-        console.log("Got GUI Release: ", guiReleaseResponse.payload.content);
+        // console.log("Got GUI Release: ", guiReleaseResponse.payload.content);
       } else {
         alert!("Error: AppWebsocket or DevHub AppInfo undefined.")
         this.selectedGuiUpdate = undefined;
