@@ -45,7 +45,6 @@ pub fn happ_window_builder<'a>(
   // attempted to be downloaded via an anchor tag
   #[cfg(target_os = "macos")]
   let anchor_event_listener = r#"window.addEventListener("click", (e) => {
-    // in case of anchor tags within shadow DOM
     const maybeHref = e.composedPath()[0].href;
 
     if (maybeHref) {
