@@ -240,6 +240,7 @@ export default defineComponent({
   box-shadow: 0 0px 5px #9b9b9b;
   /* border: 2px solid #e1e1e1; */
   padding: 9px 20px 20px 25px;
+  margin: 12px 0;
 }
 
 .highlighted {

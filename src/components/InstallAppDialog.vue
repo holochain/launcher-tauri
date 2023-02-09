@@ -148,7 +148,7 @@
             style="margin-top: 10px; display: flex; flex: 1"
             :cols="32"
             label="Membrane Proof"
-            helper="Check with the author if this is required."
+            helper="Check with the author whether this is required."
             @input="membraneProofs[appRole.name] = $event.target.value"
           />
         </div>
