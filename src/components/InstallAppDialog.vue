@@ -451,12 +451,14 @@ export default defineComponent({
           guiReleaseHash: this.guiReleaseHash,
         });
 
-        this.installing = false;
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
         this.showMessage(`Installed ${this.appId}`);
 
         this.$emit("app-installed", this.appId);
+
+        this.installing = false;
+
       } catch (e) {
         console.log("Error installing the app: ", e);
         this.showMessage(`Error installing app: ${JSON.stringify(e)}`);
