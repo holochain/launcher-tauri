@@ -1,6 +1,6 @@
 # Holochain Launcher
 
-A cross-platform executable that launches a local Holochain conductor, and lets you install and run Holochain apps.
+A cross-platform executable that launches a local Holochain conductor, and lets you install and run [Holochain](https://www.holochain.org) apps.
 
 > Feedback is more than welcome in the [issues section](https://github.com/holochain/launcher/issues).
 
@@ -41,17 +41,12 @@ WARNING! If you lose this password, you will also lose access any data from your
 
 ### Installing a Holochain App (hApp)
 
-When you are on the `Installed Apps` section, click `Install New App`. This will bring up the `App Store`, from which you can:
+When you are on the `Installed Apps` section, click `Install New App`. This will bring up the `App Library`, from where you can:
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.a) Install an application from the list of published applications.
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;or
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.b) Select Application from the FileSystem.
-
-2. Set a unique `AppId` for the app, and click install. It may take a while.
+1. Install an application from the list of published applications or install one from your file system.
+2. Choose a unique `AppId` for the app, optionally enter a network seed and click install. It may take a while.
    > This AppId only needs to be unique inside your Holochain Launcher, it doesn't affect other users.
-3. When the installation is finished, the happ will appear in the list of active happs.
+3. When the installation is finished, the hApp will appear in the list of active hApps.
 4. Click on the icon that says "Open App" when hovering over it to open the app in a new window.
 
 
