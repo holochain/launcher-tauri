@@ -82,7 +82,7 @@
       <span style="margin-top: 8px"
         ><span
           style="cursor: pointer; text-decoration: underline;"
-          title="https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-devhub"
+          :title="howToPublishUrl"
           @click="howToPublish()"
           @keydown.enter="howToPublish()"
           tabindex="0"
