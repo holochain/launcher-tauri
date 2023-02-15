@@ -5,9 +5,14 @@ use holochain_types::prelude::ZomeCallUnsigned;
 use holochain_launcher_utils::zome_call_signing::ZomeCallUnsignedTauri;
 
 
+// // I need a mapping between window label and agent public key
+// HashMap<String, AgentPubKey> where the string is HolochainVersionId.into::<String>()
+
 #[tauri::command]
 pub async fn sign_zome_call(
-  state: tauri::State<'_, LauncherState>,
+  window: tauri::Window,
+  launcher_state: tauri::State<'_, LauncherState>,
+  // state storing the information about what app id is associated with what window label
   // lair_keystore_manager: T<LairKeystoreManager>,
   zome_call_unsigned: ZomeCallUnsignedTauri,
 ) -> Result<ZomeCall, String> {
@@ -16,9 +21,16 @@ pub async fn sign_zome_call(
   //   () // this function is allowed to be called in any window
   // }
 
+  // validate that the agent public key added to the ZomeCallUnsigned field is actually
+  // one associated to the UI that's making the call
+
+  // get the agent public key associated to the tauri window that makes the call
+
+
+
   let zome_call_unsigned_converted: ZomeCallUnsigned = zome_call_unsigned.into();
 
-  let mut mutex = (*state).lock().await;
+  let mut mutex = (*launcher_state).lock().await;
   let manager = mutex.get_running()?;
 
   let lair_keystore_manager = manager.get_lair_keystore_manager()?;

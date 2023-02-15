@@ -4,8 +4,10 @@
 )]
 use file_system::{profile_holochain_data_dir, profile_tauri_dir};
 use futures::lock::Mutex;
+use hdk::prelude::AgentPubKey;
 use launcher::error::LauncherError;
 use running_state::RunningState;
+use std::collections::HashMap;
 use std::path::Path;
 use std::sync::Arc;
 use tauri::AppHandle;
@@ -142,6 +144,9 @@ fn main() {
         .initialization_script("window.__HC_LAUNCHER_ENV__ = {}")
         .build()?;
 
+      // manage the state of pubkeys associated to tauri windows. The keys of this hashmap are window labels
+      let mut pubkey_store: Arc<Mutex<HashMap<String, AgentPubKey>>> = Arc::new(Mutex::new(HashMap::new()));
+      app.manage(pubkey_store);
 
       let handle = app.handle().clone();
       let launcher_state =

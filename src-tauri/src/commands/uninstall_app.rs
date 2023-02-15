@@ -1,5 +1,6 @@
-use crate::launcher::{state::LauncherState, manager::HolochainId, manager::derive_window_label};
+use crate::launcher::{state::LauncherState, manager::HolochainId};
 use tauri::Manager;
+use holochain_web_app_manager::derive_window_label;
 
 #[tauri::command]
 pub async fn uninstall_app(
@@ -17,14 +18,14 @@ pub async fn uninstall_app(
   let manager = mutex.get_running()?;
 
   manager
-    .get_web_happ_manager(holochain_id)?
+    .get_web_happ_manager(holochain_id.clone())?
     .uninstall_app(app_id.clone())
     .await?;
 
   manager.on_apps_changed().await?;
 
   // close existing window belonging to that app if there is one
-  let window_label = derive_window_label(&app_id);
+  let window_label = derive_window_label(&app_id, &holochain_id.into());
   if let Some(w) = app_handle.get_window(window_label.as_str()) {
     w.close().map_err(|e| format!("Failed to close app window after uninstalling app: {:?}", e))?;
   }

@@ -12,6 +12,7 @@ holochain_manager = {path = "../holochain_manager"}
 lair_keystore_manager = {path = "../lair_keystore_manager"}
 
 fs_extra = "1.2.0"
+futures = "0.3"
 log = "0.4.14"
 portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}
