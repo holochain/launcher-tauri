@@ -2,7 +2,7 @@
 
 // use holochain_types::prelude::InstalledAppId;
 // use std::path::Path;
-use holochain_cli_sandbox::calls::{attach_app_interface, AddAppWs};
+use holochain_cli_sandbox::calls::{attach_app_interface, AddAppWs, InstallApp, Call, AdminRequestCli};
 use holochain_cli_sandbox::run::run_async;
 use holochain_cli_sandbox::CmdRunner;
 use holochain_launcher_utils::window_builder::UISource;
@@ -13,7 +13,7 @@ use tokio::process::Child;
 
 use crate::launch_tauri::launch_tauri;
 use crate::prepare_webapp;
-use holochain_cli_sandbox::cmds::Create;
+use holochain_cli_sandbox::cmds::{Create, Existing};
 
 
 #[derive(Debug, StructOpt)]
@@ -33,6 +33,25 @@ pub struct HcLaunch {
   /// a UI path must be specified via --ui-path or a port pointing to a localhost
   /// server via --ui-port.
   path: Option<PathBuf>,
+
+
+  /// Install and run the app into already running conductors.
+  /// The number of sandboxes cannot be specified if this flag is used
+  /// since the app will just be installed into all existing conductors.
+  #[structopt(long)]
+  reuse_conductors: bool,
+
+  /// Install the app with a specific network seed.
+  /// This option can currently only be used with the `--reuse-conductors` flag.
+  #[structopt(long)]
+  network_seed: Option<String>,
+
+  /// Install the app with a specific app id. By default the app id is derived
+  /// from the name of the .webhapp/.happ file that you pass but this option allows
+  /// you to set it explicitly.
+  #[structopt(long)]
+  app_id: Option<String>,
+
 
   #[structopt(long)]
   /// Port pointing to a localhost server that serves your assets.
@@ -70,6 +89,21 @@ impl HcLaunch {
       (None, None) => None,
     };
 
+    match (self.reuse_conductors, self.create.num_sandboxes != 1) {
+      (true, true) => {
+        eprintln!("[hc launch] WARNING: If you pass the --reuse-conductors flag the -n (--num-sandboxes) argument will be ignored.");
+      },
+      _ => (),
+    }
+
+    match (self.reuse_conductors, self.network_seed.clone()) {
+      (false, Some(_seed)) => {
+        eprintln!("[hc launch] ERROR: The --network-seed option can currently only be taken into account when installing the app to already running conductors with the --reuse-conductors flag.");
+        panic!("ERROR: The --network-seed option can currently only be taken into account when installing the app to already running conductors with the --reuse-conductors flag.");
+      },
+      _ => (),
+    }
+
     if let Some(_port) = self.ui_port {
       println!("\n[hc launch] ------ WARNING ------");
       println!(r#"[hc launch] You are running hc launch pointing to a localhost server. This is meant for development purposes
@@ -99,41 +133,87 @@ impl HcLaunch {
                   }
                 };
 
-                // extraxt filename of .webhapp
-                let app_id = p.as_path().file_stem().unwrap().to_str().unwrap();
-                let happ_file_name = format!("{}.happ", app_id);
+                // extraxt filename of .webhapp if required
+                let app_id = match self.app_id.clone() {
+                  Some(id) => id,
+                  None => p.as_path().file_stem().unwrap().to_str().unwrap().to_string(),
+                };
 
-                // generate agents
+                let happ_file_name = format!("{}.happ", p.as_path().file_stem().unwrap().to_str().unwrap());
+
                 let happ_path = temp_folder.join(happ_file_name);
 
-                // clean existing sandboxes
-                holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
+                if self.reuse_conductors {
 
-                // spawn sandboxes
-                println!("[hc launch] Spawning sandbox conductors.");
-                let child_processes = spawn_sandboxes(
-                  &self.holochain_path,
-                  happ_path,
-                  self.create,
-                  app_id.to_string(),
-                ).await?;
+                  // read the .hc file to get the existing sandbox directories
+                  let pwd = std::env::current_dir().unwrap();
+                  let dot_hc_path = pwd.join(".hc");
+
+                  let dot_hc_content = match std::fs::read_to_string(dot_hc_path) {
+                    Ok(p) => p,
+                    Err(e) => {
+                      println!("[hc launch] ERROR: Failed to read content of .hc file: {}", e);
+                      panic!("Failed to read content of .hc file: {}", e);
+                    }
+                  };
+
+                  let existing_paths = dot_hc_content
+                    .lines()
+                    .map(|path_str| PathBuf::from(path_str))
+                    .collect::<Vec<PathBuf>>();
+
+
+                  let running_ports = get_running_ports(pwd, existing_paths.len());
+
+                  let install_app = InstallApp {
+                    app_id: Some(String::from(app_id.clone())),
+                    agent_key: None,
+                    path: happ_path,
+                    network_seed: self.network_seed,
+                  };
+
+                  let call = Call {
+                    running: running_ports,
+                    existing: Existing {
+                      existing_paths: vec![],
+                      all: true,
+                      last: false,
+                      indices: vec![],
+                    },
+                    call: AdminRequestCli::InstallApp(install_app),
+                  };
+
+                  holochain_cli_sandbox::calls::call(&self.holochain_path, call).await?;
+
+                } else {
+                  // clean existing sandboxes
+                  holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
+
+                  // spawn sandboxes
+                  println!("[hc launch] Spawning sandbox conductors.");
+                  let child_processes = spawn_sandboxes(
+                    &self.holochain_path,
+                    happ_path,
+                    self.create,
+                    app_id.to_string(),
+                  ).await?;
+
+                  tauri::async_runtime::spawn(async move {
+                    tokio::signal::ctrl_c().await.unwrap();
+                    holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
+                    println!("Released ports.");
+                    temp_dir.close().unwrap();
+                    // killing child processes
+                    for (mut holochain_process, mut lair_process) in child_processes {
+                      holochain_process.start_kill().unwrap();
+                      lair_process.start_kill().unwrap();
+                    }
+                    println!("Killed holochain processes, press Ctrl+C to quit.");
+                    std::process::exit(0);
+                  });
+                }
 
                 let passphrase = holochain_util::pw::pw_get()?;
-
-                tauri::async_runtime::spawn(async move {
-                  tokio::signal::ctrl_c().await.unwrap();
-                  holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
-                  println!("Released ports.");
-                  temp_dir.close().unwrap();
-                  // killing child processes
-                  for (mut holochain_process, mut lair_process) in child_processes {
-                    holochain_process.start_kill().unwrap();
-                    lair_process.start_kill().unwrap();
-                  }
-                  println!("Killed holochain processes, press Ctrl+C to quit.");
-                  std::process::exit(0);
-                });
-
 
                 // spawn tauri windows
                 let ui_source = match maybe_ui_source {
@@ -147,7 +227,6 @@ impl HcLaunch {
                   while !ui_p.exists() {
                     println!("[hc launch] You specified a dedicated UI path to use instead of the UI of the .webhapp file but this path does not exist (yet). Waiting before launching tauri windows...");
                     tokio::time::sleep(std::time::Duration::from_secs(2)).await;
-                    // return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
                   }
                 }
 
@@ -160,26 +239,82 @@ impl HcLaunch {
                 match maybe_ui_source {
                   Some(ui_source) => {
 
-                    // extraxt filename of .happ
-                    let app_id = p.clone().as_path().file_stem().unwrap().to_str().unwrap().to_string();
+                    // extraxt filename of .happ if required
+                    let app_id = match self.app_id.clone() {
+                      Some(id) => id,
+                      None => p.as_path().file_stem().unwrap().to_str().unwrap().to_string(),
+                    };
 
-                    // clean existing sandboxes
-                    holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
+                    if self.reuse_conductors {
 
-                    // spawn sandboxes
-                    println!("[hc launch] Spawning sandbox conductors.");
-                    let _child_processes = spawn_sandboxes(
-                      &self.holochain_path,
-                      p,
-                      self.create,
-                      app_id.clone(),
-                    ).await?;
+                      // read the .hc file to get the existing sandbox directories
+                      let pwd = std::env::current_dir().unwrap();
+                      let dot_hc_path = pwd.join(".hc");
 
-                    tauri::async_runtime::spawn(async move {
-                      tokio::signal::ctrl_c().await.unwrap();
-                      holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
-                      std::process::exit(0);
-                    });
+                      let dot_hc_content = match std::fs::read_to_string(dot_hc_path) {
+                        Ok(p) => p,
+                        Err(e) => {
+                          println!("[hc launch] ERROR: Failed to read content of .hc file: {}", e);
+                          panic!("Failed to read content of .hc file: {}", e);
+                        }
+                      };
+
+                      let existing_paths = dot_hc_content
+                        .lines()
+                        .map(|path_str| PathBuf::from(path_str))
+                        .collect::<Vec<PathBuf>>();
+
+                      let running_ports = get_running_ports(pwd, existing_paths.len());
+
+                      let install_app = InstallApp {
+                        app_id: Some(String::from(app_id.clone())),
+                        agent_key: None,
+                        path: p,
+                        network_seed: self.network_seed,
+                      };
+
+                      let call = Call {
+                        running: running_ports,
+                        existing: Existing {
+                          existing_paths: vec![],
+                          all: true,
+                          last: false,
+                          indices: vec![],
+                        },
+                        call: AdminRequestCli::InstallApp(install_app),
+                      };
+
+                      holochain_cli_sandbox::calls::call(&self.holochain_path, call).await?;
+
+                    } else {
+                      // clean existing sandboxes
+                      holochain_cli_sandbox::save::clean(std::env::current_dir()?, Vec::new())?;
+
+                      // spawn sandboxes
+                      println!("[hc launch] Spawning sandbox conductors.");
+                      let child_processes = spawn_sandboxes(
+                        &self.holochain_path,
+                        p,
+                        self.create,
+                        app_id.clone(),
+                      ).await?;
+
+
+                      tauri::async_runtime::spawn(async move {
+                        tokio::signal::ctrl_c().await.unwrap();
+                        holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
+                        println!("Released ports.");
+
+                        // killing child processes
+                        for (mut holochain_process, mut lair_process) in child_processes {
+                          holochain_process.start_kill().unwrap();
+                          lair_process.start_kill().unwrap();
+                        }
+                        println!("Killed holochain processes, press Ctrl+C to quit.");
+                        std::process::exit(0);
+                      });
+
+                    }
 
                     let passphrase = holochain_util::pw::pw_get()?;
 
@@ -189,7 +324,6 @@ impl HcLaunch {
                       while !ui_p.exists() {
                         println!("[hc launch] Specified UI path does not exist (yet). Waiting before launching tauri windows...");
                         tokio::time::sleep(std::time::Duration::from_secs(2)).await;
-                        // return Err(anyhow::Error::from(HcLaunchError::UiPathDoesNotExist(format!("{}", ui_p.to_str().unwrap()))));
                       }
                     }
 
@@ -316,4 +450,44 @@ pub async fn run(
   println!("Connected successfully to a running holochain");
   let _e = format!("Failed to run holochain at {}", sandbox_path.display());
   Ok((holochain, lair))
+}
+
+
+/// Reads the contents of the .hc_live_{n} files in the given path where n is 0 to n_expected
+pub fn get_running_ports(path: PathBuf, n_expected: usize) -> Vec<u16> {
+  let mut running_ports = Vec::new();
+
+  // get ports of running conductors from .hc_live and if there are none, throw an error.
+  for n in 0..n_expected {
+    let dot_hc_live_path = path.join(format!(".hc_live_{}", n));
+
+    let admin_port = match std::fs::read_to_string(dot_hc_live_path) {
+      Ok(p) => p,
+      Err(e) => {
+        match n {
+          0 => {
+            println!("[hc launch] ERROR: No running sandbox conductors found. If you use the --reuse-conductors flag there need to be existing sandbox conductors running.\n {}", e);
+            panic!("ERROR: No running snadbox conductors found. If you use the --reuse-conductors flag there need to be existing sandbox conductors running.\n {}", e);
+          },
+          _ => {
+            println!("[hc launch] ERROR: Not enough running sandbox conductors found. If you use the --reuse-conductors flag there need to be as many running sandbox conductors as mentioned in the .hc file.\n {}", e);
+            panic!("ERROR: No running snadbox conductors found. If you use the --reuse-conductors flag there need to be as many running sandbox conductors as mentioned in the .hc file.\n {}", e);
+          }
+        }
+      }
+    };
+
+    let admin_port = match admin_port.trim().parse::<u16>() {
+      Ok(u) => u,
+      Err(e) => {
+        println!("[hc launch] ERROR: Failed to convert admin port from String to u16: {}", e);
+        panic!("Failed to convert admin port from String to u16: {}", e);
+      }
+    };
+
+    running_ports.push(admin_port);
+  }
+
+  running_ports
+
 }
