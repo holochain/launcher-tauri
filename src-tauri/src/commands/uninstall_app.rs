@@ -25,7 +25,7 @@ pub async fn uninstall_app(
   manager.on_apps_changed().await?;
 
   // close existing window belonging to that app if there is one
-  let window_label = derive_window_label(&app_id, &holochain_id.into());
+  let window_label = derive_window_label(&app_id);
   if let Some(w) = app_handle.get_window(window_label.as_str()) {
     w.close().map_err(|e| format!("Failed to close app window after uninstalling app: {:?}", e))?;
   }

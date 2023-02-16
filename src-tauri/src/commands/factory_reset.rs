@@ -1,4 +1,4 @@
-use std::{fs, io, path::PathBuf};
+use std::{fs, io, path::PathBuf, sync::Arc};
 
 use tauri::{api::process::kill_children, Manager};
 
@@ -123,7 +123,7 @@ pub async fn execute_factory_reset(
 
 
 
-  let manager_launch = LauncherManager::launch(app_handle, profile.clone()).await;
+  let manager_launch = LauncherManager::launch(Arc::new(app_handle), profile.clone()).await;
 
   let mut maybe_error: Option<LauncherError> = None;
 

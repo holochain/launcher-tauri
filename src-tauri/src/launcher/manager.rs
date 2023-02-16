@@ -56,7 +56,7 @@ impl Into<String> for HolochainId {
 }
 
 impl HolochainId {
-  fn to_string(self) -> String {
+  fn to_string(&self) -> String {
     match self {
       HolochainId::HolochainVersion(version) => version.to_string(),
       HolochainId::CustomBinary => String::from("Custom Binary"),
@@ -67,7 +67,7 @@ impl HolochainId {
 
 
 pub struct LauncherManager {
-  app_handle: AppHandle,
+  app_handle: Arc<AppHandle>,
   config: LauncherConfig,
 
   pub holochain_managers:
@@ -78,7 +78,7 @@ pub struct LauncherManager {
 }
 
 impl LauncherManager {
-  pub async fn launch(app_handle: AppHandle, profile: Profile) -> Result<Self, LauncherError> {
+  pub async fn launch(app_handle: Arc<AppHandle>, profile: Profile) -> Result<Self, LauncherError> {
 
     create_dir_if_necessary(&profile_lair_dir(profile.clone())?)?;
     create_dir_if_necessary(&profile_holochain_data_dir(profile.clone())?)?;
@@ -261,9 +261,9 @@ impl LauncherManager {
 
     let admin_window = self.app_handle.get_window("admin").unwrap();
 
-    let pubkey_map = &mut self.app_handle.state::<Arc<Mutex<HashMap<String, AgentPubKey>>>>();
+    // let mut pubkey_map = self.app_handle.state::<Arc<Mutex<HashMap<String, AgentPubKey>>>>();
 
-    let state = match WebAppManager::launch(version, config, pubkey_map, password).await {
+    let state = match WebAppManager::launch(version, config, self.app_handle.clone(), password).await {
       Ok(mut manager) => match version.eq(&HolochainVersion::default()) {
         true => match install_default_apps_if_necessary(&mut manager, admin_window).await {
           Ok(()) => {
@@ -442,7 +442,7 @@ impl LauncherManager {
 
   pub fn open_app(&mut self, holochain_id: HolochainId, app_id: &String) -> Result<(), String> {
 
-    let window_label = derive_window_label(&app_id, &holochain_id.to_string());
+    let window_label = derive_window_label(&app_id);
 
     // Iterate over the open windows, focus if the app is already open
 

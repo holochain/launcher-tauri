@@ -14,6 +14,7 @@ use holochain_manager::{
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use serde::{Serialize, Deserialize};
 use futures::lock::Mutex;
+use tauri::{AppHandle, Manager};
 use std::{
   collections::HashMap,
   fs::{self, File},
@@ -33,7 +34,8 @@ use crate::{
 
 pub struct WebAppManager {
   environment_path: PathBuf,
-  pubkey_map: &'static mut tauri::State<'static, Arc<Mutex<HashMap<String, AgentPubKey>>>>, // mapping of public keys to tauri window label
+  app_handle: Arc<AppHandle>,
+  // pubkey_map: tauri::State<'static, Arc<Mutex<HashMap<String, AgentPubKey>>>>, // mapping of public keys to tauri window label
   pub holochain_manager: HolochainManager,
   allocated_ports: HashMap<String, u16>,
 }
@@ -42,7 +44,8 @@ impl WebAppManager {
   pub async fn launch(
     version: HolochainVersion,
     mut config: LaunchHolochainConfig,
-    pubkey_map: &'static mut tauri::State<'static, Arc<Mutex<HashMap<String, AgentPubKey>>>>,
+    // pubkey_map: tauri::State<'static, Arc<Mutex<HashMap<String, AgentPubKey>>>>,
+    app_handle: Arc<AppHandle>,
     password: String,
   ) -> Result<Self, LaunchWebAppManagerError> {
     let environment_path = config.environment_path.clone();
@@ -63,7 +66,7 @@ impl WebAppManager {
     // Fetch the running apps
     let mut manager = WebAppManager {
       holochain_manager,
-      pubkey_map,
+      app_handle,
       environment_path,
       allocated_ports: HashMap::new(),
     };
@@ -370,12 +373,11 @@ impl WebAppManager {
     let mut updated_pubkey_map: HashMap<String, AgentPubKey> = HashMap::new();
     // update agent public key to tauri window label mapping
     for app_info in installed_apps.clone() {
-      let holochain_id = self.holochain_manager.version.to_string();
-      let window_label = derive_window_label(&app_info.installed_app_id, &holochain_id);
+      let window_label = derive_window_label(&app_info.installed_app_id);
       updated_pubkey_map.insert(window_label, app_info.agent_pub_key);
     }
 
-    *self.pubkey_map.lock().await = updated_pubkey_map;
+    *self.app_handle.state::<Arc<Mutex<HashMap<String, AgentPubKey>>>>().lock().await = updated_pubkey_map;
 
     self.allocate_necessary_ports(&installed_apps);
 
@@ -552,12 +554,11 @@ impl WebAppManager {
 
 /// Derives the window label from the app id and the holochain id
 /// The window label will be of the format [holochain version]#[app id with some special characters removed]
-pub fn derive_window_label(app_id: &String, holochain_id: &String) -> String {
+pub fn derive_window_label(app_id: &String) -> String {
   // !! it is important to have the window label not be uniquely defined by the app id to ensure
   // it's possible to unambiguously differentiate this window from the admin window !!
-  let mut window_label: String = holochain_id.to_owned().into();
-  window_label.push_str("#");
-  window_label.push_str(app_id.clone().replace("-", "--").replace(" ", "-").replace(".", "_").as_str());
+  let mut window_label = app_id.clone().replace("-", "--").replace(" ", "-").replace(".", "_");
+  window_label.push_str("--EXTERNAL");
   window_label
 }
 

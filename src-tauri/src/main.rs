@@ -145,10 +145,10 @@ fn main() {
         .build()?;
 
       // manage the state of pubkeys associated to tauri windows. The keys of this hashmap are window labels
-      let mut pubkey_store: Arc<Mutex<HashMap<String, AgentPubKey>>> = Arc::new(Mutex::new(HashMap::new()));
+      let pubkey_store: Arc<Mutex<HashMap<String, AgentPubKey>>> = Arc::new(Mutex::new(HashMap::new()));
       app.manage(pubkey_store);
 
-      let handle = app.handle().clone();
+      let handle = Arc::new(app.handle());
       let launcher_state =
         tauri::async_runtime::block_on(async move { launch_manager(handle, profile).await });
 
@@ -170,7 +170,7 @@ fn main() {
   }
 }
 
-async fn launch_manager(app_handle: AppHandle, profile: Profile) -> RunningState<LauncherManager, LauncherError> {
+async fn launch_manager(app_handle: Arc<AppHandle>, profile: Profile) -> RunningState<LauncherManager, LauncherError> {
   let holochain_dir = match profile_holochain_data_dir(profile.clone()) {
     Ok(dir) => dir,
     Err(e) => {
