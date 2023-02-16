@@ -1,7 +1,9 @@
+use futures::lock::Mutex;
+use hdk::prelude::AgentPubKey;
 use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
 use holochain_manager::config::LaunchHolochainConfig;
 use holochain_manager::errors::{LaunchHolochainError, InitializeConductorError};
-use holochain_web_app_manager::error::LaunchWebAppManagerError;
+use holochain_web_app_manager::{error::LaunchWebAppManagerError, derive_window_label};
 use lair_keystore_manager::error::{LairKeystoreError, LaunchChildError};
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use lair_keystore_manager::versions::v0_2::LairKeystoreManagerV0_2;
@@ -9,6 +11,7 @@ use lair_keystore_manager::LairKeystoreManager;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;
+use std::sync::Arc;
 use tauri::api::process::Command;
 use tauri::{AppHandle, Manager, PhysicalSize};
 use tauri::{CustomMenuItem, Menu, Submenu};
@@ -35,6 +38,7 @@ pub enum KeystoreStatus {
   LaunchKeystoreError(LairKeystoreError),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "type", content = "content")]
 pub enum HolochainId {
@@ -42,8 +46,28 @@ pub enum HolochainId {
   CustomBinary,
 }
 
+impl Into<String> for HolochainId {
+  fn into(self) -> String {
+    match self {
+      HolochainId::HolochainVersion(version) => version.to_string(),
+      HolochainId::CustomBinary => String::from("Custom Binary"),
+    }
+  }
+}
+
+impl HolochainId {
+  fn to_string(&self) -> String {
+    match self {
+      HolochainId::HolochainVersion(version) => version.to_string(),
+      HolochainId::CustomBinary => String::from("Custom Binary"),
+    }
+  }
+}
+
+
+
 pub struct LauncherManager {
-  app_handle: AppHandle,
+  app_handle: Arc<AppHandle>,
   config: LauncherConfig,
 
   pub holochain_managers:
@@ -54,7 +78,7 @@ pub struct LauncherManager {
 }
 
 impl LauncherManager {
-  pub async fn launch(app_handle: AppHandle, profile: Profile) -> Result<Self, LauncherError> {
+  pub async fn launch(app_handle: Arc<AppHandle>, profile: Profile) -> Result<Self, LauncherError> {
 
     create_dir_if_necessary(&profile_lair_dir(profile.clone())?)?;
     create_dir_if_necessary(&profile_holochain_data_dir(profile.clone())?)?;
@@ -237,7 +261,9 @@ impl LauncherManager {
 
     let admin_window = self.app_handle.get_window("admin").unwrap();
 
-    let state = match WebAppManager::launch(version, config, password).await {
+    // let mut pubkey_map = self.app_handle.state::<Arc<Mutex<HashMap<String, AgentPubKey>>>>();
+
+    let state = match WebAppManager::launch(version, config, self.app_handle.clone(), password).await {
       Ok(mut manager) => match version.eq(&HolochainVersion::default()) {
         true => match install_default_apps_if_necessary(&mut manager, admin_window).await {
           Ok(()) => {
@@ -519,9 +545,3 @@ fn _set_window_size(window: tauri::window::Window, scaling_factor: f64) -> () {
     };
 }
 
-
-pub fn derive_window_label(app_id: &String) -> String {
-  let mut window_label = app_id.clone().replace("-", "--").replace(" ", "-").replace(".", "_");
-  window_label.push_str("---EXTERNAL"); // !! this line is required for security reasons, to unambiguously differentiate this window from the admin window !!
-  window_label
-}

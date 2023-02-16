@@ -1,5 +1,6 @@
-use crate::launcher::{state::LauncherState, manager::HolochainId, manager::derive_window_label};
+use crate::launcher::{state::LauncherState, manager::HolochainId};
 use tauri::Manager;
+use holochain_web_app_manager::derive_window_label;
 
 #[tauri::command]
 pub async fn uninstall_app(
@@ -17,7 +18,7 @@ pub async fn uninstall_app(
   let manager = mutex.get_running()?;
 
   manager
-    .get_web_happ_manager(holochain_id)?
+    .get_web_happ_manager(holochain_id.clone())?
     .uninstall_app(app_id.clone())
     .await?;
 
