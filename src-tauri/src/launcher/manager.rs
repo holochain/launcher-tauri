@@ -496,12 +496,18 @@ impl LauncherManager {
       // removing this for now since it behaves inconsistently
       // set_window_size(window, scaling_factor);
     } else {
-      let window = window_builder
+      window_builder = window_builder
         .menu(Menu::new().add_submenu(Submenu::new( // This overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
         "Settings",
         Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
-         )))
-        .build()
+         )));
+
+      // Window opens weirdly out of bounds on windows if not centered.
+      if cfg!(target_os = "windows"){
+        window_builder = window_builder.center();
+      }
+
+      let window = window_builder.build()
         .map_err(|err| format!("Error opening app: {:?}", err))?;
       // Listen to "open-devtools" command
       let a = self.app_handle.clone();
