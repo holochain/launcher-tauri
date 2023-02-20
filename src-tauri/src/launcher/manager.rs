@@ -474,6 +474,7 @@ impl LauncherManager {
       local_storage_path,
       app_port,
       admin_port,
+      true,
     );
 
     // needs to be removed in order for set_size() to work apparently

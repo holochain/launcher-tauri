@@ -28,6 +28,7 @@ pub fn happ_window_builder<'a>(
   local_storage_path: PathBuf,
   app_port: u16,
   admin_port: u16,
+  show_404: bool, // whether to show a 404 message (true) if the index.html cannot be found or default to tauri's index.html (false)
 ) -> WindowBuilder<'a> {
 
   let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
@@ -76,6 +77,13 @@ pub fn happ_window_builder<'a>(
   });
   "#;
 
+  let message_404 = r#"
+  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
+    <h1>404 Not Found.</h1>
+    <h3>Looks like this UI has no index.html</h3>
+  </div>
+  "#.as_bytes().to_vec();
+
   let url = match ui_source.clone() {
     UISource::Path(_path) => WindowUrl::App("".into()),
     UISource::Port(port) => WindowUrl::External(format!("http://localhost:{}", port).parse().unwrap()),
@@ -100,10 +108,12 @@ pub fn happ_window_builder<'a>(
               *mutable_response = index_html;
               response.set_mimetype(Some(String::from("text/html")));
             }, // TODO! Check if there are better ways of dealing with errors here
-            Err(_e) => {
-              ()
-              // println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
-              // log::error!("Error reading the path of the UI's index.html: {:?}", e);
+            Err(e) => {
+              if show_404 {
+                *mutable_response = message_404.clone();
+                response.set_mimetype(Some(String::from("text/html")));
+              }
+              log::error!("Error reading the path of the UI's index.html: {:?}", e);
             },
           }
         },
@@ -148,7 +158,10 @@ pub fn happ_window_builder<'a>(
                     response.set_mimetype(Some(String::from("text/html")));
                   },
                   Err(e) => {
-                    // println!("\n### ERROR ### Error reading the path of the UI's index.html: {:?}\n", e);
+                    if show_404 {
+                      *mutable_response = message_404.clone();
+                      response.set_mimetype(Some(String::from("text/html")));
+                    }
                     log::error!("Error reading the path of the UI's index.html: {:?}", e);
                   },
                 }

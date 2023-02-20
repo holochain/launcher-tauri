@@ -124,6 +124,7 @@ pub fn launch_tauri(
                   local_storage_dir.clone().join(format!("Agent-{}", app_counter)),
                   app_port,
                   admin_port,
+                  false,
                 )
               },
               UISource::Port(ui_port) => {
@@ -136,6 +137,7 @@ pub fn launch_tauri(
                   local_storage_dir.clone().join(format!("Agent-{}", app_counter)),
                   app_port,
                   admin_port,
+                  false,
                 )
               }
             };
