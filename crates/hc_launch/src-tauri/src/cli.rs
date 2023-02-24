@@ -149,6 +149,11 @@ impl HcLaunch {
                   let pwd = std::env::current_dir().unwrap();
                   let dot_hc_path = pwd.join(".hc");
 
+                  while !dot_hc_path.exists() {
+                    println!("[hc launch with --reuse-conductors] No existing sandbox conductors found (yet). Waiting for sandboxes...");
+                    tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                  }
+
                   let dot_hc_content = match std::fs::read_to_string(dot_hc_path) {
                     Ok(p) => p,
                     Err(e) => {
@@ -250,6 +255,11 @@ impl HcLaunch {
                       // read the .hc file to get the existing sandbox directories
                       let pwd = std::env::current_dir().unwrap();
                       let dot_hc_path = pwd.join(".hc");
+
+                      while !dot_hc_path.exists() {
+                        println!("[hc launch with --reuse-conductors] No existing sandbox conductors found (yet). Waiting for sandboxes...");
+                        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                      }
 
                       let dot_hc_content = match std::fs::read_to_string(dot_hc_path) {
                         Ok(p) => p,
@@ -460,6 +470,11 @@ pub fn get_running_ports(path: PathBuf, n_expected: usize) -> Vec<u16> {
   // get ports of running conductors from .hc_live and if there are none, throw an error.
   for n in 0..n_expected {
     let dot_hc_live_path = path.join(format!(".hc_live_{}", n));
+
+    while !dot_hc_live_path.exists() {
+      println!("[hc launch with --reuse-conductors] No *running* sandbox conductor found (yet). Waiting for running sandbox conductor(s)...");
+      std::thread::sleep(std::time::Duration::from_secs(2));
+    }
 
     let admin_port = match std::fs::read_to_string(dot_hc_live_path) {
       Ok(p) => p,
