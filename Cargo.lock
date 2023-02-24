@@ -2874,6 +2874,7 @@ dependencies = [
  "lair_keystore_api",
  "log",
  "mime_guess",
+ "open 2.1.3",
  "serde",
  "tauri",
 ]

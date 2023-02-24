@@ -30,8 +30,8 @@ mod running_state;
 mod setup;
 mod system_tray;
 
+
 use crate::commands::choose_version::get_supported_versions;
-use crate::commands::open_app::open_url_cmd;
 use crate::commands::open_app::report_issue_cmd;
 use crate::commands::save_app::save_app;
 // use crate::commands::start_app::start_app;
@@ -88,7 +88,7 @@ fn main() {
       get_supported_versions,
       uninstall_app,
       get_app_info,
-      open_url_cmd,
+      holochain_launcher_utils::shared_commands::open_url_cmd,
       // start_app,
       execute_factory_reset,
       restart,

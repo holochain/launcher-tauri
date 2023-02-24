@@ -24,6 +24,7 @@ lair_keystore_api = "0.2.3"
 
 log = "0.4.14"
 mime_guess = "2.0.4"
+open = "2.0.1"
 serde = { version = "1.0", features = ["derive"] }
 tauri = {version = "1.2.3", features = ["clipboard-write-text", "dialog-all", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored"] }
 

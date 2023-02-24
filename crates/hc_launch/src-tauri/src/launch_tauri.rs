@@ -51,7 +51,8 @@ pub fn launch_tauri(
   // build tauri windows
   let builder_result = builder
     .invoke_handler(tauri::generate_handler![
-      crate::commands::sign_zome_call::sign_zome_call
+      crate::commands::sign_zome_call::sign_zome_call,
+      holochain_launcher_utils::shared_commands::open_url_cmd,
     ]) // uncomment when testing with right version
     .setup(move |app| {
       let pwd = std::env::current_dir().unwrap();
