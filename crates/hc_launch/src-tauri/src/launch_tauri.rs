@@ -108,8 +108,11 @@ pub fn launch_tauri(
               }
             };
 
-            let window_label = format!("Conductor-{}-{}", app_counter, app_id);
-            let window_title = format!("Conductor {} - {}", app_counter, app_id);
+            // constraint by tauri that window labels can only contain alphanumeric characters, `-`, `/`, `:` and `_`
+            let sanitized_app_id = app_id.clone().replace("-", "--").replace(" ", "-").replace(".", "_");
+
+            let window_label = format!("Conductor-{}-{}", app_counter, sanitized_app_id);
+            let window_title = format!("Conductor {} - {}", app_counter, sanitized_app_id);
 
             let window_width = 1000.0;
             let window_height = 700.0;
@@ -124,7 +127,7 @@ pub fn launch_tauri(
                   window_label.clone(),
                   window_title.clone(),
                   UISource::Path(ui_path.clone()),
-                  local_storage_dir.clone().join(format!("Conductor-{}-{}", app_counter, app_id)),
+                  local_storage_dir.clone().join(format!("Conductor-{}-{}", app_counter, sanitized_app_id)),
                   app_port,
                   admin_port,
                 )
@@ -136,7 +139,7 @@ pub fn launch_tauri(
                   window_label.clone(),
                   window_title.clone(),
                   UISource::Port(ui_port),
-                  local_storage_dir.clone().join(format!("Conductor-{}-{}", app_counter, app_id)),
+                  local_storage_dir.clone().join(format!("Conductor-{}-{}", app_counter, sanitized_app_id)),
                   app_port,
                   admin_port,
                 )
