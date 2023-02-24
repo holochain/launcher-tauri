@@ -114,8 +114,6 @@ jobs:
 
       - name: upload .msi to github release (Windows only)
         uses: matthme/tauri-action-ev-signing@dist
-        with:
-          allowUpdates: true
         if: matrix.platform == 'windows-2019'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -126,3 +124,4 @@ jobs:
           releaseBody: "See assets below to download and install this version."
           releaseDraft: true
           prerelease: true
+          allowUpdates: true
