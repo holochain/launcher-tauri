@@ -91,8 +91,6 @@ pub fn launch_tauri(
 
             let admin_port_string = admin_port.clone();
 
-            println!("GOT ADMIN PORT STRING: {}", admin_port_string);
-
             let app_port = match get_app_websocket(admin_port_string).await {
               Ok(ws) => ws,
               Err(e) => {

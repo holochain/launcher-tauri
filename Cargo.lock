@@ -2740,7 +2740,7 @@ dependencies = [
 
 [[package]]
 name = "holochain_cli_launch"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "anyhow",
  "futures",
@@ -2748,7 +2748,7 @@ dependencies = [
  "holochain_cli_sandbox",
  "holochain_client",
  "holochain_conductor_api",
- "holochain_launcher_utils 0.0.5",
+ "holochain_launcher_utils 0.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "holochain_types",
  "holochain_util",
  "holochain_zome_types",
@@ -2907,6 +2907,24 @@ dependencies = [
 [[package]]
 name = "holochain_launcher_utils"
 version = "0.0.5"
+dependencies = [
+ "holochain_client",
+ "holochain_conductor_api",
+ "holochain_types",
+ "holochain_zome_types",
+ "lair_keystore_api",
+ "log",
+ "mime_guess",
+ "open 2.1.3",
+ "serde",
+ "tauri",
+]
+
+[[package]]
+name = "holochain_launcher_utils"
+version = "0.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06988eccd6da294b8cb3e95ef18bd60ed9d2fbfa087123837d306a1718a7b943"
 dependencies = [
  "holochain_client",
  "holochain_conductor_api",
