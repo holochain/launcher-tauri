@@ -1,6 +1,6 @@
 [package]
 name = "holochain_launcher_utils"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2021"
 description = "Shared utils used by Holochain Launcher and the hc launch CLI (holochain_cli_launch)"
 license-file = "LICENSE_CAL-1.0"

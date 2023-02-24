@@ -2643,7 +2643,7 @@ dependencies = [
  "dirs-next",
  "futures",
  "hdk",
- "holochain_launcher_utils 0.0.4",
+ "holochain_launcher_utils 0.0.5",
  "holochain_manager",
  "holochain_types",
  "holochain_web_app_manager",
@@ -2707,7 +2707,7 @@ dependencies = [
  "holochain_cli_sandbox",
  "holochain_client",
  "holochain_conductor_api",
- "holochain_launcher_utils 0.0.4",
+ "holochain_launcher_utils 0.0.5",
  "holochain_types",
  "holochain_util",
  "holochain_zome_types",
@@ -2865,7 +2865,7 @@ dependencies = [
 
 [[package]]
 name = "holochain_launcher_utils"
-version = "0.0.4"
+version = "0.0.5"
 dependencies = [
  "holochain_client",
  "holochain_conductor_api",
