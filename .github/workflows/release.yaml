@@ -113,7 +113,7 @@ jobs:
           AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi"
           CertUtil -hashfile "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi" SHA256
 
-     - name: upload signed .msi to github release (Windows only)
+      - name: upload signed .msi to github release (Windows only)
         uses: matthme/tauri-action-ev-signing@dist
         if: matrix.platform == 'windows-2019'
         env:
