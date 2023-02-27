@@ -104,7 +104,7 @@ jobs:
           releaseDraft: true
           prerelease: true
 
-      - name: build and sign the app (Windows only) # NEW_VERSION change filename here
+      - name: build and sign the app (Windows only) # NEW_VERSION change filename here wherever needed
         if: matrix.platform == 'windows-2019'
         run: |
           npm run build -- --verbose
