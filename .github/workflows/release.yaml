@@ -109,6 +109,21 @@ jobs:
         if: matrix.platform == 'windows-2019'
         run: |
           npm run build -- --verbose
+          certUtil -hashfile D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi SHA256
           dotnet tool install --global AzureSignTool
           AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi"
+          certUtil -hashfile D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi SHA256
 
+
+      - name: upload signed .msi to github release (Windows only)
+        uses: matthme/tauri-action-ev-signing@dist
+        if: matrix.platform == 'windows-2019'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: src-tauri # specifying to prevent action from looking for artifacts in crates/hc_launch/src-tauri
+          tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
+          releaseName: "Holochain Launcher v__VERSION__"
+          releaseBody: "See assets below to download and install this version."
+          releaseDraft: true
+          prerelease: true
