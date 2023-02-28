@@ -1,0 +1,23 @@
+{
+  "version": "v0.9.1",
+  "notes": "- introduces automatic Launcher updates.\n- adds a security feature that prevents malicious UI's to make calls to cells they don't belong to\n- other UX related fixes/improvements",
+  "pub_date": "2023-02-28T20:20:00Z",
+  "platforms": {
+    "darwin-x86_64": {
+      "signature": "",
+      "url": ""
+    },
+    "darwin-aarch64": {
+      "signature": "",
+      "url": ""
+    },
+    "linux-x86_64": {
+      "signature": "",
+      "url": ""
+    },
+    "windows-x86_64": {
+      "signature": "",
+      "url": ""
+    }
+  }
+}
