@@ -135,6 +135,10 @@ jobs:
           CertUtil -hashfile "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi.zip" SHA256
           CertUtil -hashfile "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi.zip.sig" SHA256
 
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
 
       - name: upload signed .msi, .msi.zip, .msi.zip.sig files to github release (Windows only)
         uses: matthme/tauri-action-ev-signing@dist
