@@ -112,7 +112,7 @@ jobs:
         run: |
           npm run build -- --verbose
 
-          # NEW_VERSION change filenames here wherever needed
+          # NEW_VERSION change version number in filenames here wherever needed
 
           # log hashes before and after code signing to verify that the uploaded assets are the right ones
           CertUtil -hashfile "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi" SHA256
