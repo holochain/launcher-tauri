@@ -128,7 +128,7 @@ jobs:
 
           # zip and sign the code signed .msi
           7z a -mx=0 "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi.zip" "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi"
-          npm run tauri signer sign "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi.zip" --private-key ${{ secrets.TAURI_PRIVATE_KEY }} --password ${{ secrets.TAURI_KEY_PASSWORD }}
+          npm run tauri signer sign "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi.zip" -- -k ${{ secrets.TAURI_PRIVATE_KEY }} -p ${{ secrets.TAURI_KEY_PASSWORD }}
 
           # log hashes before and after code signing to verify that the uploaded assets are the right ones
           CertUtil -hashfile "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher_0.9.1_x64_en-US.msi" SHA256
