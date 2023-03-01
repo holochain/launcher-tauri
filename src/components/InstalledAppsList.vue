@@ -635,6 +635,13 @@ export default defineComponent({
           (this.$refs.downloading as typeof HCLoading).close();
           this.loadingText = "";
         }
+      } else {
+        console.error("Error updating the UI: Undefined bytes");
+        this.errorText = `Error updating the UI: Undefined bytes`;
+
+        (this.$refs as any).snackbar.show();
+        (this.$refs.downloading as typeof HCLoading).close();
+        this.loadingText = "";
       }
     },
   },

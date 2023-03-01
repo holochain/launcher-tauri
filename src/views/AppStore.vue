@@ -430,6 +430,12 @@ export default defineComponent({
           (this.$refs as any).snackbar.show();
           (this.$refs.downloading as typeof HCLoading).close();
         }
+      } else {
+        console.log("Error when decoding and saving webhapp to temp folder: Undefined bytes");
+        this.errorText = `Failed to decode and save webhapp: Undefined bytes`;
+
+        (this.$refs as any).snackbar.show();
+        (this.$refs.downloading as typeof HCLoading).close();
       }
     },
     async selectFromFileSystem() {
