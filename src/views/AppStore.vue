@@ -401,6 +401,7 @@ export default defineComponent({
         (this.$refs.downloading as typeof HCLoading).close();
         this.downloadFailed = true;
         setTimeout(() => (this.downloadFailed = false), 3000);
+        return;
       }
 
       if (bytes) {

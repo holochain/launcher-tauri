@@ -606,6 +606,7 @@ export default defineComponent({
         this.errorText = `Error fetching the UI: ${e}`;
         (this.$refs.snackbar as typeof HCSnackbar).show();
         (this.$refs.downloading as typeof HCLoading).close();
+        return;
       }
 
       this.loadingText = "Installing...";
