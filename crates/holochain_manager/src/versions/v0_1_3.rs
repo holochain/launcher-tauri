@@ -8,7 +8,7 @@ use holochain_conductor_api_0_1_3::{
 };
 use holochain_p2p_0_1_3::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
 
-use super::{version_manager::VersionManager, HdkVersion, HdiVersion, common::{proxy_url, boostrap_service}};
+use super::{version_manager::VersionManager, HdkVersion, HdiVersion, common::{proxy_url, bootstrap_service}};
 
 pub struct HolochainV0_1_3;
 
@@ -31,7 +31,7 @@ impl VersionManager for HolochainV0_1_3 {
     keystore_connection_url: Url2,
   ) -> String {
     let mut network_config = KitsuneP2pConfig::default();
-    network_config.bootstrap_service = Some(boostrap_service());
+    network_config.bootstrap_service = Some(bootstrap_service());
 
     let tuning_params = KitsuneP2pTuningParams::default();
 
