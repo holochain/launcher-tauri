@@ -35,7 +35,6 @@ use crate::{
 pub struct WebAppManager {
   environment_path: PathBuf,
   app_handle: Arc<AppHandle>,
-  // pubkey_map: tauri::State<'static, Arc<Mutex<HashMap<String, AgentPubKey>>>>, // mapping of public keys to tauri window label
   pub holochain_manager: HolochainManager,
   allocated_ports: HashMap<String, u16>,
 }
@@ -44,7 +43,6 @@ impl WebAppManager {
   pub async fn launch(
     version: HolochainVersion,
     mut config: LaunchHolochainConfig,
-    // pubkey_map: tauri::State<'static, Arc<Mutex<HashMap<String, AgentPubKey>>>>,
     app_handle: Arc<AppHandle>,
     password: String,
   ) -> Result<Self, LaunchWebAppManagerError> {

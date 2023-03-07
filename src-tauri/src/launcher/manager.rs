@@ -261,8 +261,6 @@ impl LauncherManager {
 
     let admin_window = self.app_handle.get_window("admin").unwrap();
 
-    // let mut pubkey_map = self.app_handle.state::<Arc<Mutex<HashMap<String, AgentPubKey>>>>();
-
     let state = match WebAppManager::launch(version, config, self.app_handle.clone(), password).await {
       Ok(mut manager) => match version.eq(&HolochainVersion::default()) {
         true => match install_default_apps_if_necessary(&mut manager, admin_window).await {

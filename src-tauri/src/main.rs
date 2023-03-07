@@ -145,8 +145,8 @@ fn main() {
         .build()?;
 
       // manage the state of pubkeys associated to tauri windows. The keys of this hashmap are window labels
-      let pubkey_store: Arc<Mutex<HashMap<String, AgentPubKey>>> = Arc::new(Mutex::new(HashMap::new()));
-      app.manage(pubkey_store);
+      let pubkey_map: Arc<Mutex<HashMap<String, AgentPubKey>>> = Arc::new(Mutex::new(HashMap::new()));
+      app.manage(pubkey_map);
 
       let handle = Arc::new(app.handle());
       let launcher_state =

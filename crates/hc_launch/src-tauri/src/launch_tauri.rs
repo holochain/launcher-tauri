@@ -3,7 +3,9 @@
   windows_subsystem = "windows"
 )]
 
+
 use holochain_client::AdminWebsocket;
+use holochain_types::prelude::AgentPubKey;
 use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
 use tauri::utils::config::AppUrl;
 use tauri::WindowUrl;
@@ -73,10 +75,12 @@ pub fn launch_tauri(
       // open a tauri window for each app instance and create a lair client instance for each window
       let mut windows: Vec<Window> = vec![];
       let mut lair_clients: HashMap<String, LairClient> = HashMap::new();
+      // map to store pubkeys allowed to make zome calls from a given window (key: window label, value: agent public key)
+      let mut pubkey_map: HashMap<String, AgentPubKey> = HashMap::new();
 
       let mut app_counter = 0;
 
-      let (windows, ui_source, lair_clients, app) = tokio::task::block_in_place(|| {
+      let (windows, ui_source, lair_clients, pubkey_map, app) = tokio::task::block_in_place(|| {
         tauri::async_runtime::block_on(async move {
           for tmp_directory_path in dot_hc_content.lines() {
             let dot_hc_live_path: PathBuf = pwd.join(format!(".hc_live_{}", app_counter)).into();
@@ -108,9 +112,9 @@ pub fn launch_tauri(
             };
 
             // constraint by tauri that window labels can only contain alphanumeric characters, `-`, `/`, `:` and `_`
-            let sanitized_app_id = app_id.clone().replace("-", "--").replace(" ", "-").replace(".", "_");
+            let sanitized_app_id = sanitize_app_id(app_id.clone());
 
-            let window_label = format!("Conductor-{}-{}", app_counter, sanitized_app_id);
+            let window_label = derive_window_label(app_counter, app_id.clone());
             let window_title = format!("Conductor {} - {}", app_counter, sanitized_app_id);
 
             let window_width = 1000.0;
@@ -179,6 +183,24 @@ pub fn launch_tauri(
 
             windows.push(window);
 
+            // get public key of installed app and add it to the pubkey map used to verify provenance
+            let mut ws = match AdminWebsocket::connect(format!("ws://localhost:{}", admin_port)).await {
+              Ok(ws) => ws,
+              Err(e) => panic!("Failed to connect to lair client: {:?}", e),
+            };
+
+            let installed_apps = match ws.list_apps(None).await {
+              Ok(apps) => apps,
+              Err(e) => panic!("Failed to list apps : {:?}", e),
+            };
+
+            for app in installed_apps {
+              if derive_window_label(app_counter, app.installed_app_id) == window_label.clone() {
+                pubkey_map.insert(window_label.clone(), app.agent_pub_key.clone());
+                println!("[hc launch] Inserted public key {} as allowed public key for window with label {}", app.agent_pub_key, window_label);
+              }
+            }
+
             // read lair-keystore-config.yaml file
             let connection_url = match read_lair_yaml(PathBuf::from(tmp_directory_path)) {
               Some(url) => url,
@@ -205,11 +227,12 @@ pub fn launch_tauri(
             app_counter += 1;
           }
 
-          (windows, ui_source, lair_clients, app)
+          (windows, ui_source, lair_clients, pubkey_map, app)
         })
       });
 
       app.manage(lair_clients);
+      app.manage(pubkey_map);
 
       // watch for file changes in the UI folder if requested
       match (watch, ui_source) {
@@ -322,5 +345,14 @@ fn read_lair_yaml(path: PathBuf) -> Option<String> {
   None
 }
 
+// Derives the window label from the app id and the conductor's number
+fn derive_window_label(conductor_nr: i32, app_id: String) -> String {
+  // constraint by tauri that window labels can only contain alphanumeric characters, `-`, `/`, `:` and `_`
+  let sanitized_app_id = sanitize_app_id(app_id);
+  return format!("Conductor-{}-{}", conductor_nr, sanitized_app_id);
+}
 
 
+fn sanitize_app_id(app_id: String) -> String {
+  return app_id.replace("-", "--").replace(" ", "-").replace(".", "_");
+}
