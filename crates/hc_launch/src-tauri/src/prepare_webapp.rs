@@ -90,7 +90,10 @@ pub async fn read_and_prepare_webapp(web_happ_path: &PathBuf, out_path: &PathBuf
 
 
 pub fn unzip_file(reader: fs::File, outpath: PathBuf) -> Result<(), String> {
-  let mut archive = zip::ZipArchive::new(reader).unwrap();
+  let mut archive = match zip::ZipArchive::new(reader) {
+    Ok(a) => a,
+    Err(e) => return Err(format!("Failed to unpack zip archive: {}", e)),
+  };
 
   for i in 0..archive.len() {
     let mut file = archive.by_index(i).unwrap();

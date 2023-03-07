@@ -5,7 +5,10 @@ use std::{
 };
 
 pub fn unzip_file(reader: File, outpath: PathBuf) -> Result<(), String> {
-  let mut archive = zip::ZipArchive::new(reader).unwrap();
+  let mut archive = match zip::ZipArchive::new(reader) {
+    Ok(a) => a,
+    Err(e) => return Err(format!("Failed to unpack zip archive: {}", e)),
+  };
 
   for i in 0..archive.len() {
     let mut file = archive.by_index(i).unwrap();
