@@ -161,6 +161,13 @@ fn main() {
   match builder_result {
     Ok(builder) => {
       builder.run(|_app_handle, event| {
+        // This event is emitted upon quitting the Launcher via cmq+Q on macOS.
+        // Sidecar binaries need to get explicitly killed in this case (https://github.com/holochain/launcher/issues/141)
+        if let RunEvent::Exit = event {
+          tauri::api::process::kill_children();
+        }
+        // This event is emitted upon pressing the x to close the Launcher admin window
+        // The app is prevented from exiting to keep it running in the background with the system tray
         if let RunEvent::ExitRequested { api, .. } = event {
           api.prevent_exit();
         }
