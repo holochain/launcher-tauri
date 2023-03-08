@@ -1,0 +1,16 @@
+{
+  "name": "tests",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test": "foreach -g \"**/*.test.ts\" -x \"NODE_NO_WARNINGS=1 ts-node-test #{path}\" --no-C"
+  },
+  "dependencies": {
+    "@msgpack/msgpack": "^2.7.0",
+    "@holochain/client": "^0.12.0",
+    "@holochain/tryorama": "^0.11.0",
+    "@goenning/foreach-cli": "^1.9.0",
+    "ts-node-test": "^0.2.0"
+  },
+  "type": "module"
+}

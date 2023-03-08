@@ -1,0 +1,7 @@
+---
+manifest_version: "1"
+name: launcher-tester
+ui:
+  bundled: "../ui/dist.zip"
+happ_manifest:
+  bundled: "./launcher-tester.happ"

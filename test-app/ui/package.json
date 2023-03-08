@@ -1,0 +1,73 @@
+{
+  "name": "ui",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "vite --port $UI_PORT --clearScreen false",
+    "build": "vite build",
+    "lint": "eslint --ext .ts,.html . --ignore-path .gitignore && prettier \"**/*.ts\" --check --ignore-path .gitignore",
+    "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
+    "package": "npm run build && cd dist && bestzip ../dist.zip *"
+  },
+  "dependencies": {
+    "@holochain/client": "^0.12.5",
+    "@lit-labs/context": "^0.2.0",
+    "@lit-labs/task": "^2.0.0",
+    "@material/mwc-circular-progress": "^0.27.0",
+    "@material/mwc-button": "^0.27.0",
+    "@material/mwc-textfield": "^0.27.0",
+    "@material/mwc-textarea": "^0.27.0",
+    "@material/mwc-checkbox": "^0.27.0",
+    "@material/mwc-slider": "^0.27.0",
+    "@material/mwc-icon-button": "^0.27.0",
+    "@material/mwc-snackbar": "^0.27.0",
+    "@material/mwc-formfield": "^0.27.0",
+    "@msgpack/msgpack": "^2.7.2",
+    "@vaadin/date-time-picker": "^23.2.8",
+    "lit": "^2.6.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@open-wc/eslint-config": "^4.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.43.0",
+    "@typescript-eslint/parser": "^5.43.0",
+    "bestzip": "^2.2.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "prettier": "^2.3.2",
+    "rimraf": "^3.0.2",
+    "vite": "^4.0.0",
+    "vite-plugin-checker": "^0.5.3",
+    "typescript": "^4.5.5",
+    "@types/uuid": "9.0.0"
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+      "@open-wc",
+      "prettier"
+    ],
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "rules": {
+      "wc/guard-super-call": "off",
+      "prefer-destructuring": "off",
+      "no-useless-constructor": "off",
+      "no-empty-function": "off",
+      "no-empty-pattern": "off",
+      "camelcase": "off",
+      "import/no-duplicates": "off",
+      "no-unused-vars": "off",
+      "class-methods-use-this": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "import/no-unresolved": "off",
+      "import/extensions": "off",
+      "no-use-before-define": "off"
+    }
+  },
+  "prettier": {
+    "singleQuote": true,
+    "arrowParens": "avoid"
+  },
+  "type": "module"
+}

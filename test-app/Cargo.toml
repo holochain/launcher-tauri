@@ -1,0 +1,19 @@
+[profile.dev]
+opt-level = "z"
+
+[profile.release]
+opt-level = "z"
+
+[workspace]
+members = ["dnas/*/zomes/coordinator/*", "dnas/*/zomes/integrity/*"]
+
+[workspace.dependencies]
+hdi = "=0.2.0"
+hdk = "=0.1.0"
+serde = "1"
+
+[workspace.dependencies.random]
+path = "dnas/clones/zomes/coordinator/random"
+
+[workspace.dependencies.random_integrity]
+path = "dnas/clones/zomes/integrity/random"

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="Description" content="Put your description here." />
+    <base href="/" />
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+        background-color: #ededed;
+      }
+
+      :root {
+        --mdc-theme-primary: #7B1FA2;
+        --mdc-theme-secondary: #FF5722;
+      }
+    </style>
+    <title>Launcher Tester</title>
+  </head>
+
+  <body>
+    <a href="https://duckduckgo.com">This is a link to duckduckgo.com outside of shadow DOM</a>
+    <holochain-app></holochain-app>
+
+    <script type="module" src="./src/holochain-app.ts"></script>
+  </body>
+</html>

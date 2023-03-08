@@ -1,0 +1,25 @@
+{
+  "name": "launcher-tester-dev",
+  "private": true,
+  "workspaces": [
+    "ui",
+    "tests"
+  ],
+  "scripts": {
+    "start": "AGENTS=2 npm run network",
+    "network": "hc s clean && npm run build:happ && UI_PORT=8888 concurrently \"npm start -w ui\" \"npm run launch:happ\" \"holochain-playground\"",
+    "test": "npm run build:zomes && hc app pack workdir --recursive && npm t -w tests",
+    "launch:happ": "echo \"pass\" | RUST_LOG=warn hc launch --piped -n $AGENTS workdir/launcher-tester.happ --ui-port $UI_PORT network mdns",
+    "package": "npm run build:happ && npm run package -w ui && hc web-app pack workdir --recursive",
+    "build:happ": "npm run build:zomes && hc app pack workdir --recursive",
+    "build:zomes": "RUSTFLAGS='' CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown"
+  },
+  "devDependencies": {
+    "@holochain-playground/cli": "^0.1.0",
+    "concurrently": "^6.2.1",
+    "rimraf": "^3.0.2"
+  },
+  "engines": {
+    "npm": ">=7.0.0"
+  }
+}

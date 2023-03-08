@@ -1,0 +1,19 @@
+---
+manifest_version: "1"
+name: clones
+integrity:
+  network_seed: ~
+  properties: ~
+  origin_time: 1675676453854674
+  zomes:
+    - name: random_integrity
+      hash: ~
+      bundled: "../../../target/wasm32-unknown-unknown/release/random_integrity.wasm"
+      dependencies: ~
+coordinator:
+  zomes:
+    - name: random
+      hash: ~
+      bundled: "../../../target/wasm32-unknown-unknown/release/random.wasm"
+      dependencies:
+        - name: random_integrity
