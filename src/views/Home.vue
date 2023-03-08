@@ -12,7 +12,11 @@
     </div>
 
     <div v-else style="flex: 1; display: flex">
-      <AppStore @go-back="view = { type: 'installedApps' }"></AppStore>
+      <div class="flex-scrollable-container">
+        <div class="flex-scrollable-y">
+          <AppStore @go-back="view = { type: 'installedApps' }"></AppStore>
+        </div>
+      </div>
     </div>
   </div>
 </template>

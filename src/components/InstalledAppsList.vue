@@ -317,6 +317,7 @@ import { devhubCells, getHappReleasesByEntryHashes, fetchGui } from "../devhub/g
 import { AppInfo, AppWebsocket, decodeHashFromBase64, encodeHashToBase64, EntryHash } from "@holochain/client";
 import { GUIReleaseEntry, HappReleaseEntry } from "../devhub/types";
 import { ActionTypes } from "../store/actions";
+import { i18n } from "../locale";
 
 
 export default defineComponent({
@@ -358,8 +359,8 @@ export default defineComponent({
       appWebsocket: undefined,
       devhubAppInfo: undefined,
       sortOptions: [
-        ["name", "name"],
-        ["name descending", "name descending"],
+        [i18n.global.t('main.name'), "name"],
+        [i18n.global.t('main.nameDescending'), "name descending"],
         // ["Holochain Version", "Holochain Version"],
       ],
       sortOption: undefined,
@@ -463,7 +464,7 @@ export default defineComponent({
     },
     holochainVersionOptions(): [string, string][] {
       let allApps = this.installedApps;
-      let hcVersions: [string, string][] = [["All Versions", "All Versions"]];
+      let hcVersions: [string, string][] = [[i18n.global.t('main.allVersions'), "All Versions"]];
       uniq(allApps.map((app) => app.holochainVersion)).forEach((hcVer) => {
         hcVersions.push([hcVer, hcVer]);
       });

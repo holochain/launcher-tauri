@@ -3,6 +3,7 @@ node_modules
 /dist
 .cargo
 /target
+/test-app
 
 # temporary files
 .hc*

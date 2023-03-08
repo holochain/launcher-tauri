@@ -23,16 +23,25 @@ window.onerror = function (message, source, lineno, colno, error) {
   });
 };
 
-const defaultLanguage = navigator.language;
 
-// if (defaultLanguage.startsWith("de")) {
-//   i18n.global.locale = "de";
-// } else {
-//   i18n.global.locale = "en";
-// }
+// logic for setting locale
+const customLocale = window.localStorage.getItem("customLocale");
 
-// always english for now
-i18n.global.locale = "en";
+console.log("Fetched customLocale: ", customLocale);
+
+if (customLocale) {
+  if (i18n.global.availableLocales.includes(customLocale as any)) {
+    i18n.global.locale = customLocale as any;
+  } else {
+    console.warn(`Invalid custom locale found in localStorage: ${customLocale}. Available locales: ${i18n.global.availableLocales}`);
+  }
+} else {
+  // default to the webview's locale which should correspond to the OS locale
+  const defaultLocale = navigator.language;
+  if (i18n.global.availableLocales.includes(defaultLocale as any)) {
+    i18n.global.locale = defaultLocale as any;
+  }
+}
 
 
 const app = createApp(App);
