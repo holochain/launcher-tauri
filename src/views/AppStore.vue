@@ -23,99 +23,97 @@
 
   </HCDialog>
 
-  <div class="column" style="flex: 1; overflow-y: auto;">
-    <div class="row center-content top-bar">
-      <mwc-icon-button
-        icon="arrow_back"
-        @click="$emit('go-back')"
-        :title="$t('buttons.back')"
-      ></mwc-icon-button>
 
-      <span
-        style="
-          flex: 1;
-          font-size: 1.5em;
-          margin-left: 4px;
-          position: sticky;
-          top: 0;
-          z-index: 1;
-        "
-        >{{ $t("appStore.appStore") }}</span
-      >
-      <HCButton
-        outlined
-        @click="howToPublish()"
-        style="height: 36px; border-radius: 8px; padding: 0 20px"
-        :title="howToPublishUrl"
-        >{{ $t("appStore.howToPublishAnApp") }}
-      </HCButton>
-      <HCButton
-        icon="folder"
-        style="
-          margin-left: 8px;
-          margin-right: 1px;
-          height: 40px;
-          border-radius: 8px;
-          padding: 0 20px;
-        "
-        @click="selectFromFileSystem()"
-      >
-        <div class="row center-content">
-          <mwc-icon>folder</mwc-icon>
-          <span style="margin-left: 5px">{{
-            $t("appStore.selectAppFromFileSystem")
-          }}</span>
-        </div>
-      </HCButton>
-    </div>
+  <div class="row center-content top-bar" style="position: sticky; top: 0; z-index: 1; width: 100%;">
+    <mwc-icon-button
+      icon="arrow_back"
+      @click="$emit('go-back')"
+      :title="$t('buttons.back')"
+      style="margin-left: 8px;"
+    ></mwc-icon-button>
 
-    <div v-if="loading" class="column center-content" style="flex: 1">
-      <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"></LoadingDots>
-    </div>
-
-    <div
-      v-else-if="installableApps.length === 0"
-      class="column center-content"
-      style="flex: 1"
+    <span
+      style="
+        flex: 1;
+        font-size: 1.5em;
+        margin-left: 4px;
+      "
+      >{{ $t("appStore.appStore") }}</span
     >
-      <span>{{ $t("appStore.noAppsInStore") }}</span>
-      <span style="margin-top: 8px"
-        ><span
-          style="cursor: pointer; text-decoration: underline;"
-          :title="howToPublishUrl"
-          @click="howToPublish()"
-          @keydown.enter="howToPublish()"
-          tabindex="0"
-          >{{ $t("appStore.readThis") }}</span
-        >
-        {{ $t("appStore.readThisToPublish") }}</span
-      >
-      <HCButton
-        outlined
-        @click="fetchApps()"
-        class="refresh-button"
-        >{{ $t("main.refresh") }}
-      </HCButton>
-    </div>
-
-    <div v-else class="row" style="flex-wrap: wrap; margin: 16px">
-      <div
-        v-for="(app, i) of installableApps"
-        :key="i"
-        class="column"
-        style="margin-right: 16px; margin-bottom: 16px"
-      >
-        <AppPreviewCard :app="app" @installApp="saveApp(app)" />
+    <HCButton
+      outlined
+      @click="howToPublish()"
+      style="height: 36px; border-radius: 8px; padding: 0 20px"
+      :title="howToPublishUrl"
+      >{{ $t("appStore.howToPublishAnApp") }}
+    </HCButton>
+    <HCButton
+      icon="folder"
+      style="
+        margin-left: 8px;
+        margin-right: 8px;
+        height: 40px;
+        border-radius: 8px;
+        padding: 0 20px;
+      "
+      @click="selectFromFileSystem()"
+    >
+      <div class="row center-content">
+        <mwc-icon>folder</mwc-icon>
+        <span style="margin-left: 5px">{{
+          $t("appStore.selectAppFromFileSystem")
+        }}</span>
       </div>
+    </HCButton>
+  </div>
+
+
+  <div v-if="loading" class="column center-content" style="flex: 1; min-height: calc(100vh - 64px);">
+    <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
+  </div>
+
+  <div
+    v-else-if="installableApps.length === 0"
+    class="column center-content"
+    style="flex: 1; min-height: calc(100vh - 64px);"
+  >
+    <span>{{ $t("appStore.noAppsInStore") }}</span>
+    <span style="margin-top: 8px"
+      ><span
+        style="cursor: pointer; text-decoration: underline;"
+        :title="howToPublishUrl"
+        @click="howToPublish()"
+        @keydown.enter="howToPublish()"
+        tabindex="0"
+        >{{ $t("appStore.readThis") }}</span
+      >
+      {{ $t("appStore.readThisToPublish") }}</span
+    >
+    <HCButton
+      outlined
+      @click="fetchApps()"
+      class="refresh-button"
+      >{{ $t("main.refresh") }}
+    </HCButton>
+  </div>
+
+  <div v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px);">
+    <div
+      v-for="(app, i) of installableApps"
+      :key="i"
+      class="column"
+      style="margin-right: 16px; margin-bottom: 16px"
+    >
+      <AppPreviewCard :app="app" @installApp="saveApp(app)" />
     </div>
   </div>
 
   <div class="progress-indicator" :class="{ highlighted: downloadFailed }">
     <div
       style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
-      title="Full synchronization with peers required to reliably download all apps."
+      :title="$t('appStore.fullSynchronizationRequired')"
     >
-      App Library Synchronization:
+      {{ $t('appStore.appLibrarySynchronization') }}:
     </div>
     <div>
       <div v-for="(cell, idx) in provisionedCells" :key="cell[0]" class="column">
@@ -149,7 +147,7 @@
               "
               title="currently ongoing data exchanges with peers"
             >
-              no ongoing peer synchronization</span
+            {{ $t('appStore.noOngoingPeerSynchronization') }}</span
             >
           </div>
           <div
@@ -218,6 +216,7 @@ import HCDialog from "../components/subcomponents/HCDialog.vue";
 import { HolochainId } from "../types";
 import prettyBytes from "pretty-bytes";
 import { getCellId } from "../utils";
+import { i18n } from "../locale";
 
 export default defineComponent({
   name: "AppStore",
@@ -396,7 +395,7 @@ export default defineComponent({
         );
       } catch (e) {
         console.log("Error fetching the webhapp: ", e);
-        this.errorText = "App Library Synchronization not Complete. Please try again later.";
+        this.errorText = i18n.global.t('appStore.synchronizationNotCompleteError');
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
         this.downloadFailed = true;
@@ -551,13 +550,10 @@ export default defineComponent({
 
 <style scoped>
 .top-bar {
-  /* background-color: rgb(225, 226, 255); */
-  padding: 8px 8px 8px 6px;
-  /* border-bottom: 1px solid black; */
+  align-items: center;
+  height: 64px;
   background: white;
   box-shadow: 0 0px 5px #9b9b9b;
-  position: sticky;
-  top: 0;
 }
 
 .progress-indicator {

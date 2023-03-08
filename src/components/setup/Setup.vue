@@ -1,4 +1,13 @@
 <template>
+  <ChangeLanguage ref="change-language"></ChangeLanguage>
+  <div
+    style="display: flex; flex-direction: row; align-items: center; position: fixed; bottom: 5px; right: 10px; cursor: pointer;"
+    @click="openChangeLanguageDialog"
+    >
+    <img src="/img/language_icon_white.svg" style="height: 25px;" />
+    <div style="color: white; text-decoration: underline; margin-left: 4px;">{{ $t("setup.changeLanguage") }}</div>
+  </div>
+
   <div class="background">
     <div v-if="step == 0" class="column" style="align-items: center">
       <div style="color: white; font-size: 56px; margin-bottom: 30px; opacity: 0.9;">
@@ -163,7 +172,7 @@
       style="max-width: 660px; align-items: center"
     >
       <div style="font-size: 40px; margin-bottom: 45px; color: #e2e1f5">
-        Setting up
+        {{ $t('setup.settingUp') }}...
       </div>
       <LoadingDots style="--radius: 15px"></LoadingDots>
     </div>
@@ -191,11 +200,13 @@ import PasswordField from "../subcomponents/PasswordField.vue";
 import HCButton from "../subcomponents/HCButton.vue";
 import ToggleSwitch from "../subcomponents/ToggleSwitch.vue";
 import LoadingDots from "../subcomponents/LoadingDots.vue";
+import ChangeLanguage from "../settings/ChangeLanguage.vue";
 import { listen } from "@tauri-apps/api/event";
+import ChangeLanguageVue from "../settings/ChangeLanguage.vue";
 
 export default defineComponent({
   name: "Setup",
-  components: { PasswordField, HCButton, ToggleSwitch, LoadingDots },
+  components: { PasswordField, HCButton, ToggleSwitch, LoadingDots, ChangeLanguage },
   data(): {
     isPasswordValid: boolean;
     passwordsDontMatch: boolean;
@@ -256,6 +267,9 @@ export default defineComponent({
     },
     choosePassword() {
       this.step = 2;
+    },
+    openChangeLanguageDialog() {
+      (this.$refs["change-language"] as typeof ChangeLanguage).open();
     },
   },
 });

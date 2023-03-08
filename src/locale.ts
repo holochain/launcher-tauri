@@ -1,6 +1,19 @@
 import { createI18n } from "vue-i18n";
 
+// a mapping between locale abbreviations and full Language names
+export const languageNames = {
+  "de": "🇩🇪 Deutsch",
+  "en": "🇬🇧 English",
+  "fr": "🇫🇷 Français",
+  "it": "🇮🇹 Italiano",
+}
+
 const messages = {
+
+  // =========================================================================
+  // 🇬🇧 ENGLISH
+  // =========================================================================
+
   en: {
     setup: {
       setup: {
@@ -13,54 +26,69 @@ const messages = {
         invalidPassword: "Invalid Password.",
         slogan: "Discover, install and easily manage your Holochain apps",
       },
+      changeLanguage: "change language",
+      settingUp: "Setting up",
+      startingUp: "Starting up",
     },
     main: {
-      installedApps: "Installed Apps",
-      webApps: "Web Apps",
-      webAppsHelper: "Holochain Apps with Graphical User Interface",
+      activePeerSynchronization: "Active Peer Synchronization",
+      allVersions: "All Versions",
       headlessApps: "Headless Apps",
       headlessAppsHelper: "Holochain Apps without Graphical User Interface",
+      hide: "Hide",
       holochainVersions: "Holochain Versions",
       holochainVersionsHelper: "Installed Holochain Versions",
+      incoming: "incoming",
+      installedApps: "Installed Apps",
+      installNewApp: "INSTALL NEW APP",
+      inThisVersion: "in this Holochain Version.",
+      name: "name",
+      nameDescending: "name descending",
       noHeadlessApps: "There are no headless apps installed",
       noWebApps: "There are no web apps installed",
       noHolochainVersions: "There are no Holochain versions installed.",
-      inThisVersion: "in this Holochain Version.",
-      sortBy: "sort by",
+      outgoing: "outgoing",
       refresh: "Refresh",
-      installNewApp: "INSTALL NEW APP",
       reportIssue: "Report Issue",
-      hide: "Hide",
+      sortBy: "sort by",
       show: "Show",
+      webApps: "Web Apps",
+      webAppsHelper: "Holochain Apps with Graphical User Interface",
     },
     appStore: {
+      activeDataExchanges: "currently ongoing data exchanges with peers",
       appStore: "App Library",
+      appLibrarySynchronization: "App Library Synchronization",
+      fullSynchronizationRequired: "Full synchronization with peers required to reliably download all apps.",
       howToPublishAnApp: "How to publish an app",
+      noOngoingPeerSynchronization: "no ongoing peer synchronization",
       selectAppFromFileSystem: "Select app from Filesystem",
       noAppsInStore:
         "There are no apps available yet in the App Library or Synchronization with Peers is not complete.",
+      synchronizationNotCompleteError: "App Library Synchronization not Complete. Please try again later.",
       readThis: "Read this",
       readThisToPublish:
         " to learn how to publish a Holochain application to the App Library.",
     },
     buttons: {
-      ok: "Ok",
-      cancel: "Cancel",
-      yes: "Yes",
-      no: "No",
-      continue: "continue",
-      next: "Next",
       back: "Back",
-      restart: "Restart",
-      quit: "Quit",
-      getStarted: "Get started",
-      letsGo: "Let's Go!",
-      update: "Update",
-      install: "Install",
-      uninstall: "Uninstall",
-      enable: "Enable",
+      cancel: "Cancel",
+      continue: "continue",
       disable: "Disable",
+      enable: "Enable",
+      getStarted: "Get started",
+      install: "Install",
+      letsGo: "Let's Go!",
+      next: "Next",
+      no: "No",
+      ok: "Ok",
+      quit: "Quit",
+      restart: "Restart",
+      save: "Save",
       start: "Start",
+      uninstall: "Uninstall",
+      update: "Update",
+      yes: "Yes",
     },
     dialogs: {
       restart:
@@ -115,8 +143,17 @@ const messages = {
         publishedAt: "published",
         question: "Would you like to install it?",
       },
+      changeLanguage: {
+        language: "Language",
+        languageSettings: "Language Settings",
+      },
     },
   },
+
+  // =========================================================================
+  // 🇩🇪 GERMAN
+  // =========================================================================
+
   de: {
     setup: {
       setup: {
@@ -129,54 +166,69 @@ const messages = {
         invalidPassword: "Ungültiges Passwort.",
         slogan: "Entdecke, installiere und verwalte deine Holochain Apps",
       },
+      changeLanguage: "Sprache ändern",
+      startingUp: "Starten",
+      settingUp: "Einrichten",
     },
     main: {
-      installedApps: "Installierte Apps",
-      webApps: "Web Apps",
-      webAppsHelper: "Holochain Apps mit Graphischer Benutzeroberfläche",
+      activePeerSynchronization: "Aktive Peer Synchronisationen",
+      allVersions: "Alle Versionen",
       headlessApps: "Headless Apps",
       headlessAppsHelper: "Holochain Apps ohne Graphische Benutzeroberfläche",
+      hide: "Verbergen",
       holochainVersions: "Holochain Versionen",
       holochainVersionsHelper: "Installierte Holochain Versionen",
+      incoming: "einkommend",
+      installedApps: "Installierte Apps",
+      installNewApp: "APP INSTALLIEREN",
+      inThisVersion: "in dieser Holochain Version.",
+      name: "Name",
+      nameDescending: "Name absteigend",
       noHeadlessApps: "Es sind keine Headless Apps installiert",
       noWebApps: "Es sind keine Web Apps installiert",
       noHolochainVersions: "Es sind keine Holochain Versionen installiert.",
-      inThisVersion: "in dieser Holochain Version.",
-      sortBy: "sortiere nach",
+      outgoing: "ausgehend",
       refresh: "Aktualisieren",
-      installNewApp: "APP INSTALLIEREN",
       reportIssue: "Problem Melden",
-      hide: "Verbergen",
       show: "Zeigen",
+      sortBy: "sortiere nach",
+      webApps: "Web Apps",
+      webAppsHelper: "Holochain Apps mit Graphischer Benutzeroberfläche",
     },
     appStore: {
+      activeDataExchanges: "Zurzeit aktiver Datenaustausch mit Peers",
       appStore: "App Store",
+      appLibrarySynchronization: "App Store Synchronisation",
+      fullSynchronizationRequired: "Vollständige Synchronisation mit Peers erforderlich, um alle Apps herunterladen zu können.",
       howToPublishAnApp: "Eigene App Publizieren",
+      noOngoingPeerSynchronization: "keine aktiven Synchronisationen mit Peers",
       selectAppFromFileSystem: "Installiere App aus Datei",
       noAppsInStore:
         "Es sind noch keine Apps im App Store verfügbar oder die Synchronisierung mit Peers ist noch unvollständig.",
+      synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut.",
       readThis: "Lese dies",
       readThisToPublish:
         " um zu lernen, wie man eine Holochain App publiziert.",
     },
     buttons: {
-      ok: "Ok",
-      cancel: "Abbrechen",
-      yes: "Ja",
-      no: "Nein",
-      continue: "Weiter",
-      next: "Weiter",
       back: "Zurück",
-      restart: "Neustart",
-      quit: "Beenden",
-      getStarted: "Loslegen",
-      letsGo: "Let's Go!",
-      update: "Update",
-      install: "Installieren",
-      uninstall: "Deinstallieren",
-      enable: "Einschalten",
+      cancel: "Abbrechen",
+      continue: "Weiter",
       disable: "Ausschalten",
+      enable: "Einschalten",
+      getStarted: "Loslegen",
+      install: "Installieren",
+      letsGo: "Let's Go!",
+      next: "Weiter",
+      no: "Nein",
+      ok: "Ok",
+      restart: "Neustart",
+      save: "Speichern",
       start: "Starten",
+      uninstall: "Deinstallieren",
+      update: "Update",
+      quit: "Beenden",
+      yes: "Ja",
     },
     dialogs: {
       restart:
@@ -225,15 +277,21 @@ const messages = {
       },
       guiUpdate: {
         title: "UI Update",
-        mainText: "Es ist ein neues UI verfügbar für diese app",
+        mainText: "Es ist ein neues UI verfügbar für diese App",
         changelog: "Änderungen",
         version: "Version",
         publishedAt: "Publiziert",
         question: "Möchtest du es installieren?",
-      }
+      },
+      changeLanguage: {
+        language: "Sprache",
+        languageSettings: "Sprach-Einstellungen",
+      },
     },
   },
 };
+
+
 
 export const i18n = createI18n({
   locale: "en",
