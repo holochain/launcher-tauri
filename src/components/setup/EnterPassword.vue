@@ -109,6 +109,26 @@
           style="
             position: absolute;
             bottom: 0;
+            left: 0;
+            font-size: 0.8em;
+            color: #331ead;
+            text-decoration: underline;
+            margin: 5px 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-end;
+            flex-direction: row;
+          "
+        >
+          <img src="/img/language_icon_blue.svg" style="height: 22px;" />
+          <div style="margin-left: 6px;">
+            {{ $t("setup.login.changeLanguage") }}
+          </div>
+        </div>
+        <div
+          style="
+            position: absolute;
+            bottom: 0;
             right: 0;
             font-size: 0.8em;
             color: #331ead;

@@ -1,5 +1,13 @@
 import { createI18n } from "vue-i18n";
 
+// a mapping between locale abbreviations and full Language names
+export const languageNames = {
+  "de": "🇩🇪 Deutsch",
+  "en": "🇬🇧 English",
+  "fr": "🇫🇷 Français",
+  "it": "🇮🇹 Italiano",
+}
+
 const messages = {
   en: {
     setup: {
@@ -8,6 +16,7 @@ const messages = {
         slogan: "Discover, install and easily manage your Holochain apps",
       },
       login: {
+        changeLanguage: "change language",
         enterPassword: "Enter password",
         forgotPassword: "forgot password",
         invalidPassword: "Invalid Password.",
@@ -124,6 +133,7 @@ const messages = {
         slogan: "Entdecke, installiere und verwalte deine Holochain Apps",
       },
       login: {
+        changeLanguage: "Sprache wechseln",
         enterPassword: "Passwort",
         forgotPassword: "Passwort vergessen",
         invalidPassword: "Ungültiges Passwort.",
