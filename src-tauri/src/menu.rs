@@ -6,6 +6,7 @@ pub fn build_menu() -> Menu {
   let factory_reset = CustomMenuItem::new("factory_reset".to_string(), "Factory Reset");
   let open_logs = CustomMenuItem::new("open_logs".to_string(), "Open Logs");
   let config = CustomMenuItem::new("config".to_string(), "Configuration");
+  let language_settings = CustomMenuItem::new("language_settings".to_string(), "Language");
   let restart = CustomMenuItem::new("restart".to_string(), "Restart");
   let quit = CustomMenuItem::new("quit".to_string(), "Quit");
   let version_info = CustomMenuItem::new("about".to_string(), "Version Info");
@@ -22,6 +23,7 @@ pub fn build_menu() -> Menu {
   let settings_submenu = Submenu::new(
     "Settings",
     Menu::new()
+      .add_item(language_settings.clone())
       .add_item(config.clone())
       .add_item(factory_reset.clone())
   );
@@ -42,6 +44,7 @@ pub fn build_menu() -> Menu {
     let settings_submenu_macos = Submenu::new(
       "Settings",
       Menu::new()
+        .add_item(language_settings.clone())
         .add_item(config)
         .add_item(factory_reset)
     );
@@ -62,6 +65,7 @@ pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
   match event_id {
     "factory_reset" => window.emit("request-factory-reset", ()).unwrap(),
     "config" => window.emit("open-config", ()).unwrap(),
+    "language_settings" => window.emit("open-language-settings", ()).unwrap(),
     "about" => window.emit("about", ()).unwrap(),
     "restart" => window.emit("request-restart", ()).unwrap(),
     "quit" => {

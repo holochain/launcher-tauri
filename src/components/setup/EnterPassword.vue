@@ -16,6 +16,8 @@
     </div>
   </HCDialog>
 
+  <ChangeLanguage ref="change-language"></ChangeLanguage>
+
   <div v-if="entering" class="entering-background">
     <div class="column" style="align-items: center">
       <div
@@ -119,12 +121,14 @@
             align-items: flex-end;
             flex-direction: row;
           "
+          @click="openChangeLanguageDialog"
         >
           <img src="/img/language_icon_blue.svg" style="height: 22px;" />
           <div style="margin-left: 6px;">
-            {{ $t("setup.login.changeLanguage") }}
+            {{ $t("setup.changeLanguage") }}
           </div>
         </div>
+
         <div
           style="
             position: absolute;
@@ -151,14 +155,15 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import PasswordField from "../subcomponents/PasswordField.vue";
 import HCButton from "../subcomponents/HCButton.vue";
-import { bootUpSlogans } from "../../bootUpSlogans";
 import LoadingDots from "../subcomponents/LoadingDots.vue";
 import HCDialog from "../subcomponents/HCDialog.vue";
+import ChangeLanguage from "../settings/ChangeLanguage.vue";
 import { listen } from "@tauri-apps/api/event";
+import { i18n } from "../../locale";
 
 export default defineComponent({
   name: "EnterPassword",
-  components: { PasswordField, HCButton, LoadingDots, HCDialog },
+  components: { PasswordField, HCButton, LoadingDots, HCDialog, ChangeLanguage },
   data(): {
     entering: boolean;
     pwInputDisabled: boolean;
@@ -179,7 +184,7 @@ export default defineComponent({
   async mounted() {
     // this.bootUpSlogan =
     //   bootUpSlogans[Math.floor(Math.random() * bootUpSlogans.length)];
-    this.bootUpSlogan = "Starting up...";
+    this.bootUpSlogan = i18n.global.t('setup.startingUp') + "...";
 
     this.loadingState = undefined;
     await listen("progress-update", (event) => {
@@ -208,6 +213,9 @@ export default defineComponent({
     },
     openForgotPasswordDialog() {
       (this.$refs["forgot-password"] as typeof HCDialog).open();
+    },
+    openChangeLanguageDialog() {
+      (this.$refs["change-language"] as typeof ChangeLanguage).open();
     },
   },
 });

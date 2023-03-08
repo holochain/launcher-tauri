@@ -15,7 +15,7 @@
     </div>
     <div>
       <div style="margin-bottom: 10px" title="Historical Gossip Throughput">
-        Active Peer Synchronization:
+        {{ $t('main.activePeerSynchronization') }}:
       </div>
       <div class="column">
         <!-- active incoming gossip rounds -->
@@ -28,12 +28,12 @@
               text-align: right;
             "
           >
-            incoming:
+            {{ $t('main.incoming') }}:
           </div>
           <div style="width: 60%; margin: 0 30px">
             <HCProgressBar
               v-if="(expectedIncoming || expectedIncoming === 0) && cachedMaxExpected"
-              title="currently ongoing data exchanges with peers"
+              :title="$t('appStore.activeDataExchanges')"
               :progress="progressRatio()"
               :style="`--height: 10px; --hc-primary-color:${
                 incomingIdle ? '#D0D0D0' : '#482edf'
@@ -43,8 +43,8 @@
               v-else
               style="text-align: center; opacity: 0.7; font-size: 0.9em"
             >
-              <span title="currently ongoing data exchanges with peers"
-                >no ongoing peer synchronization</span
+              <span :title="$t('appStore.activeDataExchanges')"
+                >{{ $t('appStore.noOngoingPeerSynchronization') }}</span
               >
             </div>
           </div>

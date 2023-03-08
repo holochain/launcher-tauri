@@ -27,6 +27,8 @@ window.onerror = function (message, source, lineno, colno, error) {
 // logic for setting locale
 const customLocale = window.localStorage.getItem("customLocale");
 
+console.log("Fetched customLocale: ", customLocale);
+
 if (customLocale) {
   if (i18n.global.availableLocales.includes(customLocale as any)) {
     i18n.global.locale = customLocale as any;
