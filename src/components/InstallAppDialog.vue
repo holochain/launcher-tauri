@@ -364,15 +364,16 @@ export default defineComponent({
     checkAppIdValidity() {
       const newValue = (this.$refs["app-id-field"] as typeof HCTextField).value;
 
-      let regExp = new RegExp(/^[a-zA-Z 0-9-/:_.]*$/);
+      let regExp = new RegExp(/^[a-zA-Z 0-9-:_.]*$/);
 
       if (newValue === "") {
         this.appIdInvalid = "App Id must not be empty.";
         return;
       } else if (!regExp.test(newValue)) {
         // this restriction is added here because labels of tauri windows require it and we base window labels on app id's
+        // additionally '/' is forbidden because it is interpreted as an OS path separator when storing the web assets
         this.appIdInvalid =
-          "App Id may only contain alphanumeric characters as well as '-', '/', ':', '.' and '_'";
+          "App Id may only contain alphanumeric characters as well as '-', ':', '.' and '_'";
         return;
       }
 

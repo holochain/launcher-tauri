@@ -147,6 +147,8 @@ const messages = {
         language: "Language",
         languageSettings: "Language Settings",
       },
+      confirmUninstallApp: "Are you sure you want to uninstall this App? This will irrevocably delete all data stored in it.",
+      confirmUninstallCell: "Are you sure you want to delete this cell? This will irrevocably delete all data stored in it.",
     },
   },
 
@@ -287,6 +289,8 @@ const messages = {
         language: "Sprache",
         languageSettings: "Sprach-Einstellungen",
       },
+      confirmUninstallApp: "Bist du sicher, dass du diese App deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
+      confirmUninstallCell: "Bist du sicher, dass du diese Cell deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
     },
   },
 };

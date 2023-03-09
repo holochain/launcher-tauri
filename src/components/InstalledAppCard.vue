@@ -5,8 +5,7 @@
     ref="uninstall-app-dialog"
     :primaryButtonLabel="$t('buttons.uninstall')"
     ><div style="text-align: center">
-      Are you sure you want to uninstall this App? This will irrevocably delete
-      all data stored in it.
+      {{ $t('dialogs.confirmUninstallApp') }}
     </div>
   </HCGenericDialog>
 
@@ -544,7 +543,6 @@ export default defineComponent({
 }
 
 .btn {
-  width: 80px;
   margin: 5px;
 }
 
