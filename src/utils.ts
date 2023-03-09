@@ -79,6 +79,16 @@ export function getCellName(cellInfo: CellInfo): string | undefined {
   }
 }
 
+export function getCellNetworkSeed(cellInfo: CellInfo): string | undefined {
+  if ("provisioned" in cellInfo) {
+    return cellInfo.provisioned.dna_modifiers.network_seed;
+  }
+  if ("cloned" in cellInfo) {
+    return cellInfo.cloned.dna_modifiers.network_seed;
+  }
+  return undefined;
+}
+
 // GossipProgress will only return anticipated bytes soon so these methods will become obsolete
 export function gossipProgressPercent(progress: GossipProgress | undefined) {
   if (!progress) {

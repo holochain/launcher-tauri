@@ -24,7 +24,7 @@
       <div style="position: relative">
         <!-- assumes same agent pub key for all cells (just taking the first one) -->
         <!-- <div v-show="showPubKeyTooltip" class="tooltip">Copied!</div> -->
-        <sl-tooltip class="tooltip" hoist placement="top" :content="showPubKeyTooltip ? 'Copied' : 'Your Public Key'">
+        <sl-tooltip class="tooltip" hoist placement="top" :content="showPubKeyTooltip ? $t('main.copied') : $t('main.yourPublicKey')">
           <HoloIdenticon
             :class="{ holoIdenticon: !showMore, holoIdenticonMore: showMore }"
             style="position: absolute; top: 78px; left: 78px; cursor: pointer"
@@ -184,7 +184,7 @@
     >
       <div class="row" style="margin-top: 45px; margin-left: 140px">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
-          >Holochain Version:</span
+          >{{ $t('main.holochainVersion') }}:</span
         >
         <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
           app.holochainId.type === "CustomBinary"
@@ -211,7 +211,7 @@
         <span
           style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
           @click="showProvisionedCells = !showProvisionedCells"
-          >{{ showProvisionedCells ? "[Hide]" : "[Show]" }}
+          >{{ showProvisionedCells ? `[${$t('main.hide')}]` : `[${$t('main.show')}]` }}
         </span>
       </div>
       <div v-if="showProvisionedCells" style="margin-left: 140px; margin-right: 20px">
@@ -237,7 +237,7 @@
         <span
           style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
           @click="showClonedCells = !showClonedCells"
-          >{{ showClonedCells ? "[Hide]" : "[Show]" }}
+          >{{ showClonedCells ? `[${$t('main.hide')}]` : `[${$t('main.show')}]` }}
         </span>
       </div>
       <div
@@ -256,7 +256,7 @@
         </div>
 
         <div v-else style="text-align: center; opacity: 0.7">
-          There are no cloned cells in this app.
+          {{ $t("main.noClonedCells") }}
         </div>
       </div>
 
@@ -271,12 +271,12 @@
         ><span style="display: flex; flex: 1"></span>
         <span
           style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
-          @click="showClonedCells = !showClonedCells"
-          >{{ showClonedCells ? "[Hide]" : "[Show]" }}
+          @click="showDisabledClonedCells = !showDisabledClonedCells"
+          >{{ showDisabledClonedCells ? `[${$t('main.hide')}]` : `[${$t('main.show')}]` }}
         </span>
       </div>
       <div
-        v-if="showClonedCells"
+        v-if="showDisabledClonedCells"
         style="margin-left: 140px; margin-right: 20px"
       >
         <div v-if="disabledClonedCells.length > 0">
@@ -293,7 +293,7 @@
         </div>
 
         <div v-else style="text-align: center; opacity: 0.7">
-          There are no disabled cloned cells in this app.
+          {{ $t("main.noDisabledClonedCells") }}
         </div>
       </div>
 
@@ -407,6 +407,7 @@ export default defineComponent({
     gossipInfo: Record<string, NetworkInfo>;
     showProvisionedCells: boolean;
     showClonedCells: boolean;
+    showDisabledClonedCells: boolean;
   } {
     return {
       showMore: false,
@@ -414,7 +415,8 @@ export default defineComponent({
       showPubKeyTooltip: false,
       gossipInfo: {},
       showProvisionedCells: true,
-      showClonedCells: true,
+      showClonedCells: false,
+      showDisabledClonedCells: false,
     };
   },
   emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp", "updateGui"],
