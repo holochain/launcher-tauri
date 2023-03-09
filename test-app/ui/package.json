@@ -22,6 +22,7 @@
     "@material/mwc-snackbar": "^0.27.0",
     "@material/mwc-formfield": "^0.27.0",
     "@msgpack/msgpack": "^2.7.2",
+    "@tauri-apps/api": "1.2.0",
     "@vaadin/date-time-picker": "^23.2.8",
     "lit": "^2.6.1",
     "uuid": "^8.3.2"

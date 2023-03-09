@@ -13,6 +13,7 @@ import {
 import { provide } from '@lit-labs/context';
 import '@material/mwc-circular-progress';
 import { v4 as uuidv4 } from "uuid";
+import { invoke } from '@tauri-apps/api';
 
 
 import { clientContext } from './contexts';
@@ -38,6 +39,8 @@ export class HolochainApp extends LitElement {
     this.appInfo = await this.client.appInfo();
 
     this.loading = false;
+
+    setTimeout(async () => this.notifyOs("This is an automatic notification independent of whether the app is running hidden in the background or visibly in the foreground."), 3000);
   }
 
   async createRandomClone() {
@@ -162,6 +165,10 @@ export class HolochainApp extends LitElement {
   }
 
 
+  async notifyOs(message: string) {
+    invoke("notify_os", { message })
+  }
+
   render() {
     if (this.loading)
       return html`
@@ -193,6 +200,14 @@ export class HolochainApp extends LitElement {
             style="cursor: pointer; font-weight: bold; text-decoration: underline;"
           >Click me to open DuckDuckGo via window.open()
           </div>
+        </div>
+
+        <div style="margin-top: 20px; border: 2px solid black; padding: 20px;">
+          <div style="font-weight: bold">Test OS notifications:</div>
+          <button
+            @click=${async () => this.notifyOs("This is a test message with some content that is a bit long just to see how it will be displayed despite its length.")}
+          >Click me to notify the OS
+          </button>
         </div>
 
         <div style="margin-top: 20px; border: 2px solid black; padding: 20px;">
