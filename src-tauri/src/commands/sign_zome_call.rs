@@ -56,7 +56,7 @@ pub async fn sign_zome_call(
   let lair_keystore_manager = manager.get_lair_keystore_manager()?;
   let signed_zome_call = lair_keystore_manager.sign_zome_call(zome_call_unsigned_converted)
     .await
-    .map_err(|_| String::from("Signing zome call failed."))?;
+    .map_err(|e| format!("Signing zome call failed: {}", e))?;
 
   Ok(signed_zome_call)
 }
