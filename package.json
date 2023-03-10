@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.8.995",
+  "version": "0.10.0-beta-webrtc.0",
   "private": true,
   "scripts": {
     "dev": "vite",
