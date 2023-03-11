@@ -1,9 +1,10 @@
+use futures::lock::Mutex;
 use holochain_manager::{
   config::LaunchHolochainConfig,
   versions::{
     holochain_conductor_api_latest::AppInfo,
     holochain_types_latest::{
-      prelude::{AgentPubKey, AppBundle, MembraneProof, CellId},
+      prelude::{AgentPubKey, AppBundle, CellId, MembraneProof},
       web_app::WebAppBundle,
     },
     mr_bundle_latest::ResourceBytes,
@@ -12,14 +13,14 @@ use holochain_manager::{
   HolochainManager,
 };
 use lair_keystore_manager::utils::create_dir_if_necessary;
-use serde::{Serialize, Deserialize};
-use futures::lock::Mutex;
-use tauri::{AppHandle, Manager};
+use serde::{Deserialize, Serialize};
 use std::{
   collections::HashMap,
   fs::{self, File},
-  path::{Path, PathBuf}, sync::Arc,
+  path::{Path, PathBuf},
+  sync::Arc,
 };
+use tauri::{AppHandle, Manager};
 
 use crate::{
   error::LaunchWebAppManagerError,
@@ -27,23 +28,15 @@ use crate::{
   utils::unzip_file,
 };
 
-
-
-
-
-
 pub struct WebAppManager {
   environment_path: PathBuf,
-  app_handle: Arc<AppHandle>,
   pub holochain_manager: HolochainManager,
-  allocated_ports: HashMap<String, u16>,
 }
 
 impl WebAppManager {
   pub async fn launch(
     version: HolochainVersion,
     mut config: LaunchHolochainConfig,
-    app_handle: Arc<AppHandle>,
     password: String,
   ) -> Result<Self, LaunchWebAppManagerError> {
     let environment_path = config.environment_path.clone();
@@ -64,9 +57,7 @@ impl WebAppManager {
     // Fetch the running apps
     let mut manager = WebAppManager {
       holochain_manager,
-      app_handle,
       environment_path,
-      allocated_ports: HashMap::new(),
     };
     manager
       .on_running_apps_changed()
@@ -75,7 +66,6 @@ impl WebAppManager {
 
     Ok(manager)
   }
-
 
   /// Install happ with UI
   pub async fn install_web_app(
@@ -98,7 +88,6 @@ impl WebAppManager {
       .await
       .or(Err("Failed to resolve Web UI"))?;
 
-
     // Assuming only one single default UI per app at the moment.
     let default_ui_name = String::from("default");
 
@@ -116,7 +105,12 @@ impl WebAppManager {
     }
 
     // Install app UI in folder
-    self.install_app_ui(app_id.clone(), web_ui_zip_bytes.into_owned(), &default_ui_name, gui_release_hash)?;
+    self.install_app_ui(
+      app_id.clone(),
+      web_ui_zip_bytes.into_owned(),
+      &default_ui_name,
+      gui_release_hash,
+    )?;
 
     // Install app in conductor manager
     if let Err(err) = self
@@ -140,10 +134,6 @@ impl WebAppManager {
     Ok(())
   }
 
-  pub fn get_allocated_port(&self, app_id: &String) -> Option<u16> {
-    self.allocated_ports.get(app_id).map(|u| u.clone())
-  }
-
   fn install_app_ui(
     &mut self,
     app_id: String,
@@ -151,7 +141,6 @@ impl WebAppManager {
     ui_name: &String,
     gui_release_hash: Option<String>,
   ) -> Result<(), String> {
-
     if let Some(hash) = gui_release_hash {
       self.store_gui_release_hash(hash, &app_id, &ui_name)?;
     }
@@ -161,7 +150,8 @@ impl WebAppManager {
     let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, ui_name);
     let ui_zip_path = apps_data_dir(&self.environment_path).join(format!("{}.zip", app_id));
 
-    fs::write(ui_zip_path.clone(), web_ui_zip_bytes.into_inner()).or(Err("Failed to write Web UI Zip file"))?;
+    fs::write(ui_zip_path.clone(), web_ui_zip_bytes.into_inner())
+      .or(Err("Failed to write Web UI Zip file"))?;
 
     let file = File::open(ui_zip_path.clone()).or(Err("Failed to read Web UI Zip file"))?;
     unzip_file(file, ui_folder_path)?;
@@ -180,9 +170,14 @@ impl WebAppManager {
   ) -> Result<(), String> {
     // move folder of previous assets to a temporary backup folder in case installation fails
     let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, ui_name);
-    let temp_old_ui_path = app_ui_dir(&self.environment_path, &app_id, ui_name).join("assets_temp_backup");
-    fs::rename(ui_folder_path.clone(), temp_old_ui_path.clone())
-      .map_err(|e| format!("Failed to move currently installed UI assets to temporary backup location: {:?}", e))?;
+    let temp_old_ui_path =
+      app_ui_dir(&self.environment_path, &app_id, ui_name).join("assets_temp_backup");
+    fs::rename(ui_folder_path.clone(), temp_old_ui_path.clone()).map_err(|e| {
+      format!(
+        "Failed to move currently installed UI assets to temporary backup location: {:?}",
+        e
+      )
+    })?;
 
     if gui_release_hash == None {
       log::warn!("WARNING: App UI updated without passing a gui release hash. This only expected if a GUI is updated from the filesystem instead of through fetching it form the DevHub");
@@ -198,20 +193,23 @@ impl WebAppManager {
           .map_err(|e| format!("Failed to remove assets dir when trying to restore the pre-update state due to failed installation of the new app UI: {:?}", e))?;
         fs::rename(temp_old_ui_path, ui_folder_path)
           .map_err(|e| format!("Failed to rename temporary assets backup dir when trying to restore the pre-update state due to failed installation of the new app UI: {:?}", e))?;
-        return Err(e)
+        return Err(e);
       }
     }
 
     // If installation was successful, remove the temporary backup directory
-    fs::remove_dir_all(temp_old_ui_path)
-      .map_err(|e| format!("Failed to remove temporary backup folder for assets after successful installation: {:?}", e))?;
+    fs::remove_dir_all(temp_old_ui_path).map_err(|e| {
+      format!(
+        "Failed to remove temporary backup folder for assets after successful installation: {:?}",
+        e
+      )
+    })?;
 
     Ok(())
   }
 
   /// Uninstalls the UI assets and tauri's localStorage associated to the given app
   fn _uninstall_app_ui(&mut self, app_id: String, ui_name: &String) -> Result<(), String> {
-
     let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, ui_name);
     let local_storage_path = app_local_storage_dir(&self.environment_path, &app_id, ui_name);
 
@@ -220,16 +218,15 @@ impl WebAppManager {
     }
 
     if Path::new(&local_storage_path).exists() {
-      fs::remove_dir_all(local_storage_path).or(Err("Failed to remove app's localStorage folder"))?;
+      fs::remove_dir_all(local_storage_path)
+        .or(Err("Failed to remove app's localStorage folder"))?;
     }
 
     Ok(())
   }
 
-
   /// Uninstalls the data of all UI's of this app as well as tauri's localStorage associated to those UI's
   fn uninstall_app_data(&mut self, app_id: String) -> Result<(), String> {
-
     let ui_folder_path = app_data_dir(&self.environment_path, &app_id);
 
     if Path::new(&ui_folder_path).exists() {
@@ -238,7 +235,6 @@ impl WebAppManager {
 
     Ok(())
   }
-
 
   async fn on_running_apps_changed(&mut self) -> Result<(), String> {
     let _installed_apps = self.list_apps().await?;
@@ -253,14 +249,6 @@ impl WebAppManager {
     match self.is_web_app(app_id.clone()) {
       true => Ok(WebUiInfo::WebApp {
         path_to_ui: ui_folder_path,
-        app_ui_port: self
-          .allocated_ports
-          .get(&app_id)
-          .ok_or(format!(
-            "This application was installed but we didn't allocate any port to it: {}",
-            app_id,
-          ))?
-          .clone(),
         gui_release_hash,
       }),
       false => Ok(WebUiInfo::Headless),
@@ -275,11 +263,9 @@ impl WebAppManager {
     app_local_storage_dir(&self.environment_path, &app_id, ui_name)
   }
 
-
   pub fn kill(self) -> Result<(), String> {
     self.holochain_manager.kill()
   }
-
 
   /// Install a happ *without* UI
   pub async fn install_app(
@@ -291,7 +277,6 @@ impl WebAppManager {
     agent_pub_key: Option<AgentPubKey>,
     happ_release_hash: Option<String>,
   ) -> Result<(), String> {
-
     // Try to write hashes first so if that fails, don't even install the app
     // Note: a hApp release hash will only be passed if the hApp is installed
     // from the AppLibrary
@@ -302,7 +287,13 @@ impl WebAppManager {
     // Install app in conductor manager
     self
       .holochain_manager
-      .install_app(app_id, app_bundle, network_seed, membrane_proofs, agent_pub_key)
+      .install_app(
+        app_id,
+        app_bundle,
+        network_seed,
+        membrane_proofs,
+        agent_pub_key,
+      )
       .await
       .map_err(|err| {
         log::error!("Error installing hApp in the conductor: {}", err);
@@ -368,24 +359,14 @@ impl WebAppManager {
   pub async fn list_apps(&mut self) -> Result<Vec<InstalledWebAppInfo>, String> {
     let installed_apps = self.holochain_manager.list_apps().await?;
 
-    let mut updated_pubkey_map: HashMap<String, AgentPubKey> = HashMap::new();
-    // update agent public key to tauri window label mapping
-    for app_info in installed_apps.clone() {
-      let window_label = derive_window_label(&app_info.installed_app_id);
-      updated_pubkey_map.insert(window_label, app_info.agent_pub_key);
-    }
-
-    *self.app_handle.state::<Arc<Mutex<HashMap<String, AgentPubKey>>>>().lock().await = updated_pubkey_map;
-
-    self.allocate_necessary_ports(&installed_apps);
-
     // Assuming only one single default UI per app at the moment.
     let default_ui_name = String::from("default");
 
     let installed_web_apps = installed_apps
       .into_iter()
       .map(|installed_app| {
-        let web_ui_info = self.get_web_ui_info(installed_app.installed_app_id.clone(), &default_ui_name)?;
+        let web_ui_info =
+          self.get_web_ui_info(installed_app.installed_app_id.clone(), &default_ui_name)?;
         // Currently only 1 UI supported
         let mut web_uis = HashMap::new();
         web_uis.insert(default_ui_name.clone(), web_ui_info);
@@ -401,45 +382,6 @@ impl WebAppManager {
       .collect::<Result<Vec<InstalledWebAppInfo>, String>>()?;
 
     Ok(installed_web_apps)
-  }
-
-  fn is_web_app(&self, app_id: String) -> bool {
-    // Assuming only one single default UI per app at the moment.
-    let default_ui_name = String::from("default");
-    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, &default_ui_name);
-
-    Path::new(&ui_folder_path).exists()
-  }
-
-  fn allocate_necessary_ports(&mut self, installed_apps: &Vec<AppInfo>) -> () {
-    let web_apps: Vec<AppInfo> = installed_apps
-      .iter()
-      .filter(|app| self.is_web_app(app.installed_app_id.clone()))
-      .cloned()
-      .collect();
-
-    let mut installed_app_ids: HashMap<String, bool> = HashMap::new();
-
-    // Allocate new ports for newly installed apps
-    for web_app in web_apps {
-      if !self.allocated_ports.contains_key(&web_app.installed_app_id) {
-        let free_port = portpicker::pick_unused_port().expect("No ports free");
-        self
-          .allocated_ports
-          .insert(web_app.installed_app_id.clone(), free_port);
-      }
-
-      installed_app_ids.insert(web_app.installed_app_id, true);
-    }
-
-    let allocated_app_ids: Vec<String> = self.allocated_ports.keys().cloned().collect();
-
-    // Remove apps no longer installed
-    for allocated_app_id in allocated_app_ids {
-      if !installed_app_ids.contains_key(&allocated_app_id) {
-        self.allocated_ports.remove(&allocated_app_id);
-      }
-    }
   }
 
   pub fn admin_interface_port(&self) -> u16 {
@@ -468,67 +410,99 @@ impl WebAppManager {
     let wasm_size = fs_extra::dir::get_size(conductor_path.join("wasm"))
       .map_err(|e| format!("Failed to get conductor directory size: {:?}", e))?;
 
-    Ok(
-      StorageInfo {
-        uis: uis_size,
-        authored: authored_size,
-        cache: cache_size,
-        conductor: conductor_size,
-        dht: dht_size,
-        p2p: p2p_size,
-        wasm: wasm_size,
-      }
-    )
-
+    Ok(StorageInfo {
+      uis: uis_size,
+      authored: authored_size,
+      cache: cache_size,
+      conductor: conductor_size,
+      dht: dht_size,
+      p2p: p2p_size,
+      wasm: wasm_size,
+    })
   }
-
 
   /// Stores the hash of a happ release of the given hApp to the filesystem
   /// EntryHash must be passed as a base64 string
   pub fn store_happ_release_hash(&self, hash: String, app_id: &String) -> Result<(), String> {
-
     let app_data_dir = app_data_dir(&self.environment_path, app_id);
 
-    create_dir_if_necessary(&app_data_dir)
-      .map_err(|e| format!("Failed to create app's data directory before storing happ release hash: {:?}", e))?;
+    create_dir_if_necessary(&app_data_dir).map_err(|e| {
+      format!(
+        "Failed to create app's data directory before storing happ release hash: {:?}",
+        e
+      )
+    })?;
 
     let dot_happrelease_path = app_data_dir.join(".happrelease");
     // if there is already a .happrelease file, store its contents to a .happrelease.previous file in order to be able
     // to revert upgrades if necessary
     if dot_happrelease_path.exists() {
       let dot_happrelease_dot_previous_path = app_data_dir.join(".happrelease.previous");
-      std::fs::rename(dot_happrelease_path.clone(), dot_happrelease_dot_previous_path)
-        .map_err(|e| format!("Failed to rename .happrelease file to .happrelease.previous file: {:?}", e))?;
+      std::fs::rename(
+        dot_happrelease_path.clone(),
+        dot_happrelease_dot_previous_path,
+      )
+      .map_err(|e| {
+        format!(
+          "Failed to rename .happrelease file to .happrelease.previous file: {:?}",
+          e
+        )
+      })?;
     }
 
     // println!("Storing happ release hash to the following path: {:?}", dot_happrelease_path);
 
-    std::fs::write(dot_happrelease_path, hash)
-      .map_err(|e| format!("Failed to write happ release hash to .happrelease file: {:?}", e))
+    std::fs::write(dot_happrelease_path, hash).map_err(|e| {
+      format!(
+        "Failed to write happ release hash to .happrelease file: {:?}",
+        e
+      )
+    })
   }
 
   /// Stores the hash of a gui release of the given hApp to the filesystem
   /// EntryHash must be passed as a base64 string
-  pub fn store_gui_release_hash(&self, hash: String, app_id: &String, ui_name: &String) -> Result<(), String> {
-
+  pub fn store_gui_release_hash(
+    &self,
+    hash: String,
+    app_id: &String,
+    ui_name: &String,
+  ) -> Result<(), String> {
     let app_gui_dir = app_ui_dir(&self.environment_path, app_id, ui_name);
-    create_dir_if_necessary(&app_gui_dir)
-      .map_err(|e| format!("Failed to create app's data directory before storing happ release hash: {:?}", e))?;
+    create_dir_if_necessary(&app_gui_dir).map_err(|e| {
+      format!(
+        "Failed to create app's data directory before storing happ release hash: {:?}",
+        e
+      )
+    })?;
 
     let dot_guirelease_path = app_gui_dir.join(".guirelease");
     // if there is already a .guirelease file, store its contents to a .guirelease.previous file in order to be able
     // to revert upgrades if necessary
     if dot_guirelease_path.exists() {
-      let dot_guirelease_dot_previous_path = app_data_dir(&self.environment_path, app_id).join(".guirelease.previous");
+      let dot_guirelease_dot_previous_path =
+        app_data_dir(&self.environment_path, app_id).join(".guirelease.previous");
 
-      std::fs::rename(dot_guirelease_path.clone(), dot_guirelease_dot_previous_path)
-        .map_err(|e| format!("Failed to rename .guirelease file to .guirelease.previous file: {:?}", e))?;
+      std::fs::rename(
+        dot_guirelease_path.clone(),
+        dot_guirelease_dot_previous_path,
+      )
+      .map_err(|e| {
+        format!(
+          "Failed to rename .guirelease file to .guirelease.previous file: {:?}",
+          e
+        )
+      })?;
     }
 
     // println!("Storing GUI release hash to the following path: {:?}", dot_guirelease_path);
 
-    std::fs::write(dot_guirelease_path, hash)
-      .map_err(|e| format!("Failed to write GUI release hash to .guirelease file: {:?}", e))
+    std::fs::write(dot_guirelease_path, hash).map_err(|e| {
+      format!(
+        "Failed to write GUI release hash to .guirelease file: {:?}",
+        e
+      )
+    })
   }
 
   /// Reads the happ release hash of an app
@@ -541,21 +515,25 @@ impl WebAppManager {
 
   /// Reads the gui release hash of an app UI
   pub fn get_gui_release_hash(&self, app_id: &String, ui_name: &String) -> Option<String> {
-    match fs::read_to_string(app_ui_dir(&self.environment_path, app_id, ui_name).join(".guirelease")) {
+    match fs::read_to_string(
+      app_ui_dir(&self.environment_path, app_id, ui_name).join(".guirelease"),
+    ) {
       Ok(s) => Some(s),
       Err(_) => None,
     }
   }
-
 }
-
 
 /// Derives the window label from the app id and the holochain id
 /// The window label will be of the format [holochain version]#[app id with some special characters removed]
 pub fn derive_window_label(app_id: &String) -> String {
   // !! it is important to have the window label not be uniquely defined by the app id to ensure
   // it's possible to unambiguously differentiate this window from the admin window !!
-  let mut window_label = app_id.clone().replace("-", "--").replace(" ", "-").replace(".", "_");
+  let mut window_label = app_id
+    .clone()
+    .replace("-", "--")
+    .replace(" ", "-")
+    .replace(".", "_");
   window_label.push_str("--EXTERNAL");
   window_label
 }
@@ -566,7 +544,6 @@ fn apps_data_dir(root_path: &PathBuf) -> PathBuf {
   root_path.join("apps")
 }
 
-
 /// Path to the apps folder relative to a root directory
 /// (normally relative to the holochain version's "data directory")
 fn app_data_dir(root_path: &PathBuf, app_id: &String) -> PathBuf {
@@ -576,7 +553,10 @@ fn app_data_dir(root_path: &PathBuf, app_id: &String) -> PathBuf {
 /// Path where things related to a specific UI of the given app are stored, relative
 /// to a root directory (normally relative to the holochain version's "data directory")
 fn app_ui_dir(root_path: &PathBuf, app_id: &String, ui_name: &String) -> PathBuf {
-  apps_data_dir(root_path).join(app_id).join("uis").join(ui_name)
+  apps_data_dir(root_path)
+    .join(app_id)
+    .join("uis")
+    .join(ui_name)
 }
 
 /// Path where UI assets of the given app are stored, relative
@@ -584,7 +564,6 @@ fn app_ui_dir(root_path: &PathBuf, app_id: &String, ui_name: &String) -> PathBuf
 fn app_assets_dir(root_path: &PathBuf, app_id: &String, ui_name: &String) -> PathBuf {
   app_ui_dir(root_path, app_id, ui_name).join("assets")
 }
-
 
 /// Path where localStorage of the given app UI is stored, relative
 /// to a root directory (normally relative to the holochain version's "data directory")
@@ -598,8 +577,6 @@ fn app_local_storage_dir(root_path: &PathBuf, app_id: &String, ui_name: &String)
 fn conductor_dir(root_path: &PathBuf) -> PathBuf {
   root_path.join("conductor")
 }
-
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct StorageInfo {
