@@ -1,6 +1,6 @@
 use holochain_manager::versions::holochain_conductor_api_latest::AppInfo;
 use serde::{Deserialize, Serialize};
-use std::{path::PathBuf, collections::HashMap};
+use std::{collections::HashMap, path::PathBuf};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "type")]
@@ -8,7 +8,6 @@ pub enum WebUiInfo {
   Headless,
   WebApp {
     path_to_ui: PathBuf,
-    app_ui_port: u16,
     gui_release_hash: Option<String>, // B64 hash
   },
 }

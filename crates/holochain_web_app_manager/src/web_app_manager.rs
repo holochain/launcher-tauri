@@ -255,6 +255,14 @@ impl WebAppManager {
     }
   }
 
+  fn is_web_app(&self, app_id: String) -> bool {
+    // Assuming only one single default UI per app at the moment.
+    let default_ui_name = String::from("default");
+    let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, &default_ui_name);
+
+    Path::new(&ui_folder_path).exists()
+  }
+
   pub fn get_app_assets_dir(&self, app_id: &String, ui_name: &String) -> PathBuf {
     app_assets_dir(&self.environment_path, &app_id, ui_name)
   }
