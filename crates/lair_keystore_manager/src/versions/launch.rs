@@ -37,10 +37,13 @@ pub async fn launch_lair_keystore_process(
     //    with unix://[path to tempdir]/socket?k=[some_key]
     let split_byte_index = connection_url_line.rfind("socket?").unwrap();
     let socket = &connection_url_line.as_str()[split_byte_index..];
-    let tempdir_connection_url = url::Url::parse(&format!(
+    let tempdir_connection_url = match url::Url::parse(&format!(
       "unix://{}",
       keystore_path.join(socket).to_str().unwrap(),
-    )).unwrap();
+    )) {
+      Ok(url) => url,
+      Err(e) => return Err(LairKeystoreError::OtherError(format!("Failed to parse URL for symlink lair path: {}", e))),
+    };
 
     let new_line = &format!("connectionUrl: {}\n", tempdir_connection_url);
 
@@ -53,9 +56,9 @@ pub async fn launch_lair_keystore_process(
       }
     }).collect::<String>();
 
+    // 5. Overwrite the lair-keystore-config.yaml with the modified content
     std::fs::write(keystore_data_dir.join("lair-keystore-config.yaml"), lair_config_string)
       .map_err(|e| LairKeystoreError::ErrorWritingLairConfig(e.to_string()))?;
-
   }
 
 
