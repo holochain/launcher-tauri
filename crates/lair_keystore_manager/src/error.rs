@@ -14,6 +14,12 @@ pub enum LairKeystoreError {
   IncorrectPassword,
   #[error("Failed to create LairClient: `{0}`")]
   ErrorCreatingLairClient(String),
+  #[error("Failed to create temp dir: `{0}`")]
+  ErrorReadingLairConfig(String),
+  #[error("Failed to read lair-keysstore-config.yaml: `{0}`")]
+  ErrorWritingLairConfig(String),
+  #[error("Failed to write lair-keysstore-config.yaml: `{0}`")]
+  ErrorCreatingSimLink(String),
   #[error("Failed to sign zome call: `{0}`")]
   SignZomeCallError(String),
 }

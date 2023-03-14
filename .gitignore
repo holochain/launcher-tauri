@@ -4,6 +4,7 @@ node_modules
 .cargo
 /target
 /test-app
+/default_apps
 
 # temporary files
 .hc*

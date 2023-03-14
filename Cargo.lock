@@ -4150,8 +4150,10 @@ dependencies = [
  "holochain_zome_types",
  "lair_keystore_api",
  "log",
+ "nanoid 0.4.0",
  "serde",
  "serde-enum-str",
+ "symlink",
  "tauri",
  "thiserror",
  "url 2.3.1",
@@ -7333,6 +7335,12 @@ checksum = "7dcb1ed7b8330c5eed5441052651dd7a12c75e2ed88f2ec024ae1fa3a5e59945"
 dependencies = [
  "zeroize",
 ]
+
+[[package]]
+name = "symlink"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7973cce6668464ea31f176d85b13c7ab3bba2cb3b77a2ed26abd7801688010a"
 
 [[package]]
 name = "syn"
