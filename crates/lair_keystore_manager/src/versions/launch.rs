@@ -15,7 +15,6 @@ pub async fn launch_lair_keystore_process(
   envs.insert(String::from("RUST_LOG"), String::from(log_level.as_str()));
 
   let mut keystore_path = keystore_data_dir.clone();
-  println!("### Keystore data dir: {:?}", keystore_path);
 
   // On Unix systems, there is a limit to the path length of a domain socket. Create a symlink to the lair directory from the tempdir
   // instead and overwrite the connectionUrl in the lair-keystore-config.yaml
@@ -56,8 +55,6 @@ pub async fn launch_lair_keystore_process(
         line
       }
     }).collect::<String>();
-
-    println!("##### REPLACING lair-keystore-config.yaml with: ####\n{}", lair_config_string);
 
     std::fs::write(keystore_data_dir.join("lair-keystore-config.yaml"), lair_config_string)
       .map_err(|e| LairKeystoreError::ErrorWritingLairConfig(e.to_string()))?;
