@@ -19,9 +19,6 @@ pub async fn launch_lair_keystore_process(
   // On Unix systems, there is a limit to the path length of a domain socket. Create a symlink to the lair directory from the tempdir
   // instead and overwrite the connectionUrl in the lair-keystore-config.yaml
   if cfg!(target_family="unix") {
-    // let tmp_dir = TempDir::new("lair")
-    //   .map_err(|e| LairKeystoreError::ErrorCreatingTempDir(format!("{}", e)))?;
-    // let tmp_dir_pathbuf = tmp_dir.into_path();
     let uid = nanoid::nanoid!(13);
     let src_path = std::env::temp_dir().join(format!("lair.{}", uid));
     symlink::symlink_dir(keystore_path, src_path.clone())
