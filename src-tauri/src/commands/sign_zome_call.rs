@@ -9,16 +9,11 @@ use holochain_types::prelude::ZomeCallUnsigned;
 use holochain_launcher_utils::zome_call_signing::ZomeCallUnsignedTauri;
 
 
-// // I need a mapping between window label and agent public key
-// HashMap<String, AgentPubKey> where the string is HolochainVersionId.into::<String>()
-
 #[tauri::command]
 pub async fn sign_zome_call(
   window: tauri::Window,
   launcher_state: tauri::State<'_, LauncherState>,
   pubkey_map_state: tauri::State<'_, Arc<Mutex<HashMap<String, AgentPubKey>>>>,
-  // state storing the information about what app id is associated with what window label
-  // lair_keystore_manager: T<LairKeystoreManager>,
   zome_call_unsigned: ZomeCallUnsignedTauri,
 ) -> Result<ZomeCall, String> {
 
