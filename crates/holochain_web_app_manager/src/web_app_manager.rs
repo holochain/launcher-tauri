@@ -286,7 +286,7 @@ impl WebAppManager {
     membrane_proofs: HashMap<String, MembraneProof>,
     agent_pub_key: Option<AgentPubKey>,
     happ_release_hash: Option<String>,
-  ) -> Result<(), String> {
+  ) -> Result<AppInfo, String> {
     // Try to write hashes first so if that fails, don't even install the app
     // Note: a hApp release hash will only be passed if the hApp is installed
     // from the AppLibrary
@@ -295,7 +295,7 @@ impl WebAppManager {
     }
 
     // Install app in conductor manager
-    self
+    let app_info = self
       .holochain_manager
       .install_app(
         app_id,
@@ -312,7 +312,7 @@ impl WebAppManager {
 
     self.on_running_apps_changed().await?;
 
-    Ok(())
+    Ok(app_info)
   }
 
   /// This uninstalls the happ from the conductor as well as all UI's and
