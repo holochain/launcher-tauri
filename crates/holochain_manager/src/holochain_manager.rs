@@ -4,13 +4,13 @@ use std::path::Path;
 use std::time::SystemTime;
 use std::{fs, time::Duration};
 
+use holochain::conductor::ConductorHandle;
 // NEW_VERSION change holochain_types version
 use holochain_client::{AdminWebsocket, AgentPubKey, AppInfo, InstallAppPayload};
 use holochain_types_0_1_3::prelude::{
   AppBundleSource, CellId, CloneCellId, DisableCloneCellPayload,
 };
 use lair_keystore_manager::utils::create_dir_if_necessary;
-use tauri::api::process::CommandChild;
 
 use crate::versions::holochain_types_latest::prelude::{AppBundle, MembraneProof};
 
@@ -31,7 +31,7 @@ pub struct HolochainManager {
   // If it changes, move this property down in the HolochainVersion
   ws: AdminWebsocket,
 
-  command_child: CommandChild,
+  conductor_handle: ConductorHandle,
 }
 
 impl HolochainManager {
@@ -66,14 +66,7 @@ impl HolochainManager {
     fs::write(conductor_config_path.clone(), new_conductor_config.clone())
       .expect("Could not write conductor config");
 
-    let command_child = launch_holochain_process(
-      config.log_level,
-      version,
-      config.command,
-      conductor_config_path,
-      password,
-    )
-    .await?;
+    let conductor_handle = launch_holochain_process(conductor_config_path, password).await?;
 
     std::thread::sleep(Duration::from_millis(100));
 
@@ -113,7 +106,7 @@ impl HolochainManager {
       ws,
       admin_interface_port: config.admin_port,
       app_interface_port,
-      command_child,
+      conductor_handle,
     })
   }
 
@@ -123,16 +116,6 @@ impl HolochainManager {
 
   pub fn app_interface_port(&self) -> u16 {
     self.app_interface_port
-  }
-
-  pub fn kill(mut self) -> Result<(), String> {
-    self.ws.close();
-    self
-      .command_child
-      .kill()
-      .map_err(|err| format!("Could not kill the holochain process: {}", err))?;
-
-    Ok(())
   }
 
   pub async fn install_app(

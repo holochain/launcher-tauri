@@ -6,6 +6,11 @@ use thiserror::Error;
 
 #[derive(Error, Serialize, Deserialize, Debug, Clone)]
 pub enum LaunchHolochainError {
+  #[error("Failed to read conductor config: `{0}`")]
+  Serde(String),
+  #[error("Conductor error: `{0}`")]
+  ConductorError(String),
+
   #[error("Failed to launch child: `{0}`")]
   LaunchChildError(#[from] LaunchChildError),
   #[error("Failed to write the password: `{0}`")]
@@ -31,8 +36,6 @@ impl From<io::Error> for LaunchHolochainError {
     LaunchHolochainError::IoError(format!("{:?}", err))
   }
 }
-
-
 
 #[derive(Error, Serialize, Deserialize, Debug, Clone)]
 pub enum InitializeConductorError {

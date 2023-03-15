@@ -273,10 +273,6 @@ impl WebAppManager {
     app_local_storage_dir(&self.environment_path, &app_id, ui_name)
   }
 
-  pub fn kill(self) -> Result<(), String> {
-    self.holochain_manager.kill()
-  }
-
   /// Install a happ *without* UI
   pub async fn install_app(
     &mut self,

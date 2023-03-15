@@ -2945,6 +2945,7 @@ dependencies = [
  "ascii",
  "async-trait",
  "enum_dispatch",
+ "holochain",
  "holochain_client",
  "holochain_conductor_api",
  "holochain_p2p",
