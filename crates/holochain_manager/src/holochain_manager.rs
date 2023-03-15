@@ -6,7 +6,9 @@ use std::{fs, time::Duration};
 
 // NEW_VERSION change holochain_types version
 use holochain_client::{AdminWebsocket, AgentPubKey, AppInfo, InstallAppPayload};
-use holochain_types_0_1_3::prelude::{AppBundleSource, CellId, DisableCloneCellPayload, CloneCellId};
+use holochain_types_0_1_3::prelude::{
+  AppBundleSource, CellId, CloneCellId, DisableCloneCellPayload,
+};
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
 
@@ -140,7 +142,7 @@ impl HolochainManager {
     network_seed: Option<String>,
     membrane_proofs: HashMap<String, MembraneProof>,
     agent_pub_key: Option<AgentPubKey>,
-  ) -> Result<(), String> {
+  ) -> Result<AppInfo, String> {
     let agent_key = match agent_pub_key {
       Some(pub_key) => Ok(pub_key),
       None => self
@@ -169,7 +171,7 @@ impl HolochainManager {
       membrane_proofs,
       network_seed,
     };
-    self
+    let app_info = self
       .ws
       .install_app(payload)
       .await
@@ -181,7 +183,7 @@ impl HolochainManager {
       .await
       .map_err(|err| format!("Error enabling app: {:?}", err))?;
 
-    Ok(())
+    Ok(app_info)
   }
 
   pub async fn uninstall_app(&mut self, app_id: String) -> Result<(), String> {
@@ -231,7 +233,8 @@ impl HolochainManager {
       .delete_clone_cell(DisableCloneCellPayload {
         app_id,
         clone_cell_id,
-      }).await
+      })
+      .await
       .map_err(|err| format!("Error deleting cloned cell: {:?}", err))?;
 
     Ok(())

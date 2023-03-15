@@ -77,7 +77,7 @@ impl WebAppManager {
     agent_pub_key: Option<AgentPubKey>,
     happ_release_hash: Option<String>,
     gui_release_hash: Option<String>,
-  ) -> Result<(), String> {
+  ) -> Result<AppInfo, String> {
     let app_bundle = web_app_bundle
       .happ_bundle()
       .await
@@ -113,7 +113,7 @@ impl WebAppManager {
     )?;
 
     // Install app in conductor manager
-    if let Err(err) = self
+    let install_result = self
       .holochain_manager
       .install_app(
         app_id.clone(),
@@ -122,16 +122,18 @@ impl WebAppManager {
         membrane_proofs,
         agent_pub_key,
       )
-      .await
-    {
-      self.uninstall_app_data(app_id)?;
+      .await;
+    match install_result {
+      Ok(app_info) => {
+        self.on_running_apps_changed().await?;
+        Ok(app_info)
+      }
+      Err(err) => {
+        self.uninstall_app_data(app_id)?;
 
-      return Err(err);
+        Err(err)
+      }
     }
-
-    self.on_running_apps_changed().await?;
-
-    Ok(())
   }
 
   fn install_app_ui(
