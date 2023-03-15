@@ -18,8 +18,10 @@ holochain_launcher_utils = { path = "../holochain_launcher_utils" }
 ascii = "1.0.0"
 async-trait = "0.1.52"
 log = "0.4.14"
+nanoid = "0.4.0"
 serde = {version = "1", features = ["derive"]}
 serde-enum-str = "0.2"
+symlink = "0.1.0"
 tauri = { version = "1.2.3", features = ["process-command-api"]}
 thiserror = "1.0.30"
 url2 = "0.0.6"
