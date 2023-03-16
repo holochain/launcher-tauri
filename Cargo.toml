@@ -7,3 +7,24 @@ members = [
 ]
 resolver = "2"
 
+
+[workspace.dependencies]
+
+hdk = { package = "hdk", version = "0.2.0-beta-rc.0"}
+
+holochain_client = { path = "../holochain-client-rust" }
+
+holochain = "0.2.0-beta-rc.0"
+holochain_types = { package = "holochain_types", version = "0.2.0-beta-rc.0"}
+holochain_conductor_api = { package = "holochain_conductor_api", version = "0.2.0-beta-rc.0" }
+holochain_zome_types = { package = "holochain_zome_types", version = "0.2.0-beta-rc.0" }
+
+holochain_cli_sandbox =  {package = "holochain_cli_sandbox", version = "0.2.0-beta-rc.0"}
+holochain_launcher_utils = { path = "./crates/holochain_launcher_utils" }
+holochain_util = { package = "holochain_util", version = "0.2.0-beta-rc.0", features = [ "pw" ] }
+
+
+# Specific versions for holochain manager
+holochain_conductor_api_0_2_0 = { package = "holochain_conductor_api", version = "0.2.0-beta-rc.0"}
+holochain_p2p_0_2_0 = { package = "holochain_p2p", version = "0.2.0-beta-rc.0"}
+holochain_types_0_2_0 = { package = "holochain_types", version = "0.2.0-beta-rc.0"}
