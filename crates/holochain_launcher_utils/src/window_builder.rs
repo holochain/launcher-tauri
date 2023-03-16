@@ -1,7 +1,13 @@
 use std::fs::read;
 use std::path::PathBuf;
-use tauri::{api::http::Response, window::WindowBuilder, WindowUrl};
+use tauri::{http::Response, window::WindowBuilder, WindowUrl};
 
+const MESSAGE_404: &'static str = r#"
+  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
+    <h1>404 Not Found.</h1>
+    <h3>Looks like this UI has no index.html</h3>
+  </div>
+  "#;
 pub enum UISource {
   Path(PathBuf),
   Port(u16),
@@ -98,7 +104,7 @@ pub fn happ_window_builder<'a>(
             } // TODO! Check if there are better ways of dealing with errors here
             Err(e) => {
               if show_404 {
-                *mutable_response = message_404.clone();
+                *mutable_response = MESSAGE_404.as_bytes().to_vec();
                 response.set_mimetype(Some(String::from("text/html")));
               }
               log::error!("Error reading the path of the UI's index.html: {:?}", e);
@@ -116,7 +122,7 @@ pub fn happ_window_builder<'a>(
             // TODO! if files in subfolders are requested, additional logic may be required here to get paths right across platforms
             let asset_path = assets_path.join(asset_file);
 
-            *mutable_response = read_resource_from_path(asset_path, response, show_404);
+            read_resource_from_path(asset_path, response, show_404, Some(index_path));
           }
         }
       }
@@ -131,8 +137,13 @@ pub fn happ_window_builder<'a>(
     .title(window_title)
 }
 
-pub fn read_resource_from_path(resource_path: PathBuf, response: &mut Response, show_404: bool) {
-  let mime_guess = mime_guess::from_path(resource_path);
+pub fn read_resource_from_path(
+  resource_path: PathBuf,
+  response: &mut Response,
+  show_404: bool,
+  fallback_index_html_path: Option<PathBuf>,
+) {
+  let mime_guess = mime_guess::from_path(resource_path.clone());
 
   let mime_type = match mime_guess.first() {
     Some(mime) => Some(mime.essence_str().to_string()),
@@ -146,13 +157,6 @@ pub fn read_resource_from_path(resource_path: PathBuf, response: &mut Response, 
     }
   };
 
-  let message_404 = r#"
-  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
-    <h1>404 Not Found.</h1>
-    <h3>Looks like this UI has no index.html</h3>
-  </div>
-  "#.as_bytes().to_vec();
-
   match read(resource_path.clone()) {
     Ok(asset) => {
       let mutable_response = response.body_mut();
@@ -164,18 +168,23 @@ pub fn read_resource_from_path(resource_path: PathBuf, response: &mut Response, 
     Err(_e) => {
       // println!("\n### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.\n", asset_path, e);
       let mutable_response = response.body_mut();
-      match read(index_path.clone()) {
-        Ok(index_html) => {
-          *mutable_response = index_html;
-          response.set_mimetype(Some(String::from("text/html")));
-        }
-        Err(e) => {
-          if show_404 {
-            *mutable_response = message_404.clone();
+
+      if let Some(fallback_path) = fallback_index_html_path {
+        match read(fallback_path) {
+          Ok(fallback_file) => {
+            *mutable_response = fallback_file;
             response.set_mimetype(Some(String::from("text/html")));
+            return ();
           }
-          log::error!("Error reading the path of the UI's index.html: {:?}", e);
+          Err(e) => {
+            log::error!("Error reading the path of the UI's index.html: {:?}", e);
+          }
         }
+      }
+
+      if show_404 {
+        *mutable_response = MESSAGE_404.as_bytes().to_vec();
+        response.set_mimetype(Some(String::from("text/html")));
       }
     }
   }
