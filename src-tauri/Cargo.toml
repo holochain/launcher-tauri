@@ -22,8 +22,8 @@ holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
 lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 
 # NEW_VERSION update holochain types
-holochain_types = { workspacce = true }
-hdk = { workspace = true }
+holochain_types = { package = "holochain_types", version = "0.1.3"}
+hdk = { package = "hdk", version = "0.1.1"}
 
 
 async-trait = "0.1.52"
