@@ -37,7 +37,7 @@ jobs:
 
           cargo install holochain --version 0.1.3 --locked --features db-encryption
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.1.3-x86_64-unknown-linux-gnu
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.1.3-Beta-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
