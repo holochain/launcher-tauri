@@ -109,6 +109,12 @@ fn main() {
               eprintln!("Error: The name 'default' is not allowed for a profile.");
               panic!("Error: The name 'default' is not allowed for a profile.");
             }
+            // \, /, and ? have a meaning as path symbols or domain socket url sympols and are therefore not allowed
+            // because they would break stuff
+            if profile.contains("/") || profile.contains("\\") || profile.contains("?") {
+              eprintln!("Error: \"/\", \"\\\" and \"?\" are not allowed in profile names.");
+              panic!("Error: \"/\", \"\\\" and \"?\" are not allowed in profile names.");
+            }
             profile
           },
           _ => {
