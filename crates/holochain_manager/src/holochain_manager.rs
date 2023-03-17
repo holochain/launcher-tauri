@@ -242,7 +242,7 @@ impl HolochainManager {
       .ws
       .list_apps(None)
       .await
-      .or(Err("Could not get the currently installed apps"))?;
+      .map_err(|e| format!("{:?}", e))?;
 
     Ok(installed_apps)
   }
