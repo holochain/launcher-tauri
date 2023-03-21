@@ -4,8 +4,8 @@ use std::path::PathBuf;
 use url2::Url2;
 
 // NEW_VERSION: Upgrade these two crates so that they refer to the latest version of them
-pub use holochain_conductor_api_0_1_3 as holochain_conductor_api_latest;
-pub use holochain_types_0_1_3 as holochain_types_latest;
+pub use holochain_conductor_api_0_2_0_preview as holochain_conductor_api_latest;
+pub use holochain_types_0_2_0_preview as holochain_types_latest;
 
 use lair_keystore_manager::versions::LairKeystoreVersion;
 pub use mr_bundle as mr_bundle_latest;
@@ -21,7 +21,7 @@ use version_manager::VersionManager;
 
 pub mod v0_2_0_preview;
 
-use v0_2_0_preview::HolochainV0_2_0_beta_591a74;
+use v0_2_0_preview::HolochainV0_2_0_beta_96a166;
 
 
 // NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
@@ -55,8 +55,8 @@ impl Into<String> for HdiVersion {
 pub enum HolochainVersion {
   #[serde(rename = "Custom Binary")]
   CustomBinary,
-  #[serde(rename = "0.2.0-beta-591a74")]
-  V0_2_0_beta_591a74,
+  #[serde(rename = "0.2.0-beta-96a166")]
+  V0_2_0_beta_96a166,
   // !!! ONLY USE MINOR VERSION HERE ONCE BETA 0.1.0 IS OUT since this affects the folder structure, i.e. whether
   // the same conductor database will be used across holochain bumps
 }
@@ -77,18 +77,18 @@ impl HolochainVersion {
   // Not necessarily the newest one
   // NEW_VERSION Switch devhub holochain version in case there is a new version of the devhub
   pub fn default() -> HolochainVersion {
-    HolochainVersion::V0_2_0_beta_591a74
+    HolochainVersion::V0_2_0_beta_96a166
   }
 
   // NEW_VERSION (latest() is currently unused)
   pub fn latest() -> HolochainVersion {
-    HolochainVersion::V0_2_0_beta_591a74
+    HolochainVersion::V0_2_0_beta_96a166
   }
 
   pub fn supported_versions() -> Vec<HolochainVersion> {
     // NEW_VERSION: Add the new version to this array
     return vec![
-      HolochainVersion::V0_2_0_beta_591a74,
+      HolochainVersion::V0_2_0_beta_96a166,
     ];
   }
 
@@ -112,8 +112,8 @@ impl HolochainVersion {
     // NEW_VERSION: Create a new version manager, duplicating one of the files in this folder
     // Then, import and add the new version manager here
     match self { // NEW_VERSION assume the latest version for the custom binary
-      HolochainVersion::CustomBinary => HolochainVersionManager::HolochainV0_2_0_beta_591a74(HolochainV0_2_0_beta_591a74),
-      HolochainVersion::V0_2_0_beta_591a74 => HolochainVersionManager::HolochainV0_2_0_beta_591a74(HolochainV0_2_0_beta_591a74),
+      HolochainVersion::CustomBinary => HolochainVersionManager::HolochainV0_2_0_beta_96a166(HolochainV0_2_0_beta_96a166),
+      HolochainVersion::V0_2_0_beta_96a166 => HolochainVersionManager::HolochainV0_2_0_beta_96a166(HolochainV0_2_0_beta_96a166),
     }
   }
 }
@@ -121,5 +121,5 @@ impl HolochainVersion {
 // NEW_VERSION: Add the new version manager to this enum
 #[enum_dispatch(VersionManager)]
 pub enum HolochainVersionManager {
-  HolochainV0_2_0_beta_591a74,
+  HolochainV0_2_0_beta_96a166,
 }

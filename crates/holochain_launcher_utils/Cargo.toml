@@ -13,11 +13,12 @@ categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 
-holochain_client = "0.3.0"
+holochain_client = { git="https://github.com/holochain/holochain-client-rust", branch = "holochain-0.2.0-beta-rc.0" }
 
-holochain_conductor_api = "0.1.3"
-holochain_types = "0.1.3"
-holochain_zome_types = "0.1.1"
+holochain_conductor_api = { git="https://github.com/holochain/holochain", package = "holochain_conductor_api", rev = "96a166fce9362da635339bf14e42a8cf157bdc8f" }
+holochain_types = { git="https://github.com/holochain/holochain", package = "holochain_types", rev = "96a166fce9362da635339bf14e42a8cf157bdc8f" }
+holochain_zome_types = { git="https://github.com/holochain/holochain", package = "holochain_zome_types", rev = "96a166fce9362da635339bf14e42a8cf157bdc8f" }
+
 
 lair_keystore_api = "0.2.3"
 

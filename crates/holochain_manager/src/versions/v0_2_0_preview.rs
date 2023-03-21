@@ -11,9 +11,9 @@ use holochain_p2p_0_2_0_preview::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, Tr
 
 use super::{version_manager::VersionManager, HdkVersion, HdiVersion, common::{proxy_url, bootstrap_service}};
 
-pub struct HolochainV0_2_0_beta_591a74;
+pub struct HolochainV0_2_0_beta_96a166;
 
-impl VersionManager for HolochainV0_2_0_beta_591a74 {
+impl VersionManager for HolochainV0_2_0_beta_96a166 {
   // NEW_VERSION: Careful! Indicate here which HDK version comes bundled with this Holochain version
   fn hdk_version(&self) -> HdkVersion {
     HdkVersion::V0_1_1
@@ -63,6 +63,7 @@ impl VersionManager for HolochainV0_2_0_beta_591a74 {
       network: Some(network_config),
       db_sync_strategy: Default::default(),
       chc_namespace: None,
+      tracing_override: None,
     };
 
     serde_yaml::to_string(&config).expect("Could not convert conductor config to string")
