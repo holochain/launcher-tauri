@@ -25,6 +25,10 @@ jobs:
         with:
           override: true
           toolchain: stable
+      - name: install Go stable
+        uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
       - name: install app dependencies and info
         run: npm install && npm run tauri info
 
