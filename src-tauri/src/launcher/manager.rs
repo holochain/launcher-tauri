@@ -144,6 +144,10 @@ impl LauncherManager {
       .emit("progress-update", String::from("Launching keystore"))
       .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
+
+    // sleep for 300ms to prevent potential issue with DevHub's public key missing in lair keystore (https://github.com/holochain/launcher/issues/146)
+    std::thread::sleep(std::time::Duration::from_millis(300));
+
     self.launch_managers(password, profile).await?;
 
     Ok(())
@@ -162,6 +166,9 @@ impl LauncherManager {
         .map_err(|err| format!("Error launching the keystore: {:?}", err))?;
 
     self.lair_keystore_manager = RunningState::Running(Box::new(lair_keystore_manager));
+
+    // sleep for 300ms to prevent potential issue with DevHub's public key missing in lair keystore (https://github.com/holochain/launcher/issues/146)
+    std::thread::sleep(std::time::Duration::from_millis(300));
 
     let mut holochain_versions_to_run = self.config.running_versions.clone();
 

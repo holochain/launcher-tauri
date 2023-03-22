@@ -2677,7 +2677,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-launcher"
-version = "0.9.2"
+version = "0.9.3"
 dependencies = [
  "async-trait",
  "chrono",
@@ -2885,23 +2885,6 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
-]
-
-[[package]]
-name = "holochain_launcher_utils"
-version = "0.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9cc7ba1fd5c79444fd97400ed1fae6d6ccc542fc482fc78e4a090571d8448bd8"
-dependencies = [
- "holochain_client",
- "holochain_conductor_api",
- "holochain_types",
- "holochain_zome_types",
- "lair_keystore_api",
- "log",
- "mime_guess",
- "serde",
- "tauri",
 ]
 
 [[package]]
@@ -4146,13 +4129,15 @@ dependencies = [
  "ascii",
  "async-trait",
  "holochain_conductor_api",
- "holochain_launcher_utils 0.0.1",
+ "holochain_launcher_utils 0.0.5",
  "holochain_types",
  "holochain_zome_types",
  "lair_keystore_api",
  "log",
+ "nanoid 0.4.0",
  "serde",
  "serde-enum-str",
+ "symlink",
  "tauri",
  "thiserror",
  "url 2.3.1",
@@ -7334,6 +7319,12 @@ checksum = "7dcb1ed7b8330c5eed5441052651dd7a12c75e2ed88f2ec024ae1fa3a5e59945"
 dependencies = [
  "zeroize",
 ]
+
+[[package]]
+name = "symlink"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7973cce6668464ea31f176d85b13c7ab3bba2cb3b77a2ed26abd7801688010a"
 
 [[package]]
 name = "syn"
