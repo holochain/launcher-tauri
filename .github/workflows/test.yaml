@@ -59,6 +59,10 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v2
+      - name: install Go stable
+        uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
       - name: install webkit2gtk (ubuntu only)
         if: matrix.platform == 'ubuntu-18.04'
         run: |
