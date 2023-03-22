@@ -8,6 +8,7 @@ version = "0.1.0"
 [dependencies]
 # NEW_VERSION pick right client version
 
+holochain = { version = "0.2.0-beta-rc.1", features = ["db-encryption"] }
 holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "holochain-0.2.0-beta-rc.1" }
 
 
