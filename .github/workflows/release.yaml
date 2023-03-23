@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-10.15, ubuntu-18.04, windows-2019]
+        platform: [windows-2019]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -114,6 +114,10 @@ jobs:
       - name: build and sign the app (Windows only)
         if: matrix.platform == 'windows-2019'
         run: |
+
+          # required to fix 'LINK : fatal error LNK1181: cannot open input file 'sqlite3.lib'': https://github.com/rusqlite/rusqlite#notes-on-building-rusqlite-and-libsqlite3-sys
+          vcpkg install sqlite3:x64-windows
+
           npm run build -- --verbose
 
           # NEW_VERSION change version number in filenames here wherever needed
