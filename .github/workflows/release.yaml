@@ -117,7 +117,9 @@ jobs:
 
           # required to fix 'LINK : fatal error LNK1181: cannot open input file 'sqlite3.lib'': https://github.com/rusqlite/rusqlite#notes-on-building-rusqlite-and-libsqlite3-sys
           vcpkg install sqlite3:x64-windows
-          VCPKGRS_DYNAMIC=1
+
+          set VCPKGRS_DYNAMIC=1
+
           npm run build -- --verbose
 
           # NEW_VERSION change version number in filenames here wherever needed
