@@ -1,6 +1,6 @@
 import { AgentPubKey, AppInfo, AppWebsocket, decodeHashFromBase64, DnaHash, DnaHashB64, EntryHash } from "@holochain/client";
 import { getCellId } from "../utils";
-import { AppEntry, CustomRemoteCallInput, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry } from "./types";
+import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry } from "./types";
 
 
 
@@ -36,38 +36,70 @@ export async function getAllApps(
 
 // =========== Bridge Calls via Portal API =================
 
-
-export async function getHappReleases(
+/**
+ * Gets the happ releases corresponding to the passed entry hashes
+ *
+ * @param happReleaseEntryHash
+ */
+export async function getHappReleasesByEntryHashes(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
-  forHapp: EntryHash,
-): Promise<Array<HappReleaseEntry>> {
+  happReleaseEntryHashes: Array<EntryHash | undefined>
+) {
+
+  // Find an online host
+  const host: AgentPubKey = await getAvailableHostForZomeFunction(
+    appWebsocket,
+    appStoreApp,
+    "happ_library",
+    "get_happ_releases",
+  );
+
+  // make zome calls for each EntryHash to this one host
+  const happReleases = await Promise.all(happReleaseEntryHashes.map( async (entryHash) => {
+    if (entryHash) {
+      return getHappReleaseFromHost(appWebsocket, appStoreApp, host, entryHash);
+    } else {
+      return undefined;
+    }
+  }));
+
+  return happReleases;
+}
+
+/**
+ * Get the happ released associated to a happ release entry hash from a specific DevHub host
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param host
+ * @param entryHash
+ */
+async function getHappReleaseFromHost (
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  host: AgentPubKey,
+  entryHash: EntryHash, // EntryHash of the HappReleaseEntry
+): Promise<HappReleaseEntry> {
+
+  const input: CustomRemoteCallInput = {
+    host,
+    call: {
+      dna: DEVHUB_DNA_HASH,
+      zome: "happ_library",
+      function: "get_happ_release",
+      payload: {
+        id: entryHash,
+      }
+    }
+  }
 
   const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+
   if (!portalCell) {
     throw new Error("portal cell not found.")
   } else {
 
-    const host: AgentPubKey = await getAvailableHostForZomeFunction(
-      appWebsocket,
-      appStoreApp,
-      "happ_library",
-      "get_happ_releases",
-    );
-
-    const input: CustomRemoteCallInput = {
-      host,
-      call: {
-        dna: DEVHUB_DNA_HASH,
-        zome: "happ_library",
-        function: "get_happ_releases",
-        payload: {
-          for_happ: forHapp,
-        }
-      }
-    }
-
-    const happReleaseEntities: Array<Entity<HappReleaseEntry>> = await appWebsocket.callZome({
+    const happReleaseResponse: DevHubResponse<Entity<HappReleaseEntry>> = await appWebsocket.callZome({
       fn_name: "custom_remote_call",
       zome_name: "portal_api",
       cell_id: getCellId(portalCell)!,
@@ -75,9 +107,80 @@ export async function getHappReleases(
       provenance: getCellId(portalCell)![1],
     });
 
-    return happReleaseEntities.map((entity) => entity.content);
+    // maybe it needs to be entity.payload.content instead...
+    return happReleaseResponse.payload.content;
   }
 }
+
+
+/**
+ * Get happ releases for a happ. Searches for an online DevHub host first.
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param forHapp
+ * @returns
+ */
+export async function getHappReleases(
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  forHapp: EntryHash,
+): Promise<Array<HappReleaseEntry>> {
+
+  const host: AgentPubKey = await getAvailableHostForZomeFunction(
+    appWebsocket,
+    appStoreApp,
+    "happ_library",
+    "get_happ_releases",
+  );
+
+  return getHappReleasesFromHost(appWebsocket, appStoreApp, host, forHapp);
+}
+
+/**
+ * Get happ releases for a happ from a specific DevHub host
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param host
+ * @param forHapp
+ */
+async function getHappReleasesFromHost (
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  host: AgentPubKey,
+  forHapp: EntryHash,
+): Promise<Array<HappReleaseEntry>> {
+
+  const input: CustomRemoteCallInput = {
+    host,
+    call: {
+      dna: DEVHUB_DNA_HASH,
+      zome: "happ_library",
+      function: "get_happ_releases",
+      payload: {
+        for_happ: forHapp,
+      }
+    }
+  }
+
+  const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+
+  if (!portalCell) {
+    throw new Error("portal cell not found.")
+  } else {
+
+    const happReleaseEntities: DevHubResponse<Array<Entity<HappReleaseEntry>>> = await appWebsocket.callZome({
+      fn_name: "custom_remote_call",
+      zome_name: "portal_api",
+      cell_id: getCellId(portalCell)!,
+      payload: input,
+      provenance: getCellId(portalCell)![1],
+    });
+
+    // maybe it needs to be entity.payload.content instead...
+    return happReleaseEntities.payload.map((entity) => entity.content);
+  }
+}
+
 
 export async function fetchWebHapp(
   appWebsocket: AppWebsocket,
@@ -170,6 +273,8 @@ export async function fetchGui(
     return guiBytes;
   }
 }
+
+
 
 
 

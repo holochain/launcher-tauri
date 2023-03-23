@@ -9,6 +9,11 @@ export interface Entity<T> {
   content: T,
 }
 
+export interface DevHubResponse<T> {
+  metadata: any,
+  payload: T,
+}
+
 export type EntityId = ActionHash;
 
 export interface AppEntry {
