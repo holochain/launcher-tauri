@@ -1,5 +1,6 @@
 <template>
   <div style="flex: 1; display: flex">
+    <div class="beta-indicator">Beta 0.1</div>
     <AlreadyRunning v-if="$store.getters[`isAlreadyRunning`]"> </AlreadyRunning>
     <Error
       v-else-if="
@@ -235,6 +236,14 @@ body,
 .flex-scrollable-y {
   max-height: 100%;
   overflow-y: auto;
+}
+
+.beta-indicator {
+  font-size: 35px;
+  opacity: 0.3;
+  position: fixed;
+  bottom: 6px;
+  left: 18px;
 }
 
 mwc-button,

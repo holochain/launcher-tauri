@@ -296,7 +296,7 @@ export default defineComponent({
 .top-bar {
   align-items: center;
   height: 64px;
-  background: #e8e8eb;
+  /* background: #e8e8eb; */
   background: white;
   box-shadow: 0 0px 5px #9b9b9b;
 }
