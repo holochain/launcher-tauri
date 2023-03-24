@@ -2,7 +2,7 @@ name: "publish"
 on:
   push:
     branches:
-      - main
+      - launcher-hc-beta-0.1
 
 jobs:
   publish-tauri:
