@@ -5,7 +5,7 @@ use enum_dispatch::enum_dispatch;
 use lair_keystore_manager::versions::LairKeystoreVersion;
 use url2::Url2;
 
-use super::{HdkVersion, HdiVersion};
+use super::{HdiVersion, HdkVersion};
 
 #[enum_dispatch]
 pub trait VersionManager {
@@ -23,6 +23,7 @@ pub trait VersionManager {
     admin_port: u16,
     conductor_environment_path: PathBuf,
     keystore_connection_url: Url2,
+    mdns: bool,
   ) -> String;
 
   fn overwrite_config(
@@ -30,6 +31,7 @@ pub trait VersionManager {
     conductor_config: String,
     admin_port: u16,
     keystore_connection_url: Url2,
+    _mdns: bool,
   ) -> String {
     let mut config = serde_yaml::from_str::<serde_yaml::Mapping>(conductor_config.as_str())
       .expect("Couldn't convert string to conductor config");

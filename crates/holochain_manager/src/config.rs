@@ -10,4 +10,5 @@ pub struct LaunchHolochainConfig {
   pub conductor_config_dir: PathBuf,
   pub environment_path: PathBuf,
   pub keystore_connection_url: Url2,
+  pub mdns: bool,
 }

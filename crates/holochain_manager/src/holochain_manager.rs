@@ -54,12 +54,14 @@ impl HolochainManager {
           current_config_str,
           config.admin_port,
           config.keystore_connection_url.clone(),
+          config.mdns,
         )
       }
       false => version_manager.initial_config(
         config.admin_port,
         config.environment_path.clone(),
         config.keystore_connection_url.clone(),
+        config.mdns,
       ),
     };
 
