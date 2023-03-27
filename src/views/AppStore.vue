@@ -108,62 +108,19 @@
     </div>
   </div>
 
-  <div class="progress-indicator" :class="{ highlighted: downloadFailed }">
-    <div
-      style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
-      :title="$t('appStore.fullSynchronizationRequired')"
-    >
-      {{ $t('appStore.appLibrarySynchronization') }}:
-    </div>
-    <div>
-      <div v-for="(cell, idx) in provisionedCells" :key="cell[0]" class="column">
-        <div class="row" style="align-items: center">
-          <div
-            style="
-              width: 20%;
-              margin-left: 20px;
-              font-size: 0.95em;
-              text-align: right;
-            "
-          >
-            {{ cell[0] }}
-          </div>
-          <div style="width: 50%; margin: 0 30px">
-            <HCProgressBar
-              v-if="(networkStates[idx] || networkStates[idx] === 0) && cachedMaxExpected[idx]"
-              title="currently ongoing data exchanges with peers"
-              :progress="progressRatio(idx)"
-              :style="`--height: 10px; --hc-primary-color:${
-                idleStates[idx] ? '#6B6B6B' : '#482edf'
-              };`"
-            />
-            <span
-              v-else
-              style="
-                opacity: 0.7;
-                font-size: 0.8em;
-                display: flex;
-                justify-content: center;
-              "
-              title="currently ongoing data exchanges with peers"
-            >
-            {{ $t('appStore.noOngoingPeerSynchronization') }}</span
-            >
-          </div>
-          <div
-            :style="`width: 30%; text-align: center; ${
-              idleStates[idx] ? 'opacity: 0.7;' : ''
-            }`"
-            title="received bytes | expected bytes"
-          >
-            {{ prettyBytesLocal(byteDiff(idx)) }}
-            | <span :class="{ highglightedText: maxExceeded[idx] }">
-            {{ prettyBytesLocal(cachedMaxExpected[idx]) }}
-            </span>
-          </div>
-        </div>
+  <div v-show="showLoadingSpinner" class="progress-indicator" :class="{ highlighted: downloadFailed }">
+    <div style="padding: 0 15px;">
+      <div
+        style="margin-bottom: 5px; font-weight: 600; font-size: 18px;"
+        :title="$t('appStore.fullSynchronizationRequired')"
+      >
+        {{ $t('appStore.receivingData') }}...
+      </div>
+      <div style="text-align: right; margin-bottom: 10px;" :title="$t('appStore.amountOfData')">
+        <b>{{ prettyBytesLocal(queuedBytes) }}</b> {{ $t('appStore.inQueue') }}
       </div>
     </div>
+    <span :class="queuedBytes ? 'loader' : 'inactive-loader'" style="position: absolute; bottom: 0;"></span>
   </div>
 
   <InstallAppDialog
@@ -245,7 +202,9 @@ export default defineComponent({
     latestNetworkUpdates: number[]; // timestamps of the latest non-zero gossipInfo update
     idleStates: boolean[];
     maxExceeded: boolean[];
-    showProgressIndicator: boolean;
+    queuedBytes: number | undefined;
+    latestQueuedBytesUpdate: number;
+    showLoadingSpinner: boolean;
     downloadFailed: boolean;
     errorText: string;
     appWebsocket: AppWebsocket | undefined;
@@ -268,7 +227,9 @@ export default defineComponent({
       latestNetworkUpdates: [0, 0, 0],
       idleStates: [true, true, true],
       maxExceeded: [false, false, false],
-      showProgressIndicator: false,
+      queuedBytes: undefined,
+      latestQueuedBytesUpdate: 0,
+      showLoadingSpinner: false,
       downloadFailed: false,
       errorText: "Unknown error occured.",
       appWebsocket: undefined,
@@ -290,9 +251,14 @@ export default defineComponent({
 
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
-    await this.getNetworkState();
+    // await this.getNetworkState();
+    // this.pollInterval = window.setInterval(
+    //   async () => await this.getNetworkState(),
+    //   2000
+    // );
+    await this.getQueuedBytes();
     this.pollInterval = window.setInterval(
-      async () => await this.getNetworkState(),
+      async () => await this.getQueuedBytes(),
       2000
     );
   },
@@ -453,6 +419,41 @@ export default defineComponent({
       this.selectedAppBundlePath = undefined;
       // this.hdkVersionForApp = undefined;
     },
+    /**
+     * Gets aggregated bytes that are in queue for the DevHub cells
+     */
+    async getQueuedBytes() {
+      if (!this.appWebsocket) {
+        await this.connectAppWebsocket();
+      }
+
+      const networkInfo: NetworkInfo[] = await this.appWebsocket!.networkInfo({
+        dnas: this.provisionedCells!.filter(([roleName, cellInfo]) => !!cellInfo)
+          .map(([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array),
+      });
+
+      let queuedBytes = 0;
+      networkInfo.forEach((info, _idx) => {
+        queuedBytes += info.fetch_pool_info.op_bytes_to_fetch;
+      });
+
+      this.queuedBytes = queuedBytes;
+
+      const now = Date.now();
+
+      if (!!queuedBytes && queuedBytes > 0) {
+        this.latestQueuedBytesUpdate = now;
+        console.log("updated timestamp: ", this.latestQueuedBytesUpdate);
+      }
+
+      if ((now - this.latestQueuedBytesUpdate) < 5000) {
+        this.showLoadingSpinner = true;
+      } else {
+        this.showLoadingSpinner = false;
+      }
+
+      return queuedBytes;
+    },
     async getNetworkState() {
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
@@ -525,7 +526,7 @@ export default defineComponent({
     },
     prettyBytesLocal(input: number | undefined) {
       if (input || input === 0) {
-        return prettyBytes(input);
+        return prettyBytes(input, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       } else {
         return "-";
       }
@@ -558,18 +559,19 @@ export default defineComponent({
 
 .progress-indicator {
   position: fixed;
-  bottom: 0;
-  right: 0;
-  padding: 20px;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 0 0 0;
   background-color: white;
   box-shadow: 0 0px 5px #9b9b9b;
-  border-radius: 20px 0 0 0;
-  min-width: 540px;
+  border-radius: 10px 10px 6px 6px;
+  min-width: 350px;
 }
 
 .highlighted {
-  border-top: 4px solid transparent;
-  border-left: 4px solid transparent;
+  /* border-top: 4px solid transparent;
+  border-left: 4px solid transparent; */
+  box-shadow: 0 0 0 4px transparent;
   animation: bordercolorchange 1s linear infinite;
 }
 
@@ -577,6 +579,48 @@ export default defineComponent({
   font-weight: bold;
   color: #482edf;
 }
+
+.inactive-loader {
+  width: 100%;
+  height: 6px;
+  display: inline-block;
+  position: relative;
+  background: rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  border-radius: 0 0 6px 6px;
+}
+
+.loader {
+  width: 100%;
+  height: 6px;
+  display: inline-block;
+  position: relative;
+  background: rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  border-radius: 0 0 6px 6px;
+}
+.loader::after {
+  content: '';
+  width: 192px;
+  height: 6px;
+  background: #482edf;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  animation: animloader 2s linear infinite;
+}
+
+@keyframes animloader {
+  0% {
+    left: -192px;
+  }
+  100% {
+    left: 100%;
+    transform: translateX(0%);
+  }
+}
+
 
 .refresh-button {
   height: 30px;
@@ -593,13 +637,13 @@ export default defineComponent({
 
 @keyframes bordercolorchange {
   0% {
-    border-color: white;
+    box-shadow: 0 0 0 4px transparent;
   }
   50% {
-    border-color: #482edf;
+    box-shadow: 0 0 0 4px #482edf;
   }
   100% {
-    border-color: white;
+    box-shadow: 0 0 0 4px transparent;
   }
 }
 </style>

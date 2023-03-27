@@ -68,10 +68,12 @@ const messages = {
     },
     appStore: {
       activeDataExchanges: "currently ongoing data exchanges with peers",
+      amountOfData: "Amount of data that's waiting to be transmitted by peers",
       appStore: "App Library",
       appLibrarySynchronization: "App Library Synchronization",
-      fullSynchronizationRequired: "Full synchronization with peers required to reliably download all apps.",
+      fullSynchronizationRequired: "Full synchronization with peers is required to reliably download all apps.",
       howToPublishAnApp: "How to publish an app",
+      inQueue: "in queue",
       noOngoingPeerSynchronization: "no ongoing peer synchronization",
       selectAppFromFileSystem: "Select app from Filesystem",
       noAppsInStore:
@@ -80,6 +82,7 @@ const messages = {
       readThis: "Read this",
       readThisToPublish:
         " to learn how to publish a Holochain application to the App Library.",
+      receivingData: "Receiving new data",
     },
     buttons: {
       back: "Back",
@@ -221,10 +224,12 @@ const messages = {
     },
     appStore: {
       activeDataExchanges: "Zurzeit aktiver Datenaustausch mit Peers",
+      amountOfData: "Daten, die darauf warten von Peers übermittelt zu werden",
       appStore: "App Store",
       appLibrarySynchronization: "App Store Synchronisation",
       fullSynchronizationRequired: "Vollständige Synchronisation mit Peers erforderlich, um alle Apps herunterladen zu können.",
       howToPublishAnApp: "Eigene App Publizieren",
+      inQueue: "ausstehend",
       noOngoingPeerSynchronization: "keine aktiven Synchronisationen mit Peers",
       selectAppFromFileSystem: "Installiere App von Datei",
       noAppsInStore:
@@ -233,6 +238,7 @@ const messages = {
       readThis: "Lese dies",
       readThisToPublish:
         " um zu lernen, wie man eine Holochain App publiziert.",
+      receivingData: "Neue Daten werden empfangen",
     },
     buttons: {
       back: "Zurück",
