@@ -335,7 +335,7 @@ export async function getAvailableHostForZomeFunction(
     // 2. ping each of them and take the first one that responds
     return Promise.any(hosts.payload.map(async (hostEntity) => {
       const hostPubKey = hostEntity.content.author;
-      console.log("@getAvailableHostForZomeFunction: trying to ping host: ", hostPubKey);
+      console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
 
       const success: boolean = await appWebsocket.callZome({
         fn_name: "ping",
