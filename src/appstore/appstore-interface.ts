@@ -1,12 +1,12 @@
-import { AgentPubKey, AppInfo, AppWebsocket, decodeHashFromBase64, DnaHash, DnaHashB64, EntryHash } from "@holochain/client";
+import { AgentPubKey, AppInfo, AppWebsocket, decodeHashFromBase64, DnaHash, DnaHashB64, encodeHashToBase64, EntryHash } from "@holochain/client";
 import { getCellId } from "../utils";
 import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry } from "./types";
 
 
 
 // hard coded dna hash of the DevHub in use
-const DEVHUB_DNA_HASH_B64: DnaHashB64 = "dummy93f0938f09f";
-const DEVHUB_DNA_HASH: DnaHash = decodeHashFromBase64(DEVHUB_DNA_HASH_B64);
+const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0ke1JijHM0tAVTy3OH3-i1fuZzB7FlCBi2oLiD96p-NW97ueuK";
+const DEVHUB_HAPP_LIBRARY_DNA_HASH: DnaHash = decodeHashFromBase64(DEVHUB_HAPP_LIBRARY_DNA_HASH_B64);
 
 
 
@@ -15,12 +15,15 @@ export async function getAllApps(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
 ): Promise<Array<AppEntry>> {
+  console.log("@getAllApps");
   const appstoreCell = appStoreApp.cell_info["appstore"].find((c) => "provisioned" in c);
+
+  console.log("@getAllApps: appstoreCell", appstoreCell);
 
   if (!appstoreCell) {
     throw new Error("appstore cell not found.")
   } else {
-    const allApps: Array<Entity<AppEntry>> = await appWebsocket.callZome({
+    const allApps: DevHubResponse<Array<Entity<AppEntry>>> = await appWebsocket.callZome({
       fn_name: "get_all_apps",
       zome_name: "appstore_api",
       cell_id: getCellId(appstoreCell)!,
@@ -28,7 +31,10 @@ export async function getAllApps(
       provenance: getCellId(appstoreCell)![1],
     })
 
-    return allApps.map((appEntity) => appEntity.content)
+    console.log("@getAllApps: allApps", allApps);
+
+
+    return allApps.payload.map((appEntity) => appEntity.content)
   }
 
 }
@@ -79,12 +85,12 @@ async function getHappReleaseFromHost (
   appStoreApp: AppInfo,
   host: AgentPubKey,
   entryHash: EntryHash, // EntryHash of the HappReleaseEntry
-): Promise<HappReleaseEntry> {
+): Promise<Entity<HappReleaseEntry>> {
 
   const input: CustomRemoteCallInput = {
     host,
     call: {
-      dna: DEVHUB_DNA_HASH,
+      dna: DEVHUB_HAPP_LIBRARY_DNA_HASH,
       zome: "happ_library",
       function: "get_happ_release",
       payload: {
@@ -108,7 +114,7 @@ async function getHappReleaseFromHost (
     });
 
     // maybe it needs to be entity.payload.content instead...
-    return happReleaseResponse.payload.content;
+    return happReleaseResponse.payload;
   }
 }
 
@@ -124,7 +130,9 @@ export async function getHappReleases(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   forHapp: EntryHash,
-): Promise<Array<HappReleaseEntry>> {
+): Promise<Array<Entity<HappReleaseEntry>>> {
+
+  console.log("@getHappReleases: trying to get host.");
 
   const host: AgentPubKey = await getAvailableHostForZomeFunction(
     appWebsocket,
@@ -132,6 +140,8 @@ export async function getHappReleases(
     "happ_library",
     "get_happ_releases",
   );
+
+  console.log("@getHappReleases: found host: ", host);
 
   return getHappReleasesFromHost(appWebsocket, appStoreApp, host, forHapp);
 }
@@ -148,12 +158,12 @@ async function getHappReleasesFromHost (
   appStoreApp: AppInfo,
   host: AgentPubKey,
   forHapp: EntryHash,
-): Promise<Array<HappReleaseEntry>> {
+): Promise<Array<Entity<HappReleaseEntry>>> {
 
   const input: CustomRemoteCallInput = {
     host,
     call: {
-      dna: DEVHUB_DNA_HASH,
+      dna: DEVHUB_HAPP_LIBRARY_DNA_HASH,
       zome: "happ_library",
       function: "get_happ_releases",
       payload: {
@@ -177,7 +187,7 @@ async function getHappReleasesFromHost (
     });
 
     // maybe it needs to be entity.payload.content instead...
-    return happReleaseEntities.payload.map((entity) => entity.content);
+    return happReleaseEntities.payload;
   }
 }
 
@@ -211,7 +221,7 @@ export async function fetchWebHapp(
     const input: CustomRemoteCallInput = {
       host,
       call: {
-        dna: DEVHUB_DNA_HASH,
+        dna: DEVHUB_HAPP_LIBRARY_DNA_HASH,
         zome: "happ_library",
         function: "get_webhapp_package",
         payload,
@@ -253,7 +263,7 @@ export async function fetchGui(
     const input: CustomRemoteCallInput = {
       host,
       call: {
-        dna: DEVHUB_DNA_HASH,
+        dna: DEVHUB_HAPP_LIBRARY_DNA_HASH,
         zome: "happ_library",
         function: "get_webasset",
         payload: {
@@ -303,34 +313,44 @@ export async function getAvailableHostForZomeFunction(
   } else if (!portalCell) {
     throw new Error("portal cell not found.")
   } else {
+    console.log("@getAvailableHostForZomeFunction: searching hosts.");
+
     // 1. get all registered hosts for this zome function
-    const hosts: Array<Entity<HostEntry>> = await appWebsocket.callZome({
+    const hosts: DevHubResponse<Array<Entity<HostEntry>>> = await appWebsocket.callZome({
       fn_name: "get_hosts_for_zome_function",
-      zome_name: "appstore_api",
-      cell_id: getCellId(appstoreCell)!,
+      zome_name: "portal_api",
+      cell_id: getCellId(portalCell)!,
       payload: {
-        dna: DEVHUB_DNA_HASH,
+        dna: DEVHUB_HAPP_LIBRARY_DNA_HASH,
         zome: zome_name,
         function: fn_name,
       },
-      provenance: getCellId(appstoreCell)![1],
+      provenance: getCellId(portalCell)![1],
     })
 
+    console.log("@getAvailableHostForZomeFunction: found hosts: ", hosts);
+    let b64Hosts = hosts.payload.map((entity) => encodeHashToBase64(entity.content.author));
+    console.log("@getAvailableHostForZomeFunction: b64 hosts: ", b64Hosts);
+
     // 2. ping each of them and take the first one that responds
-    return Promise.any(hosts.map(async (hostEntity) => {
+    return Promise.any(hosts.payload.map(async (hostEntity) => {
       const hostPubKey = hostEntity.content.author;
+      console.log("@getAvailableHostForZomeFunction: trying to ping host: ", hostPubKey);
+
       const success: boolean = await appWebsocket.callZome({
         fn_name: "ping",
         zome_name: "portal_api",
         cell_id: getCellId(portalCell)!,
         payload: {
-          dna: DEVHUB_DNA_HASH,
+          dna: DEVHUB_HAPP_LIBRARY_DNA_HASH,
           zome: zome_name,
           function: fn_name,
         },
         provenance: getCellId(portalCell)![1],
       });
       // what happens in the "false" case? Can this happen?
+
+      console.log("@getAvailableHostForZomeFunction Sent ping to host and got result: ", success);
 
       return hostPubKey;
     }))

@@ -16,7 +16,7 @@
       </div> -->
       <div class="row">
         <div style="width: 160px">hApp version:</div>
-        <div>{{ getLatestRelease(app).content.name }}</div>
+        <div>[NOT IMPLEMENTED]</div>
       </div>
       <div class="row">
         <div style="width: 160px">UI version:</div>
@@ -24,7 +24,7 @@
         <div v-else style="font-size: 0.9em; opacity: 0.7;">loading...</div>
       </div>
       <div style="font-weight: bold; margin-top: 10px">Description:</div>
-      {{ app.app.content.description }}
+      {{ app.description }}
     </div>
 
     <div v-else class="column" style="flex: 1">
@@ -32,7 +32,7 @@
         <!-- if icon provided -->
         <img
           v-if="appIcon"
-          :src="appIcon"
+          :src="appIconSrc()"
           alt="app icon"
           style="
             width: 80px;
@@ -57,7 +57,7 @@
           "
         >
           <div style="color: white; font-size: 40px; font-weight: 600">
-            {{ app.app.content.title.slice(0, 2) }}
+            {{ app.name.slice(0, 2) }}
           </div>
         </div>
 
@@ -71,12 +71,12 @@
               line-height: 115%;
               word-break: normal;
             "
-            :title="app.app.content.title"
+            :title="app.name"
           >
-            {{ app.app.content.title }}
+            {{ app.name }}
           </div>
           <div style="margin-top: -5px">
-            {{ getLatestRelease(app).content.name }}
+            [VERSION NOT IMPLEMENTED]
           </div>
         </div>
       </div>
@@ -90,7 +90,7 @@
           overflow-y: auto;
         "
       >
-        {{ app.app.content.subtitle }}
+        [SUBTITLE NOT IMPLEMENTED]
       </div>
     </div>
 
@@ -112,23 +112,23 @@
 </template>
 
 <script lang="ts">
-import { AppWithReleases, getLatestRelease } from "../devhub/get-happs";
 import { HolochainVersion } from "../types";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent, PropType } from "vue";
 
 import HCButton from "./subcomponents/HCButton.vue";
 import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
+import { AppEntry } from "../appstore/types";
 
 export default defineComponent({
   name: "AppPreviewCard",
   components: { HCButton, HCMoreToggle },
   props: {
     appIcon: {
-      type: String,
+      type: Uint8Array,
     },
     app: {
-      type: Object as PropType<AppWithReleases>,
+      type: Object as PropType<AppEntry>,
       required: true,
     },
   },
@@ -144,19 +144,11 @@ export default defineComponent({
     };
   },
   emits: ["installApp"],
-  async mounted() {
-    const latestRelease = getLatestRelease(this.app);
-    // 1:1 mapping of holochain version to hdk verison is removed
-    // this.holochainVersion = await invoke("choose_version_for_hdk", {
-    //   hdkVersion: latestRelease.content.hdk_version,
-    // });
-    this.guiVersion = this.app.guiReleases.find(
-      (release) => JSON.stringify(release.id) === JSON.stringify(latestRelease.content.official_gui)
-    )?.content.version;
-  },
   methods: {
-    getLatestRelease,
-  },
+    appIconSrc(): string | undefined {
+      return this.appIcon ? URL.createObjectURL(new Blob([this.appIcon], { type: 'image/png' })) : undefined
+    }
+  }
 });
 </script>
 

@@ -6,6 +6,8 @@ import {
   AppInfo,
 } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
+import { Base64 } from "js-base64";
+
 
 import { GossipProgress } from "./types";
 
@@ -106,3 +108,15 @@ export function gossipProgressString(progress: GossipProgress | undefined) {
     progress.expectedBytes
   )}`;
 }
+
+
+export function toSrc(png: Uint8Array | undefined): string | undefined {
+  if (png) {
+    const base64Data = Base64.fromUint8Array(png);
+    return "data:image/png;base64," + base64Data;
+  }
+
+  return undefined;
+}
+
+

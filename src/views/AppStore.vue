@@ -104,7 +104,7 @@
       class="column"
       style="margin-right: 16px; margin-bottom: 16px"
     >
-      <AppPreviewCard :app="app" @installApp="saveApp(app)" />
+      <AppPreviewCard :app="app" :appIcon="app.icon" @installApp="saveApp(app)" />
     </div>
   </div>
 
@@ -195,18 +195,13 @@ import "@material/mwc-icon-button";
 import { AppWebsocket, NetworkInfo, CellInfo, EntryHashB64, encodeHashToBase64 } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
+import { toSrc } from "../utils";
 
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
-import {
-  AppWithReleases,
-  getAllAppsWithGui,
-  getLatestRelease,
-  fetchWebHapp,
-} from "../devhub/get-happs";
-import { HdkVersion } from "../hdk";
+import { getHappReleases, fetchWebHapp } from "../appstore/appstore-interface";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
@@ -217,6 +212,8 @@ import { HolochainId } from "../types";
 import prettyBytes from "pretty-bytes";
 import { getCellId } from "../utils";
 import { i18n } from "../locale";
+import { AppEntry } from "../appstore/types";
+import { getAllApps } from "../appstore/appstore-interface";
 
 export default defineComponent({
   name: "AppStore",
@@ -233,7 +230,7 @@ export default defineComponent({
   data(): {
     loadingText: string;
     loading: boolean;
-    installableApps: Array<AppWithReleases>;
+    installableApps: Array<AppEntry>;
     selectedAppBundlePath: string | undefined;
     howToPublishUrl: string;
     holochainId: HolochainId | undefined;
@@ -297,6 +294,7 @@ export default defineComponent({
     );
   },
   methods: {
+    toSrc,
     async connectAppWebsocket() {
       // const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
       const holochainId = this.$store.getters["holochainIdForDevhub"];
@@ -309,37 +307,42 @@ export default defineComponent({
     async fetchApps() {
       this.loading = true;
 
+      console.log("@fetchApps: about to call appInfo...");
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
       }
 
-      const devhubInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: `DevHub-${this.holochainId!.content}`,
+      console.log("@fetchApps: about to call appInfo...");
+      const appStoreInfo = await this.appWebsocket!.appInfo({
+        installed_app_id: `Appstore`,
       });
 
-      const allCells = devhubInfo.cell_info;
+      console.log("@fetchApps: appStoreInfo: ", appStoreInfo);
+      const allCells = appStoreInfo.cell_info;
+      console.log("@fetchApps: allCells: ", allCells);
+
       const provisionedCells: [string, CellInfo | undefined][] = Object.entries(allCells).map(([roleName, cellInfos]) => {
         return [roleName, cellInfos.find((cellInfo) => "provisioned" in cellInfo)]
       });
+
+      console.log("@fetchApps: provisionedCells: ", provisionedCells);
 
       this.provisionedCells = provisionedCells.sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => {
         return roleName_a.localeCompare(roleName_b);
       });
 
 
-      let allApps: Array<AppWithReleases>;
+      let allApps: Array<AppEntry>;
       try {
-        allApps = await getAllAppsWithGui((this.appWebsocket! as AppWebsocket), devhubInfo);
+        allApps = await getAllApps((this.appWebsocket! as AppWebsocket), appStoreInfo);
       } catch (e) {
         console.error(e);
         // Catch other errors than being offline
         allApps = [];
       }
 
-      const { hdk_versions }: { hdk_versions: HdkVersion[] } = await invoke(
-        "get_supported_versions",
-        {}
-      );
+      console.log("@fetchApps: allApps: ", allApps);
+
       this.installableApps = allApps;
 
       this.loading = false;
@@ -358,44 +361,64 @@ export default defineComponent({
         url: "https://developer.holochain.org/glossary/#peer-to-peer",
       });
     },
-    getLatestRelease,
-    async saveApp(app: AppWithReleases) {
-      // if downloading, always take holochain version of DevHub
+    async saveApp(app: AppEntry) {
+      // // if downloading, always take holochain version of DevHub
       this.holochainSelection = false;
-      this.loadingText = "Connecting with DevHub";
-      (this.$refs.downloading as typeof HCLoading).open();
-      const release = getLatestRelease(app);
+      // this.loadingText = "fetching available releases";
+      // (this.$refs.downloading as typeof HCLoading).open();
+      // const release = getLatestRelease(app);
 
-
+      // 1. get happ releases for app from DevHub
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
       }
 
-      const devhubInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: `DevHub-${this.holochainId!.content}`,
+      const appStoreInfo = await this.appWebsocket!.appInfo({
+        installed_app_id: `Appstore`,
       });
 
-      this.loadingText = "Downloading...";
+      let happReleases = undefined;
 
-      const happReleaseHash = release.id;
-      const guiReleaseHash = release.content.official_gui!;  // releases without official_gui have been filtered out earlier
+      try {
+        happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, app.devhub_address.happ)
+      } catch (e) {
+        this.errorText = `Error getting happ releases from a DevHub host. See console for details.`;
+        (this.$refs as any).snackbar.show();
+        (this.$refs.downloading as typeof HCLoading).close();
+        throw new Error(`Error getting happ releases from a DevHub host: ${JSON.stringify(e)}`);
+      }
 
-      // console.log("@AppStore: happReleaseHash: ", happReleaseHash);
-      // console.log("@AppStore: guiReleaseHash: ", guiReleaseHash);
+      if (!happReleases) {
+        this.errorText = "Undefined happ releases.";
+        (this.$refs as any).snackbar.show();
+        (this.$refs.downloading as typeof HCLoading).close();
+        throw new Error("Undefined happ releases.");
+      }
+
+      // 1b. Filter out releases without GUIs for now. Installing headless apps should become possible as well of course
+      happReleases = happReleases.filter((release) => !!release.content.official_gui);
+
+      // 2. select latest happ release (later maybe option to select older ones)
+      const latestHappRelease = happReleases.sort((a, b) => b.content.last_updated - a.content.last_updated)[0];
+
+      // 3. fetchwebhapp
+
+      const happReleaseHash = latestHappRelease.id;
+      const guiReleaseHash = latestHappRelease.content.official_gui;
 
       let bytes = undefined;
 
       try {
         bytes = await fetchWebHapp(
           this.appWebsocket! as AppWebsocket,
-          devhubInfo,
-          app.app.content.title,
+          appStoreInfo,
+          app.name,
           happReleaseHash,
           guiReleaseHash!, // releases without official_gui have been filtered out earlier
         );
       } catch (e) {
-        console.log("Error fetching the webhapp: ", e);
-        this.errorText = i18n.global.t('appStore.synchronizationNotCompleteError');
+        console.error("Error fetching the webhapp: ", e);
+        this.errorText = "Failed to fetch webhapp from DevHub host.";
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
         this.downloadFailed = true;
@@ -410,7 +433,7 @@ export default defineComponent({
           });
           // this.hdkVersionForApp = release.content.hdk_version;
           this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
-          this.selectedGuiReleaseHash = encodeHashToBase64(guiReleaseHash);
+          this.selectedGuiReleaseHash = encodeHashToBase64(guiReleaseHash!);
           (this.$refs.downloading as typeof HCLoading).close();
           this.loadingText = "";
 
