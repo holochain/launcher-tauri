@@ -9,7 +9,7 @@ on:
 
 jobs:
   testbuild:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - name: setup node
@@ -39,9 +39,9 @@ jobs:
           cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.3-x86_64-unknown-linux-gnu
 
 
-          cargo install holochain --version 0.2.0-beta-rc.1 --locked --features db-encryption
+          cargo install holochain --git https://github.com/holochain/holochain --rev 352bcebe41808b0a5c58cc6f1ed1e1c96149d010 --locked --features db-encryption          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.2.0-beta-rc.1-x86_64-unknown-linux-gnu
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.2.0-352bce-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 

@@ -22,8 +22,8 @@ holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
 lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 
 # NEW_VERSION update holochain types
-holochain_types = { package = "holochain_types", version = "0.2.0-beta-rc.1"}
-hdk = { package = "hdk", version = "0.2.0-beta-rc.1"}
+holochain_types = { git = "https://github.com/holochain/holochain", package = "holochain_types", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
+hdk = { git = "https://github.com/holochain/holochain", package = "hdk", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
 
 
 async-trait = "0.1.52"
@@ -32,7 +32,7 @@ dirs-next = "2.0.0"
 futures = "0.3"
 log = "0.4.14"
 log4rs = "1.0.0"
-mr_bundle = "0.2.0-beta-rc.0"
+mr_bundle = { git = "https://github.com/holochain/holochain", package = "mr_bundle", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
 open = "2.0.1"
 opener = "0.5.0"
 portpicker = "0.1.1"
