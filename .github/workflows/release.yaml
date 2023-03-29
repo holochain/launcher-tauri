@@ -9,8 +9,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [windows-2019]
-    env:
+        platform: [macos-10.15, ubuntu-18.04, windows-2019]
+      env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
     runs-on: ${{ matrix.platform }}
