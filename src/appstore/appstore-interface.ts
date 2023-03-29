@@ -178,7 +178,7 @@ async function getHappReleasesFromHost (
     throw new Error("portal cell not found.")
   } else {
 
-    const happReleaseEntities: DevHubResponse<Array<Entity<HappReleaseEntry>>> = await appWebsocket.callZome({
+    const happReleaseEntities: DevHubResponse<DevHubResponse<Array<Entity<HappReleaseEntry>>>> = await appWebsocket.callZome({
       fn_name: "custom_remote_call",
       zome_name: "portal_api",
       cell_id: getCellId(portalCell)!,
@@ -187,7 +187,7 @@ async function getHappReleasesFromHost (
     });
 
     // maybe it needs to be entity.payload.content instead...
-    return happReleaseEntities.payload;
+    return happReleaseEntities.payload.payload;
   }
 }
 
