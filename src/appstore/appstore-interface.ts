@@ -343,11 +343,7 @@ export async function getAvailableHostForZomeFunction(
           fn_name: "ping",
           zome_name: "portal_api",
           cell_id: getCellId(portalCell)!,
-          payload: {
-            dna: DEVHUB_HAPP_LIBRARY_DNA_HASH,
-            zome: zome_name,
-            function: fn_name,
-          },
+          payload: hostPubKey,
           provenance: getCellId(portalCell)![1],
         });
       } catch (e) {

@@ -27,7 +27,7 @@ use v0_2_0_rc1::HolochainV0_2_0_rc1;
 // NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HdkVersion {
-  #[serde(rename = "0.2.0-beta-rc.1")]
+  #[serde(rename = "0.2.0-352bce")]
   V0_2_0_rc1,
 }
 
@@ -40,7 +40,7 @@ impl Into<String> for HdkVersion {
 // NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HdiVersion {
-  #[serde(rename = "0.3.0-beta-rc.1")]
+  #[serde(rename = "0.3.0-352bce")]
   V0_3_0_rc1,
 }
 
@@ -55,7 +55,7 @@ impl Into<String> for HdiVersion {
 pub enum HolochainVersion {
   #[serde(rename = "Custom Binary")]
   CustomBinary,
-  #[serde(rename = "0.2.0-beta-rc.1")]
+  #[serde(rename = "0.2.0-352bce")]
   V0_2_0_rc1,
   // !!! ONLY USE MINOR VERSION HERE ONCE BETA 0.1.0 IS OUT since this affects the folder structure, i.e. whether
   // the same conductor database will be used across holochain bumps
