@@ -337,17 +337,24 @@ export async function getAvailableHostForZomeFunction(
       const hostPubKey = hostEntity.content.author;
       console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
 
-      const success: boolean = await appWebsocket.callZome({
-        fn_name: "ping",
-        zome_name: "portal_api",
-        cell_id: getCellId(portalCell)!,
-        payload: {
-          dna: DEVHUB_HAPP_LIBRARY_DNA_HASH,
-          zome: zome_name,
-          function: fn_name,
-        },
-        provenance: getCellId(portalCell)![1],
-      });
+      let success = false;
+      try{
+        success = await appWebsocket.callZome({
+          fn_name: "ping",
+          zome_name: "portal_api",
+          cell_id: getCellId(portalCell)!,
+          payload: {
+            dna: DEVHUB_HAPP_LIBRARY_DNA_HASH,
+            zome: zome_name,
+            function: fn_name,
+          },
+          provenance: getCellId(portalCell)![1],
+        });
+      } catch (e) {
+        console.error("Failed to ping host: ", e);
+        console.log("stringified error: ", JSON.stringify(e));
+        throw new Error("Failed to ping host.");
+      }
       // what happens in the "false" case? Can this happen?
 
       console.log("@getAvailableHostForZomeFunction Sent ping to host and got result: ", success);
