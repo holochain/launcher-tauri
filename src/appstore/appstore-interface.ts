@@ -5,8 +5,8 @@ import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPack
 
 
 // hard coded dna hash of the DevHub in use
-const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0ke1JijHM0tAVTy3OH3-i1fuZzB7FlCBi2oLiD96p-NW97ueuK";
-const DEVHUB_HAPP_LIBRARY_DNA_HASH: DnaHash = decodeHashFromBase64(DEVHUB_HAPP_LIBRARY_DNA_HASH_B64);
+export const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0ke1JijHM0tAVTy3OH3-i1fuZzB7FlCBi2oLiD96p-NW97ueuK";
+export const DEVHUB_HAPP_LIBRARY_DNA_HASH: DnaHash = decodeHashFromBase64(DEVHUB_HAPP_LIBRARY_DNA_HASH_B64);
 
 
 
@@ -205,12 +205,16 @@ export async function fetchWebHapp(
     throw new Error("portal cell not found.")
   } else {
 
+    console.log("@fetchWebHapp: trying to fetch webhapp...");
+
     const host: AgentPubKey = await getAvailableHostForZomeFunction(
       appWebsocket,
       appStoreApp,
       "happ_library",
       "get_webhapp_package",
     );
+
+    console.log("@fetchWebHapp: got host: ", encodeHashToBase64(host));
 
     const payload: GetWebHappPackageInput = {
       name,
@@ -228,7 +232,9 @@ export async function fetchWebHapp(
       }
     }
 
-    const webHappBytes: Uint8Array = await appWebsocket.callZome({
+    console.log("@fetchWebHapp: calling portal API with payload: ", input);
+
+    const webHappBytesResponse: DevHubResponse<DevHubResponse<Uint8Array>> = await appWebsocket.callZome({
       fn_name: "custom_remote_call",
       zome_name: "portal_api",
       cell_id: getCellId(portalCell)!,
@@ -236,7 +242,7 @@ export async function fetchWebHapp(
       provenance: getCellId(portalCell)![1],
     });
 
-    return webHappBytes;
+    return webHappBytesResponse.payload.payload;
   }
 }
 

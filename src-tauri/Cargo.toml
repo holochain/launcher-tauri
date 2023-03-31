@@ -16,6 +16,9 @@ version = "0.9.991"
 tauri-build = { version = "1.2.1", features = [] }
 
 [dependencies]
+
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "holochain-0.2.0-beta-rc.2" }
+
 holochain_manager = { path = "../crates/holochain_manager" }
 holochain_launcher_utils = { path = "../crates/holochain_launcher_utils" }
 holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
@@ -23,7 +26,10 @@ lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 
 # NEW_VERSION update holochain types
 holochain_types = { git = "https://github.com/holochain/holochain", package = "holochain_types", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
+holochain_state = { git = "https://github.com/holochain/holochain", package = "holochain_state", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
 hdk = { git = "https://github.com/holochain/holochain", package = "hdk", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
+
+devhub_types = { git = "https://github.com/holochain/devhub-dnas", branch = "develop" }
 
 
 async-trait = "0.1.52"
@@ -36,6 +42,7 @@ mr_bundle = { git = "https://github.com/holochain/holochain", package = "mr_bund
 open = "2.0.1"
 opener = "0.5.0"
 portpicker = "0.1.1"
+rmpv = { version = "1.0.0", features = ["with-serde"] }
 serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"

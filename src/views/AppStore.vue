@@ -192,7 +192,7 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket, NetworkInfo, CellInfo, EntryHashB64, encodeHashToBase64 } from "@holochain/client";
+import { AppWebsocket, NetworkInfo, CellInfo, EntryHashB64, encodeHashToBase64, AgentPubKey } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 import { toSrc } from "../utils";
@@ -201,7 +201,7 @@ import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
-import { getHappReleases, fetchWebHapp } from "../appstore/appstore-interface";
+import { getHappReleases, fetchWebHapp, getAvailableHostForZomeFunction, DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../appstore/appstore-interface";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
@@ -364,9 +364,8 @@ export default defineComponent({
     async saveApp(app: AppEntry) {
       // // if downloading, always take holochain version of DevHub
       this.holochainSelection = false;
-      // this.loadingText = "fetching available releases";
-      // (this.$refs.downloading as typeof HCLoading).open();
-      // const release = getLatestRelease(app);
+      this.loadingText = "Fetching available releases";
+      (this.$refs.downloading as typeof HCLoading).open();
 
       // 1. get happ releases for app from DevHub
       if (!this.appWebsocket) {
@@ -408,58 +407,90 @@ export default defineComponent({
 
       let bytes = undefined;
 
+      this.loadingText = "Searching available Host";
+
+      const host: AgentPubKey = await getAvailableHostForZomeFunction(
+        this.appWebsocket as AppWebsocket,
+        appStoreInfo,
+        "happ_library",
+        "get_webhapp_package",
+      );
+
+      this.loadingText = "Requesting webhapp";
+
       try {
-        bytes = await fetchWebHapp(
-          this.appWebsocket! as AppWebsocket,
-          appStoreInfo,
-          app.name,
-          happReleaseHash,
-          guiReleaseHash!, // releases without official_gui have been filtered out earlier
-        );
+        this.selectedAppBundlePath = await invoke("fetch_and_save_app", {
+          holochainId: this.holochainId,
+          appstoreAppId: appStoreInfo.installed_app_id,
+          appTitle: app.name,
+          host: Array.from(host),
+          devhubHappLibraryDnaHash: Array.from(DEVHUB_HAPP_LIBRARY_DNA_HASH), // DNA hash of the DevHub to which the remote call shall be made
+          appstorePubKey: encodeHashToBase64(appStoreInfo.agent_pub_key),
+          happReleaseHash: encodeHashToBase64(happReleaseHash),
+          guiReleaseHash: guiReleaseHash ? encodeHashToBase64(guiReleaseHash) : undefined,
+        });
+
+        console.log("@saveApp: selectedAppBundlePath: ", this.selectedAppBundlePath);
       } catch (e) {
-        console.error("Error fetching the webhapp: ", e);
+        console.error("Error fetching the webhapp from the DevHub host: ", e);
         this.errorText = "Failed to fetch webhapp from DevHub host.";
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
-        this.downloadFailed = true;
-        setTimeout(() => (this.downloadFailed = false), 3000);
         return;
       }
 
-      if (bytes) {
-        try {
-          this.selectedAppBundlePath = await invoke("save_app", {
-            appBundleBytes: bytes,
-          });
-          // this.hdkVersionForApp = release.content.hdk_version;
-          this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
-          this.selectedGuiReleaseHash = encodeHashToBase64(guiReleaseHash!);
-          (this.$refs.downloading as typeof HCLoading).close();
-          this.loadingText = "";
+      // try {
+      //   bytes = await fetchWebHapp(
+      //     this.appWebsocket! as AppWebsocket,
+      //     appStoreInfo,
+      //     app.name,
+      //     happReleaseHash,
+      //     guiReleaseHash!, // releases without official_gui have been filtered out earlier
+      //   );
+      // } catch (e) {
+      //   console.error("Error fetching the webhapp: ", e);
+      //   this.errorText = "Failed to fetch webhapp from DevHub host.";
+      //   (this.$refs as any).snackbar.show();
+      //   (this.$refs.downloading as typeof HCLoading).close();
+      //   this.downloadFailed = true;
+      //   setTimeout(() => (this.downloadFailed = false), 3000);
+      //   return;
+      // }
 
-          this.$nextTick(() => {
-            (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
-          });
-        } catch (e) {
-          console.log("Error when decoding and saving webhapp to temp folder: ", e);
-          console.log("Error Payload: ", (e as any).data);
+      // if (bytes) {
+      //   try {
+      //     this.selectedAppBundlePath = await invoke("save_app", {
+      //       appBundleBytes: bytes,
+      //     });
+      //     // this.hdkVersionForApp = release.content.hdk_version;
+      //     this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
+      //     this.selectedGuiReleaseHash = encodeHashToBase64(guiReleaseHash!);
+      //     (this.$refs.downloading as typeof HCLoading).close();
+      //     this.loadingText = "";
 
-          if ((e as any).data) {
-            this.errorText = `Failed to decode and save webhapp: ${(e as any).data}`;
-          } else {
-            this.errorText = `Failed to decode and save webhapp: ${e}`;
-          }
+      //     this.$nextTick(() => {
+      //       (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
+      //     });
+      //   } catch (e) {
+      //     console.log("Error when decoding and saving webhapp to temp folder: ", e);
+      //     console.log("Error Payload: ", (e as any).data);
 
-          (this.$refs as any).snackbar.show();
-          (this.$refs.downloading as typeof HCLoading).close();
-        }
-      } else {
-        console.log("Error when decoding and saving webhapp to temp folder: Undefined bytes");
-        this.errorText = `Failed to decode and save webhapp: Undefined bytes`;
+      //     if ((e as any).data) {
+      //       this.errorText = `Failed to decode and save webhapp: ${(e as any).data}`;
+      //     } else {
+      //       this.errorText = `Failed to decode and save webhapp: ${e}`;
+      //     }
 
-        (this.$refs as any).snackbar.show();
-        (this.$refs.downloading as typeof HCLoading).close();
-      }
+      //     (this.$refs as any).snackbar.show();
+      //     (this.$refs.downloading as typeof HCLoading).close();
+      //   }
+      // } else {
+      //   console.log("Error when decoding and saving webhapp to temp folder: Undefined bytes");
+      //   this.errorText = `Failed to decode and save webhapp: Undefined bytes`;
+
+      //   (this.$refs as any).snackbar.show();
+      //   (this.$refs.downloading as typeof HCLoading).close();
+      // }
     },
     async selectFromFileSystem() {
       this.selectedAppBundlePath = (await open({
