@@ -38,7 +38,7 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          rustup toolchain install x86_64-pc-windows-gnu
+          rustup target add x86_64-pc-windows-gnu
 
           cargo install --version 0.2.3 lair_keystore
           $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
