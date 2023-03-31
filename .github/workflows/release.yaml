@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-10.15, ubuntu-20.04, windows-2019]
+        platform: [windows-2019]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -38,12 +38,14 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
+          rustup toolchain install x86_64-pc-windows-gnu
+
           cargo install --version 0.2.3 lair_keystore
           $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
           Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.2.3-x86_64-pc-windows-msvc.exe
 
 
-          cargo install holochain --git https://github.com/holochain/holochain --rev 352bcebe41808b0a5c58cc6f1ed1e1c96149d010 --locked --features db-encryption
+          cargo install holochain --git https://github.com/holochain/holochain --rev 352bcebe41808b0a5c58cc6f1ed1e1c96149d010 --locked --features db-encryption --target x86_64-pc-windows-gnu
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.2.0-352bce-x86_64-pc-windows-msvc.exe
 
@@ -120,7 +122,7 @@ jobs:
 
           set VCPKGRS_DYNAMIC=1
 
-          npm run build -- --verbose
+          npm run build -- --verbose --target x86_64-pc-windows-gnu
 
           # NEW_VERSION change version number in filenames here wherever needed
 
