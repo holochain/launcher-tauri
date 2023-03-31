@@ -33,7 +33,7 @@ mod system_tray;
 
 use crate::commands::choose_version::get_supported_versions;
 use crate::commands::open_app::report_issue_cmd;
-use crate::commands::save_app::save_app;
+use crate::commands::save_app::{save_app, fetch_and_save_app};
 // use crate::commands::start_app::start_app;
 use crate::commands::restart::restart;
 use crate::commands::quit::quit;
@@ -81,6 +81,7 @@ fn main() {
       unlock_and_launch,
       install_app,
       save_app,
+      fetch_and_save_app,
       enable_app,
       disable_app,
       delete_clone,

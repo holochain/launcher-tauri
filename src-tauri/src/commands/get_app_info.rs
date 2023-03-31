@@ -4,12 +4,13 @@ use holochain_manager::versions::holochain_types_latest::{
 };
 use std::fs;
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct WebAppInfo {
-  app_name: String,
-  roles_to_create: Vec<AppRoleManifest>,
+  pub app_name: String,
+  pub roles_to_create: Vec<AppRoleManifest>,
 }
 
+/// Read roles of app to use in the InstallAppDialog to ask for membrane proofs
 #[tauri::command]
 pub async fn get_app_info(window: tauri::Window, app_bundle_path: String) -> Result<WebAppInfo, String> {
   if window.label() != "admin" {

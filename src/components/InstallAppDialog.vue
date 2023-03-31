@@ -331,6 +331,7 @@ export default defineComponent({
     }
 
     try {
+      console.log("@created: this.appBundlePath: ", this.appBundlePath);
       this.appInfo = (await invoke("get_app_info", {
         appBundlePath: this.appBundlePath,
       })) as WebAppInfo;
