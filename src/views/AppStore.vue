@@ -430,6 +430,13 @@ export default defineComponent({
           guiReleaseHash: guiReleaseHash ? encodeHashToBase64(guiReleaseHash) : undefined,
         });
 
+        (this.$refs.downloading as typeof HCLoading).close();
+        this.loadingText = "";
+
+        this.$nextTick(() => {
+          (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
+        });
+
         console.log("@saveApp: selectedAppBundlePath: ", this.selectedAppBundlePath);
       } catch (e) {
         console.error("Error fetching the webhapp from the DevHub host: ", e);

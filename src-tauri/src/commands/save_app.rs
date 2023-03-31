@@ -52,7 +52,7 @@ pub async fn fetch_and_save_app(
   appstore_pub_key: String,
   happ_release_hash: String,
   gui_release_hash: String,
-) -> Result<((PathBuf, WebAppInfo)), String> {
+) -> Result<PathBuf, String> {
 
   if window.label() != "admin" {
     return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (I)"))
@@ -90,29 +90,7 @@ pub async fn fetch_and_save_app(
   fs::write(path.clone(), bytes)
     .map_err(|err| format!("Failed to write app bundle: {}", err))?;
 
-  // return app slots for membrane proofs UI
-  let happ_bundle = web_app_bundle.happ_bundle().await
-    .map_err(|e| format!("Failed to get happ bundle from webhapp bundle: {}", e))?;
-  let app_slots = happ_bundle.manifest().app_roles();
-
-  let roles_to_create: Vec<AppRoleManifest> = app_slots
-    .into_iter()
-    .filter(|slot| match slot.provisioning {
-      Some(
-        CellProvisioning::Create { .. }
-        | CellProvisioning::CreateClone { .. }
-        | CellProvisioning::CreateIfNotExists { .. },
-      ) => true,
-      _ => false,
-    })
-    .collect();
-
-  let web_app_info = WebAppInfo {
-    app_name: happ_bundle.manifest().app_name().to_string(),
-    roles_to_create,
-  };
-
-  Ok((path, web_app_info))
+  Ok(path)
 }
 
 
