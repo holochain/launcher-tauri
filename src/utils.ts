@@ -6,6 +6,8 @@ import {
   AppInfo,
 } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
+import { Base64 } from "js-base64";
+
 
 import { GossipProgress } from "./types";
 
@@ -79,6 +81,16 @@ export function getCellName(cellInfo: CellInfo): string | undefined {
   }
 }
 
+export function getCellNetworkSeed(cellInfo: CellInfo): string | undefined {
+  if ("provisioned" in cellInfo) {
+    return cellInfo.provisioned.dna_modifiers.network_seed;
+  }
+  if ("cloned" in cellInfo) {
+    return cellInfo.cloned.dna_modifiers.network_seed;
+  }
+  return undefined;
+}
+
 // GossipProgress will only return anticipated bytes soon so these methods will become obsolete
 export function gossipProgressPercent(progress: GossipProgress | undefined) {
   if (!progress) {
@@ -96,3 +108,15 @@ export function gossipProgressString(progress: GossipProgress | undefined) {
     progress.expectedBytes
   )}`;
 }
+
+
+export function toSrc(png: Uint8Array | undefined): string | undefined {
+  if (png) {
+    const base64Data = Base64.fromUint8Array(png);
+    return "data:image/png;base64," + base64Data;
+  }
+
+  return undefined;
+}
+
+

@@ -6,7 +6,7 @@ use std::{fs, time::Duration};
 
 // NEW_VERSION change holochain_types version
 use holochain_client::{AdminWebsocket, AgentPubKey, AppInfo, InstallAppPayload};
-use holochain_types_0_1_3::prelude::{AppBundleSource, CellId, DisableCloneCellPayload, CloneCellId};
+use holochain_types_0_2_0_rc3::prelude::{AppBundleSource, CellId, DisableCloneCellPayload, CloneCellId};
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
 
@@ -242,7 +242,7 @@ impl HolochainManager {
       .ws
       .list_apps(None)
       .await
-      .or(Err("Could not get the currently installed apps"))?;
+      .map_err(|e| format!("{:?}", e))?;
 
     Ok(installed_apps)
   }

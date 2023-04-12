@@ -23,99 +23,97 @@
 
   </HCDialog>
 
-  <div class="column" style="flex: 1; overflow-y: auto;">
-    <div class="row center-content top-bar">
-      <mwc-icon-button
-        icon="arrow_back"
-        @click="$emit('go-back')"
-        :title="$t('buttons.back')"
-      ></mwc-icon-button>
 
-      <span
-        style="
-          flex: 1;
-          font-size: 1.5em;
-          margin-left: 4px;
-          position: sticky;
-          top: 0;
-          z-index: 1;
-        "
-        >{{ $t("appStore.appStore") }}</span
-      >
-      <HCButton
-        outlined
-        @click="howToPublish()"
-        style="height: 36px; border-radius: 8px; padding: 0 20px"
-        :title="howToPublishUrl"
-        >{{ $t("appStore.howToPublishAnApp") }}
-      </HCButton>
-      <HCButton
-        icon="folder"
-        style="
-          margin-left: 8px;
-          margin-right: 1px;
-          height: 40px;
-          border-radius: 8px;
-          padding: 0 20px;
-        "
-        @click="selectFromFileSystem()"
-      >
-        <div class="row center-content">
-          <mwc-icon>folder</mwc-icon>
-          <span style="margin-left: 5px">{{
-            $t("appStore.selectAppFromFileSystem")
-          }}</span>
-        </div>
-      </HCButton>
-    </div>
+  <div class="row center-content top-bar" style="position: sticky; top: 0; z-index: 1; width: 100%;">
+    <mwc-icon-button
+      icon="arrow_back"
+      @click="$emit('go-back')"
+      :title="$t('buttons.back')"
+      style="margin-left: 8px;"
+    ></mwc-icon-button>
 
-    <div v-if="loading" class="column center-content" style="flex: 1">
-      <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"></LoadingDots>
-    </div>
-
-    <div
-      v-else-if="installableApps.length === 0"
-      class="column center-content"
-      style="flex: 1"
+    <span
+      style="
+        flex: 1;
+        font-size: 1.5em;
+        margin-left: 4px;
+      "
+      >{{ $t("appStore.appStore") }}</span
     >
-      <span>{{ $t("appStore.noAppsInStore") }}</span>
-      <span style="margin-top: 8px"
-        ><span
-          style="cursor: pointer; text-decoration: underline;"
-          :title="howToPublishUrl"
-          @click="howToPublish()"
-          @keydown.enter="howToPublish()"
-          tabindex="0"
-          >{{ $t("appStore.readThis") }}</span
-        >
-        {{ $t("appStore.readThisToPublish") }}</span
-      >
-      <HCButton
-        outlined
-        @click="fetchApps()"
-        class="refresh-button"
-        >{{ $t("main.refresh") }}
-      </HCButton>
-    </div>
-
-    <div v-else class="row" style="flex-wrap: wrap; margin: 16px">
-      <div
-        v-for="(app, i) of installableApps"
-        :key="i"
-        class="column"
-        style="margin-right: 16px; margin-bottom: 16px"
-      >
-        <AppPreviewCard :app="app" @installApp="saveApp(app)" />
+    <HCButton
+      outlined
+      @click="howToPublish()"
+      style="height: 36px; border-radius: 8px; padding: 0 20px"
+      :title="howToPublishUrl"
+      >{{ $t("appStore.howToPublishAnApp") }}
+    </HCButton>
+    <HCButton
+      icon="folder"
+      style="
+        margin-left: 8px;
+        margin-right: 8px;
+        height: 40px;
+        border-radius: 8px;
+        padding: 0 20px;
+      "
+      @click="selectFromFileSystem()"
+    >
+      <div class="row center-content">
+        <mwc-icon>folder</mwc-icon>
+        <span style="margin-left: 5px">{{
+          $t("appStore.selectAppFromFileSystem")
+        }}</span>
       </div>
+    </HCButton>
+  </div>
+
+
+  <div v-if="loading" class="column center-content" style="flex: 1; min-height: calc(100vh - 64px);">
+    <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
+  </div>
+
+  <div
+    v-else-if="installableApps.length === 0"
+    class="column center-content"
+    style="flex: 1; min-height: calc(100vh - 64px);"
+  >
+    <span>{{ $t("appStore.noAppsInStore") }}</span>
+    <span style="margin-top: 8px"
+      ><span
+        style="cursor: pointer; text-decoration: underline;"
+        :title="howToPublishUrl"
+        @click="howToPublish()"
+        @keydown.enter="howToPublish()"
+        tabindex="0"
+        >{{ $t("appStore.readThis") }}</span
+      >
+      {{ $t("appStore.readThisToPublish") }}</span
+    >
+    <HCButton
+      outlined
+      @click="fetchApps()"
+      class="refresh-button"
+      >{{ $t("main.refresh") }}
+    </HCButton>
+  </div>
+
+  <div v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px); margin-bottom: 200px;">
+    <div
+      v-for="(app, i) of installableApps"
+      :key="i"
+      class="column"
+      style="margin-right: 16px; margin-bottom: 16px"
+    >
+      <AppPreviewCard :app="app" :appIcon="app.icon" @installApp="saveApp(app)" />
     </div>
   </div>
 
   <div class="progress-indicator" :class="{ highlighted: downloadFailed }">
     <div
       style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
-      title="Full synchronization with peers required to reliably download all apps."
+      :title="$t('appStore.fullSynchronizationRequired')"
     >
-      App Library Synchronization:
+      {{ $t('appStore.appLibrarySynchronization') }}:
     </div>
     <div>
       <div v-for="(cell, idx) in provisionedCells" :key="cell[0]" class="column">
@@ -149,7 +147,7 @@
               "
               title="currently ongoing data exchanges with peers"
             >
-              no ongoing peer synchronization</span
+            {{ $t('appStore.noOngoingPeerSynchronization') }}</span
             >
           </div>
           <div
@@ -194,21 +192,16 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket, NetworkInfo, CellInfo, EntryHashB64, encodeHashToBase64 } from "@holochain/client";
+import { AppWebsocket, NetworkInfo, CellInfo, EntryHashB64, encodeHashToBase64, AgentPubKey } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
+import { toSrc } from "../utils";
 
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
-import {
-  AppWithReleases,
-  getAllAppsWithGui,
-  getLatestRelease,
-  fetchWebHapp,
-} from "../devhub/get-happs";
-import { HdkVersion } from "../hdk";
+import { getHappReleases, fetchWebHapp, getAvailableHostForZomeFunction, DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../appstore/appstore-interface";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
@@ -218,6 +211,9 @@ import HCDialog from "../components/subcomponents/HCDialog.vue";
 import { HolochainId } from "../types";
 import prettyBytes from "pretty-bytes";
 import { getCellId } from "../utils";
+import { i18n } from "../locale";
+import { AppEntry } from "../appstore/types";
+import { getAllApps } from "../appstore/appstore-interface";
 
 export default defineComponent({
   name: "AppStore",
@@ -234,7 +230,7 @@ export default defineComponent({
   data(): {
     loadingText: string;
     loading: boolean;
-    installableApps: Array<AppWithReleases>;
+    installableApps: Array<AppEntry>;
     selectedAppBundlePath: string | undefined;
     howToPublishUrl: string;
     holochainId: HolochainId | undefined;
@@ -298,6 +294,7 @@ export default defineComponent({
     );
   },
   methods: {
+    toSrc,
     async connectAppWebsocket() {
       // const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
       const holochainId = this.$store.getters["holochainIdForDevhub"];
@@ -310,37 +307,42 @@ export default defineComponent({
     async fetchApps() {
       this.loading = true;
 
+      console.log("@fetchApps: about to call appInfo...");
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
       }
 
-      const devhubInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: `DevHub-${this.holochainId!.content}`,
+      console.log("@fetchApps: about to call appInfo...");
+      const appStoreInfo = await this.appWebsocket!.appInfo({
+        installed_app_id: `Appstore`,
       });
 
-      const allCells = devhubInfo.cell_info;
+      console.log("@fetchApps: appStoreInfo: ", appStoreInfo);
+      const allCells = appStoreInfo.cell_info;
+      console.log("@fetchApps: allCells: ", allCells);
+
       const provisionedCells: [string, CellInfo | undefined][] = Object.entries(allCells).map(([roleName, cellInfos]) => {
         return [roleName, cellInfos.find((cellInfo) => "provisioned" in cellInfo)]
       });
+
+      console.log("@fetchApps: provisionedCells: ", provisionedCells);
 
       this.provisionedCells = provisionedCells.sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => {
         return roleName_a.localeCompare(roleName_b);
       });
 
 
-      let allApps: Array<AppWithReleases>;
+      let allApps: Array<AppEntry>;
       try {
-        allApps = await getAllAppsWithGui((this.appWebsocket! as AppWebsocket), devhubInfo);
+        allApps = await getAllApps((this.appWebsocket! as AppWebsocket), appStoreInfo);
       } catch (e) {
         console.error(e);
         // Catch other errors than being offline
         allApps = [];
       }
 
-      const { hdk_versions }: { hdk_versions: HdkVersion[] } = await invoke(
-        "get_supported_versions",
-        {}
-      );
+      console.log("@fetchApps: allApps: ", allApps);
+
       this.installableApps = allApps;
 
       this.loading = false;
@@ -359,85 +361,143 @@ export default defineComponent({
         url: "https://developer.holochain.org/glossary/#peer-to-peer",
       });
     },
-    getLatestRelease,
-    async saveApp(app: AppWithReleases) {
-      // if downloading, always take holochain version of DevHub
+    async saveApp(app: AppEntry) {
+      // // if downloading, always take holochain version of DevHub
       this.holochainSelection = false;
-      this.loadingText = "Connecting with DevHub";
+      this.loadingText = "Fetching available releases";
       (this.$refs.downloading as typeof HCLoading).open();
-      const release = getLatestRelease(app);
 
-
+      // 1. get happ releases for app from DevHub
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
       }
 
-      const devhubInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: `DevHub-${this.holochainId!.content}`,
+      const appStoreInfo = await this.appWebsocket!.appInfo({
+        installed_app_id: `Appstore`,
       });
 
-      this.loadingText = "Downloading...";
+      let happReleases = undefined;
 
-      const happReleaseHash = release.id;
-      const guiReleaseHash = release.content.official_gui!;  // releases without official_gui have been filtered out earlier
+      try {
+        happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, app.devhub_address.happ)
+      } catch (e) {
+        this.errorText = `Error getting happ releases from a DevHub host. See console for details.`;
+        (this.$refs as any).snackbar.show();
+        (this.$refs.downloading as typeof HCLoading).close();
+        throw new Error(`Error getting happ releases from a DevHub host: ${JSON.stringify(e)}`);
+      }
 
-      // console.log("@AppStore: happReleaseHash: ", happReleaseHash);
-      // console.log("@AppStore: guiReleaseHash: ", guiReleaseHash);
+      if (!happReleases) {
+        this.errorText = "Undefined happ releases.";
+        (this.$refs as any).snackbar.show();
+        (this.$refs.downloading as typeof HCLoading).close();
+        throw new Error("Undefined happ releases.");
+      }
+
+      // 1b. Filter out releases without GUIs for now. Installing headless apps should become possible as well of course
+      happReleases = happReleases.filter((release) => !!release.content.official_gui);
+
+      // 2. select latest happ release (later maybe option to select older ones)
+      const latestHappRelease = happReleases.sort((a, b) => b.content.last_updated - a.content.last_updated)[0];
+
+      // 3. fetchwebhapp
+
+      const happReleaseHash = latestHappRelease.id;
+      const guiReleaseHash = latestHappRelease.content.official_gui;
 
       let bytes = undefined;
 
+      this.loadingText = "Searching available Host";
+
+      const host: AgentPubKey = await getAvailableHostForZomeFunction(
+        this.appWebsocket as AppWebsocket,
+        appStoreInfo,
+        "happ_library",
+        "get_webhapp_package",
+      );
+
+      this.loadingText = "Requesting webhapp";
+
       try {
-        bytes = await fetchWebHapp(
-          this.appWebsocket! as AppWebsocket,
-          devhubInfo,
-          app.app.content.title,
-          happReleaseHash,
-          guiReleaseHash!, // releases without official_gui have been filtered out earlier
-        );
+        this.selectedAppBundlePath = await invoke("fetch_and_save_app", {
+          holochainId: this.holochainId,
+          appstoreAppId: appStoreInfo.installed_app_id,
+          appTitle: app.name,
+          host: Array.from(host),
+          devhubHappLibraryDnaHash: Array.from(DEVHUB_HAPP_LIBRARY_DNA_HASH), // DNA hash of the DevHub to which the remote call shall be made
+          appstorePubKey: encodeHashToBase64(appStoreInfo.agent_pub_key),
+          happReleaseHash: encodeHashToBase64(happReleaseHash),
+          guiReleaseHash: guiReleaseHash ? encodeHashToBase64(guiReleaseHash) : undefined,
+        });
+
+        (this.$refs.downloading as typeof HCLoading).close();
+        this.loadingText = "";
+
+        this.$nextTick(() => {
+          (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
+        });
+
+        console.log("@saveApp: selectedAppBundlePath: ", this.selectedAppBundlePath);
       } catch (e) {
-        console.log("Error fetching the webhapp: ", e);
-        this.errorText = "App Library Synchronization not Complete. Please try again later.";
+        console.error("Error fetching the webhapp from the DevHub host: ", e);
+        this.errorText = "Failed to fetch webhapp from DevHub host.";
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
-        this.downloadFailed = true;
-        setTimeout(() => (this.downloadFailed = false), 3000);
         return;
       }
 
-      if (bytes) {
-        try {
-          this.selectedAppBundlePath = await invoke("save_app", {
-            appBundleBytes: bytes,
-          });
-          // this.hdkVersionForApp = release.content.hdk_version;
-          this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
-          this.selectedGuiReleaseHash = encodeHashToBase64(guiReleaseHash);
-          (this.$refs.downloading as typeof HCLoading).close();
-          this.loadingText = "";
+      // try {
+      //   bytes = await fetchWebHapp(
+      //     this.appWebsocket! as AppWebsocket,
+      //     appStoreInfo,
+      //     app.name,
+      //     happReleaseHash,
+      //     guiReleaseHash!, // releases without official_gui have been filtered out earlier
+      //   );
+      // } catch (e) {
+      //   console.error("Error fetching the webhapp: ", e);
+      //   this.errorText = "Failed to fetch webhapp from DevHub host.";
+      //   (this.$refs as any).snackbar.show();
+      //   (this.$refs.downloading as typeof HCLoading).close();
+      //   this.downloadFailed = true;
+      //   setTimeout(() => (this.downloadFailed = false), 3000);
+      //   return;
+      // }
 
-          this.$nextTick(() => {
-            (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
-          });
-        } catch (e) {
-          console.log("Error when decoding and saving webhapp to temp folder: ", e);
-          console.log("Error Payload: ", (e as any).data);
+      // if (bytes) {
+      //   try {
+      //     this.selectedAppBundlePath = await invoke("save_app", {
+      //       appBundleBytes: bytes,
+      //     });
+      //     // this.hdkVersionForApp = release.content.hdk_version;
+      //     this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
+      //     this.selectedGuiReleaseHash = encodeHashToBase64(guiReleaseHash!);
+      //     (this.$refs.downloading as typeof HCLoading).close();
+      //     this.loadingText = "";
 
-          if ((e as any).data) {
-            this.errorText = `Failed to decode and save webhapp: ${(e as any).data}`;
-          } else {
-            this.errorText = `Failed to decode and save webhapp: ${e}`;
-          }
+      //     this.$nextTick(() => {
+      //       (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
+      //     });
+      //   } catch (e) {
+      //     console.log("Error when decoding and saving webhapp to temp folder: ", e);
+      //     console.log("Error Payload: ", (e as any).data);
 
-          (this.$refs as any).snackbar.show();
-          (this.$refs.downloading as typeof HCLoading).close();
-        }
-      } else {
-        console.log("Error when decoding and saving webhapp to temp folder: Undefined bytes");
-        this.errorText = `Failed to decode and save webhapp: Undefined bytes`;
+      //     if ((e as any).data) {
+      //       this.errorText = `Failed to decode and save webhapp: ${(e as any).data}`;
+      //     } else {
+      //       this.errorText = `Failed to decode and save webhapp: ${e}`;
+      //     }
 
-        (this.$refs as any).snackbar.show();
-        (this.$refs.downloading as typeof HCLoading).close();
-      }
+      //     (this.$refs as any).snackbar.show();
+      //     (this.$refs.downloading as typeof HCLoading).close();
+      //   }
+      // } else {
+      //   console.log("Error when decoding and saving webhapp to temp folder: Undefined bytes");
+      //   this.errorText = `Failed to decode and save webhapp: Undefined bytes`;
+
+      //   (this.$refs as any).snackbar.show();
+      //   (this.$refs.downloading as typeof HCLoading).close();
+      // }
     },
     async selectFromFileSystem() {
       this.selectedAppBundlePath = (await open({
@@ -551,13 +611,10 @@ export default defineComponent({
 
 <style scoped>
 .top-bar {
-  /* background-color: rgb(225, 226, 255); */
-  padding: 8px 8px 8px 6px;
-  /* border-bottom: 1px solid black; */
+  align-items: center;
+  height: 64px;
   background: white;
   box-shadow: 0 0px 5px #9b9b9b;
-  position: sticky;
-  top: 0;
 }
 
 .progress-indicator {

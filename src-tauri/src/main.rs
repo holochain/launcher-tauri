@@ -33,7 +33,7 @@ mod system_tray;
 
 use crate::commands::choose_version::get_supported_versions;
 use crate::commands::open_app::report_issue_cmd;
-use crate::commands::save_app::save_app;
+use crate::commands::save_app::{save_app, fetch_and_save_app};
 // use crate::commands::start_app::start_app;
 use crate::commands::restart::restart;
 use crate::commands::quit::quit;
@@ -81,6 +81,7 @@ fn main() {
       unlock_and_launch,
       install_app,
       save_app,
+      fetch_and_save_app,
       enable_app,
       disable_app,
       delete_clone,
@@ -108,6 +109,12 @@ fn main() {
             if profile == "default" {
               eprintln!("Error: The name 'default' is not allowed for a profile.");
               panic!("Error: The name 'default' is not allowed for a profile.");
+            }
+            // \, /, and ? have a meaning as path symbols or domain socket url symbols and are therefore not allowed
+            // because they would break stuff
+            if profile.contains("/") || profile.contains("\\") || profile.contains("?") {
+              eprintln!("Error: \"/\", \"\\\" and \"?\" are not allowed in profile names.");
+              panic!("Error: \"/\", \"\\\" and \"?\" are not allowed in profile names.");
             }
             profile
           },

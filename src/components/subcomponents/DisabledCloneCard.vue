@@ -5,8 +5,7 @@
     ref="delete-cell-dialog"
     primaryButtonLabel="Delete"
     ><div style="text-align: center; margin: 0 10px;">
-      Are you sure you want to delete this cell? This will irrevocably delete
-      all data stored in it.
+      {{ $t('dialogs.confirmUninstallCell') }}
     </div>
   </HCGenericDialog>
 

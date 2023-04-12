@@ -65,6 +65,18 @@ pub async fn execute_factory_reset(
         log::error!("Could not remove holochain data directory: {}", err);
         format!("Could not remove holochain data directory: {}", err)
     })?;
+
+
+    // !!! IMPORTANT !!! Lair is shared across holochain versions. ONLY DELETE IT if apps of all holochain versions are
+    // supposed to be deleted
+    let lair_dir = profile_lair_dir(profile.clone())
+    .map_err(|e| format!("Failed to get lair dir: {}", e))?;
+
+    remove_dir_if_exists(lair_dir).map_err(|err| {
+      log::error!("Could not remove lair directory: {}", err);
+      String::from("Could not remove lair directory")
+    })?;
+
   } else {
     let mut mutex = (*state).lock().await;
     let launcher_manager = mutex.get_running()?;
@@ -82,15 +94,6 @@ pub async fn execute_factory_reset(
       })?;
     }
   }
-
-
-  let lair_dir = profile_lair_dir(profile.clone())
-    .map_err(|e| format!("Failed to get lair dir: {}", e))?;
-
-  remove_dir_if_exists(lair_dir).map_err(|err| {
-    log::error!("Could not remove lair directory: {}", err);
-    String::from("Could not remove lair directory")
-  })?;
 
 
   if cfg!(not(target_os="windows")) {
