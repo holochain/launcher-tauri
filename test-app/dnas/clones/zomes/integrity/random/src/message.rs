@@ -32,7 +32,13 @@ pub fn validate_create_link_message_updates(
     _tag: LinkTag,
 ) -> ExternResult<ValidateCallbackResult> {
     // Check the entry type for the given action hash
-    let action_hash = ActionHash::from(base_address);
+    let action_hash = match base_address.into_action_hash() {
+        Some(a) => a,
+        None => return Err(
+            wasm_error!(
+                WasmErrorInner::Guest(String::from("Base address is not an action hash."))
+            ),)
+    };
     let record = must_get_valid_record(action_hash)?;
     let _message: crate::Message = record
         .entry()
@@ -44,7 +50,13 @@ pub fn validate_create_link_message_updates(
             ),
         )?;
     // Check the entry type for the given action hash
-    let action_hash = ActionHash::from(target_address);
+    let action_hash = match target_address.into_action_hash() {
+        Some(a) => a,
+        None => return Err(
+            wasm_error!(
+                WasmErrorInner::Guest(String::from("Target address is not an action hash."))
+            ),)
+    };
     let record = must_get_valid_record(action_hash)?;
     let _message: crate::Message = record
         .entry()

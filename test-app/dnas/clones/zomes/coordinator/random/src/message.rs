@@ -22,7 +22,13 @@ pub fn get_message(original_message_hash: ActionHash) -> ExternResult<Option<Rec
         .into_iter()
         .max_by(|link_a, link_b| link_b.timestamp.cmp(&link_a.timestamp));
     let latest_message_hash = match latest_link {
-        Some(link) => ActionHash::from(link.target.clone()),
+        Some(link) => match link.target.clone().into_action_hash() {
+            Some(a) => a,
+            None => return Err(
+                wasm_error!(
+                    WasmErrorInner::Guest(String::from("Link target is not an action hash."))
+                ),)
+        },
         None => original_message_hash.clone(),
     };
     get(latest_message_hash, GetOptions::default())

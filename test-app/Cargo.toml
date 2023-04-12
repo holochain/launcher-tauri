@@ -8,8 +8,8 @@ opt-level = "z"
 members = ["dnas/*/zomes/coordinator/*", "dnas/*/zomes/integrity/*"]
 
 [workspace.dependencies]
-hdi = "=0.2.0"
-hdk = "=0.1.0"
+hdi = "=0.3.0-beta-rc.3"
+hdk = "=0.2.0-beta-rc.3"
 serde = "1"
 
 [workspace.dependencies.random]
