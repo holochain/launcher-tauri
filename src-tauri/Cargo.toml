@@ -7,7 +7,7 @@ edition = "2021"
 license = ""
 name = "holochain-launcher"
 repository = ""
-version = "0.9.992"
+version = "0.9.993"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -25,9 +25,9 @@ holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
 lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 
 # NEW_VERSION update holochain types
-holochain_types = { git = "https://github.com/holochain/holochain", package = "holochain_types", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
-holochain_state = { git = "https://github.com/holochain/holochain", package = "holochain_state", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
-hdk = { git = "https://github.com/holochain/holochain", package = "hdk", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
+holochain_types = "0.2.0-beta-rc.3"
+holochain_state = "0.2.0-beta-rc.3"
+hdk = "0.2.0-beta-rc.3"
 
 devhub_types = { git = "https://github.com/holochain/devhub-dnas", branch = "develop" }
 
@@ -38,7 +38,7 @@ dirs-next = "2.0.0"
 futures = "0.3"
 log = "0.4.14"
 log4rs = "1.0.0"
-mr_bundle = { git = "https://github.com/holochain/holochain", package = "mr_bundle", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
+mr_bundle = { git = "https://github.com/holochain/holochain", package = "mr_bundle", version = "0.2.0-beta-rc.0" }
 open = "2.0.1"
 opener = "0.5.0"
 portpicker = "0.1.1"

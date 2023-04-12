@@ -8,18 +8,18 @@ version = "0.1.0"
 [dependencies]
 # NEW_VERSION pick right client version
 
-holochain = { git = "https://github.com/holochain/holochain", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010", features = ["db-encryption"] }
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "holochain-0.2.0-beta-rc.2" }
+holochain = { version = "0.2.0-beta-rc.3", features = ["db-encryption"] }
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "holochain-0.2.0-beta-rc.3" }
 
 
 # NEW_VERSION add latest crates here # taken from commit instead this time
 
-holochain_conductor_api_0_2_0_rc1 = { git = "https://github.com/holochain/holochain", package = "holochain_conductor_api", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
-holochain_p2p_0_2_0_rc1 = { git = "https://github.com/holochain/holochain", package = "holochain_p2p", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
-holochain_types_0_2_0_rc1 = { git = "https://github.com/holochain/holochain", package = "holochain_types", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
+holochain_conductor_api_0_2_0_rc3 = { git = "https://github.com/holochain/holochain", package = "holochain_conductor_api", version = "0.2.0-beta-rc.3" }
+holochain_p2p_0_2_0_rc3 = { git = "https://github.com/holochain/holochain", package = "holochain_p2p", version = "0.2.0-beta-rc.3" }
+holochain_types_0_2_0_rc3 = { git = "https://github.com/holochain/holochain", package = "holochain_types", version = "0.2.0-beta-rc.3" }
 
 
-mr_bundle = { git = "https://github.com/holochain/holochain", package = "mr_bundle", rev = "352bcebe41808b0a5c58cc6f1ed1e1c96149d010" }
+mr_bundle = { git = "https://github.com/holochain/holochain", package = "mr_bundle", version = "0.2.0-beta-rc.0" }
 
 lair_keystore_manager = {path = "../lair_keystore_manager"}
 
