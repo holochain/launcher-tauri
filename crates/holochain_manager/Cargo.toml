@@ -14,12 +14,11 @@ holochain_client = { git = "https://github.com/holochain/holochain-client-rust",
 
 # NEW_VERSION add latest crates here # taken from commit instead this time
 
-holochain_conductor_api_0_2_0_rc3 = { git = "https://github.com/holochain/holochain", package = "holochain_conductor_api", version = "0.2.0-beta-rc.3" }
-holochain_p2p_0_2_0_rc3 = { git = "https://github.com/holochain/holochain", package = "holochain_p2p", version = "0.2.0-beta-rc.3" }
-holochain_types_0_2_0_rc3 = { git = "https://github.com/holochain/holochain", package = "holochain_types", version = "0.2.0-beta-rc.3" }
+holochain_conductor_api_0_2_0_rc3 = { package = "holochain_conductor_api", version = "0.2.0-beta-rc.3" }
+holochain_p2p_0_2_0_rc3 = { package = "holochain_p2p", version = "0.2.0-beta-rc.3" }
+holochain_types_0_2_0_rc3 = { package = "holochain_types", version = "0.2.0-beta-rc.3" }
 
-
-mr_bundle = { git = "https://github.com/holochain/holochain", package = "mr_bundle", version = "0.2.0-beta-rc.0" }
+mr_bundle = { package = "mr_bundle", version = "0.2.0-beta-rc.0" }
 
 lair_keystore_manager = {path = "../lair_keystore_manager"}
 

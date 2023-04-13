@@ -37,16 +37,7 @@ impl VersionManager for HolochainV0_2_0_rc3 {
 
     network_config.tuning_params = Arc::new(tuning_params);
 
-    network_config.transport_pool.push(TransportConfig::Proxy {
-      sub_transport: Box::new(TransportConfig::Quic {
-        bind_to: None,
-        override_host: None,
-        override_port: None,
-      }),
-      proxy_config: ProxyConfig::RemoteProxyClient {
-        proxy_url: proxy_url(),
-      },
-    });
+    network_config.transport_pool.push(TransportConfig::WebRTC { signal_url: String::from("wss://signal.holotest.net") });
 
     let config = ConductorConfig {
       environment_path: conductor_environment_path.into(),
