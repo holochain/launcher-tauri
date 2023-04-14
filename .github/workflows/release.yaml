@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-10.15, ubuntu-20.04, windows-2019]
+        platform: [windows-2019]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -115,10 +115,19 @@ jobs:
         if: matrix.platform == 'windows-2019'
         run: |
 
-          # required to fix 'LINK : fatal error LNK1181: cannot open input file 'sqlite3.lib'': https://github.com/rusqlite/rusqlite#notes-on-building-rusqlite-and-libsqlite3-sys
-          vcpkg install sqlite3:x64-windows
+          # attempting to fix 'LINK : fatal error LNK1181: cannot open input file 'sqlite3.lib'': https://github.com/rusqlite/rusqlite#notes-on-building-rusqlite-and-libsqlite3-sys
+          # vcpkg install sqlite3:x64-windows
 
-          set VCPKGRS_DYNAMIC=1
+          # set VCPKGRS_DYNAMIC=1
+
+          # trying https://github.com/dlang-community/d2sqlite3/issues/49#issuecomment-694725249
+          curl --output sqlite-amalgamation-3390300.zip --url https://www.sqlite.org/2022/sqlite-amalgamation-3390300.zip
+          tar -xf sqlite-amalgamation-3390300.zip
+
+          curl --output sqlite-dll-win64-x64-3390300.zip --url https://www.sqlite.org/2022/sqlite-dll-win64-x64-3390300.zip
+          tar -xf sqlite-dll-win64-x64-3390300.zip
+
+          lib /DEF:sqlite3.def /OUT:sqlite3.lib /MACHINE:x64
 
           npm run build -- --verbose
 
