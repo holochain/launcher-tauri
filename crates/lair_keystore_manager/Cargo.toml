@@ -9,9 +9,9 @@ version = "0.1.0"
 
 # NEW_VERSION update holochain_types, holochain_zome_types and holochain_conductor_api here and if necessary also lair_keystore_api
 lair_keystore_api = "0.2.3"
-holochain_conductor_api = "0.2.0-beta-rc.3"
-holochain_types = "0.2.0-beta-rc.3"
-holochain_zome_types = "0.2.0-beta-rc.3"
+holochain_conductor_api = "0.2.0-beta-rc.4"
+holochain_types = "0.2.0-beta-rc.4"
+holochain_zome_types = "0.2.0-beta-rc.4"
 
 holochain_launcher_utils = { path = "../holochain_launcher_utils" }
 
