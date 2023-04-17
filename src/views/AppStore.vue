@@ -431,7 +431,7 @@ export default defineComponent({
         this.selectedAppBundlePath = await invoke("fetch_and_save_app", {
           holochainId: this.holochainId,
           appstoreAppId: appStoreInfo.installed_app_id,
-          appTitle: app.name,
+          appTitle: app.title,
           host: Array.from(host),
           devhubHappLibraryDnaHash: Array.from(DEVHUB_HAPP_LIBRARY_DNA_HASH), // DNA hash of the DevHub to which the remote call shall be made
           appstorePubKey: encodeHashToBase64(appStoreInfo.agent_pub_key),
