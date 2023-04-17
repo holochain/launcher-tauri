@@ -48,7 +48,6 @@
       >{{ $t("appStore.howToPublishAnApp") }}
     </HCButton>
     <HCButton
-      icon="folder"
       style="
         margin-left: 8px;
         margin-right: 8px;
@@ -283,15 +282,24 @@ export default defineComponent({
       window.localStorage.setItem("appLibraryWarningShown", "true");
     }
 
-    await this.fetchApps();
+    try {
+      await this.fetchApps();
+    } catch (e) {
+      console.error(`Failed to fetch apps in mounted() hook: ${e}`);
+    }
 
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
-    await this.getNetworkState();
-    this.pollInterval = window.setInterval(
-      async () => await this.getNetworkState(),
-      2000
-    );
+    // try {
+    //   await this.getNetworkState();
+    // } catch (e) {
+    //   console.error(`Failed to get NetworkState: ${JSON.stringify(e)}`);
+    // }
+
+    // this.pollInterval = window.setInterval(
+    //   async () => await this.getNetworkState(),
+    //   2000
+    // );
   },
   methods: {
     toSrc,
@@ -305,6 +313,7 @@ export default defineComponent({
       // console.log("connected to AppWebsocket.");
     },
     async fetchApps() {
+      console.log("LOADING...");
       this.loading = true;
 
       console.log("@fetchApps: about to call appInfo...");
@@ -336,7 +345,7 @@ export default defineComponent({
       try {
         allApps = await getAllApps((this.appWebsocket! as AppWebsocket), appStoreInfo);
       } catch (e) {
-        console.error(e);
+        console.error(`Error getting all apps: ${e}`);
         // Catch other errors than being offline
         allApps = [];
       }

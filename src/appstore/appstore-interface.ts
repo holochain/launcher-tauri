@@ -134,16 +134,21 @@ export async function getHappReleases(
 
   console.log("@getHappReleases: trying to get host.");
 
-  const host: AgentPubKey = await getAvailableHostForZomeFunction(
-    appWebsocket,
-    appStoreApp,
-    "happ_library",
-    "get_happ_releases",
-  );
+  try {
+    const host: AgentPubKey = await getAvailableHostForZomeFunction(
+      appWebsocket,
+      appStoreApp,
+      "happ_library",
+      "get_happ_releases",
+    );
 
-  console.log("@getHappReleases: found host: ", host);
+    console.log("@getHappReleases: found host: ", host);
 
-  return getHappReleasesFromHost(appWebsocket, appStoreApp, host, forHapp);
+    return getHappReleasesFromHost(appWebsocket, appStoreApp, host, forHapp);
+  } catch (e) {
+    console.error(`Failed to get happ releases: ${e}`);
+    return Promise.reject(`Failed to get happ releases: ${e}`);
+  }
 }
 
 /**
@@ -337,6 +342,10 @@ export async function getAvailableHostForZomeFunction(
     console.log("@getAvailableHostForZomeFunction: found hosts: ", hosts);
     let b64Hosts = hosts.payload.map((entity) => encodeHashToBase64(entity.content.author));
     console.log("@getAvailableHostForZomeFunction: b64 hosts: ", b64Hosts);
+
+    if (hosts.payload.length === 0) {
+      throw new Error(`Found no registered hosts for zome ${zome_name} and function ${fn_name}.`);
+    }
 
     // 2. ping each of them and take the first one that responds
     return Promise.any(hosts.payload.map(async (hostEntity) => {

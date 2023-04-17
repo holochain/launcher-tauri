@@ -17,7 +17,8 @@ export interface DevHubResponse<T> {
 export type EntityId = ActionHash;
 
 export interface AppEntry {
-  name: string,
+  title: string,
+  subtitle: string,
   description: string,
   icon: EntryHash,
   publisher: ActionHash, // alias EntityId

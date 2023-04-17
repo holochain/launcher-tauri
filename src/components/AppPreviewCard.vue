@@ -57,7 +57,7 @@
           "
         >
           <div style="color: white; font-size: 40px; font-weight: 600">
-            {{ app.name.slice(0, 2) }}
+            {{ app.title.slice(0, 2) }}
           </div>
         </div>
 
@@ -71,9 +71,9 @@
               line-height: 115%;
               word-break: normal;
             "
-            :title="app.name"
+            :title="app.title"
           >
-            {{ app.name }}
+            {{ app.title }}
           </div>
           <div style="margin-top: -5px">
             [VERSION NOT IMPLEMENTED]
@@ -90,7 +90,7 @@
           overflow-y: auto;
         "
       >
-        [SUBTITLE NOT IMPLEMENTED]
+        {{ app.subtitle }}
       </div>
     </div>
 
