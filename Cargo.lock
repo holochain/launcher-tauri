@@ -1590,6 +1590,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c877555693c14d2f84191cfd3ad8582790fc52b5e2274b40b59cf5f5cea25c7"
 
 [[package]]
+name = "devhub_types"
+version = "0.2.0-beta-rc.4"
+source = "git+https://github.com/holochain/devhub-dnas?branch=develop#101acea6578d7c6d6bb41695ee0135009c19e4c8"
+dependencies = [
+ "essence_payloads",
+ "flate2",
+ "hc_crud_ceps",
+ "hdk",
+ "hex",
+ "rmp-serde 0.15.5",
+ "serde",
+ "serde_yaml 0.8.26",
+ "sha2 0.9.9",
+ "thiserror",
+]
+
+[[package]]
 name = "diff"
 version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1868,6 +1885,16 @@ checksum = "aa68f1b12764fab894d2755d2518754e71b4fd80ecfb822714a1206c2aab39bf"
 dependencies = [
  "cc",
  "libc",
+]
+
+[[package]]
+name = "essence_payloads"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b5862712b20f8ee17bd1bc63a1bbef34a031c593b43d6bfdd7bdcb5c1f9b2e0a"
+dependencies = [
+ "serde",
+ "thiserror",
 ]
 
 [[package]]
@@ -2626,6 +2653,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "hc_crud_ceps"
+version = "0.77.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "59f8e0ab0a9e0f4f2dd93333b1222e29e4f7713fd763c3f6015a79d9b62760fa"
+dependencies = [
+ "hdk",
+ "holo_hash",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "hc_seed_bundle"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2881,6 +2920,7 @@ version = "0.9.993"
 dependencies = [
  "async-trait",
  "chrono",
+ "devhub_types",
  "dirs-next",
  "futures",
  "hdk",

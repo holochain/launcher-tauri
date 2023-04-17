@@ -31,7 +31,7 @@ holochain_state = "0.2.0-beta-rc.4"
 hdk = "0.2.0-beta-rc.4"
 
 
-# devhub_types = { git = "https://github.com/holochain/devhub-dnas", branch = "develop" }
+devhub_types = { git = "https://github.com/holochain/devhub-dnas", branch = "develop" }
 
 
 async-trait = "0.1.52"
