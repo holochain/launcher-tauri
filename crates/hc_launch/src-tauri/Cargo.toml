@@ -9,6 +9,7 @@ documentation = "https://docs.rs/holochain_cli_launch"
 repository = "https://github.com/holochain/launcher"
 readme = "../README.md"
 categories = ["command-line-utilities", "development-tools"]
+resolver = "2"
 
 [[bin]]
 name = "hc-launch"
