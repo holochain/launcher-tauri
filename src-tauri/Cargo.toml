@@ -30,6 +30,7 @@ holochain_types = "0.2.0-beta-rc.4"
 holochain_state = "0.2.0-beta-rc.4"
 hdk = "0.2.0-beta-rc.4"
 
+holochain = "0.2.0-beta-rc.4"
 
 devhub_types = { git = "https://github.com/holochain/devhub-dnas", branch = "develop" }
 
