@@ -5,24 +5,6 @@
       class="column"
       style="flex: 1; overflow-y: auto; padding: 20px"
     >
-      <div style="font-weight: bold">Version details:</div>
-      <!-- <div v-if="holochainVersion" class="row">
-        <div style="width: 160px">Holochain version:</div>
-        <div>{{ holochainVersion }}</div>
-      </div>
-      <div class="row">
-        <div style="width: 160px">HDK version:</div>
-        <div>{{ getLatestRelease(app).content.hdk_version }}</div>
-      </div> -->
-      <div class="row">
-        <div style="width: 160px">hApp version:</div>
-        <div>[NOT IMPLEMENTED]</div>
-      </div>
-      <div class="row">
-        <div style="width: 160px">UI version:</div>
-        <div v-if="guiVersion">{{ guiVersion }}</div>
-        <div v-else style="font-size: 0.9em; opacity: 0.7;">loading...</div>
-      </div>
       <div style="font-weight: bold; margin-top: 10px">Description:</div>
       {{ app.description }}
     </div>
@@ -74,9 +56,6 @@
             :title="app.title"
           >
             {{ app.title }}
-          </div>
-          <div style="margin-top: -5px">
-            [VERSION NOT IMPLEMENTED]
           </div>
         </div>
       </div>
