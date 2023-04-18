@@ -54,6 +54,12 @@ thiserror = "1.0.30"
 url2 = "0.0.6"
 mime_guess = "2.0.4"
 
+
+[dependencies.rusqlite]
+version = "0.28.0"
+features = ["bundled-sqlcipher-vendored-openssl"]
+
+
 [features]
 custom-protocol = ["tauri/custom-protocol"]
 default = ["custom-protocol"]

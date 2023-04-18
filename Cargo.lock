@@ -2940,6 +2940,7 @@ dependencies = [
  "opener",
  "portpicker",
  "rmpv",
+ "rusqlite",
  "serde",
  "serde_json",
  "serde_yaml 0.8.26",
