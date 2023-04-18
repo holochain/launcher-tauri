@@ -1,11 +1,11 @@
 import { AgentPubKey, AppInfo, AppWebsocket, decodeHashFromBase64, DnaHash, DnaHashB64, encodeHashToBase64, EntryHash } from "@holochain/client";
 import { getCellId } from "../utils";
-import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry } from "./types";
+import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry } from "./types";
 
 
 
 // hard coded dna hash of the DevHub in use
-export const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0ke1JijHM0tAVTy3OH3-i1fuZzB7FlCBi2oLiD96p-NW97ueuK";
+export const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0kDupbWYOgc9vleIfoSIDD-ckK38aRhoej-uhSHAtl41D6rpT1";
 export const DEVHUB_HAPP_LIBRARY_DNA_HASH: DnaHash = decodeHashFromBase64(DEVHUB_HAPP_LIBRARY_DNA_HASH_B64);
 
 
@@ -146,8 +146,8 @@ export async function getHappReleases(
 
     return getHappReleasesFromHost(appWebsocket, appStoreApp, host, forHapp);
   } catch (e) {
-    console.error(`Failed to get happ releases: ${e}`);
-    return Promise.reject(`Failed to get happ releases: ${e}`);
+    console.error(`Failed to get happ releases: ${JSON.stringify(e)}`);
+    return Promise.reject(`Failed to get happ releases: ${JSON.stringify(e)}`);
   }
 }
 
@@ -326,6 +326,18 @@ export async function getAvailableHostForZomeFunction(
   } else {
     console.log("@getAvailableHostForZomeFunction: searching hosts.");
 
+    const registeredHosts: DevHubResponse<Array<Entity<HostEntry>>> = await appWebsocket.callZome({
+      fn_name: "get_registered_hosts",
+      zome_name: "portal_api",
+      cell_id: getCellId(portalCell)!,
+      payload: {
+        dna: DEVHUB_HAPP_LIBRARY_DNA_HASH,
+      },
+      provenance: getCellId(portalCell)![1],
+    });
+
+    console.log("Registered Hosts overall: ", registeredHosts);
+
     // 1. get all registered hosts for this zome function
     const hosts: DevHubResponse<Array<Entity<HostEntry>>> = await appWebsocket.callZome({
       fn_name: "get_hosts_for_zome_function",
@@ -377,3 +389,82 @@ export async function getAvailableHostForZomeFunction(
 
 
 
+/**
+ * Gets bytes from the mere_memory zome
+ *
+ * @param appWebsocket
+ * @param appStoreApp
+ * @returns
+ */
+export async function collectBytes(
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  entryHash: EntryHash,
+): Promise<Uint8Array> {
+
+  console.log("@collectBytes");
+  const appstoreCell = appStoreApp.cell_info["appstore"].find((c) => "provisioned" in c);
+
+  console.log("@collectBytes: appstoreCell", appstoreCell);
+
+  if (!appstoreCell) {
+    throw new Error("appstore cell not found.")
+  } else {
+
+    const response: Response<MemoryEntry> = await appWebsocket.callZome({
+      fn_name: "get_memory",
+      zome_name: "mere_memory_api",
+      cell_id: getCellId(appstoreCell)!,
+      payload: entryHash,
+      provenance: getCellId(appstoreCell)![1],
+    })
+
+    console.log("@collectBytes RECEIVED RESPONSE: ", response);
+
+    if (!(response.type === "success")) {
+      return Promise.reject(`Failed to get MemoryEntry: ${response.payload}`)
+    }
+
+    let memoryEntry = response.payload;
+    let blockAddresses = memoryEntry.block_addresses;
+
+    let chunks: Array<MemoryBlockEntry> = [];
+    // for each block address get the bytes
+    try {
+      await Promise.all(blockAddresses.map(async (entryHash) => {
+        const memoryBlockResponse: Response<MemoryBlockEntry> = await appWebsocket.callZome({
+          fn_name: "get_memory_block",
+          zome_name: "mere_memory_api",
+          cell_id: getCellId(appstoreCell)!,
+          payload: entryHash,
+          provenance: getCellId(appstoreCell)![1],
+        })
+
+        if (!(memoryBlockResponse.type === "success")) {
+          return Promise.reject(`Failed to get MemoryBlockEntry: ${response.payload}`)
+        }
+
+        chunks.push(memoryBlockResponse.payload)
+
+      }))
+
+      // sort chunks and plug them together to one array
+      chunks.sort((a, b) => a.sequence.position - b.sequence.position);
+
+      let combinedBytes: Array<number> = [];
+      chunks.forEach((chunk) => combinedBytes = [...combinedBytes, ...chunk.bytes]);
+
+      return Uint8Array.from(combinedBytes);
+
+    } catch (e) {
+      return Promise.reject(`Failed to collect bytes from mere_memory zome: ${e}`);
+    }
+
+
+    // console.log("@getImage: image", image);
+
+
+    // return allApps.payload.map((appEntity) => appEntity.content)
+  }
+
+}

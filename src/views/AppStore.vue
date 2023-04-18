@@ -103,7 +103,7 @@
       class="column"
       style="margin-right: 16px; margin-bottom: 16px"
     >
-      <AppPreviewCard :app="app" :appIcon="app.icon" @installApp="saveApp(app)" />
+      <AppPreviewCard :app="app" :appWebsocket="appWebsocket" @installApp="saveApp(app)" />
     </div>
   </div>
 

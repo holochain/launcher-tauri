@@ -91,3 +91,28 @@ export interface DnaReference {
   version : EntryHash, // Version ID
   wasm_hash : string,
 }
+
+
+
+export interface Response<T> {
+  type: "success" | "failure",
+  payload: T,
+}
+
+export interface MemoryEntry {
+  author: AgentPubKey,
+  published_at: number,
+  hash: string,
+  memory_size: number,
+  block_addresses: Array<EntryHash>,
+}
+
+export interface MemoryBlockEntry {
+  sequence: SequencePosition,
+  bytes: Uint8Array,
+}
+
+export interface SequencePosition {
+  position: number,
+  length: number,
+}

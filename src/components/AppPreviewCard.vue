@@ -13,8 +13,8 @@
       <div class="row" style="align-items: center">
         <!-- if icon provided -->
         <img
-          v-if="appIcon"
-          :src="appIconSrc()"
+          v-if="imgSrc"
+          :src="imgSrc"
           alt="app icon"
           style="
             width: 80px;
@@ -98,16 +98,19 @@ import { defineComponent, PropType } from "vue";
 import HCButton from "./subcomponents/HCButton.vue";
 import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import { AppEntry } from "../appstore/types";
+import { collectBytes } from "../appstore/appstore-interface";
+import { AppWebsocket } from "@holochain/client";
 
 export default defineComponent({
   name: "AppPreviewCard",
   components: { HCButton, HCMoreToggle },
   props: {
-    appIcon: {
-      type: Uint8Array,
-    },
     app: {
       type: Object as PropType<AppEntry>,
+      required: true,
+    },
+    appWebsocket: {
+      type: Object as PropType<AppWebsocket>,
       required: true,
     },
   },
@@ -115,19 +118,27 @@ export default defineComponent({
     showDescription: boolean;
     holochainVersion: HolochainVersion | undefined;
     guiVersion: string | undefined;
+    imgSrc: string | undefined;
   } {
     return {
       showDescription: false,
       holochainVersion: undefined,
       guiVersion: undefined,
+      imgSrc: undefined,
     };
   },
   emits: ["installApp"],
-  methods: {
-    appIconSrc(): string | undefined {
-      return this.appIcon ? URL.createObjectURL(new Blob([this.appIcon], { type: 'image/png' })) : undefined
-    }
-  }
+  async mounted () {
+    console.log("Preview card is mounted...");
+    const iconHash = this.app.icon;
+    console.log("@mounted: Getting mere_memory data for hash: ", iconHash);
+    const appStoreInfo = await this.appWebsocket!.appInfo({
+      installed_app_id: `Appstore`,
+    });
+
+    const collectedBytes = await collectBytes(this.appWebsocket, appStoreInfo, iconHash);
+    this.imgSrc = URL.createObjectURL(new Blob([collectedBytes],  { type: "image/png" }));
+  },
 });
 </script>
 
