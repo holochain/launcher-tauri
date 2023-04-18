@@ -110,7 +110,7 @@ export default defineComponent({
       required: true,
     },
     appWebsocket: {
-      type: Object as PropType<AppWebsocket>,
+      type: Object as PropType<any>,
       required: true,
     },
   },
