@@ -57,7 +57,7 @@ mime_guess = "2.0.4"
 
 [dependencies.rusqlite]
 version = "0.28.0"
-features = ["bundled-sqlcipher-vendored-openssl"]
+features = ["bundled"]
 
 
 [features]
