@@ -2,7 +2,6 @@
 edition = "2021"
 name = "holochain_web_app_manager"
 version = "0.1.0"
-resolver = "2"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

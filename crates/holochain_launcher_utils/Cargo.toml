@@ -9,8 +9,6 @@ documentation = "https://docs.rs/holochain_launcher_utils"
 repository = "https://github.com/holochain/launcher"
 readme = "README.md"
 categories = ["command-line-utilities", "development-tools"]
-resolver = "2"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
