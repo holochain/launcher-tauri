@@ -4,6 +4,7 @@ import {
   AppInfo,
   EntryHash,
 } from "@holochain/client";
+import { Entity, GUIReleaseEntry, HappReleaseEntry } from "./appstore/types";
 
 export interface WebAppInfo {
   app_name: string;
@@ -154,3 +155,8 @@ export interface StorageInfo {
   wasm: number;
 }
 
+
+export interface ReleaseInfo {
+  happRelease: Entity<HappReleaseEntry>,
+  guiRelease: Entity<GUIReleaseEntry> | undefined,
+}

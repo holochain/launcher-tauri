@@ -69,7 +69,7 @@ export interface GetWebHappPackageInput {
 
 
 export interface HappReleaseEntry {
-  name: string,
+  version: string,
   description: string,
   for_happ: EntryHash,
   ordering: number,
