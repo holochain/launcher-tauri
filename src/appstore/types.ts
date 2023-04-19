@@ -10,6 +10,7 @@ export interface Entity<T> {
 }
 
 export interface DevHubResponse<T> {
+  type: "success" | "failure",
   metadata: any,
   payload: T,
 }
@@ -130,4 +131,18 @@ export interface MemoryBlockEntry {
 export interface SequencePosition {
   position: number,
   length: number,
+}
+
+export interface FilePackage {
+  author: AgentPubKey,
+  published_at: number,
+  last_updated: number,
+  file_size: number,
+  mere_memory_addr: EntryHash,
+  mere_memory_hash: String,
+
+  // optional
+  bytes: Uint8Array | undefined,
+  name: string | undefined,
+  metadata: any,
 }

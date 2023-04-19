@@ -1,11 +1,11 @@
 import { AgentPubKey, AppInfo, AppWebsocket, decodeHashFromBase64, DnaHash, DnaHashB64, encodeHashToBase64, EntryHash } from "@holochain/client";
 import { getCellId } from "../utils";
-import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry, GUIReleaseEntry } from "./types";
+import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry, GUIReleaseEntry, FilePackage } from "./types";
 
 
 
 // hard coded dna hash of the DevHub in use
-export const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0kDupbWYOgc9vleIfoSIDD-ckK38aRhoej-uhSHAtl41D6rpT1";
+export const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0kenEh_slR59FCLNSzhsO3KxphMNy3Be30pBd454jyRLr6IsHY";
 export const DEVHUB_HAPP_LIBRARY_DNA_HASH: DnaHash = decodeHashFromBase64(DEVHUB_HAPP_LIBRARY_DNA_HASH_B64);
 
 
@@ -348,7 +348,7 @@ export async function fetchGui(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   webAssetEntryHash: EntryHash,
-): Promise<Uint8Array> {
+): Promise<Uint8Array | undefined> {
 
   const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
   if (!portalCell) {
@@ -375,7 +375,7 @@ export async function fetchGui(
       }
     }
 
-    const guiBytes: Uint8Array = await appWebsocket.callZome({
+    const response: DevHubResponse<DevHubResponse<Entity<FilePackage>>> = await appWebsocket.callZome({
       fn_name: "custom_remote_call",
       zome_name: "portal_api",
       cell_id: getCellId(portalCell)!,
@@ -383,7 +383,15 @@ export async function fetchGui(
       provenance: getCellId(portalCell)![1],
     });
 
-    return guiBytes;
+    if (response.type === "success") {
+      if (response.payload.type === "success") {
+        return response.payload.payload.content.bytes;
+      } else {
+        return Promise.reject(`Failed to fetch UI: ${response.payload.payload}`);
+      }
+    } else {
+      return Promise.reject(`Failed to fetch UI: ${response.payload}`);
+    }
   }
 }
 

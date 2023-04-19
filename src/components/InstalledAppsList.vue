@@ -315,10 +315,9 @@ import prettyBytes from "pretty-bytes";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 import { getHappReleasesByEntryHashes, fetchGui, appstoreCells, fetchGuiReleaseEntry } from "../appstore/appstore-interface";
 import { AppInfo, AppWebsocket, decodeHashFromBase64, encodeHashToBase64, EntryHash } from "@holochain/client";
-import { GUIReleaseEntry, HappReleaseEntry } from "../devhub/types";
+import { GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { ActionTypes } from "../store/actions";
 import { i18n } from "../locale";
-import { Entity } from "../appstore/types";
 
 
 export default defineComponent({
@@ -600,7 +599,7 @@ export default defineComponent({
       this.loadingText = "Connecting with DevHub";
       (this.$refs.downloading as typeof HCLoading).open();
 
-      this.loadingText = "Downloading...";
+      this.loadingText = "fetching UI from peer host...";
 
       let bytes = undefined;
 
