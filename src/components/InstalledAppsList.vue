@@ -313,11 +313,12 @@ import HCLoading from "./subcomponents/HCLoading.vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import prettyBytes from "pretty-bytes";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
-import { devhubCells, getHappReleasesByEntryHashes, fetchGui } from "../devhub/get-happs";
+import { getHappReleasesByEntryHashes, fetchGui, appstoreCells, fetchGuiReleaseEntry } from "../appstore/appstore-interface";
 import { AppInfo, AppWebsocket, decodeHashFromBase64, encodeHashToBase64, EntryHash } from "@holochain/client";
 import { GUIReleaseEntry, HappReleaseEntry } from "../devhub/types";
 import { ActionTypes } from "../store/actions";
 import { i18n } from "../locale";
+import { Entity } from "../appstore/types";
 
 
 export default defineComponent({
@@ -338,7 +339,7 @@ export default defineComponent({
   },
   data(): {
     appWebsocket: AppWebsocket | undefined;
-    devhubAppInfo: AppInfo | undefined;
+    appstoreAppInfo: AppInfo | undefined;
     sortOptions: [string, string][];
     sortOption: string | undefined;
     selectedHolochainVersion: string;
@@ -357,7 +358,7 @@ export default defineComponent({
   } {
     return {
       appWebsocket: undefined,
-      devhubAppInfo: undefined,
+      appstoreAppInfo: undefined,
       sortOptions: [
         [i18n.global.t('main.name'), "name"],
         [i18n.global.t('main.nameDescending'), "name descending"],
@@ -395,10 +396,11 @@ export default defineComponent({
     const port = this.$store.getters["appInterfacePort"](holochainId);
     const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
     this.appWebsocket = appWebsocket;
-    const devhubAppInfo = await appWebsocket.appInfo({
-        installed_app_id: `DevHub-${holochainId.content}`,
+    // TODO add correct installed app id here.
+    const appstoreAppInfo = await appWebsocket.appInfo({
+        installed_app_id: `Appstore`,
     });
-    this.devhubAppInfo = devhubAppInfo;
+    this.appstoreAppInfo = appstoreAppInfo;
 
     await this.checkForUiUpdates();
 
@@ -478,18 +480,22 @@ export default defineComponent({
       return app.webAppInfo.web_uis.default.type === "Headless";
     },
     async checkForUiUpdates() {
-
+      console.log("Checking for UI updates...");
       // check for GUI updates
       const allApps: Array<HolochainAppInfo> = this.$store.getters["allApps"];
       const allHappReleaseHashes = allApps.map((app) => app.webAppInfo.happ_release_hash ? decodeHashFromBase64(app.webAppInfo.happ_release_hash) : undefined);
       // console.log("@InstalledAppsList: allHappReleaseHashes from store's allApps: ", allHappReleaseHashes);
-      const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByEntryHashes((this.appWebsocket! as AppWebsocket), this.devhubAppInfo!, allHappReleaseHashes);
+      const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByEntryHashes((this.appWebsocket! as AppWebsocket), this.appstoreAppInfo!, allHappReleaseHashes);
 
-      // console.log("@InstalledAppsList: happReleaseHashes: ", happReleases);
+      console.log("@InstalledAppsList: happReleases: ", happReleases);
 
       // compare with existing
 
       const extendedAppInfos: Array<HolochainAppInfoExtended> = allApps.map((appInfo: HolochainAppInfo, idx) => {
+
+        if (happReleases[idx]) {
+          console.log("official_gui: ", happReleases[idx]!.official_gui ? encodeHashToBase64(happReleases[idx]!.official_gui!) : undefined)
+        }
 
         const isGuiUpdateAvailable = (appInfo.webAppInfo.web_uis.default.type === "WebApp" && happReleases[idx]?.official_gui)
           ? appInfo.webAppInfo.web_uis.default.gui_release_hash != encodeHashToBase64(happReleases[idx]?.official_gui!)
@@ -503,7 +509,7 @@ export default defineComponent({
         }
       });
 
-      // console.log("@InstalledAppsLlist: extendedAppInfos: ", extendedAppInfos);
+      console.log("@InstalledAppsLlist: extendedAppInfos: ", extendedAppInfos);
 
       this.extendedAppInfos = extendedAppInfos;
     },
@@ -513,23 +519,25 @@ export default defineComponent({
       // console.log("Gui release hash @openUpdateGuiDialog: ", app.guiUpdateAvailable);
       (this.$refs.updateGuiDialog as typeof HCGenericDialog).open();
 
-      if (this.appWebsocket && this.devhubAppInfo) {
-          const cells = devhubCells(this.devhubAppInfo);
-          const guiReleaseResponse = await this.appWebsocket?.callZome({
-          cap_secret: null,
-          cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
-          fn_name: "get_gui_release",
-          zome_name: "happ_library",
-          payload: {
-            id: app.guiUpdateAvailable,
-          },
-          provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
-        });
+      if (this.appWebsocket && this.appstoreAppInfo) {
+          const cells = appstoreCells(this.appstoreAppInfo);
+        //   const guiReleaseResponse = await this.appWebsocket?.callZome({
+        //   cap_secret: null,
+        //   cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
+        //   fn_name: "get_gui_release",
+        //   zome_name: "happ_library",
+        //   payload: {
+        //     id: app.guiUpdateAvailable,
+        //   },
+        //   provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
+        // });
 
-        this.selectedGuiUpdate = guiReleaseResponse.payload.content;
-        // console.log("Got GUI Release: ", guiReleaseResponse.payload.content);
+        const guiReleaseResponse = await fetchGuiReleaseEntry(this.appWebsocket as AppWebsocket, this.appstoreAppInfo, app.guiUpdateAvailable!);
+
+        this.selectedGuiUpdate = guiReleaseResponse.content;
+        console.log("Got GUI Release: ", guiReleaseResponse.content);
       } else {
-        alert!("Error: AppWebsocket or DevHub AppInfo undefined.")
+        alert!("Error: AppWebsocket or Appstore AppInfo undefined.")
         this.selectedGuiUpdate = undefined;
       }
     },
@@ -599,7 +607,7 @@ export default defineComponent({
       try {
         bytes = await fetchGui(
           this.appWebsocket! as AppWebsocket,
-          this.devhubAppInfo!,
+          this.appstoreAppInfo!,
           this.selectedGuiUpdate!.web_asset_id,
         );
       } catch (e) {

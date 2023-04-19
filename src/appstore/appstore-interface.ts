@@ -1,6 +1,6 @@
 import { AgentPubKey, AppInfo, AppWebsocket, decodeHashFromBase64, DnaHash, DnaHashB64, encodeHashToBase64, EntryHash } from "@holochain/client";
 import { getCellId } from "../utils";
-import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry } from "./types";
+import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry, GUIReleaseEntry } from "./types";
 
 
 
@@ -9,6 +9,18 @@ export const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0kDupbWYOgc9vleI
 export const DEVHUB_HAPP_LIBRARY_DNA_HASH: DnaHash = decodeHashFromBase64(DEVHUB_HAPP_LIBRARY_DNA_HASH_B64);
 
 
+
+export function appstoreCells(appstoreHapp: AppInfo) {
+  const appstore = appstoreHapp.cell_info["appstore"];
+  const portal = appstoreHapp.cell_info["portal"];
+
+  if (!appstore || !portal ) throw new Error("Bad app info");
+
+  return {
+    appstore,
+    portal,
+  };
+}
 
 
 export async function getAllApps(
@@ -51,7 +63,9 @@ export async function getHappReleasesByEntryHashes(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   happReleaseEntryHashes: Array<EntryHash | undefined>
-) {
+): Promise<Array<HappReleaseEntry | undefined>> {
+
+  console.log("@getHappReleasesByEntryHashes: getting happ releases by entry hashes");
 
   // Find an online host
   const host: AgentPubKey = await getAvailableHostForZomeFunction(
@@ -60,6 +74,9 @@ export async function getHappReleasesByEntryHashes(
     "happ_library",
     "get_happ_releases",
   );
+
+  console.log("@getHappReleasesByEntryHashes: found host: ", host);
+
 
   // make zome calls for each EntryHash to this one host
   const happReleases = await Promise.all(happReleaseEntryHashes.map( async (entryHash) => {
@@ -70,7 +87,16 @@ export async function getHappReleasesByEntryHashes(
     }
   }));
 
-  return happReleases;
+
+  console.log("@getHappReleasesByEntryHashes: Found happReleases: ", happReleases);
+
+  return happReleases.map((response) => {
+    if (response) {
+      return response.content;
+    } else {
+      return undefined;
+    }
+  });
 }
 
 /**
@@ -105,7 +131,7 @@ async function getHappReleaseFromHost (
     throw new Error("portal cell not found.")
   } else {
 
-    const happReleaseResponse: DevHubResponse<Entity<HappReleaseEntry>> = await appWebsocket.callZome({
+    const happReleaseResponse: DevHubResponse<Response<Entity<HappReleaseEntry>>> = await appWebsocket.callZome({
       fn_name: "custom_remote_call",
       zome_name: "portal_api",
       cell_id: getCellId(portalCell)!,
@@ -114,7 +140,7 @@ async function getHappReleaseFromHost (
     });
 
     // maybe it needs to be entity.payload.content instead...
-    return happReleaseResponse.payload;
+    return happReleaseResponse.payload.payload;
   }
 }
 
@@ -197,6 +223,72 @@ async function getHappReleasesFromHost (
 }
 
 
+/**
+ * Fetching GuiRelease Entry from a DevHub host
+ *
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param guiReleaseEntryHash
+ */
+export async function fetchGuiReleaseEntry(
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  guiReleaseEntryHash: EntryHash,
+) {
+
+  const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+  if (!portalCell) {
+    throw new Error("portal cell not found.")
+  } else {
+
+    console.log("@fetchGuiReleaseEntry: trying to fetch GUI release entry...");
+
+    const host: AgentPubKey = await getAvailableHostForZomeFunction(
+      appWebsocket,
+      appStoreApp,
+      "happ_library",
+      "get_gui_release",
+    );
+
+    console.log("@fetchGuiReleaseEntry: got host: ", encodeHashToBase64(host));
+
+    const input: CustomRemoteCallInput = {
+      host,
+      call: {
+        dna: DEVHUB_HAPP_LIBRARY_DNA_HASH,
+        zome: "happ_library",
+        function: "get_gui_release",
+        payload: {
+          id: guiReleaseEntryHash,
+        },
+      }
+    }
+
+
+    const guiReleaseEntryResponse: DevHubResponse<DevHubResponse<Entity<GUIReleaseEntry>>> = await appWebsocket.callZome({
+      fn_name: "custom_remote_call",
+      zome_name: "portal_api",
+      cell_id: getCellId(portalCell)!,
+      payload: input,
+      provenance: getCellId(portalCell)![1],
+    });
+
+
+    return guiReleaseEntryResponse.payload.payload;
+  }
+}
+
+
+/**
+ * Fetching the webhapp bytes from a DevHub host.
+ *
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param name
+ * @param happReleaseEntryHash
+ * @param guiReleaseEntryHash
+ * @returns
+ */
 export async function fetchWebHapp(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
@@ -316,8 +408,16 @@ export async function getAvailableHostForZomeFunction(
   fn_name: string,
 ): Promise<AgentPubKey> {
 
+  console.log("@getAvailableHostForZomeFunction: being called...");
+  console.log("@getAvailableHostForZomeFunction: appStoreApp: ", appStoreApp);
+
+
   const appstoreCell = appStoreApp.cell_info["appstore"].find((c) => "provisioned" in c);
   const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+
+  console.log("@getAvailableHostForZomeFunction: appstoreCell", appstoreCell);
+  console.log("@getAvailableHostForZomeFunction: portalCell", portalCell);
+
 
   if (!appstoreCell) {
     throw new Error("appstore cell not found.")
@@ -364,23 +464,27 @@ export async function getAvailableHostForZomeFunction(
       const hostPubKey = hostEntity.content.author;
       console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
 
-      let success = false;
       try{
-        success = await appWebsocket.callZome({
+        const result: Response<any> = await appWebsocket.callZome({
           fn_name: "ping",
           zome_name: "portal_api",
           cell_id: getCellId(portalCell)!,
           payload: hostPubKey,
           provenance: getCellId(portalCell)![1],
         });
+
+        console.log("@getAvailableHostForZomeFunction Sent ping to host and got result: ", result);
+
+        if (result.type === "failure") {
+          return Promise.reject(`Failed to ping host: ${result.payload}`);
+        }
       } catch (e) {
         console.error("Failed to ping host: ", e);
-        console.log("stringified error: ", JSON.stringify(e));
+        console.log("Failed to ping host: stringified error: ", JSON.stringify(e));
         throw new Error("Failed to ping host.");
       }
       // what happens in the "false" case? Can this happen?
 
-      console.log("@getAvailableHostForZomeFunction Sent ping to host and got result: ", success);
 
       return hostPubKey;
     }))

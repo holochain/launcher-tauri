@@ -92,6 +92,21 @@ export interface DnaReference {
   wasm_hash : string,
 }
 
+export interface GUIReleaseEntry {
+  version: string,
+  changelog: string,
+  for_gui: EntryHash,
+  for_happ_releases: Array<EntryHash>,
+  web_asset_id: EntryHash,
+  published_at: number,
+  last_updated: number,
+  metadata: Record<string, any>,
+
+  // Optional fields
+  screenshots: Array<EntryHash> | undefined,
+  // pub dna_support: Option<Vec<EntryHash>>, // list of DnaEntry IDs of intended support, does not mean they are guaranteed to work for all those DNA's versions
+}
+
 
 
 export interface Response<T> {

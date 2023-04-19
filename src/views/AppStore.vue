@@ -414,6 +414,10 @@ export default defineComponent({
       const happReleaseHash = latestHappRelease.id;
       const guiReleaseHash = latestHappRelease.content.official_gui;
 
+
+      this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
+      this.selectedGuiReleaseHash = guiReleaseHash ? encodeHashToBase64(guiReleaseHash) : undefined;
+
       let bytes = undefined;
 
       this.loadingText = "Searching available Host";
@@ -450,6 +454,8 @@ export default defineComponent({
       } catch (e) {
         console.error("Error fetching the webhapp from the DevHub host: ", e);
         this.errorText = "Failed to fetch webhapp from DevHub host.";
+        this.selectedHappReleaseHash = undefined;
+        this.selectedGuiReleaseHash = undefined;
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
         return;
