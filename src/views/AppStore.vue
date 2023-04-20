@@ -107,62 +107,18 @@
     </div>
   </div>
 
-  <div class="progress-indicator" :class="{ highlighted: downloadFailed }">
-    <div
-      style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
-      :title="$t('appStore.fullSynchronizationRequired')"
-    >
-      {{ $t('appStore.appLibrarySynchronization') }}:
+  <div
+    class="peer-host-indicator column"
+    v-if="peerHostStatus"
+  >
+    <div class="row" style="align-items: center;">
+      <span style="background-color: green; border-radius: 50%; width: 10px; height: 10px; margin-right: 10px;"></span>
+      <span>{{ peerHostStatus.responded }} visible peer Hosts</span>
     </div>
-    <div>
-      <div v-for="(cell, idx) in provisionedCells" :key="cell[0]" class="column">
-        <div class="row" style="align-items: center">
-          <div
-            style="
-              width: 20%;
-              margin-left: 20px;
-              font-size: 0.95em;
-              text-align: right;
-            "
-          >
-            {{ cell[0] }}
-          </div>
-          <div style="width: 50%; margin: 0 30px">
-            <HCProgressBar
-              v-if="(networkStates[idx] || networkStates[idx] === 0) && cachedMaxExpected[idx]"
-              title="currently ongoing data exchanges with peers"
-              :progress="progressRatio(idx)"
-              :style="`--height: 10px; --hc-primary-color:${
-                idleStates[idx] ? '#6B6B6B' : '#482edf'
-              };`"
-            />
-            <span
-              v-else
-              style="
-                opacity: 0.7;
-                font-size: 0.8em;
-                display: flex;
-                justify-content: center;
-              "
-              title="currently ongoing data exchanges with peers"
-            >
-            {{ $t('appStore.noOngoingPeerSynchronization') }}</span
-            >
-          </div>
-          <div
-            :style="`width: 30%; text-align: center; ${
-              idleStates[idx] ? 'opacity: 0.7;' : ''
-            }`"
-            title="received bytes | expected bytes"
-          >
-            {{ prettyBytesLocal(byteDiff(idx)) }}
-            | <span :class="{ highglightedText: maxExceeded[idx] }">
-            {{ prettyBytesLocal(cachedMaxExpected[idx]) }}
-            </span>
-          </div>
-        </div>
-      </div>
+    <div class="row">
+      <span>{{ peerHostStatus.totalHosts }} registered Hosts</span>
     </div>
+    <!-- <div>last updated: TimeAgo....</div> -->
   </div>
 
   <SelectReleaseDialog
@@ -214,7 +170,7 @@ import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
-import { getHappReleases, getAvailableHostForZomeFunction, DEVHUB_HAPP_LIBRARY_DNA_HASH, fetchGuiReleaseEntry } from "../appstore/appstore-interface";
+import { getHappReleases, getAvailableHostForZomeFunction, DEVHUB_HAPP_LIBRARY_DNA_HASH, fetchGuiReleaseEntry, getVisibleHostsForZomeFunction } from "../appstore/appstore-interface";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
@@ -226,7 +182,7 @@ import { HolochainId, ReleaseInfo } from "../types";
 import prettyBytes from "pretty-bytes";
 import { getCellId } from "../utils";
 import { i18n } from "../locale";
-import { AppEntry, Entity, HappReleaseEntry } from "../appstore/types";
+import { AppEntry, Entity, HappReleaseEntry, HostAvailability } from "../appstore/types";
 import { getAllApps } from "../appstore/appstore-interface";
 
 
@@ -252,6 +208,7 @@ export default defineComponent({
     howToPublishUrl: string;
     holochainId: HolochainId | undefined;
     holochainSelection: boolean;
+    peerHostStatus: HostAvailability | undefined;
     pollInterval: number | null;
     provisionedCells: [string, CellInfo | undefined][] | undefined;
     networkStates: (number | undefined)[];
@@ -278,6 +235,7 @@ export default defineComponent({
         "https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-devhub",
       holochainId: undefined,
       holochainSelection: true,
+      peerHostStatus: undefined,
       pollInterval: null,
       provisionedCells: undefined,
       networkStates: [undefined, undefined, undefined],
@@ -312,18 +270,35 @@ export default defineComponent({
       console.error(`Failed to fetch apps in mounted() hook: ${e}`);
     }
 
+    await this.connectAppWebsocket();
+
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
-    // try {
-    //   await this.getNetworkState();
-    // } catch (e) {
-    //   console.error(`Failed to get NetworkState: ${JSON.stringify(e)}`);
-    // }
+    const appStoreInfo = await this.appWebsocket!.appInfo({
+      installed_app_id: `Appstore`,
+    });
 
-    // this.pollInterval = window.setInterval(
-    //   async () => await this.getNetworkState(),
-    //   2000
-    // );
+    try {
+      const result = await getVisibleHostsForZomeFunction(this.appWebsocket as AppWebsocket, appStoreInfo, 'happ_library', 'get_webhapp_package');
+      this.peerHostStatus = result;
+    } catch (e) {
+      console.error(`Failed to get peer host statuses: ${JSON.stringify(e)}`);
+    }
+
+
+    this.pollInterval = window.setInterval(
+      async () => {
+        const result = await getVisibleHostsForZomeFunction(
+          this.appWebsocket as AppWebsocket,
+          appStoreInfo,
+          "happ_library",
+          "get_webhapp_package"
+        );
+
+        this.peerHostStatus = result;
+      },
+      60000
+    );
   },
   methods: {
     toSrc,
@@ -708,27 +683,17 @@ export default defineComponent({
   box-shadow: 0 0px 5px #9b9b9b;
 }
 
-.progress-indicator {
+.peer-host-indicator {
   position: fixed;
-  bottom: 0;
-  right: 0;
-  padding: 20px;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px;
   background-color: white;
   box-shadow: 0 0px 5px #9b9b9b;
-  border-radius: 20px 0 0 0;
-  min-width: 540px;
+  border-radius: 10px 10px 6px 6px;
+  min-width: 200px;
 }
 
-.highlighted {
-  border-top: 4px solid transparent;
-  border-left: 4px solid transparent;
-  animation: bordercolorchange 1s linear infinite;
-}
-
-.highglightedText {
-  font-weight: bold;
-  color: #482edf;
-}
 
 .refresh-button {
   height: 30px;

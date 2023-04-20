@@ -146,3 +146,11 @@ export interface FilePackage {
   name: string | undefined,
   metadata: any,
 }
+
+
+
+export interface HostAvailability {
+  responded: number,
+  totalHosts: number,
+  pingTimestamp: number,
+}

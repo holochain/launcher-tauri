@@ -1,6 +1,6 @@
 import { AgentPubKey, AppInfo, AppWebsocket, decodeHashFromBase64, DnaHash, DnaHashB64, encodeHashToBase64, EntryHash } from "@holochain/client";
 import { getCellId } from "../utils";
-import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry, GUIReleaseEntry, FilePackage } from "./types";
+import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry, GUIReleaseEntry, FilePackage, HostAvailability } from "./types";
 
 
 
@@ -416,23 +416,143 @@ export async function getAvailableHostForZomeFunction(
   fn_name: string,
 ): Promise<AgentPubKey> {
 
-  console.log("@getAvailableHostForZomeFunction: being called...");
-  console.log("@getAvailableHostForZomeFunction: appStoreApp: ", appStoreApp);
+    const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+
+    if (!portalCell) {
+      return Promise.reject("Failed to get hosts for zome function: portal cell not found.");
+    }
+
+    try {
+      const hosts = await getHostsForZomeFunction(appWebsocket, appStoreApp, zome_name, fn_name)
+
+      // 2. ping each of them and take the first one that responds
+      return Promise.any(hosts.map(async (hostEntry) => {
+        const hostPubKey = hostEntry.author;
+        console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
+
+        try{
+          const result: Response<any> = await appWebsocket.callZome({
+            fn_name: "ping",
+            zome_name: "portal_api",
+            cell_id: getCellId(portalCell)!,
+            payload: hostPubKey,
+            provenance: getCellId(portalCell)![1],
+          });
+
+          console.log("@getAvailableHostForZomeFunction Sent ping to host and got result: ", result);
+
+          if (result.type === "failure") {
+            return Promise.reject(`Failed to ping host: ${result.payload}`);
+          }
+        } catch (e) {
+          console.error("Failed to ping host: ", e);
+          console.log("Failed to ping host: stringified error: ", JSON.stringify(e));
+          throw new Error("Failed to ping host.");
+        }
+        // what happens in the "false" case? Can this happen?
 
 
-  const appstoreCell = appStoreApp.cell_info["appstore"].find((c) => "provisioned" in c);
+        return hostPubKey;
+      }))
+
+    } catch (e) {
+      return Promise.reject(`Failed to get available host for zome ${zome_name} and function ${fn_name}: ${e}`);
+    }
+}
+
+
+
+export async function getVisibleHostsForZomeFunction(
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  zome_name: string,
+  fn_name: string,
+): Promise<HostAvailability> {
+
+    const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+
+    if (!portalCell) {
+      return Promise.reject("Failed to get hosts for zome function: portal cell not found.");
+    }
+
+    let responded = 0;
+
+    const pingTimestamp = Date.now();
+
+    try {
+      const hosts = await getHostsForZomeFunction(appWebsocket, appStoreApp, zome_name, fn_name)
+
+      // 2. ping each of them and take the first one that responds
+      await Promise.allSettled(hosts.map(async (hostEntry) => {
+
+        try {
+          const result = await appWebsocket.callZome({
+            fn_name: "ping",
+            zome_name: "portal_api",
+            cell_id: getCellId(portalCell)!,
+            payload: hostEntry.author,
+            provenance: getCellId(portalCell)![1],
+          });
+
+          if (result.type === "failure") {
+              return Promise.reject(`Failed to ping host: ${result.payload}`);
+          }
+
+          responded += 1;
+
+        } catch (e) {
+          return Promise.reject(`Failed to ping host: ${e}`);
+        };
+
+      }))
+
+      console.log("@getVisibleHostsForZomeFunction: all Promises settled: result: ", {
+        responded,
+        totalHosts: hosts.length,
+        pingTimestamp,
+      });
+
+      return {
+        responded,
+        totalHosts: hosts.length,
+        pingTimestamp,
+      };
+
+    } catch (e) {
+      return Promise.reject(`Failed to get visible hosts for zome ${zome_name} and function ${fn_name}: ${e}`);
+    }
+}
+
+
+/**
+ * Gets all the hosts that registered to grant remote calls for the given zome function
+ *
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param zome_name
+ * @param fn_name
+ * @returns
+ */
+export async function getHostsForZomeFunction(
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  zome_name: string,
+  fn_name: string,
+): Promise<Array<HostEntry>> {
+
+  // console.log("@getHostsForZomeFunction: being called...");
+  // console.log("@getHostsForZomeFunction: appStoreApp: ", appStoreApp);
+
+
   const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
 
-  console.log("@getAvailableHostForZomeFunction: appstoreCell", appstoreCell);
-  console.log("@getAvailableHostForZomeFunction: portalCell", portalCell);
+  // console.log("@getHostsForZomeFunction: appstoreCell", appstoreCell);
+  // console.log("@getHostsForZomeFunction: portalCell", portalCell);
 
-
-  if (!appstoreCell) {
-    throw new Error("appstore cell not found.")
-  } else if (!portalCell) {
-    throw new Error("portal cell not found.")
+  if (!portalCell) {
+    return Promise.reject("Failed to get hosts for zome function: portal cell not found.");
   } else {
-    console.log("@getAvailableHostForZomeFunction: searching hosts.");
+    console.log("@getHostsForZomeFunction: searching hosts.");
 
     const registeredHosts: DevHubResponse<Array<Entity<HostEntry>>> = await appWebsocket.callZome({
       fn_name: "get_registered_hosts",
@@ -444,7 +564,7 @@ export async function getAvailableHostForZomeFunction(
       provenance: getCellId(portalCell)![1],
     });
 
-    console.log("Registered Hosts overall: ", registeredHosts);
+    // console.log("Registered Hosts overall: ", registeredHosts);
 
     // 1. get all registered hosts for this zome function
     const hosts: DevHubResponse<Array<Entity<HostEntry>>> = await appWebsocket.callZome({
@@ -459,45 +579,18 @@ export async function getAvailableHostForZomeFunction(
       provenance: getCellId(portalCell)![1],
     })
 
-    console.log("@getAvailableHostForZomeFunction: found hosts: ", hosts);
+    // console.log("@getHostsForZomeFunction: found hosts: ", hosts);
     let b64Hosts = hosts.payload.map((entity) => encodeHashToBase64(entity.content.author));
-    console.log("@getAvailableHostForZomeFunction: b64 hosts: ", b64Hosts);
+    console.log("@getHostsForZomeFunction: b64 hosts: ", b64Hosts);
 
     if (hosts.payload.length === 0) {
-      throw new Error(`Found no registered hosts for zome ${zome_name} and function ${fn_name}.`);
+      return Promise.reject(`Found no registered hosts for zome ${zome_name} and function ${fn_name}.`);
     }
 
-    // 2. ping each of them and take the first one that responds
-    return Promise.any(hosts.payload.map(async (hostEntity) => {
-      const hostPubKey = hostEntity.content.author;
-      console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
-
-      try{
-        const result: Response<any> = await appWebsocket.callZome({
-          fn_name: "ping",
-          zome_name: "portal_api",
-          cell_id: getCellId(portalCell)!,
-          payload: hostPubKey,
-          provenance: getCellId(portalCell)![1],
-        });
-
-        console.log("@getAvailableHostForZomeFunction Sent ping to host and got result: ", result);
-
-        if (result.type === "failure") {
-          return Promise.reject(`Failed to ping host: ${result.payload}`);
-        }
-      } catch (e) {
-        console.error("Failed to ping host: ", e);
-        console.log("Failed to ping host: stringified error: ", JSON.stringify(e));
-        throw new Error("Failed to ping host.");
-      }
-      // what happens in the "false" case? Can this happen?
-
-
-      return hostPubKey;
-    }))
+    return hosts.payload.map((host) => host.content);
   }
 }
+
 
 
 
