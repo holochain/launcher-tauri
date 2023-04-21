@@ -481,13 +481,14 @@ export async function getVisibleHostsForZomeFunction(
       await Promise.allSettled(hosts.map(async (hostEntry) => {
 
         try {
+          // consider hosts that do not respond after 6 seconds as offline
           const result = await appWebsocket.callZome({
             fn_name: "ping",
             zome_name: "portal_api",
             cell_id: getCellId(portalCell)!,
             payload: hostEntry.author,
             provenance: getCellId(portalCell)![1],
-          });
+          }, 6000);
 
           if (result.type === "failure") {
               return Promise.reject(`Failed to ping host: ${result.payload}`);

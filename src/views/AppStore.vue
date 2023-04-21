@@ -84,20 +84,23 @@
     </div>
   </div>
 
+  <!-- Indicator of online peer hosts -->
   <div
     class="peer-host-indicator column"
-    v-if="peerHostStatus"
   >
-    <div class="row" style="align-items: center;">
-      <span style="background-color: green; border-radius: 50%; width: 10px; height: 10px; margin-right: 10px;"></span>
-      <span>{{ peerHostStatus.responded }} visible peer Hosts</span>
+    <div class="row" style="align-items: center;" title="number of peers that are part of the app distribution peer network and currently responsive">
+      <span style="background-color: #17d310; border-radius: 50%; width: 10px; height: 10px; margin-right: 10px;"></span>
+      <span v-if="peerHostStatus"><span style="font-weight: 600;">{{ peerHostStatus.responded }} online</span> peer host{{ peerHostStatus.responded === 1 ? "" : "s"}}</span>
+      <span v-else>pinging peer hosts...</span>
     </div>
-    <div class="row">
-      <span>{{ peerHostStatus.totalHosts }} registered Hosts</span>
+    <div class="row" style="align-items: center;" title="number of peers that registered themselves in the app distribution peer network but are currently unresponsive">
+      <span style="background-color: #bfbfbf; border-radius: 50%; width: 10px; height: 10px; margin-right: 10px;"></span>
+      <span v-if="peerHostStatus"><span style="font-weight: 600;">{{ peerHostStatus.totalHosts - peerHostStatus.responded }} unresponsive</span> peer host{{ (peerHostStatus.totalHosts - peerHostStatus.responded) === 1 ? "" : "s"}}</span>
+      <span v-else>pinging peer hosts...</span>
     </div>
-    <!-- <div>last updated: TimeAgo....</div> -->
   </div>
 
+  <!-- Dialog to select releases -->
   <SelectReleaseDialog
     v-if="selectedReleaseInfos && selectedAppName"
     :release-infos="selectedReleaseInfos"
@@ -147,7 +150,7 @@ import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
-import { getHappReleases, getAvailableHostForZomeFunction, DEVHUB_HAPP_LIBRARY_DNA_HASH, fetchGuiReleaseEntry, getVisibleHostsForZomeFunction } from "../appstore/appstore-interface";
+import { getHappReleases, getAvailableHostForZomeFunction, fetchGuiReleaseEntry, getVisibleHostsForZomeFunction } from "../appstore/appstore-interface";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
@@ -161,7 +164,7 @@ import { getCellId } from "../utils";
 import { i18n } from "../locale";
 import { AppEntry, Entity, HappReleaseEntry, HostAvailability } from "../appstore/types";
 import { getAllApps } from "../appstore/appstore-interface";
-import { APP_STORE_ID } from "../constants";
+import { APP_STORE_ID, DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../constants";
 
 
 
@@ -603,11 +606,11 @@ export default defineComponent({
   position: fixed;
   bottom: 20px;
   right: 20px;
-  padding: 10px;
+  padding: 10px 15px;
   background-color: white;
   box-shadow: 0 0px 5px #9b9b9b;
   border-radius: 10px 10px 6px 6px;
-  min-width: 200px;
+  min-width: 220px;
 }
 
 
