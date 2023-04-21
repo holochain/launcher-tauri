@@ -1,15 +1,7 @@
 <template>
-  <div class="column card">
-    <div
-      v-if="showDescription"
-      class="column"
-      style="flex: 1; overflow-y: auto; padding: 20px"
-    >
-      <div style="font-weight: bold; margin-top: 10px">Description:</div>
-      {{ app.description }}
-    </div>
+  <div class="column card" @click="$emit('installApp', { imgSrc })" title="Click to see details and install">
 
-    <div v-else class="column" style="flex: 1">
+    <div class="column" style="flex: 1">
       <div class="row" style="align-items: center">
         <!-- if icon provided -->
         <img
@@ -73,20 +65,6 @@
       </div>
     </div>
 
-    <div class="row" style="justify-content: flex-end; align-items: center">
-      <HCMoreToggle
-        style="margin-left: 22px; margin-bottom: 5px"
-        title="Details"
-        @click="showDescription = !showDescription"
-      />
-      <span style="display: flex; flex: 1"></span>
-      <HCButton
-        class="install-btn"
-        style="border-radius: 12px; margin: 12px;"
-        @click="$emit('installApp', { imgSrc })"
-        >Install</HCButton
-      >
-    </div>
   </div>
 </template>
 
@@ -146,9 +124,15 @@ export default defineComponent({
 <style scoped>
 .card {
   width: 370px;
-  height: 240px;
+  height: 220px;
   background: white;
   border-radius: 15px;
+  box-shadow: 0 0px 5px #9b9b9b;
+  cursor: pointer;
+}
+
+.card:hover {
+  background: #f4f4fc;
   box-shadow: 0 0px 5px #9b9b9b;
 }
 
