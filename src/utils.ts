@@ -8,8 +8,8 @@ import {
 import prettyBytes from "pretty-bytes";
 import { Base64 } from "js-base64";
 
-
 import { GossipProgress } from "./types";
+
 
 export function isAppRunning(app: AppInfo): boolean {
   return (app.status as any) === "running";

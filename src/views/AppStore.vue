@@ -184,6 +184,7 @@ import { getCellId } from "../utils";
 import { i18n } from "../locale";
 import { AppEntry, Entity, HappReleaseEntry, HostAvailability } from "../appstore/types";
 import { getAllApps } from "../appstore/appstore-interface";
+import { APP_STORE_ID } from "../constants";
 
 
 
@@ -275,7 +276,7 @@ export default defineComponent({
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
     const appStoreInfo = await this.appWebsocket!.appInfo({
-      installed_app_id: `Appstore`,
+      installed_app_id: APP_STORE_ID,
     });
 
     try {
@@ -312,17 +313,15 @@ export default defineComponent({
       // console.log("connected to AppWebsocket.");
     },
     async fetchApps() {
-      console.log("LOADING...");
+
       this.loading = true;
 
-      console.log("@fetchApps: about to call appInfo...");
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
       }
 
-      console.log("@fetchApps: about to call appInfo...");
       const appStoreInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: `Appstore`,
+        installed_app_id: APP_STORE_ID,
       });
 
       console.log("@fetchApps: appStoreInfo: ", appStoreInfo);
@@ -385,7 +384,7 @@ export default defineComponent({
       }
 
       const appStoreInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: `Appstore`,
+        installed_app_id: APP_STORE_ID,
       });
 
       let happReleases: Array<Entity<HappReleaseEntry>> | undefined = undefined;
@@ -458,7 +457,7 @@ export default defineComponent({
 
 
       const appStoreInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: `Appstore`,
+        installed_app_id: APP_STORE_ID,
       });
 
       const happReleaseHash = releaseInfo.happRelease.id;
@@ -508,59 +507,6 @@ export default defineComponent({
         (this.$refs.downloading as typeof HCLoading).close();
         return;
       }
-
-      // try {
-      //   bytes = await fetchWebHapp(
-      //     this.appWebsocket! as AppWebsocket,
-      //     appStoreInfo,
-      //     app.name,
-      //     happReleaseHash,
-      //     guiReleaseHash!, // releases without official_gui have been filtered out earlier
-      //   );
-      // } catch (e) {
-      //   console.error("Error fetching the webhapp: ", e);
-      //   this.errorText = "Failed to fetch webhapp from DevHub host.";
-      //   (this.$refs as any).snackbar.show();
-      //   (this.$refs.downloading as typeof HCLoading).close();
-      //   this.downloadFailed = true;
-      //   setTimeout(() => (this.downloadFailed = false), 3000);
-      //   return;
-      // }
-
-      // if (bytes) {
-      //   try {
-      //     this.selectedAppBundlePath = await invoke("save_app", {
-      //       appBundleBytes: bytes,
-      //     });
-      //     // this.hdkVersionForApp = release.content.hdk_version;
-      //     this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
-      //     this.selectedGuiReleaseHash = encodeHashToBase64(guiReleaseHash!);
-      //     (this.$refs.downloading as typeof HCLoading).close();
-      //     this.loadingText = "";
-
-      //     this.$nextTick(() => {
-      //       (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
-      //     });
-      //   } catch (e) {
-      //     console.log("Error when decoding and saving webhapp to temp folder: ", e);
-      //     console.log("Error Payload: ", (e as any).data);
-
-      //     if ((e as any).data) {
-      //       this.errorText = `Failed to decode and save webhapp: ${(e as any).data}`;
-      //     } else {
-      //       this.errorText = `Failed to decode and save webhapp: ${e}`;
-      //     }
-
-      //     (this.$refs as any).snackbar.show();
-      //     (this.$refs.downloading as typeof HCLoading).close();
-      //   }
-      // } else {
-      //   console.log("Error when decoding and saving webhapp to temp folder: Undefined bytes");
-      //   this.errorText = `Failed to decode and save webhapp: Undefined bytes`;
-
-      //   (this.$refs as any).snackbar.show();
-      //   (this.$refs.downloading as typeof HCLoading).close();
-      // }
     },
     async selectFromFileSystem() {
       this.selectedAppBundlePath = (await open({
@@ -708,15 +654,4 @@ export default defineComponent({
   opacity: 1;
 }
 
-@keyframes bordercolorchange {
-  0% {
-    border-color: white;
-  }
-  50% {
-    border-color: #482edf;
-  }
-  100% {
-    border-color: white;
-  }
-}
 </style>
