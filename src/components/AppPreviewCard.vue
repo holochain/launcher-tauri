@@ -83,7 +83,7 @@
       <HCButton
         class="install-btn"
         style="border-radius: 12px; margin: 12px;"
-        @click="$emit('installApp')"
+        @click="$emit('installApp', { imgSrc })"
         >Install</HCButton
       >
     </div>

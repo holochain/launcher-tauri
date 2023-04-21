@@ -42,6 +42,36 @@ export interface HostEntry {
   metadata: any,
 }
 
+export interface PublisherEntry {
+  name: string,
+  location: LocationTriplet,
+  website: WebAddress,
+  icon: EntryHash,
+  editors: Array<AgentPubKey>,
+
+  // common fields
+  author: AgentPubKey,
+  published_at: number,
+  last_updated: number,
+  metadata: any,
+
+  // optional
+  description: string | undefined,
+  email: string | undefined,
+  deprecation: any,
+}
+
+export interface WebAddress {
+  url: string,
+  context: string | undefined,
+}
+
+export interface LocationTriplet {
+  country: string,
+  region: string,
+  city: string,
+}
+
 
 export interface WebHappConfig {
   dna: DnaHash,

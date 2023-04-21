@@ -1,6 +1,6 @@
 import { AgentPubKey, AppInfo, AppWebsocket, decodeHashFromBase64, DnaHash, DnaHashB64, encodeHashToBase64, EntryHash } from "@holochain/client";
 import { getCellId } from "../utils";
-import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry, GUIReleaseEntry, FilePackage, HostAvailability } from "./types";
+import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry, GUIReleaseEntry, FilePackage, HostAvailability, PublisherEntry } from "./types";
 import { DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../constants";
 
 
@@ -42,6 +42,50 @@ export async function getAllApps(
 
 
     return allApps.payload.map((appEntity) => appEntity.content)
+  }
+
+}
+
+
+/**
+ * Gets a publisher entry
+ *
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param publisherEntryHash
+ * @returns
+ */
+export async function getPublisher(
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  publisherEntryHash: EntryHash,
+): Promise<PublisherEntry> {
+
+  const appstoreCell = appStoreApp.cell_info["appstore"].find((c) => "provisioned" in c);
+
+  if (!appstoreCell) {
+    throw new Error("appstore cell not found.")
+  }
+
+  try {
+    const response: Response<Entity<PublisherEntry>> = await appWebsocket.callZome({
+      fn_name: "get_publisher",
+      zome_name: "appstore_api",
+      cell_id: getCellId(appstoreCell)!,
+      payload: {
+        id: publisherEntryHash,
+      },
+      provenance: getCellId(appstoreCell)![1],
+    })
+
+    if (response.type !== "success") {
+      return Promise.reject(`Failed to get publisher entry: ${response.payload}`)
+    }
+
+    return response.payload.content
+
+  } catch (e) {
+    return Promise.reject(`Failed to get publisher entry: ${e}`)
   }
 
 }

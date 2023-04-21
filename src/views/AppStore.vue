@@ -80,7 +80,7 @@
       class="column"
       style="margin-right: 16px; margin-bottom: 16px"
     >
-      <AppPreviewCard :app="app" :appWebsocket="appWebsocket" @installApp="requestInstall(app)" />
+      <AppPreviewCard :app="app" :appWebsocket="appWebsocket" @installApp="requestInstall(app, $event.imgSrc)" />
     </div>
   </div>
 
@@ -102,13 +102,14 @@
 
   <!-- Dialog to select releases -->
   <SelectReleaseDialog
-    v-if="selectedReleaseInfos && selectedAppName"
+    v-if="selectedReleaseInfos && selectedApp"
     :release-infos="selectedReleaseInfos"
-    :app-name="selectedAppName"
+    :app="selectedApp"
+    :appWebsocket="appWebsocket"
+    :imgSrc="selectedImgSrc"
     ref="selectAppReleasesDialog"
     @cancel="() => {
       selectedReleaseInfos = undefined;
-      selectedAppName = undefined;
       selectedApp = undefined;
     }"
     @release-selected="saveApp($event)"
@@ -204,8 +205,8 @@ export default defineComponent({
     selectedHappReleaseHash: EntryHashB64 | undefined;
     selectedGuiReleaseHash: EntryHashB64 | undefined;
     selectedReleaseInfos: Array<ReleaseInfo> | undefined;
-    selectedAppName: string | undefined;
     selectedApp: AppEntry | undefined;
+    selectedImgSrc: string | undefined;
   } {
     return {
       loadingText: "",
@@ -231,8 +232,8 @@ export default defineComponent({
       selectedHappReleaseHash: undefined,
       selectedGuiReleaseHash: undefined,
       selectedReleaseInfos: undefined,
-      selectedAppName: undefined,
       selectedApp: undefined,
+      selectedImgSrc: undefined,
     };
   },
   beforeUnmount() {
@@ -348,11 +349,13 @@ export default defineComponent({
     /**
      *
      */
-    async requestInstall(app: AppEntry) {
+    async requestInstall(app: AppEntry, imgSrc: string | undefined) {
       // fetch releases and open a dialog offering to install different releases
       this.holochainSelection = false;
-      this.loadingText = "fetching available releases from peer host";
+      this.loadingText = "requesting app meta data from peer host";
       (this.$refs.downloading as typeof HCLoading).open();
+
+      this.selectedImgSrc = imgSrc ? imgSrc : undefined;
 
       // 1. get happ releases for app from DevHub
       if (!this.appWebsocket) {
@@ -412,7 +415,6 @@ export default defineComponent({
         throw new Error("Failed to fetch UI release infos.");
       }
 
-      this.selectedAppName = app.title;
       this.selectedApp = app;
       this.selectedReleaseInfos = selectedReleaseInfos.sort((a, b) => b.happRelease.content.published_at - a.happRelease.content.published_at);
 
@@ -477,7 +479,6 @@ export default defineComponent({
         this.selectedHappReleaseHash = undefined;
         this.selectedGuiReleaseHash = undefined;
         this.selectedApp = undefined;
-        this.selectedAppName = undefined;
         this.selectedReleaseInfos = undefined;
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
@@ -499,7 +500,6 @@ export default defineComponent({
       this.selectedAppBundlePath = undefined;
       this.selectedApp = undefined;
       this.selectedReleaseInfos = undefined;
-      this.selectedAppName = undefined;
       // this.hdkVersionForApp = undefined;
     },
     async getNetworkState() {

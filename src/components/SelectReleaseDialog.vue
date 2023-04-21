@@ -1,19 +1,83 @@
 <template>
-  <HCDialog ref="dialog" @closing="$emit('closing-dialog')">
+  <HCDialog ref="dialog" @closing="$emit('closing-dialog')" closeOnSideClick>
 
     <div
       class="column"
-      style="align-items: center; margin: 10px 15px; padding: 0 10px"
+      style="align-items: center; margin: 10px 15px; padding: 10px 20px"
     >
-      <div style="font-weight: 600; font-size: 25px; margin: 20px 0 10px 0">
-        Select App Version
-      </div>
 
-      <div style="margin-bottom: 30px; color: #482edf; font-size: 20px">
-        {{ appName }}
-      </div>
+      <div class="column" style="width: 100%; align-items: flex-start; margin: 12px 0 40px 0;">
 
-      <div class="column" style="width: 100%; align-items: flex-start; margin-bottom: 40px;">
+        <div class="row" style="align-items: center; margin-bottom: 20px;">
+          <!-- if icon provided -->
+          <img
+            v-if="imgSrc"
+            :src="imgSrc"
+            alt="app icon"
+            style="
+              width: 120px;
+              height: 120px;
+              border-radius: 12px;
+              object-fit: cover;
+            "
+          />
+          <!-- if no icon provided -->
+          <div
+            v-else
+            class="column center-content"
+            style="
+              width: 120px;
+              min-width: 120px;
+              height: 80px;
+              border-radius: 12px;
+              background: #372ba5;
+              margin: 15px;
+            "
+          >
+            <div style="color: white; font-size: 40px; font-weight: 600">
+              {{ app.title.slice(0, 2) }}
+            </div>
+          </div>
+          <div
+            style="
+              font-size: 30px;
+              font-weight: 600;
+              margin: 0 0 0 30px;
+              line-height: 115%;
+              word-break: normal;
+            "
+            :title="app.title"
+          >
+            {{ app.title }}
+          </div>
+        </div>
+
+        <div style="margin-left: 10px;"><span style="font-weight: 600;">published by: </span>{{ publisher? `${publisher.name}, ${publisher.location.country}` : "unknown" }}</div>
+        <div style="margin-left: 10px;"><span style="font-weight: 600;">first published: </span>{{ (new Date(app.published_at)).toLocaleDateString(locale) }}</div>
+
+        <div style="font-weight: 600; font-size: 20px; margin: 20px 0 10px 0">
+          Description:
+        </div>
+
+        <div style="max-height: 200px; overflow-y: auto; background: #f6f6fa; padding: 5px 10px; border-radius: 10px;">
+          {{ app.description }} asjlkd falsdkjf alskjdf alöskdjf alösdkjf aölsdkjf alöskdfj alöskdjf alöskdfj alöskdjf
+          alsdjkf alsdkj falskdfj alösdkjf alösdkjf alösdkjf alöskjdf alöskjfdwepoirjf opeirjv eori vjoeirj v oaisjd fasi jfdal
+           alsdjf alsfjd alöskfjd aölskjf aölskjfd alösk jfd
+           a sdlfjkasöldfkj alsökf jalöskdjf aöefwifj apoijva poijv j alsjdf alskjfd aölskfdj aölskfjd
+           pwefj peorifj oeirj voeirj vosivj
+           vsj vpsoijv oeirjv oeirjv soiejrv sijv seivj ij jfd
+           a sdlfjkasöldfkj alsökf jalöskdjf aöefwifj apoijva poijv j alsjdf alskjfd aölskfdj aölskfjd
+           pwefj peorifj oeirj voeirj vosivj
+           vsj vpsoijv oeirjv oeirjv soiejrv sijv seivj ijoijv j alsjdf alskjfd aölskfdj aölskfjd
+           pwefj peorifj oeirj voeirj vosivj
+           vsj vpsoijv oeirjv oeirjv soiejrv sijv seivj ij jfd
+           a sdlfjkasöldfkj alsökf jalöskdjf aöefwifj apoijva poijv j alsjdf alskjfd aölskfdj aölskfjd
+           pwefj peorifj oeirj voeirj vosivj
+        </div>
+
+        <div style="font-weight: 600; font-size: 20px; margin: 20px 0 10px 0">
+          Available Releases:
+        </div>
 
         <div class="column card">
           <div style="text-align: right; font-weight: 600">latest Release</div>
@@ -93,7 +157,7 @@
         style="width: 80px; height: 30px; margin: 4px 6px; margin-bottom: 15px;"
         outlined
         @click="cancel"
-      >Cancel
+      >Close
       </HCButton>
 
     </div>
@@ -114,6 +178,10 @@ import HCDialog from "./subcomponents/HCDialog.vue";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 
 import { ReleaseInfo } from "../types";
+import { AppEntry, PublisherEntry } from "../appstore/types";
+import { AppWebsocket } from "@holochain/client";
+import { APP_STORE_ID } from "../constants";
+import { collectBytes, getPublisher } from "../appstore/appstore-interface";
 
 export default defineComponent({
   name: "SelectReleaseDialog",
@@ -128,25 +196,55 @@ export default defineComponent({
       type: Object as PropType<Array<ReleaseInfo>>, // assumed to be sorted by "published_at" in descending order (latest release first)
       required: true,
     },
-    appName: {
-      type: String,
+    app: {
+      type: Object as PropType<AppEntry>,
       required: true,
-    }
+    },
+    appWebsocket: {
+      type: Object as PropType<any>,
+      required: true,
+    },
+    imgSrc: {
+      type: String,
+    },
   },
   data(): {
     showAdvanced: boolean;
     snackbarText: string | undefined;
     error: boolean;
+    publisher: PublisherEntry | undefined;
+    locale: string;
   } {
     return {
       showAdvanced: false,
       snackbarText: undefined,
       error: false,
+      publisher: undefined,
+      locale: "en-US",
     };
   },
+  mounted () {
+    const customLocale = window.localStorage.getItem("customLocale");
+    this.locale =  customLocale ? customLocale : navigator.language;
+  },
   methods: {
-    open() {
+    async open() {
       (this.$refs.dialog as typeof HCDialog).open();
+
+      console.log("########## App Icon: ", this.imgSrc);
+
+      try {
+        const appStoreInfo = await this.appWebsocket!.appInfo({
+          installed_app_id: APP_STORE_ID,
+        });
+
+        console.log("@mounted: getting publisher...");
+        this.publisher = await getPublisher(this.appWebsocket, appStoreInfo, this.app.publisher);
+
+        console.log("@mounted: got publisher: ", this.publisher);
+      } catch (e) {
+        console.error(`Failed to get publisher info: ${JSON.stringify(e)}`)
+      }
     },
     close() {
       (this.$refs.dialog as typeof HCDialog).close();
@@ -169,7 +267,7 @@ export default defineComponent({
 
 
 .card {
-  min-width: 500px;
+  min-width: 600px;
   background: #f6f6fa;
   border-radius: 15px;
   box-shadow: 0 0px 5px #9b9b9b;
