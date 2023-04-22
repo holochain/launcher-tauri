@@ -383,7 +383,7 @@ export default defineComponent({
         "get_webhapp_package",
       );
 
-      this.loadingText = "fetching app from peer host";
+      this.loadingText = "fetching app from peer host...";
 
       try {
         this.selectedAppBundlePath = await invoke("fetch_and_save_app", {

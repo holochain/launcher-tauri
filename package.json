@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.9.993",
+  "version": "0.9.994",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test:unit": "vue-cli-service test:unit",
     "tauri": "tauri",
-    "prepare": "curl -L --output DevHub.webhapp https://github.com/holochain/devhub-gui/releases/download/v0.12.0/DevHub.webhapp"
+    "prepare": "curl -L --output DevHub.webhapp https://drive.switch.ch/index.php/s/El03wfnXaJafLCJ/download && curl -L --output AppStore.webhapp https://drive.switch.ch/index.php/s/ey8VgsiV90cqUVP/download"
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",
