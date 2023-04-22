@@ -163,7 +163,7 @@ import { getCellId } from "../utils";
 import { i18n } from "../locale";
 import { AppEntry, Entity, HappReleaseEntry, HostAvailability } from "../appstore/types";
 import { getAllApps } from "../appstore/appstore-interface";
-import { APP_STORE_ID, DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../constants";
+import { APPSTORE_APP_ID, DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../constants";
 
 
 
@@ -249,7 +249,7 @@ export default defineComponent({
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
     const appStoreInfo = await this.appWebsocket!.appInfo({
-      installed_app_id: APP_STORE_ID,
+      installed_app_id: APPSTORE_APP_ID,
     });
 
     try {
@@ -294,7 +294,7 @@ export default defineComponent({
       }
 
       const appStoreInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: APP_STORE_ID,
+        installed_app_id: APPSTORE_APP_ID,
       });
 
       console.log("@fetchApps: appStoreInfo: ", appStoreInfo);
@@ -367,7 +367,7 @@ export default defineComponent({
 
 
       const appStoreInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: APP_STORE_ID,
+        installed_app_id: APPSTORE_APP_ID,
       });
 
       const happReleaseHash = releaseInfo.happRelease.id;

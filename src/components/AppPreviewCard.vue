@@ -78,7 +78,7 @@ import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import { AppEntry } from "../appstore/types";
 import { collectBytes } from "../appstore/appstore-interface";
 import { AppWebsocket } from "@holochain/client";
-import { APP_STORE_ID } from "../constants";
+import { APPSTORE_APP_ID } from "../constants";
 
 export default defineComponent({
   name: "AppPreviewCard",
@@ -112,7 +112,7 @@ export default defineComponent({
     const iconHash = this.app.icon;
     console.log("@mounted: Getting mere_memory data for hash: ", iconHash);
     const appStoreInfo = await this.appWebsocket!.appInfo({
-      installed_app_id: APP_STORE_ID,
+      installed_app_id: APPSTORE_APP_ID,
     });
 
     const collectedBytes = await collectBytes(this.appWebsocket, appStoreInfo, iconHash);

@@ -193,7 +193,7 @@ import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 import { ReleaseInfo } from "../types";
 import { AppEntry, Entity, HappReleaseEntry, PublisherEntry } from "../appstore/types";
 import { AppWebsocket } from "@holochain/client";
-import { APP_STORE_ID } from "../constants";
+import { APPSTORE_APP_ID } from "../constants";
 import { collectBytes, fetchGuiReleaseEntry, getHappReleases, getPublisher } from "../appstore/appstore-interface";
 
 export default defineComponent({
@@ -244,7 +244,7 @@ export default defineComponent({
     async getReleaseInfos(): Promise<void> {
 
       const appStoreInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: APP_STORE_ID,
+        installed_app_id: APPSTORE_APP_ID,
       });
 
       let happReleases: Array<Entity<HappReleaseEntry>> | undefined = undefined;
@@ -305,7 +305,7 @@ export default defineComponent({
 
       try {
         appStoreInfo = await this.appWebsocket!.appInfo({
-          installed_app_id: APP_STORE_ID,
+          installed_app_id: APPSTORE_APP_ID,
         });
         console.log("@mounted: getting publisher...");
         this.publisher = await getPublisher(this.appWebsocket, appStoreInfo, this.app.publisher);

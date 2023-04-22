@@ -5,6 +5,7 @@ pub mod factory_reset;
 pub mod get_app_info;
 pub mod get_state_info;
 pub mod install_app;
+pub mod install_devhub;
 pub mod open_app;
 pub mod password;
 pub mod quit;

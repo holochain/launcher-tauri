@@ -23,7 +23,7 @@ pub async fn install_app(
   gui_release_hash: Option<String>,
 ) -> Result<(), String> {
   if window.label() != "admin" {
-    return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (I)"))
+    return Err(String::from("Unauthorized: Attempted to call tauri command 'install_app' which is not allowed in this window."))
   }
 
   log::info!("Installing: web_app_bundle = {}", app_bundle_path);

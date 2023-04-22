@@ -318,7 +318,7 @@ import { AppInfo, AppWebsocket, decodeHashFromBase64, encodeHashToBase64, EntryH
 import { GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { ActionTypes } from "../store/actions";
 import { i18n } from "../locale";
-import { APP_STORE_ID } from "../constants";
+import { APPSTORE_APP_ID } from "../constants";
 
 
 export default defineComponent({
@@ -398,7 +398,7 @@ export default defineComponent({
     this.appWebsocket = appWebsocket;
     // TODO add correct installed app id here.
     const appstoreAppInfo = await appWebsocket.appInfo({
-        installed_app_id: APP_STORE_ID,
+        installed_app_id: APPSTORE_APP_ID,
     });
     this.appstoreAppInfo = appstoreAppInfo;
 
