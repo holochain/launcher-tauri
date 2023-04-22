@@ -102,14 +102,12 @@
 
   <!-- Dialog to select releases -->
   <SelectReleaseDialog
-    v-if="selectedReleaseInfos && selectedApp"
-    :release-infos="selectedReleaseInfos"
+    v-if="selectedApp"
     :app="selectedApp"
     :appWebsocket="appWebsocket"
     :imgSrc="selectedImgSrc"
     ref="selectAppReleasesDialog"
     @cancel="() => {
-      selectedReleaseInfos = undefined;
       selectedApp = undefined;
     }"
     @release-selected="saveApp($event)"
@@ -204,7 +202,6 @@ export default defineComponent({
     appWebsocket: AppWebsocket | undefined;
     selectedHappReleaseHash: EntryHashB64 | undefined;
     selectedGuiReleaseHash: EntryHashB64 | undefined;
-    selectedReleaseInfos: Array<ReleaseInfo> | undefined;
     selectedApp: AppEntry | undefined;
     selectedImgSrc: string | undefined;
   } {
@@ -231,7 +228,6 @@ export default defineComponent({
       appWebsocket: undefined,
       selectedHappReleaseHash: undefined,
       selectedGuiReleaseHash: undefined,
-      selectedReleaseInfos: undefined,
       selectedApp: undefined,
       selectedImgSrc: undefined,
     };
@@ -350,81 +346,17 @@ export default defineComponent({
      *
      */
     async requestInstall(app: AppEntry, imgSrc: string | undefined) {
-      // fetch releases and open a dialog offering to install different releases
-      this.holochainSelection = false;
-      this.loadingText = "requesting app meta data from peer host";
-      (this.$refs.downloading as typeof HCLoading).open();
 
       this.selectedImgSrc = imgSrc ? imgSrc : undefined;
+      this.selectedApp = app;
 
       // 1. get happ releases for app from DevHub
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
       }
 
-      const appStoreInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: APP_STORE_ID,
-      });
-
-      let happReleases: Array<Entity<HappReleaseEntry>> | undefined = undefined;
-
-      try {
-        happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, app.devhub_address.happ)
-      } catch (e) {
-        this.errorText = `Error getting happ releases from a DevHub host. See console for details.`;
-        (this.$refs as any).snackbar.show();
-        (this.$refs.downloading as typeof HCLoading).close();
-        throw new Error(`Error getting happ releases from a DevHub host: ${JSON.stringify(e)}`);
-      }
-
-      if (!happReleases) {
-        this.errorText = "Undefined happ releases.";
-        (this.$refs as any).snackbar.show();
-        (this.$refs.downloading as typeof HCLoading).close();
-        throw new Error("Undefined happ releases.");
-      }
-
-      // this.selectedHappReleases = happReleases.map((entity) => entity.content).sort((a, b) => b.last_updated - a.last_updated);
-      let selectedReleaseInfos: Array<ReleaseInfo> = [];
-
-      console.log("@requestInstall: fetching gui release entries...");
-
-      try {
-        await Promise.all(happReleases.map(
-          async (happReleaseEntity) => {
-            let releaseInfo: ReleaseInfo = {
-              happRelease: happReleaseEntity,
-              guiRelease: undefined,
-            };
-
-            const guiReleaseHash = happReleaseEntity.content.official_gui;
-            if (guiReleaseHash) {
-              const guiReleaseEntry = await fetchGuiReleaseEntry(this.appWebsocket as AppWebsocket, appStoreInfo, guiReleaseHash);
-              releaseInfo.guiRelease = guiReleaseEntry;
-            }
-
-            console.log("@requestInstall: fetched GUIReleaseEntry: ReleaseInfo: ", releaseInfo);
-
-            selectedReleaseInfos.push(releaseInfo);
-          })
-        );
-      } catch (e) {
-        this.errorText = "Failed to fetch UI release infos.";
-        (this.$refs as any).snackbar.show();
-        (this.$refs.downloading as typeof HCLoading).close();
-        throw new Error("Failed to fetch UI release infos.");
-      }
-
-      this.selectedApp = app;
-      this.selectedReleaseInfos = selectedReleaseInfos.sort((a, b) => b.happRelease.content.published_at - a.happRelease.content.published_at);
-
-      console.log("@requestInstall: successfully fetched GUIReleaseEntries: ", this.selectedReleaseInfos);
-
       this.$nextTick(() => {
         (this.$refs.selectAppReleasesDialog as typeof SelectReleaseDialog).open();
-        this.loadingText = "Loading";
-        (this.$refs.downloading as typeof HCLoading).close();
-        console.log("@requestInstall: closed Dialog.")
       });
     },
     async saveApp(releaseInfo: ReleaseInfo) {
@@ -451,7 +383,7 @@ export default defineComponent({
         "get_webhapp_package",
       );
 
-      this.loadingText = "requesting app from peer host";
+      this.loadingText = "fetching app from peer host";
 
       try {
         this.selectedAppBundlePath = await invoke("fetch_and_save_app", {
@@ -479,7 +411,6 @@ export default defineComponent({
         this.selectedHappReleaseHash = undefined;
         this.selectedGuiReleaseHash = undefined;
         this.selectedApp = undefined;
-        this.selectedReleaseInfos = undefined;
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
         return;
@@ -499,7 +430,6 @@ export default defineComponent({
     installClosed() {
       this.selectedAppBundlePath = undefined;
       this.selectedApp = undefined;
-      this.selectedReleaseInfos = undefined;
       // this.hdkVersionForApp = undefined;
     },
     async getNetworkState() {
