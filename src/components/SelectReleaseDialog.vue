@@ -27,14 +27,13 @@
             class="column center-content"
             style="
               width: 120px;
-              min-width: 120px;
-              height: 80px;
+              height: 120px;
               border-radius: 12px;
               background: #372ba5;
               margin: 15px;
             "
           >
-            <div style="color: white; font-size: 40px; font-weight: 600">
+            <div style="color: white; font-size: 55px; font-weight: 600">
               {{ app.title.slice(0, 2) }}
             </div>
           </div>
@@ -148,12 +147,13 @@
           </div>
         </div>
 
-        <div v-else-if="releaseInfos && releaseInfos.length < 1">
+        <div v-else-if="releaseInfos && releaseInfos.length < 1" style="text-align: center;">
           There are no installable releases available for this app.
         </div>
 
-        <div v-else-if="getReleaseInfosError">
-          Error getting releases from peer host: {{ getReleaseInfosError }}
+        <div v-else-if="getReleaseInfosError" style="background: #f4b2b2; padding: 5px 10px; border-radius: 5px; width: 610px;">
+          <b>Error getting releases from peer host:</b><br>
+          {{ getReleaseInfosError }}
         </div>
 
         <div v-else class="column" style="align-items: center; width: 100%;">
@@ -285,9 +285,14 @@ export default defineComponent({
           })
         );
       } catch (e) {
-        this.getReleaseInfosError = `Failed to find available releases: ${JSON.stringify(e)}`;
-        console.error(`Failed to find available releases: ${JSON.stringify(e)}`)
-        return;
+        if (JSON.stringify(e).includes("No available peer host found")) {
+          this.getReleaseInfosError = "No available peer host found.";
+          return;
+        } else {
+          this.getReleaseInfosError = `Failed to find available releases: ${JSON.stringify(e)}`;
+          console.error(`Failed to find available releases: ${JSON.stringify(e)}`)
+          return;
+        }
       }
 
       this.releaseInfos = releaseInfos.sort((a, b) => b.happRelease.content.published_at - a.happRelease.content.published_at);

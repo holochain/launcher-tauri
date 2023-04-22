@@ -90,7 +90,7 @@
   >
     <div class="row" style="align-items: center;" title="number of peers that are part of the app distribution peer network and currently responsive">
       <span style="background-color: #17d310; border-radius: 50%; width: 10px; height: 10px; margin-right: 10px;"></span>
-      <span v-if="peerHostStatus"><span style="font-weight: 600;">{{ peerHostStatus.responded }} online</span> peer host{{ peerHostStatus.responded === 1 ? "" : "s"}}</span>
+      <span v-if="peerHostStatus"><span style="font-weight: 600;">{{ peerHostStatus.responded }} available</span> peer host{{ peerHostStatus.responded === 1 ? "" : "s"}}</span>
       <span v-else>pinging peer hosts...</span>
     </div>
     <div class="row" style="align-items: center;" title="number of peers that registered themselves in the app distribution peer network but are currently unresponsive">

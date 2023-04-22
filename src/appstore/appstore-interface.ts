@@ -197,7 +197,7 @@ export async function getHappReleases(
   forHapp: EntryHash,
 ): Promise<Array<Entity<HappReleaseEntry>>> {
 
-  console.log("@getHappReleases: trying to get host.");
+  // console.log("@getHappReleases: trying to get host.");
 
   try {
     const host: AgentPubKey = await getAvailableHostForZomeFunction(
@@ -211,6 +211,9 @@ export async function getHappReleases(
 
     return getHappReleasesFromHost(appWebsocket, appStoreApp, host, forHapp);
   } catch (e) {
+    if (e instanceof AggregateError) {
+      return Promise.reject(`No available peer host found.`);
+    }
     console.error(`Failed to get happ releases: ${JSON.stringify(e)}`);
     return Promise.reject(`Failed to get happ releases: ${JSON.stringify(e)}`);
   }
@@ -465,34 +468,40 @@ export async function getAvailableHostForZomeFunction(
       const hosts = await getHostsForZomeFunction(appWebsocket, appStoreApp, zome_name, fn_name)
 
       // 2. ping each of them and take the first one that responds
-      return Promise.any(hosts.map(async (hostEntry) => {
-        const hostPubKey = hostEntry.author;
-        console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
+      try {
+        const availableHost = await Promise.any(hosts.map(async (hostEntry) => {
+          const hostPubKey = hostEntry.author;
+          console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
 
-        try{
-          const result: Response<any> = await appWebsocket.callZome({
-            fn_name: "ping",
-            zome_name: "portal_api",
-            cell_id: getCellId(portalCell)!,
-            payload: hostPubKey,
-            provenance: getCellId(portalCell)![1],
-          });
+          try{
+            const result: Response<any> = await appWebsocket.callZome({
+              fn_name: "ping",
+              zome_name: "portal_api",
+              cell_id: getCellId(portalCell)!,
+              payload: hostPubKey,
+              provenance: getCellId(portalCell)![1],
+            });
 
-          console.log("@getAvailableHostForZomeFunction Sent ping to host and got result: ", result);
+            console.log("@getAvailableHostForZomeFunction Sent ping to host and got result: ", result);
 
-          if (result.type === "failure") {
-            return Promise.reject(`Failed to ping host: ${result.payload}`);
+            if (result.type === "failure") {
+              return Promise.reject(`Failed to ping host: ${result.payload}`);
+            }
+          } catch (e) {
+            console.error("Failed to ping host: ", e);
+            console.log("Failed to ping host: stringified error: ", JSON.stringify(e));
+            return Promise.reject("Failed to ping host.");
           }
-        } catch (e) {
-          console.error("Failed to ping host: ", e);
-          console.log("Failed to ping host: stringified error: ", JSON.stringify(e));
-          throw new Error("Failed to ping host.");
-        }
-        // what happens in the "false" case? Can this happen?
+          // what happens in the "false" case? Can this happen?
 
 
-        return hostPubKey;
-      }))
+          return hostPubKey;
+        }))
+
+        return availableHost;
+      } catch (e) {
+        return Promise.reject("No available peer host found.")
+      }
 
     } catch (e) {
       return Promise.reject(`Failed to get available host for zome ${zome_name} and function ${fn_name}: ${e}`);
