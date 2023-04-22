@@ -59,19 +59,7 @@
         </div>
 
         <div style="max-height: 200px; min-width: 610px; overflow-y: auto; background: #f6f6fa; padding: 5px 10px; border-radius: 10px;">
-          {{ app.description }} asjlkd falsdkjf alskjdf alöskdjf alösdkjf aölsdkjf alöskdfj alöskdjf alöskdfj alöskdjf
-          alsdjkf alsdkj falskdfj alösdkjf alösdkjf alösdkjf alöskjdf alöskjfdwepoirjf opeirjv eori vjoeirj v oaisjd fasi jfdal
-           alsdjf alsfjd alöskfjd aölskjf aölskjfd alösk jfd
-           a sdlfjkasöldfkj alsökf jalöskdjf aöefwifj apoijva poijv j alsjdf alskjfd aölskfdj aölskfjd
-           pwefj peorifj oeirj voeirj vosivj
-           vsj vpsoijv oeirjv oeirjv soiejrv sijv seivj ij jfd
-           a sdlfjkasöldfkj alsökf jalöskdjf aöefwifj apoijva poijv j alsjdf alskjfd aölskfdj aölskfjd
-           pwefj peorifj oeirj voeirj vosivj
-           vsj vpsoijv oeirjv oeirjv soiejrv sijv seivj ijoijv j alsjdf alskjfd aölskfdj aölskfjd
-           pwefj peorifj oeirj voeirj vosivj
-           vsj vpsoijv oeirjv oeirjv soiejrv sijv seivj ij jfd
-           a sdlfjkasöldfkj alsökf jalöskdjf aöefwifj apoijva poijv j alsjdf alskjfd aölskfdj aölskfjd
-           pwefj peorifj oeirj voeirj vosivj
+          {{ app.description }}
         </div>
 
         <div style="font-weight: 600; font-size: 20px; margin: 30px 0 10px 0">
