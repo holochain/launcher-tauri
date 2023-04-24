@@ -209,9 +209,11 @@ impl HcLaunch {
                     println!("Released ports.");
                     temp_dir.close().unwrap();
                     // killing child processes
-                    for (mut holochain_process, mut lair_process) in child_processes {
+                    for (mut holochain_process, lair_process) in child_processes {
                       holochain_process.start_kill().unwrap();
-                      lair_process.start_kill().unwrap();
+                      if let Some(mut p) = lair_process {
+                        p.start_kill().unwrap();
+                      }
                     }
                     println!("Killed holochain processes, press Ctrl+C to quit.");
                     std::process::exit(0);
@@ -316,9 +318,11 @@ impl HcLaunch {
                         println!("Released ports.");
 
                         // killing child processes
-                        for (mut holochain_process, mut lair_process) in child_processes {
+                        for (mut holochain_process, lair_process) in child_processes {
                           holochain_process.start_kill().unwrap();
-                          lair_process.start_kill().unwrap();
+                          if let Some(mut p) = lair_process {
+                            p.start_kill().unwrap();
+                          }
                         }
                         println!("Killed holochain processes, press Ctrl+C to quit.");
                         std::process::exit(0);
@@ -368,7 +372,7 @@ async fn spawn_sandboxes(
   happ_path: PathBuf,
   create: Create,
   app_id: InstalledAppId,
-) -> anyhow::Result<Vec<(Child, Child)>> {
+) -> anyhow::Result<Vec<(Child, Option<Child>)>> {
   let sandbox_paths = generate(holochain_path, Some(happ_path), create, app_id).await?;
 
   let port = portpicker::pick_unused_port().expect("Cannot find any unused port");
@@ -410,7 +414,7 @@ async fn run_n(
   paths: Vec<PathBuf>,
   app_ports: Vec<u16>,
   force_admin_ports: Vec<u16>,
-) -> anyhow::Result<Vec<(Child, Child)>> {
+) -> anyhow::Result<Vec<(Child, Option<Child>)>> {
   let run_holochain = |holochain_path: PathBuf, path: PathBuf, ports, force_admin_port| async move {
     run(&holochain_path, path, ports, force_admin_port).await
   };
@@ -441,7 +445,7 @@ pub async fn run(
   sandbox_path: PathBuf,
   app_ports: Vec<u16>,
   force_admin_port: Option<u16>,
-) -> anyhow::Result<(Child, Child)> {
+) -> anyhow::Result<(Child, Option<Child>)> {
   let (port, holochain, lair) =
     run_async(holochain_path, sandbox_path.clone(), force_admin_port).await?;
   println!("Running conductor on admin port {} {:?}", port, app_ports);
