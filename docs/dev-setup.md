@@ -2,6 +2,8 @@
 
 Go through the [tauri prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites).
 
+[Install Go](https://go.dev/doc/install) 
+
 > Note: for now in Linux you will need to install `patchelf` and `librsvg2-dev`:
 > `sudo apt-get install patchelf librsvg2-dev`
 
@@ -14,14 +16,17 @@ The commands to install them should look like below, replacing the version numbe
 
 ### Linux/macOs
 ```
+mkdir src-tauri/bins
+
 cargo install --version 0.2.3 lair_keystore
 LAIR_PATH=$(which lair-keystore)
 cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.3-x86_64-apple-darwin
+(on an Arm/M1 machine this will look like: cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.3-aarch64-apple-darwin)
 
 cargo install holochain --version 0.1.0-beta-rc.2 --locked --features db-encryption
 HOLOCHAIN_PATH=$(which holochain)
 cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.1.0-beta-rc.2-x86_64-apple-darwin
-
+(on an Arm/M1 machine this will look like: cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.1.0-beta-rc.2-aarch64-apple-darwin)
 
 [... install further holochain versions if required]
 
