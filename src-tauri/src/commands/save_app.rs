@@ -80,7 +80,7 @@ pub async fn fetch_and_save_app(
   )
   .await?;
 
-  let web_app_bundle = WebAppBundle::decode(&bytes)
+  let _web_app_bundle = WebAppBundle::decode(&bytes)
     .or(Err(String::from("Failed to read Web hApp bundle file")))?;
 
   let now = SystemTime::now();

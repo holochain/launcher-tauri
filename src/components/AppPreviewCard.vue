@@ -1,38 +1,12 @@
 <template>
-  <div class="column card">
-    <div
-      v-if="showDescription"
-      class="column"
-      style="flex: 1; overflow-y: auto; padding: 20px"
-    >
-      <div style="font-weight: bold">Version details:</div>
-      <!-- <div v-if="holochainVersion" class="row">
-        <div style="width: 160px">Holochain version:</div>
-        <div>{{ holochainVersion }}</div>
-      </div>
-      <div class="row">
-        <div style="width: 160px">HDK version:</div>
-        <div>{{ getLatestRelease(app).content.hdk_version }}</div>
-      </div> -->
-      <div class="row">
-        <div style="width: 160px">hApp version:</div>
-        <div>[NOT IMPLEMENTED]</div>
-      </div>
-      <div class="row">
-        <div style="width: 160px">UI version:</div>
-        <div v-if="guiVersion">{{ guiVersion }}</div>
-        <div v-else style="font-size: 0.9em; opacity: 0.7;">loading...</div>
-      </div>
-      <div style="font-weight: bold; margin-top: 10px">Description:</div>
-      {{ app.description }}
-    </div>
+  <div class="column card" @click="$emit('installApp', { imgSrc })" title="Click to see details and install">
 
-    <div v-else class="column" style="flex: 1">
+    <div class="column" style="flex: 1">
       <div class="row" style="align-items: center">
         <!-- if icon provided -->
         <img
-          v-if="appIcon"
-          :src="appIconSrc()"
+          v-if="imgSrc"
+          :src="imgSrc"
           alt="app icon"
           style="
             width: 80px;
@@ -57,7 +31,7 @@
           "
         >
           <div style="color: white; font-size: 40px; font-weight: 600">
-            {{ app.name.slice(0, 2) }}
+            {{ app.title.slice(0, 2) }}
           </div>
         </div>
 
@@ -71,12 +45,9 @@
               line-height: 115%;
               word-break: normal;
             "
-            :title="app.name"
+            :title="app.title"
           >
-            {{ app.name }}
-          </div>
-          <div style="margin-top: -5px">
-            [VERSION NOT IMPLEMENTED]
+            {{ app.title }}
           </div>
         </div>
       </div>
@@ -90,24 +61,10 @@
           overflow-y: auto;
         "
       >
-        [SUBTITLE NOT IMPLEMENTED]
+        {{ app.subtitle }}
       </div>
     </div>
 
-    <div class="row" style="justify-content: flex-end; align-items: center">
-      <HCMoreToggle
-        style="margin-left: 22px; margin-bottom: 5px"
-        title="Details"
-        @click="showDescription = !showDescription"
-      />
-      <span style="display: flex; flex: 1"></span>
-      <HCButton
-        class="install-btn"
-        style="border-radius: 12px; margin: 12px;"
-        @click="$emit('installApp')"
-        >Install</HCButton
-      >
-    </div>
   </div>
 </template>
 
@@ -119,16 +76,20 @@ import { defineComponent, PropType } from "vue";
 import HCButton from "./subcomponents/HCButton.vue";
 import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import { AppEntry } from "../appstore/types";
+import { collectBytes } from "../appstore/appstore-interface";
+import { AppWebsocket } from "@holochain/client";
+import { APPSTORE_APP_ID } from "../constants";
 
 export default defineComponent({
   name: "AppPreviewCard",
   components: { HCButton, HCMoreToggle },
   props: {
-    appIcon: {
-      type: Uint8Array,
-    },
     app: {
       type: Object as PropType<AppEntry>,
+      required: true,
+    },
+    appWebsocket: {
+      type: Object as PropType<any>,
       required: true,
     },
   },
@@ -136,28 +97,42 @@ export default defineComponent({
     showDescription: boolean;
     holochainVersion: HolochainVersion | undefined;
     guiVersion: string | undefined;
+    imgSrc: string | undefined;
   } {
     return {
       showDescription: false,
       holochainVersion: undefined,
       guiVersion: undefined,
+      imgSrc: undefined,
     };
   },
   emits: ["installApp"],
-  methods: {
-    appIconSrc(): string | undefined {
-      return this.appIcon ? URL.createObjectURL(new Blob([this.appIcon], { type: 'image/png' })) : undefined
-    }
-  }
+  async mounted () {
+    console.log("Preview card is mounted...");
+    const iconHash = this.app.icon;
+    console.log("@mounted: Getting mere_memory data for hash: ", iconHash);
+    const appStoreInfo = await this.appWebsocket!.appInfo({
+      installed_app_id: APPSTORE_APP_ID,
+    });
+
+    const collectedBytes = await collectBytes(this.appWebsocket, appStoreInfo, iconHash);
+    this.imgSrc = URL.createObjectURL(new Blob([collectedBytes],  { type: "image/png" }));
+  },
 });
 </script>
 
 <style scoped>
 .card {
   width: 370px;
-  height: 240px;
+  height: 220px;
   background: white;
   border-radius: 15px;
+  box-shadow: 0 0px 5px #9b9b9b;
+  cursor: pointer;
+}
+
+.card:hover {
+  background: #f4f4fc;
   box-shadow: 0 0px 5px #9b9b9b;
 }
 

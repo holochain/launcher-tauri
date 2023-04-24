@@ -1,5 +1,6 @@
 <template>
   <div style="flex: 1; display: flex">
+    <div class="beta-indicator">Beta 0.2</div>
     <AlreadyRunning v-if="$store.getters[`isAlreadyRunning`]"> </AlreadyRunning>
     <Error
       v-else-if="
@@ -196,6 +197,14 @@ body,
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+
+.beta-indicator {
+  font-size: 35px;
+  opacity: 0.3;
+  position: fixed;
+  bottom: 6px;
+  left: 18px;
 }
 
 .column {

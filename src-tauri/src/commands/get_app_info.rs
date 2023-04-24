@@ -26,8 +26,7 @@ pub async fn get_app_info(window: tauri::Window, app_bundle_path: String) -> Res
     .filter(|slot| match slot.provisioning {
       Some(
         CellProvisioning::Create { .. }
-        | CellProvisioning::CreateClone { .. }
-        | CellProvisioning::CreateIfNotExists { .. },
+        | CellProvisioning::CloneOnly
       ) => true,
       _ => false,
     })

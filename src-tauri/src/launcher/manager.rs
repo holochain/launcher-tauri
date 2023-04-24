@@ -488,6 +488,12 @@ impl LauncherManager {
     // set window size to 80% of a common screen resolution of 1920 x 1080.
     window_builder = window_builder.inner_size(1536.0, 864.0);
 
+
+    // TODO remove again
+    if app_id == &String::from("AppStore") {
+      window_builder = window_builder.initialization_script("window.localStorage.setItem('DNAREPO_DNA_HASH', 'uhC0k_9lMIJLbiHk8dRoLxqDv_ipPdMSh900TOaTlZaykDmflcK4p'); window.localStorage.setItem('HAPPS_DNA_HASH', 'uhC0kco40cQ_lAEoz_rNB8ruwhPlAlmzLpL5H18dEohyUSXldWSiX');")
+    }
+
     // placeholder for when apps come shipped with their custom icons:
     //
     // window_builder

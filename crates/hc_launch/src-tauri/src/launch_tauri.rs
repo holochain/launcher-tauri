@@ -186,7 +186,7 @@ pub fn launch_tauri(
             // get public key of installed app and add it to the pubkey map used to verify provenance
             let mut ws = match AdminWebsocket::connect(format!("ws://localhost:{}", admin_port)).await {
               Ok(ws) => ws,
-              Err(e) => panic!("Failed to connect to lair client: {:?}", e),
+              Err(e) => panic!("Failed to connect to admin websocket: {:?}", e),
             };
 
             let installed_apps = match ws.list_apps(None).await {

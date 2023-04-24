@@ -41,6 +41,14 @@
     }}</span>
     <span style="display: flex; flex: 1"></span>
     <HCButton
+      outlined
+      @click="installDevHub()"
+      style="height: 36px; border-radius: 8px; padding: 0 20px"
+      title="Install DevHub"
+      :disabled="installingDevHub"
+      >{{ installingDevHub ? 'installing...' : 'Install DevHub' }}
+    </HCButton>
+    <HCButton
       style="
         margin-left: 8px;
         margin-right: 12px;
@@ -122,6 +130,7 @@ export default defineComponent({
     showDevHubDevsOnlyWarning: boolean;
     devHubAppInfo: HolochainAppInfo | undefined;
     ignoreDevHubWaring: boolean;
+    installingDevHub: boolean;
   } {
     return {
       snackbarText: undefined,
@@ -129,6 +138,7 @@ export default defineComponent({
       showDevHubDevsOnlyWarning: false,
       devHubAppInfo: undefined,
       ignoreDevHubWaring: false,
+      installingDevHub: false,
     };
   },
   async created() {
@@ -270,6 +280,18 @@ export default defineComponent({
         });
       }
     },
+    async installDevHub() {
+      this.installingDevHub = true;
+      try {
+        await invoke("install_devhub", {});
+        this.installingDevHub = false;
+        window.location.reload();
+      } catch (e) {
+        alert(`Failed to install DevHub: ${JSON.stringify(e)}`);
+        console.error(`Failed to install DevHub: ${JSON.stringify(e)}`);
+        this.installingDevHub = false;
+      }
+    },
     async reportIssue() {
       await invoke("open_url_cmd", {
         url: this.reportIssueUrl,
@@ -296,7 +318,7 @@ export default defineComponent({
 .top-bar {
   align-items: center;
   height: 64px;
-  background: #e8e8eb;
+  /* background: #e8e8eb; */
   background: white;
   box-shadow: 0 0px 5px #9b9b9b;
 }

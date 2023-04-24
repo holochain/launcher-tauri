@@ -1,29 +1,6 @@
 <template>
   <HCLoading ref="downloading" :text="loadingText" />
 
-  <HCDialog ref="appLibraryFirstEnter">
-    <div
-      class="column"
-      style="padding: 30px; align-items: center; max-width: 600px"
-    >
-      <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
-        Note
-      </div>
-      <div>
-        Holochain is <span @click="peerToPeer" title="https://developer.holochain.org/glossary/#peer-to-peer" style="color: #0000EE; text-decoration: underline; cursor: pointer;">peer-to-peer</span>
-         and the <b>App Library is not optimized for download speed yet.</b><br><br>
-        Before you can download your first app, <b>the App Library needs to get synchronized with other peers in the background.</b>
-        This can take up to 10-20 Minutes depending on the number and size of apps available and the bandwidth of your internet connection.
-        <br><br>
-        You can see the progress of ongoing App Library Synchronizations in the bottom right corner.
-      </div>
-
-      <HCButton style="margin-top: 20px; width: 100px;" @click="closeNote">Ok</HCButton>
-    </div>
-
-  </HCDialog>
-
-
   <div class="row center-content top-bar" style="position: sticky; top: 0; z-index: 1; width: 100%;">
     <mwc-icon-button
       icon="arrow_back"
@@ -48,7 +25,6 @@
       >{{ $t("appStore.howToPublishAnApp") }}
     </HCButton>
     <HCButton
-      icon="folder"
       style="
         margin-left: 8px;
         margin-right: 8px;
@@ -104,67 +80,39 @@
       class="column"
       style="margin-right: 16px; margin-bottom: 16px"
     >
-      <AppPreviewCard :app="app" :appIcon="app.icon" @installApp="saveApp(app)" />
+      <AppPreviewCard :app="app" :appWebsocket="appWebsocket" @installApp="requestInstall(app, $event.imgSrc)" />
     </div>
   </div>
 
-  <div class="progress-indicator" :class="{ highlighted: downloadFailed }">
-    <div
-      style="margin-bottom: 10px; font-weight: 600; margin-left: 10px"
-      :title="$t('appStore.fullSynchronizationRequired')"
-    >
-      {{ $t('appStore.appLibrarySynchronization') }}:
+  <!-- Indicator of online peer hosts -->
+  <div
+    class="peer-host-indicator column"
+  >
+    <div class="row" style="align-items: center;" title="number of peers that are part of the app distribution peer network and currently responsive">
+      <span style="background-color: #17d310; border-radius: 50%; width: 10px; height: 10px; margin-right: 10px;"></span>
+      <span v-if="peerHostStatus"><span style="font-weight: 600;">{{ peerHostStatus.responded }} available</span> peer host{{ peerHostStatus.responded === 1 ? "" : "s"}}</span>
+      <span v-else>pinging peer hosts...</span>
     </div>
-    <div>
-      <div v-for="(cell, idx) in provisionedCells" :key="cell[0]" class="column">
-        <div class="row" style="align-items: center">
-          <div
-            style="
-              width: 20%;
-              margin-left: 20px;
-              font-size: 0.95em;
-              text-align: right;
-            "
-          >
-            {{ cell[0] }}
-          </div>
-          <div style="width: 50%; margin: 0 30px">
-            <HCProgressBar
-              v-if="(networkStates[idx] || networkStates[idx] === 0) && cachedMaxExpected[idx]"
-              title="currently ongoing data exchanges with peers"
-              :progress="progressRatio(idx)"
-              :style="`--height: 10px; --hc-primary-color:${
-                idleStates[idx] ? '#6B6B6B' : '#482edf'
-              };`"
-            />
-            <span
-              v-else
-              style="
-                opacity: 0.7;
-                font-size: 0.8em;
-                display: flex;
-                justify-content: center;
-              "
-              title="currently ongoing data exchanges with peers"
-            >
-            {{ $t('appStore.noOngoingPeerSynchronization') }}</span
-            >
-          </div>
-          <div
-            :style="`width: 30%; text-align: center; ${
-              idleStates[idx] ? 'opacity: 0.7;' : ''
-            }`"
-            title="received bytes | expected bytes"
-          >
-            {{ prettyBytesLocal(byteDiff(idx)) }}
-            | <span :class="{ highglightedText: maxExceeded[idx] }">
-            {{ prettyBytesLocal(cachedMaxExpected[idx]) }}
-            </span>
-          </div>
-        </div>
-      </div>
+    <div class="row" style="align-items: center;" title="number of peers that registered themselves in the app distribution peer network but are currently unresponsive">
+      <span style="background-color: #bfbfbf; border-radius: 50%; width: 10px; height: 10px; margin-right: 10px;"></span>
+      <span v-if="peerHostStatus"><span style="font-weight: 600;">{{ peerHostStatus.totalHosts - peerHostStatus.responded }} unresponsive</span> peer host{{ (peerHostStatus.totalHosts - peerHostStatus.responded) === 1 ? "" : "s"}}</span>
+      <span v-else>pinging peer hosts...</span>
     </div>
   </div>
+
+  <!-- Dialog to select releases -->
+  <SelectReleaseDialog
+    v-if="selectedApp"
+    :app="selectedApp"
+    :appWebsocket="appWebsocket"
+    :imgSrc="selectedImgSrc"
+    ref="selectAppReleasesDialog"
+    @cancel="() => {
+      selectedApp = undefined;
+    }"
+    @release-selected="saveApp($event)"
+  >
+  </SelectReleaseDialog>
 
   <InstallAppDialog
     v-if="selectedAppBundlePath"
@@ -201,19 +149,23 @@ import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
-import { getHappReleases, fetchWebHapp, getAvailableHostForZomeFunction, DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../appstore/appstore-interface";
+import { getHappReleases, getAvailableHostForZomeFunction, fetchGuiReleaseEntry, getVisibleHostsForZomeFunction } from "../appstore/appstore-interface";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
 import HCDialog from "../components/subcomponents/HCDialog.vue";
+import SelectReleaseDialog from "../components/SelectReleaseDialog.vue";
 
-import { HolochainId } from "../types";
+import { HolochainId, ReleaseInfo } from "../types";
 import prettyBytes from "pretty-bytes";
 import { getCellId } from "../utils";
 import { i18n } from "../locale";
-import { AppEntry } from "../appstore/types";
+import { AppEntry, Entity, HappReleaseEntry, HostAvailability } from "../appstore/types";
 import { getAllApps } from "../appstore/appstore-interface";
+import { APPSTORE_APP_ID, DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../constants";
+
+
 
 export default defineComponent({
   name: "AppStore",
@@ -226,6 +178,7 @@ export default defineComponent({
     HCProgressBar,
     HCDialog,
     LoadingDots,
+    SelectReleaseDialog,
   },
   data(): {
     loadingText: string;
@@ -235,6 +188,7 @@ export default defineComponent({
     howToPublishUrl: string;
     holochainId: HolochainId | undefined;
     holochainSelection: boolean;
+    peerHostStatus: HostAvailability | undefined;
     pollInterval: number | null;
     provisionedCells: [string, CellInfo | undefined][] | undefined;
     networkStates: (number | undefined)[];
@@ -248,6 +202,8 @@ export default defineComponent({
     appWebsocket: AppWebsocket | undefined;
     selectedHappReleaseHash: EntryHashB64 | undefined;
     selectedGuiReleaseHash: EntryHashB64 | undefined;
+    selectedApp: AppEntry | undefined;
+    selectedImgSrc: string | undefined;
   } {
     return {
       loadingText: "",
@@ -258,6 +214,7 @@ export default defineComponent({
         "https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-devhub",
       holochainId: undefined,
       holochainSelection: true,
+      peerHostStatus: undefined,
       pollInterval: null,
       provisionedCells: undefined,
       networkStates: [undefined, undefined, undefined],
@@ -271,6 +228,8 @@ export default defineComponent({
       appWebsocket: undefined,
       selectedHappReleaseHash: undefined,
       selectedGuiReleaseHash: undefined,
+      selectedApp: undefined,
+      selectedImgSrc: undefined,
     };
   },
   beforeUnmount() {
@@ -278,19 +237,41 @@ export default defineComponent({
   },
   async mounted() {
 
-    if (!window.localStorage.getItem("appLibraryWarningShown")) {
-      (this.$refs.appLibraryFirstEnter as typeof HCDialog).open();
-      window.localStorage.setItem("appLibraryWarningShown", "true");
+
+    try {
+      await this.fetchApps();
+    } catch (e) {
+      console.error(`Failed to fetch apps in mounted() hook: ${e}`);
     }
 
-    await this.fetchApps();
+    await this.connectAppWebsocket();
 
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
-    await this.getNetworkState();
+    const appStoreInfo = await this.appWebsocket!.appInfo({
+      installed_app_id: APPSTORE_APP_ID,
+    });
+
+    try {
+      const result = await getVisibleHostsForZomeFunction(this.appWebsocket as AppWebsocket, appStoreInfo, 'happ_library', 'get_webhapp_package');
+      this.peerHostStatus = result;
+    } catch (e) {
+      console.error(`Failed to get peer host statuses: ${JSON.stringify(e)}`);
+    }
+
+
     this.pollInterval = window.setInterval(
-      async () => await this.getNetworkState(),
-      2000
+      async () => {
+        const result = await getVisibleHostsForZomeFunction(
+          this.appWebsocket as AppWebsocket,
+          appStoreInfo,
+          "happ_library",
+          "get_webhapp_package"
+        );
+
+        this.peerHostStatus = result;
+      },
+      60000
     );
   },
   methods: {
@@ -305,16 +286,15 @@ export default defineComponent({
       // console.log("connected to AppWebsocket.");
     },
     async fetchApps() {
+
       this.loading = true;
 
-      console.log("@fetchApps: about to call appInfo...");
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
       }
 
-      console.log("@fetchApps: about to call appInfo...");
       const appStoreInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: `Appstore`,
+        installed_app_id: APPSTORE_APP_ID,
       });
 
       console.log("@fetchApps: appStoreInfo: ", appStoreInfo);
@@ -336,14 +316,15 @@ export default defineComponent({
       try {
         allApps = await getAllApps((this.appWebsocket! as AppWebsocket), appStoreInfo);
       } catch (e) {
-        console.error(e);
+        console.error(`Error getting all apps: ${e}`);
         // Catch other errors than being offline
         allApps = [];
       }
 
       console.log("@fetchApps: allApps: ", allApps);
 
-      this.installableApps = allApps;
+      // filter by apps of the relevant DevHub dna hash
+      this.installableApps = allApps.filter((appEntry) => JSON.stringify(appEntry.devhub_address.dna) === JSON.stringify(DEVHUB_HAPP_LIBRARY_DNA_HASH));
 
       this.loading = false;
 
@@ -361,53 +342,39 @@ export default defineComponent({
         url: "https://developer.holochain.org/glossary/#peer-to-peer",
       });
     },
-    async saveApp(app: AppEntry) {
-      // // if downloading, always take holochain version of DevHub
-      this.holochainSelection = false;
-      this.loadingText = "Fetching available releases";
-      (this.$refs.downloading as typeof HCLoading).open();
+    /**
+     *
+     */
+    async requestInstall(app: AppEntry, imgSrc: string | undefined) {
+
+      this.selectedImgSrc = imgSrc ? imgSrc : undefined;
+      this.selectedApp = app;
 
       // 1. get happ releases for app from DevHub
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
       }
 
+      this.$nextTick(() => {
+        (this.$refs.selectAppReleasesDialog as typeof SelectReleaseDialog).open();
+      });
+    },
+    async saveApp(releaseInfo: ReleaseInfo) {
+      // // if downloading, always take holochain version of DevHub
+      this.holochainSelection = false;
+      this.loadingText = "searching available peer host";
+      (this.$refs.downloading as typeof HCLoading).open();
+
+
       const appStoreInfo = await this.appWebsocket!.appInfo({
-        installed_app_id: `Appstore`,
+        installed_app_id: APPSTORE_APP_ID,
       });
 
-      let happReleases = undefined;
+      const happReleaseHash = releaseInfo.happRelease.id;
+      const guiReleaseHash = releaseInfo.happRelease.content.official_gui;
 
-      try {
-        happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, app.devhub_address.happ)
-      } catch (e) {
-        this.errorText = `Error getting happ releases from a DevHub host. See console for details.`;
-        (this.$refs as any).snackbar.show();
-        (this.$refs.downloading as typeof HCLoading).close();
-        throw new Error(`Error getting happ releases from a DevHub host: ${JSON.stringify(e)}`);
-      }
-
-      if (!happReleases) {
-        this.errorText = "Undefined happ releases.";
-        (this.$refs as any).snackbar.show();
-        (this.$refs.downloading as typeof HCLoading).close();
-        throw new Error("Undefined happ releases.");
-      }
-
-      // 1b. Filter out releases without GUIs for now. Installing headless apps should become possible as well of course
-      happReleases = happReleases.filter((release) => !!release.content.official_gui);
-
-      // 2. select latest happ release (later maybe option to select older ones)
-      const latestHappRelease = happReleases.sort((a, b) => b.content.last_updated - a.content.last_updated)[0];
-
-      // 3. fetchwebhapp
-
-      const happReleaseHash = latestHappRelease.id;
-      const guiReleaseHash = latestHappRelease.content.official_gui;
-
-      let bytes = undefined;
-
-      this.loadingText = "Searching available Host";
+      this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
+      this.selectedGuiReleaseHash = guiReleaseHash ? encodeHashToBase64(guiReleaseHash) : undefined;
 
       const host: AgentPubKey = await getAvailableHostForZomeFunction(
         this.appWebsocket as AppWebsocket,
@@ -416,13 +383,13 @@ export default defineComponent({
         "get_webhapp_package",
       );
 
-      this.loadingText = "Requesting webhapp";
+      this.loadingText = "fetching app from peer host...";
 
       try {
         this.selectedAppBundlePath = await invoke("fetch_and_save_app", {
           holochainId: this.holochainId,
           appstoreAppId: appStoreInfo.installed_app_id,
-          appTitle: app.name,
+          appTitle: this.selectedApp!.title,
           host: Array.from(host),
           devhubHappLibraryDnaHash: Array.from(DEVHUB_HAPP_LIBRARY_DNA_HASH), // DNA hash of the DevHub to which the remote call shall be made
           appstorePubKey: encodeHashToBase64(appStoreInfo.agent_pub_key),
@@ -441,63 +408,13 @@ export default defineComponent({
       } catch (e) {
         console.error("Error fetching the webhapp from the DevHub host: ", e);
         this.errorText = "Failed to fetch webhapp from DevHub host.";
+        this.selectedHappReleaseHash = undefined;
+        this.selectedGuiReleaseHash = undefined;
+        this.selectedApp = undefined;
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
         return;
       }
-
-      // try {
-      //   bytes = await fetchWebHapp(
-      //     this.appWebsocket! as AppWebsocket,
-      //     appStoreInfo,
-      //     app.name,
-      //     happReleaseHash,
-      //     guiReleaseHash!, // releases without official_gui have been filtered out earlier
-      //   );
-      // } catch (e) {
-      //   console.error("Error fetching the webhapp: ", e);
-      //   this.errorText = "Failed to fetch webhapp from DevHub host.";
-      //   (this.$refs as any).snackbar.show();
-      //   (this.$refs.downloading as typeof HCLoading).close();
-      //   this.downloadFailed = true;
-      //   setTimeout(() => (this.downloadFailed = false), 3000);
-      //   return;
-      // }
-
-      // if (bytes) {
-      //   try {
-      //     this.selectedAppBundlePath = await invoke("save_app", {
-      //       appBundleBytes: bytes,
-      //     });
-      //     // this.hdkVersionForApp = release.content.hdk_version;
-      //     this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
-      //     this.selectedGuiReleaseHash = encodeHashToBase64(guiReleaseHash!);
-      //     (this.$refs.downloading as typeof HCLoading).close();
-      //     this.loadingText = "";
-
-      //     this.$nextTick(() => {
-      //       (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
-      //     });
-      //   } catch (e) {
-      //     console.log("Error when decoding and saving webhapp to temp folder: ", e);
-      //     console.log("Error Payload: ", (e as any).data);
-
-      //     if ((e as any).data) {
-      //       this.errorText = `Failed to decode and save webhapp: ${(e as any).data}`;
-      //     } else {
-      //       this.errorText = `Failed to decode and save webhapp: ${e}`;
-      //     }
-
-      //     (this.$refs as any).snackbar.show();
-      //     (this.$refs.downloading as typeof HCLoading).close();
-      //   }
-      // } else {
-      //   console.log("Error when decoding and saving webhapp to temp folder: Undefined bytes");
-      //   this.errorText = `Failed to decode and save webhapp: Undefined bytes`;
-
-      //   (this.$refs as any).snackbar.show();
-      //   (this.$refs.downloading as typeof HCLoading).close();
-      // }
     },
     async selectFromFileSystem() {
       this.selectedAppBundlePath = (await open({
@@ -512,6 +429,7 @@ export default defineComponent({
     },
     installClosed() {
       this.selectedAppBundlePath = undefined;
+      this.selectedApp = undefined;
       // this.hdkVersionForApp = undefined;
     },
     async getNetworkState() {
@@ -602,9 +520,6 @@ export default defineComponent({
         return diff;
       }
     },
-    closeNote() {
-      (this.$refs.appLibraryFirstEnter as typeof HCDialog).close()
-    }
   },
 });
 </script>
@@ -617,27 +532,17 @@ export default defineComponent({
   box-shadow: 0 0px 5px #9b9b9b;
 }
 
-.progress-indicator {
+.peer-host-indicator {
   position: fixed;
-  bottom: 0;
-  right: 0;
-  padding: 20px;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 15px;
   background-color: white;
   box-shadow: 0 0px 5px #9b9b9b;
-  border-radius: 20px 0 0 0;
-  min-width: 540px;
+  border-radius: 10px 10px 6px 6px;
+  min-width: 220px;
 }
 
-.highlighted {
-  border-top: 4px solid transparent;
-  border-left: 4px solid transparent;
-  animation: bordercolorchange 1s linear infinite;
-}
-
-.highglightedText {
-  font-weight: bold;
-  color: #482edf;
-}
 
 .refresh-button {
   height: 30px;
@@ -652,15 +557,4 @@ export default defineComponent({
   opacity: 1;
 }
 
-@keyframes bordercolorchange {
-  0% {
-    border-color: white;
-  }
-  50% {
-    border-color: #482edf;
-  }
-  100% {
-    border-color: white;
-  }
-}
 </style>

@@ -256,9 +256,7 @@ export async function getHappReleasesByEntryHashes(
  * Fetches a GUI from the DevHub
  * @param appWebsocket
  * @param devhubHapp
- * @param name
- * @param happReleaseEntryHash
- * @param guiReleaseEntryHash
+ * @param webAssetEntryHash
  * @param retryCount
  * @returns
  */

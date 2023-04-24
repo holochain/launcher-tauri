@@ -7,7 +7,7 @@ edition = "2021"
 license = ""
 name = "holochain-launcher"
 repository = ""
-version = "0.9.993"
+version = "0.9.994"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -17,17 +17,20 @@ tauri-build = { version = "1.2.1", features = [] }
 
 [dependencies]
 
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "holochain-0.2.0-beta-rc.2" }
+# NEW_VERSION update holochain client version if requireds
+holochain_client = "0.4.0"
 
 holochain_manager = { path = "../crates/holochain_manager" }
 holochain_launcher_utils = { path = "../crates/holochain_launcher_utils" }
 holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
 lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 
-# NEW_VERSION update holochain types
-holochain_types = "0.2.0-beta-rc.3"
-holochain_state = "0.2.0-beta-rc.3"
-hdk = "0.2.0-beta-rc.3"
+# NEW_VERSION update holochain dependencies
+holochain_types = "0.2.0-beta-rc.4"
+holochain_state = "0.2.0-beta-rc.4"
+hdk = "0.2.0-beta-rc.4"
+
+holochain = "0.2.0-beta-rc.4"
 
 devhub_types = { git = "https://github.com/holochain/devhub-dnas", branch = "develop" }
 
@@ -38,7 +41,7 @@ dirs-next = "2.0.0"
 futures = "0.3"
 log = "0.4.14"
 log4rs = "1.0.0"
-mr_bundle = { git = "https://github.com/holochain/holochain", package = "mr_bundle", version = "0.2.0-beta-rc.0" }
+mr_bundle = { package = "mr_bundle", version = "0.2.0-beta-rc.0" }
 open = "2.0.1"
 opener = "0.5.0"
 portpicker = "0.1.1"
@@ -50,6 +53,7 @@ tauri = {version = "1.2.3", features = ["cli", "clipboard-write-text", "devtools
 thiserror = "1.0.30"
 url2 = "0.0.6"
 mime_guess = "2.0.4"
+
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

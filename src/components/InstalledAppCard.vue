@@ -378,6 +378,7 @@ import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
 import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
 import DisabledCloneCard from "./subcomponents/DisabledCloneCard.vue";
+import { APPSTORE_APP_ID } from "../constants";
 
 
 export default defineComponent({
@@ -486,10 +487,7 @@ export default defineComponent({
       return "Unknown State";
     },
     isAppUninstallable(installedAppId: string) {
-      const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"];
-      const holochainId = this.$store.getters["holochainIdForDevhub"];
-
-      return installedAppId !== `DevHub-${holochainId.content}`;
+      return installedAppId !== APPSTORE_APP_ID;
     },
     async handleSlider(app: HolochainAppInfo) {
       if (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) {
