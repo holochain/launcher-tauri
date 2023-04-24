@@ -1,15 +1,13 @@
 # Developer Setup
 
-## Tauri Prerequisites
+## Tauri and Holochain Prerequisites
 
 Go through the [tauri prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites).
 
+[Install Go](https://go.dev/doc/install)
+
 > Note: for now on Linux you will need to install `patchelf` and `librsvg2-dev`:
 > `sudo apt-get install patchelf librsvg2-dev`
-
-## Install Go
-
-Install Go from [here](https://go.dev/doc/install) if you don't have it installed yet. It is required to compile Holochain 0.2.X.
 
 ## Install Holochain and lair-keystore globally
 
@@ -19,9 +17,13 @@ The commands to install them should look like below, replacing the version numbe
 
 ### Linux/macOS
 ```
+mkdir src-tauri/bins
+
 cargo install --version 0.2.3 lair_keystore
 LAIR_PATH=$(which lair-keystore)
+cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.3-x86_64-apple-darwin
 cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.3-[_ARCHITECTURE_]
+
 
 cargo install holochain --version 0.2.0-beta-rc.6 --locked --features db-encryption
 HOLOCHAIN_PATH=$(which holochain)
@@ -31,7 +33,7 @@ cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.2.0-beta-rc.6-[_ARCHITECTURE_]
 [... install further holochain versions if required]
 
 ```
-`[_ARCHITECTURE_]` is `x86_64-apple-darwin` on an x86 macOS, `aarch64-apple-darwin` on an M1 macOS and `unknown-linux-gnu` on Linux.
+`[_ARCHITECTURE_]` is `x86_64-apple-darwin` on an x86 macOS, `aarch64-apple-darwin` on an Arm/M1 macOS and `unknown-linux-gnu` on Linux.
 
 ### Windows
 ```
