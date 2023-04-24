@@ -2926,7 +2926,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-launcher"
-version = "0.9.994"
+version = "0.9.995"
 dependencies = [
  "async-trait",
  "chrono",
@@ -7937,7 +7937,6 @@ checksum = "fe7e0f1d535e7cbbbab43c82be4fc992b84f9156c16c160955617e0260ebc449"
 dependencies = [
  "anyhow",
  "attohttpc",
- "base64 0.13.1",
  "bytes",
  "clap 3.2.23",
  "cocoa",
@@ -7952,7 +7951,6 @@ dependencies = [
  "heck 0.4.1",
  "http",
  "ignore",
- "minisign-verify",
  "objc",
  "once_cell",
  "open 3.2.0",
@@ -7977,14 +7975,12 @@ dependencies = [
  "tauri-utils",
  "tempfile",
  "thiserror",
- "time 0.3.20",
  "tokio",
  "url 2.3.1",
  "uuid 1.3.1",
  "webkit2gtk",
  "webview2-com",
  "windows 0.39.0",
- "zip 0.6.4",
 ]
 
 [[package]]

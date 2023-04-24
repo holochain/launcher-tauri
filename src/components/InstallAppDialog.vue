@@ -59,7 +59,7 @@
         ref="app-id-field"
       />
       <HCSelect
-        v-if="holochainSelection"
+        v-if="holochainSelection && supportedHolochains.length > 1"
         style="margin: 5px; margin-bottom: 15px; width: 360px"
         label="Holochain Version*"
         :items="supportedHolochains"
@@ -208,8 +208,7 @@ import {
   InstalledWebAppInfo,
   WebAppInfo,
 } from "../types";
-import { AppWithReleases } from "../devhub/get-happs";
-import { AppRoleManifest } from "@holochain/client";
+import { DEVHUB_APP_ID } from "../constants";
 
 export default defineComponent({
   name: "InstallAppDialog",
@@ -322,7 +321,7 @@ export default defineComponent({
 
     this.supportedHolochains = supportedHolochains;
 
-    if (!this.holochainSelection) {
+    if (!this.holochainSelection || this.supportedHolochains.length < 2) {
       try {
         this.holochainId = this.$store.getters["holochainIdForDevhub"];
       } catch (e) {
@@ -369,6 +368,9 @@ export default defineComponent({
 
       if (newValue === "") {
         this.appIdInvalid = "App Id must not be empty.";
+        return;
+      } else if (newValue === DEVHUB_APP_ID) {
+        this.appIdInvalid = "The app id 'DevHub' is reserved for the official DevHub and cannot be used."
         return;
       } else if (!regExp.test(newValue)) {
         // this restriction is added here because labels of tauri windows require it and we base window labels on app id's
