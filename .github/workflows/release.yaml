@@ -91,7 +91,7 @@ jobs:
 
       - name: build the app (macOS and Linux only)
         if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'macos-10.15'
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
