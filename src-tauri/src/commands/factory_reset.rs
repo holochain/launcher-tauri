@@ -106,7 +106,7 @@ pub async fn execute_factory_reset(
         format!("Could not remove tauri data directory: {}", err)
     })?;
   } else {
-    // On Windows, deleting the tauri directory throws an ose error 32, so instead just clear localStorage in the window
+    // On Windows, deleting the tauri directory throws an os error 32, so instead just clear localStorage in the window
     window.eval("window.localStorage.clear()")
       .map_err(|e| format!("Failed to clear localStorage in admin window: {}", e))?;
   }

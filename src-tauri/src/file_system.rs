@@ -5,7 +5,7 @@ use lair_keystore_manager::versions::LairKeystoreVersion;
 
 use crate::launcher::error::LauncherError;
 
-static APP_NAME: &str = "holochain-launcher";
+static APP_NAME: &str = "holochain-launcher-0.2";
 
 /// Name of the profile
 pub type Profile = String;
