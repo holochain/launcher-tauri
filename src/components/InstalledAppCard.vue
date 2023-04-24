@@ -207,7 +207,7 @@
       >
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Provisioned Cells:</span
-        ><span style="display: flex; flex: 1"></span>
+        ><span style="display: flex; flex: 1">{{ provisionedCells.length }}</span>
         <span
           style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
           @click="showProvisionedCells = !showProvisionedCells"
@@ -233,7 +233,7 @@
       >
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Cloned Cells:</span
-        ><span style="display: flex; flex: 1"></span>
+        ><span style="display: flex; flex: 1">{{ enabledClonedCells.length }}</span>
         <span
           style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
           @click="showClonedCells = !showClonedCells"
@@ -268,7 +268,7 @@
       >
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Disabled Cloned Cells:</span
-        ><span style="display: flex; flex: 1"></span>
+        ><span style="display: flex; flex: 1">{{ disabledClonedCells.length }}</span>
         <span
           style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
           @click="showDisabledClonedCells = !showDisabledClonedCells"
