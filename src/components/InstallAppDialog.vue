@@ -59,7 +59,7 @@
         ref="app-id-field"
       />
       <HCSelect
-        v-if="holochainSelection"
+        v-if="holochainSelection && supportedHolochains.length > 1"
         style="margin: 5px; margin-bottom: 15px; width: 360px"
         label="Holochain Version*"
         :items="supportedHolochains"
@@ -321,7 +321,7 @@ export default defineComponent({
 
     this.supportedHolochains = supportedHolochains;
 
-    if (!this.holochainSelection) {
+    if (!this.holochainSelection || this.supportedHolochains.length < 2) {
       try {
         this.holochainId = this.$store.getters["holochainIdForDevhub"];
       } catch (e) {
