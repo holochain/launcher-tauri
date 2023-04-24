@@ -197,7 +197,7 @@ pub fn launch_tauri(
             for app in installed_apps {
               if derive_window_label(app_counter, app.installed_app_id) == window_label.clone() {
                 pubkey_map.insert(window_label.clone(), app.agent_pub_key.clone());
-                println!("[hc launch] Inserted public key {} as allowed public key for window with label {}", app.agent_pub_key, window_label);
+                // println!("[hc launch] Inserted public key {} as allowed public key for window with label {}", app.agent_pub_key, window_label);
               }
             }
 
