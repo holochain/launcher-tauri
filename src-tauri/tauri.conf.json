@@ -27,6 +27,7 @@
       "active": true,
       "targets": "all",
       "identifier": "holochain-launcher-0.2",
+      "publisher": "Holochain Foundation",
       "icon": [
         "icons/icon.png",
         "icons/icon.ico",
