@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [windows-2019]
+        platform: [windows-2019, macos-10.15, ubuntu-20.04]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -100,7 +100,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_0_2 }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
         with:
@@ -138,7 +138,7 @@ jobs:
 
           # zip and sign the code signed .msi
           7z a -mx=0 "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher Beta 2_0.9.995_x64_en-US.msi.zip" "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher Beta 2_0.9.995_x64_en-US.msi"
-          npm run tauri signer sign "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher Beta 2_0.9.995_x64_en-US.msi.zip" -- -k ${{ secrets.TAURI_PRIVATE_KEY_0_2 }} -p "${{ secrets.TAURI_KEY_PASSWORD }}"
+          npm run tauri signer sign "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher Beta 2_0.9.995_x64_en-US.msi.zip" -- -k ${{ secrets.TAURI_PRIVATE_KEY }} -p "${{ secrets.TAURI_KEY_PASSWORD }}"
 
           # log hashes before and after code signing to verify that the uploaded assets are the right ones
           CertUtil -hashfile "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher Beta 2_0.9.995_x64_en-US.msi" SHA256
@@ -146,7 +146,7 @@ jobs:
           CertUtil -hashfile "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher Beta 2_0.9.995_x64_en-US.msi.zip.sig" SHA256
 
         env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_0_2 }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
 
