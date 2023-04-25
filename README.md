@@ -9,13 +9,16 @@ A cross-platform executable that launches a local Holochain conductor, and lets 
 1. Go to the [Releases page](https://github.com/holochain/launcher/releases).
 2. Download the appropriate executable for your platform and execute it.
 
+Notes:
+* **macOS**: If you are running the Holochain Launcher from a `.app` file extracted from an `app.tar.gz` bundle instead of having it installed from a `.dmg` file, automatic updates will only succeed if the `.app` file is located in the `Applications` folder due to file permissions.
+* **Linux**: Automatic updates are currently not supported when the Launcher is installed from a `.deb` file instead of runniing it from the `.AppImage`.
+
+
 ## Updating Launcher
 
-As of version 0.9.1 of the Holochain Launcher automatic updates are available for Windows, macOS and Linux' AppImage. If you installed the Holochain Launcher from a `.deb` file on Linux and would like to update to a new version of the Holochain Launcher, go to the [Releases page](https://github.com/holochain/launcher/releases) and download the new `.deb` file.
+If your current version is 0.9.0 or lower (click on "Menu" > "Version Info" on Windows/Linux or "Launcher > "Version Info" on macOS to find out the version you are using), go to the [Releases page](https://github.com/holochain/launcher/releases) and install the latest version of the Holochain Launcher.
 
-**Note for macOS**:
-If you are running the Holochain Launcher from a `.app` file extracted from an `app.tar.gz` bundle instead of having it installed from a `.dmg` file, automatic updates will only succeed if the `.app` file is located in the `Applications` folder due to file permissions.
-
+If your current version is 0.9.1 or higher, you should automatically receive Updates in the Launcher and don't need to care about manually updating the Launcher.
 
 ## Usage
 
