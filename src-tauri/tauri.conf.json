@@ -58,7 +58,10 @@
     },
     "updater": {
       "active": false,
-      "endpoints": [],
+      "endpoints": [
+        "https://s3.eu-central-2.wasabisys.com/holochain-launcher/automatic-updates/updater_0_2.json",
+        "https://drive.switch.ch/index.php/s/gTcgvbHAJPA56xA"
+      ],
       "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI3RkNGRjMxMDQ0QTg0RDEKUldUUmhFb0VNZi84SnluN2J3N0hHNkQrOHhvYmtnMXdLR1hKQ09Ja3c3eUNGYUgxUllDZlhNWmIK"
     },

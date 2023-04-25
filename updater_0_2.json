@@ -1,5 +1,5 @@
 {
-  "version": "v0.9.3",
+  "version": "v0.10.0",
   "notes": "- testing automatic Launcher updates.\n- adds a security feature that prevents malicious UI's to make calls to cells they don't belong to\n- other UX related fixes/improvements\n\nNote: On macOS automatic updates of .app files only work if the .app file is located in the Applications folder.",
   "pub_date": "2023-02-28T20:20:00Z",
   "platforms": {
