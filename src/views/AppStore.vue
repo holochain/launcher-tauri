@@ -432,63 +432,63 @@ export default defineComponent({
       this.selectedApp = undefined;
       // this.hdkVersionForApp = undefined;
     },
-    async getNetworkState() {
-      if (!this.appWebsocket) {
-        await this.connectAppWebsocket();
-      }
+    // async getNetworkState() {
+    //   if (!this.appWebsocket) {
+    //     await this.connectAppWebsocket();
+    //   }
 
-      const networkInfo: NetworkInfo[] = await this.appWebsocket!.networkInfo({
-        dnas: this.provisionedCells!.filter(([roleName, cellInfo]) => !!cellInfo)
-          .map(([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array),
-      });
+    //   const networkInfo: NetworkInfo[] = await this.appWebsocket!.networkInfo({
+    //     dnas: this.provisionedCells!.filter(([roleName, cellInfo]) => !!cellInfo)
+    //       .map(([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array),
+    //   });
 
-      networkInfo.forEach((info, idx) => {
-        const expectedIncoming =
-          info.fetch_pool_info.op_bytes_to_fetch;
+    //   networkInfo.forEach((info, idx) => {
+    //     const expectedIncoming =
+    //       info.fetch_pool_info.op_bytes_to_fetch;
 
-        // In case expected incoming bytes are undefined, keep the chached values, otherwise update
-        // expectedIncoming
-      if (expectedIncoming || expectedIncoming === 0) {
-          // if the expected incoming bytes are larger then the max cached value or there
-          // is no cached max value, replace it
-          const currentMax = this.cachedMaxExpected[idx];
-          if ((!currentMax && currentMax !== 0) || expectedIncoming > currentMax) {
-            this.cachedMaxExpected[idx] = expectedIncoming;
-            this.maxExceeded[idx] = true;
-            setTimeout(() => (this.maxExceeded[idx] = false), 500);
-          }
+    //     // In case expected incoming bytes are undefined, keep the chached values, otherwise update
+    //     // expectedIncoming
+    //   if (expectedIncoming || expectedIncoming === 0) {
+    //       // if the expected incoming bytes are larger then the max cached value or there
+    //       // is no cached max value, replace it
+    //       const currentMax = this.cachedMaxExpected[idx];
+    //       if ((!currentMax && currentMax !== 0) || expectedIncoming > currentMax) {
+    //         this.cachedMaxExpected[idx] = expectedIncoming;
+    //         this.maxExceeded[idx] = true;
+    //         setTimeout(() => (this.maxExceeded[idx] = false), 500);
+    //       }
 
-          if (expectedIncoming != this.networkStates[idx]) {
-            this.idleStates[idx] = false;
-            this.latestNetworkUpdates[idx] = Date.now();
-          }
-          // make this call after setting max cached value to ensure it is always <= to it
-          this.networkStates[idx] = expectedIncoming;
-        }
+    //       if (expectedIncoming != this.networkStates[idx]) {
+    //         this.idleStates[idx] = false;
+    //         this.latestNetworkUpdates[idx] = Date.now();
+    //       }
+    //       // make this call after setting max cached value to ensure it is always <= to it
+    //       this.networkStates[idx] = expectedIncoming;
+    //     }
 
-        // if expected incoming remains the same for > 10 seconds, set to idle. Except expectedIncoming
-        // is below 16MB, in this case transmission may already be finished.
-        if (new Date().getTime() - this.latestNetworkUpdates[idx] > 10000) {
-          if (this.networkStates[idx] || this.networkStates[idx] === 0) {
-            if (this.networkStates[idx]! > 16000000) {
-              this.idleStates[idx] = false
-            }
-          } else {
-            this.idleStates[idx] = true;
-          }
-        }
-
-
-        // if latest non-zero update to gossip progress is older than 80 seconds, set expected incoming
-        // and max cached expected incoming to undefined again
-        if (new Date().getTime() - this.latestNetworkUpdates[idx] > 80000) {
-          this.networkStates[idx] = undefined;
-          this.cachedMaxExpected[idx] = undefined;
-        }
-      });
+    //     // if expected incoming remains the same for > 10 seconds, set to idle. Except expectedIncoming
+    //     // is below 16MB, in this case transmission may already be finished.
+    //     if (new Date().getTime() - this.latestNetworkUpdates[idx] > 10000) {
+    //       if (this.networkStates[idx] || this.networkStates[idx] === 0) {
+    //         if (this.networkStates[idx]! > 16000000) {
+    //           this.idleStates[idx] = false
+    //         }
+    //       } else {
+    //         this.idleStates[idx] = true;
+    //       }
+    //     }
 
 
-    },
+    //     // if latest non-zero update to gossip progress is older than 80 seconds, set expected incoming
+    //     // and max cached expected incoming to undefined again
+    //     if (new Date().getTime() - this.latestNetworkUpdates[idx] > 80000) {
+    //       this.networkStates[idx] = undefined;
+    //       this.cachedMaxExpected[idx] = undefined;
+    //     }
+    //   });
+
+
+    // },
     showError(e: string) {
       this.errorText = e;
       (this.$refs as any).snackbar.show();

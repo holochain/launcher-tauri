@@ -101,34 +101,21 @@
           >
             {{ $t('main.incoming') }}:
           </div>
-          <div style="width: 60%; margin: 0 30px">
-            <HCProgressBar
-              v-if="(expectedIncoming || expectedIncoming === 0) && cachedMaxExpected"
-              :title="$t('appStore.activeDataExchanges')"
-              :progress="progressRatio()"
-              :style="`--height: 10px; --hc-primary-color:${
-                incomingIdle ? '#D0D0D0' : '#482edf'
-              };`"
-            />
+          <div class="row" style="width: 100%; margin: 0 30px; align-items: center;">
+            <div v-if="networkInfo?.fetch_pool_info.op_bytes_to_fetch">
+              <span class="loader"></span>
+              <span style="margin-left: 30px; font-size: 0.95em;">{{ networkInfo?.fetch_pool_info ? `${prettyBytes(networkInfo?.fetch_pool_info.op_bytes_to_fetch)} in queue` : "" }}</span>
+            </div>
             <div
               v-else
               style="text-align: center; opacity: 0.7; font-size: 0.9em"
             >
-              <span :title="$t('appStore.activeDataExchanges')"
+              <span style="margin-left: 140px;" :title="$t('appStore.activeDataExchanges')"
                 >{{ $t('appStore.noOngoingPeerSynchronization') }}</span
               >
             </div>
           </div>
-          <div
-            :style="`width: 25%; text-align: center; ${
-              incomingIdle ? 'opacity: 0.7;' : ''
-            }`"
-            title="received bytes | expected bytes"
-          >
-            {{ ((expectedIncoming || expectedIncoming === 0) && cachedMaxExpected) ? prettyBytes(cachedMaxExpected - expectedIncoming) : "-" }}
-            | <span :class="{ highlighted: maxExceeded }">
-            {{ cachedMaxExpected ? prettyBytes(cachedMaxExpected) : "-" }}
-            </span>
+          <div v-if="networkInfo?.fetch_pool_info.op_bytes_to_fetch">
           </div>
         </div>
       </div>
@@ -171,11 +158,7 @@ export default defineComponent({
   },
   data(): {
     pollInterval: number | null;
-    expectedIncoming: number | undefined;
-    latestIncomingUpdate: number;
-    incomingIdle: boolean;
-    cachedMaxExpected: number | undefined;
-    maxExceeded: boolean;
+    networkInfo: NetworkInfo | undefined;
     appWebsocket: AppWebsocket | undefined;
     networkSeedVisible: boolean;
     showNetworkSeedCopiedTooltip: boolean;
@@ -183,11 +166,7 @@ export default defineComponent({
   } {
     return {
       pollInterval: null,
-      expectedIncoming: undefined,
-      latestIncomingUpdate: 0,
-      incomingIdle: true,
-      cachedMaxExpected: undefined,
-      maxExceeded: false,
+      networkInfo: undefined,
       appWebsocket: undefined,
       networkSeedVisible: false,
       showNetworkSeedCopiedTooltip: false,
@@ -196,7 +175,7 @@ export default defineComponent({
   },
   async created() {
     const port = this.$store.getters["appInterfacePort"](this.holochainId);
-    this. appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+    this.appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
     await this.getNetworkInfo();
@@ -222,88 +201,30 @@ export default defineComponent({
     },
     async getNetworkInfo() {
 
+      // console.log("========================================");
+      // console.log("@getNetworkInfo: getting network info...")
+
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
       }
 
-      const networkInfo: NetworkInfo[] = await this.appWebsocket!.networkInfo({
-        dnas: [getCellId(this.cellInfo)![0]],
-      });
+      // console.log("@getNetworkInfo: connected to app websocket: ", this.appWebsocket);
 
-      // console.log("========================================");
-      // console.log("Received NetworkInfo: ", networkInfo);
+      let networkInfos: NetworkInfo[] = [];
 
-      const expectedIncoming =
-        networkInfo[0].fetch_pool_info.op_bytes_to_fetch;
+      try {
+        networkInfos = await this.appWebsocket!.networkInfo({
+          agent_pub_key: getCellId(this.cellInfo)![1],
+          dnas: [getCellId(this.cellInfo)![0]],
+          last_time_queried: undefined,
+        });
 
-      // console.log("expectedIncoming: ", expectedIncoming);
-
-      // In case expected incoming bytes are undefined, keep the chached values, otherwise update
-      // expectedIncoming
-      if (expectedIncoming || expectedIncoming === 0) {
-        // console.log("expectedIncoming inside: ", expectedIncoming);
-        // if the expected incoming bytes are larger then the max cached value or there
-        // is no cached max value, replace it
-        if (
-          (!this.cachedMaxExpected && this.cachedMaxExpected !== 0) ||
-          expectedIncoming > this.cachedMaxExpected
-        ) {
-          this.cachedMaxExpected = expectedIncoming;
-          this.maxExceeded = true;
-          setTimeout(() => (this.maxExceeded = false), 500);
-        }
-
-        if (expectedIncoming !== this.expectedIncoming) {
-          this.incomingIdle = false;
-          this.latestIncomingUpdate = Date.now();
-        }
-
-
-        // make this call after setting max cached value to ensure it is always <= to it
-        this.expectedIncoming = expectedIncoming;
+        this.networkInfo = networkInfos[0]; // only one network info expected per cell
+      } catch(e) {
+        console.log(`Failed to get network info: ${JSON.stringify(e)}`);
+        console.error(`Failed to get network info: ${JSON.stringify(e)}`);
       }
 
-      // if expected incoming remains the same for > 10 seconds, set to idle. Except expectedIncoming
-      // is below 16MB, in this case transmission may already be finished.
-      if (new Date().getTime() - this.latestIncomingUpdate > 10000) {
-        if ((this.expectedIncoming || this.expectedIncoming === 0) && this.expectedIncoming > 16000000) {
-          this.incomingIdle = false
-        } else {
-          this.incomingIdle = true;
-        }
-      }
-
-      // if latest non-zero update to network info is older than 80 seconds, set expected incoming
-      // and max cached expected incoming to undefined again
-      if (new Date().getTime() - this.latestIncomingUpdate > 80000) {
-        this.expectedIncoming = undefined;
-        this.cachedMaxExpected = undefined;
-      }
-
-      // console.log("========================================");
-      // console.log(
-      //   "this.expectedIncoming: ",
-      //   this.expectedIncoming
-      // );
-      // console.log(
-      //   "cachedMaxExpected: ",
-      //   this.cachedMaxExpected
-      // );
-      // console.log("incomingIdle: ", this.incomingIdle);
-      // console.log("progressRatio(): ", this.progressRatio());
-      // console.log("========================================");
-    },
-    progressRatio() {
-      // console.log("@progressRatio: this.expectedIncoming", this.expectedIncoming);
-      // console.log("@progressRatio: this.cachedMaxExpected", this.cachedMaxExpected);
-
-      if ((this.expectedIncoming || this.expectedIncoming === 0) && this.cachedMaxExpected) {
-        // console.log("@progressRatio: ratio",(1 - this.expectedIncoming / this.cachedMaxExpected) * 100);
-        return (1 - this.expectedIncoming / this.cachedMaxExpected) * 100;
-      } else {
-        // console.log("@progressRatio: NO PROGRESS RATIO CALCULATED!!");
-        return undefined;
-      }
     },
     dnaHashForCell(cell: CellInfo) {
       return encodeHashToBase64(new Uint8Array(getCellId(cell)![0]))
@@ -342,5 +263,34 @@ export default defineComponent({
 .highlighted {
   font-weight: bold;
   color: #482edf;
+}
+
+.loader {
+  width: 400px;
+  height: 6px;
+  display: inline-block;
+  position: relative;
+  background: rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+.loader::after {
+  content: '';
+  width: 192px;
+  height: 6px;
+  background: #482edf;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  animation: animloader 2s linear infinite;
+}
+@keyframes animloader {
+  0% {
+    left: -192px;
+  }
+  100% {
+    left: 100%;
+    transform: translateX(0%);
+  }
 }
 </style>
