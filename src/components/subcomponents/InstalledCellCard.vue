@@ -90,21 +90,21 @@
       </div>
       <div class="column">
         <!-- active incoming gossip rounds -->
-        <div class="row" style="align-items: center">
+        <div class="row" style="align-items: flex-start;">
           <div
             style="
-              width: 10%;
-              margin-left: 20px;
+              margin-left: 35px;
               font-size: 0.95em;
               text-align: right;
             "
           >
             {{ $t('main.incoming') }}:
           </div>
-          <div class="row" style="width: 100%; margin: 0 30px; align-items: center;">
-            <div v-if="networkInfo?.fetch_pool_info.op_bytes_to_fetch">
+          <div class="row" style="width: 100%; margin: 0 20px;">
+            <div class="column" v-if="networkInfo?.fetch_pool_info.op_bytes_to_fetch" style="align-items: flex-end; margin-top: 9px;">
               <span class="loader"></span>
-              <span style="margin-left: 30px; font-size: 0.95em;">{{ networkInfo?.fetch_pool_info ? `${prettyBytes(networkInfo?.fetch_pool_info.op_bytes_to_fetch)} in queue` : "" }}</span>
+              <span style="display: flex; flex: 1;"></span>
+              <span style="font-size: 0.95em;">{{ networkInfo?.fetch_pool_info ? `${prettyBytes(networkInfo?.fetch_pool_info.op_bytes_to_fetch)} in queue` : "" }}</span>
             </div>
             <div
               v-else
@@ -114,8 +114,6 @@
                 >{{ $t('appStore.noOngoingPeerSynchronization') }}</span
               >
             </div>
-          </div>
-          <div v-if="networkInfo?.fetch_pool_info.op_bytes_to_fetch">
           </div>
         </div>
       </div>
@@ -131,6 +129,7 @@ import {
   NetworkInfo,
   CellInfo,
   encodeHashToBase64,
+  NetworkInfoRequest,
 } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 
@@ -217,7 +216,7 @@ export default defineComponent({
           agent_pub_key: getCellId(this.cellInfo)![1],
           dnas: [getCellId(this.cellInfo)![0]],
           last_time_queried: undefined,
-        });
+        } as NetworkInfoRequest);
 
         this.networkInfo = networkInfos[0]; // only one network info expected per cell
       } catch(e) {
@@ -266,7 +265,7 @@ export default defineComponent({
 }
 
 .loader {
-  width: 400px;
+  width: 475px;
   height: 6px;
   display: inline-block;
   position: relative;
