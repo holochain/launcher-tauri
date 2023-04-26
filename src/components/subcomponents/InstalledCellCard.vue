@@ -84,6 +84,16 @@
         />
       </span>
     </div>
+
+    <!-- visible peers -->
+    <div style="display: flex; flex-direction: row; align-items: center; min-width: 500px; position: relative; margin-bottom: 10px;">
+      <span style="margin-right: 30px">{{ $t('main.visiblePeers') }}:</span>
+      <span style="opacity: 0.7; font-family: monospace; font-size: 15px"
+        >{{ networkInfo ? networkInfo.current_number_of_peers - 1 : "unknown" }}
+      </span>
+    </div>
+
+    <!-- Active Peer Synchronization -->
     <div>
       <div style="margin-bottom: 10px" title="Historical Gossip Throughput">
         {{ $t('main.activePeerSynchronization') }}:
@@ -220,6 +230,7 @@ export default defineComponent({
 
         this.networkInfo = networkInfos[0]; // only one network info expected per cell
       } catch(e) {
+        this.networkInfo = undefined;
         console.log(`Failed to get network info: ${JSON.stringify(e)}`);
         console.error(`Failed to get network info: ${JSON.stringify(e)}`);
       }
