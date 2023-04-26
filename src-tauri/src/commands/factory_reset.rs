@@ -1,11 +1,10 @@
-use std::{fs, io, path::PathBuf, sync::Arc};
+use std::{fs, io, path::PathBuf};
 
 use tauri::{api::process::kill_children, Manager};
 
 use crate::{
   file_system::{profile_config_dir, profile_holochain_data_dir, profile_lair_dir, Profile, profile_logs_dir, profile_tauri_dir, holochain_version_data_dir},
-  launcher::{error::LauncherError, manager::LauncherManager, state::LauncherState},
-  running_state::RunningState,
+  launcher::{state::LauncherState}
 };
 
 #[tauri::command]
@@ -124,38 +123,9 @@ pub async fn execute_factory_reset(
     })?;
   }
 
+  app_handle.restart();
 
-
-  let manager_launch = LauncherManager::launch(Arc::new(app_handle), profile.clone()).await;
-
-  let mut maybe_error: Option<LauncherError> = None;
-
-  let manager_state = match manager_launch {
-    Ok(mut launcher_manager) => {
-      log::info!("Launch setup successful");
-      launcher_manager.on_apps_changed().await?;
-
-      RunningState::Running(launcher_manager)
-    }
-    Err(error) => {
-      kill_children();
-
-      maybe_error = Some(error.clone());
-
-      log::error!("There was an error launching holochain: {:?}", error);
-      RunningState::Error(error)
-    }
-  };
-
-  let mut m = state.lock().await;
-
-  (*m) = manager_state;
-
-  log::info!("Started children processes again, factory reset completed");
-
-  if let Some(err) = maybe_error {
-    return Err(format!("{:?}", err));
-  }
+  log::info!("Restarted Launcher, factory reset completed");
 
   Ok(())
 }
