@@ -1,4 +1,4 @@
-use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile};
+use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile, BootstrapServerUrl, SignalingServerUrl};
 use mr_bundle::ResourceBytes;
 
 #[tauri::command]
@@ -6,6 +6,8 @@ pub async fn update_default_ui(
   window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
   profile: tauri::State<'_, Profile>,
+  bootstrap_server_url: tauri::State<'_, BootstrapServerUrl>,
+  signaling_server_url: tauri::State<'_, SignalingServerUrl>,
   holochain_id: HolochainId,
   app_id: String,
   ui_zip_bytes: Vec<u8>,
@@ -26,8 +28,12 @@ pub async fn update_default_ui(
   let manager = mutex.get_running()?;
 
   manager
-    .get_or_launch_holochain(holochain_id, profile.inner().clone())
-    .await?
+    .get_or_launch_holochain(
+      holochain_id,
+      profile.inner().clone(),
+      bootstrap_server_url.inner().to_owned(),
+      signaling_server_url.inner().to_owned()
+    ).await?
     .update_app_ui(
       app_id.clone(),
       ResourceBytes::from(ui_zip_bytes),

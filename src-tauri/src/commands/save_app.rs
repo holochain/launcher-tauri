@@ -11,7 +11,7 @@ use hdk::prelude::{
   EntryHash, ExternIO, FunctionName, Serialize, Timestamp, ZomeCallUnsigned, ZomeName, Deserialize
 };
 
-use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile};
+use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile, BootstrapServerUrl, SignalingServerUrl};
 
 use super::get_app_info::WebAppInfo;
 
@@ -44,6 +44,8 @@ pub async fn fetch_and_save_app(
   window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
   profile: tauri::State<'_, Profile>,
+  bootstrap_server_url: tauri::State<'_, BootstrapServerUrl>,
+  signaling_server_url: tauri::State<'_, SignalingServerUrl>,
   holochain_id: HolochainId,
   appstore_app_id: String,
   app_title: String,
@@ -68,7 +70,12 @@ pub async fn fetch_and_save_app(
   let manager = mutex.get_running()?;
 
   let bytes = fetch_web_happ(
-      manager.get_or_launch_holochain(holochain_id, profile.inner().clone()).await?.app_interface_port(),
+      manager.get_or_launch_holochain(
+        holochain_id,
+        profile.inner().clone(),
+        bootstrap_server_url.inner().clone(),
+        signaling_server_url.inner().clone()
+      ).await?.app_interface_port(),
       &appstore_app_id,
       &appstore_pub_key,
       manager.get_lair_keystore_manager()?,

@@ -6,6 +6,8 @@ pub async fn initialize_keystore(
   state: tauri::State<'_, LauncherState>,
   profile: tauri::State<'_, Profile>,
   password: String,
+  bootstrap_server_url: Option<String>,
+  signaling_server_url: Option<String>,
 ) -> Result<(), String> {
   if window.label() != "admin" {
     return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (K)"))
@@ -18,7 +20,7 @@ pub async fn initialize_keystore(
   let manager = mutex.get_running()?;
 
   manager
-    .initialize_keystore_and_launch(password, profile.inner().clone())
+    .initialize_keystore_and_launch(password, profile.inner().clone(), bootstrap_server_url, signaling_server_url)
     .await?;
 
   Ok(())
@@ -30,6 +32,8 @@ pub async fn unlock_and_launch(
   state: tauri::State<'_, LauncherState>,
   profile: tauri::State<'_, Profile>,
   password: String,
+  bootstrap_server_url: Option<String>,
+  signaling_server_url: Option<String>,
 ) -> Result<(), String> {
   if window.label() != "admin" {
     return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (K)"))
@@ -38,7 +42,7 @@ pub async fn unlock_and_launch(
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
 
-  manager.launch_managers(password, profile.inner().clone()).await?;
+  manager.launch_managers(password, profile.inner().clone(), bootstrap_server_url, signaling_server_url).await?;
 
   Ok(())
 }

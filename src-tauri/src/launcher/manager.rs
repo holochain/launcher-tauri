@@ -19,6 +19,7 @@ use tauri::{CustomMenuItem, Menu, Submenu};
 use holochain_manager::versions::HolochainVersion;
 use holochain_web_app_manager::WebAppManager;
 
+use crate::{BootstrapServerUrl, SignalingServerUrl};
 use crate::file_system::{
   conductor_config_dir, holochain_version_data_dir, keystore_data_dir,
   profile_holochain_data_dir, profile_lair_dir, profile_config_dir, Profile, launcher_config_dir,
@@ -125,7 +126,13 @@ impl LauncherManager {
 
   /// Initializes a new keystore with the given password, then lanuches LairKeystoreManager, HolochainManager(s)
   /// and WebAppManager(s).
-  pub async fn initialize_keystore_and_launch(&mut self, password: String, profile: Profile) -> Result<(), String> {
+  pub async fn initialize_keystore_and_launch(
+    &mut self,
+    password: String,
+    profile: Profile,
+    bootstrap_server_url: BootstrapServerUrl,
+    signaling_server_url: SignalingServerUrl,
+  ) -> Result<(), String> {
 
     // emitting signal to the front-end for progress indication
     self.app_handle.get_window("admin").unwrap()
@@ -148,14 +155,20 @@ impl LauncherManager {
     // sleep for 300ms to prevent potential issue with DevHub's public key missing in lair keystore (https://github.com/holochain/launcher/issues/146)
     std::thread::sleep(std::time::Duration::from_millis(300));
 
-    self.launch_managers(password, profile).await?;
+    self.launch_managers(password, profile, bootstrap_server_url, signaling_server_url).await?;
 
     Ok(())
   }
 
 
   /// Launches LairKeystoreManager, HolochainManager(s) and WebAppManager(s).
-  pub async fn launch_managers(&mut self, password: String, profile: Profile) -> Result<(), String> {
+  pub async fn launch_managers(
+    &mut self,
+    password: String,
+    profile: Profile,
+    bootstrap_server_url: Option<String>,
+    signaling_server_url: Option<String>,
+  ) -> Result<(), String> {
 
     let keystore_path = keystore_data_dir(LairKeystoreManagerV0_2::lair_keystore_version(), profile.clone())
       .map_err(|e| format!("Failed to get keystore data dir: {}", e))?;
@@ -180,12 +193,12 @@ impl LauncherManager {
         .emit("progress-update", format!("Launching Holochain version {}", version.to_string()))
         .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
-      self.launch_holochain_manager(version, None, profile.clone()).await?;
+      self.launch_holochain_manager(version, None, profile.clone(), bootstrap_server_url.clone(), signaling_server_url.clone()).await?;
     }
 
     if let Some(path) = self.config.custom_binary_path.clone() {
       self
-        .launch_holochain_manager(HolochainVersion::custom(), Some(path), profile.clone())
+        .launch_holochain_manager(HolochainVersion::custom(), Some(path), profile.clone(), bootstrap_server_url, signaling_server_url)
         .await?;
     } else {
       // If no custom holochain binary is specified in launcher-config.yaml, remove the data associated to previous
@@ -209,6 +222,8 @@ impl LauncherManager {
     version: HolochainVersion,
     custom_binary_path: Option<String>,
     profile: Profile, // custom root path for config files etc.
+    bootstrap_server_url: Option<String>,
+    signaling_server_url: Option<String>,
   ) -> Result<(), String> {
     // If we are trying to launch Holochain from a custom binary path, but there is nothing in that path, error and exit immediately
     if let Some(path) = custom_binary_path.clone() {
@@ -262,13 +277,22 @@ impl LauncherManager {
       conductor_config_dir: conductor_config_path,
       environment_path,
       keystore_connection_url,
+      bootstrap_server_url: bootstrap_server_url.clone(),
+      signaling_server_url: signaling_server_url.clone(),
     };
 
     let version_str: String = version.into();
 
     let admin_window = self.app_handle.get_window("admin").unwrap();
 
-    let state = match WebAppManager::launch(version, config, self.app_handle.clone(), password).await {
+    let state = match WebAppManager::launch(
+      version,
+      config,
+      self.app_handle.clone(),
+      password,
+      bootstrap_server_url,
+      signaling_server_url,
+    ).await {
       Ok(mut manager) => match version.eq(&HolochainVersion::default()) {
         true => match install_default_apps_if_necessary(&mut manager, admin_window).await {
           Ok(()) => {
@@ -351,11 +375,13 @@ impl LauncherManager {
     &mut self,
     holochain_id: HolochainId,
     profile: String,
+    bootstrap_server_url: BootstrapServerUrl,
+    signaling_server_url: SignalingServerUrl,
   ) -> Result<&mut WebAppManager, String> {
     match holochain_id {
       HolochainId::HolochainVersion(version) => {
         if let None = self.holochain_managers.get(&version) {
-          self.launch_holochain_manager(version.clone(), None, profile).await?;
+          self.launch_holochain_manager(version.clone(), None, profile, bootstrap_server_url, signaling_server_url).await?;
         }
       }
       HolochainId::CustomBinary => {
@@ -367,7 +393,7 @@ impl LauncherManager {
 
         if let None = self.custom_binary_manager {
           self
-            .launch_holochain_manager(HolochainVersion::custom(), Some(path), profile)
+            .launch_holochain_manager(HolochainVersion::custom(), Some(path), profile, bootstrap_server_url, signaling_server_url)
             .await?;
         }
       }
@@ -490,7 +516,7 @@ impl LauncherManager {
 
 
     // TODO remove again
-    if app_id == &String::from("AppStore") {
+    if app_id == &String::from("AppStore Admin") {
       window_builder = window_builder.initialization_script("window.localStorage.setItem('DNAREPO_DNA_HASH', 'uhC0k_9lMIJLbiHk8dRoLxqDv_ipPdMSh900TOaTlZaykDmflcK4p'); window.localStorage.setItem('HAPPS_DNA_HASH', 'uhC0kco40cQ_lAEoz_rNB8ruwhPlAlmzLpL5H18dEohyUSXldWSiX');")
     }
 

@@ -37,6 +37,8 @@ impl HolochainManager {
     version: HolochainVersion,
     config: LaunchHolochainConfig,
     password: String,
+    bootstrap_server_url: Option<String>,
+    signaling_server_url: Option<String>,
   ) -> Result<Self, LaunchHolochainError> {
     let conductor_config_path = config.conductor_config_dir.join("conductor-config.yaml");
     create_dir_if_necessary(&config.conductor_config_dir)?;
@@ -52,12 +54,16 @@ impl HolochainManager {
           current_config_str,
           config.admin_port,
           config.keystore_connection_url.clone(),
-        )
+          bootstrap_server_url,
+          signaling_server_url,
+        ).map_err(|e| LaunchHolochainError::FailedToOverwriteConfig(e))?
       }
       false => version_manager.initial_config(
         config.admin_port,
         config.environment_path.clone(),
         config.keystore_connection_url.clone(),
+        bootstrap_server_url,
+        signaling_server_url,
       ),
     };
 

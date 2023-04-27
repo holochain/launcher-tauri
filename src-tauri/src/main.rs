@@ -61,6 +61,9 @@ use crate::setup::logs::setup_logs;
 use crate::system_tray::handle_system_tray_event;
 use crate::file_system::Profile;
 
+pub type BootstrapServerUrl = Option<String>;
+pub type SignalingServerUrl = Option<String>;
+
 
 
 fn main() {
@@ -134,6 +137,11 @@ fn main() {
       let local_storage_path = profile_tauri_dir(profile.clone())?;
 
       app.manage(profile.clone());
+
+      let bootstrap_server_url: BootstrapServerUrl = None;
+      let signaling_server_url: SignalingServerUrl = None;
+      app.manage(bootstrap_server_url);
+      app.manage(signaling_server_url);
 
       if let Err(err) = setup_logs(profile.clone()) {
         println!("Error setting up the logs: {:?}", err);

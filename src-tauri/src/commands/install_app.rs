@@ -6,13 +6,15 @@ use holochain_manager::versions::{
 };
 use std::{collections::HashMap, fs, sync::Arc};
 
-use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile};
+use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile, BootstrapServerUrl, SignalingServerUrl};
 
 #[tauri::command]
 pub async fn install_app(
   window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
   profile: tauri::State<'_, Profile>,
+  bootstrap_server_url: tauri::State<'_, BootstrapServerUrl>,
+  signaling_server_url: tauri::State<'_, SignalingServerUrl>,
   holochain_id: HolochainId,
   app_id: String,
   app_bundle_path: String,
@@ -44,8 +46,12 @@ pub async fn install_app(
   match WebAppBundle::decode(&bytes) {
     Ok(web_app_bundle) => {
       manager
-        .get_or_launch_holochain(holochain_id, profile.inner().clone())
-        .await?
+        .get_or_launch_holochain(
+          holochain_id,
+          profile.inner().clone(),
+          bootstrap_server_url.inner().clone(),
+          signaling_server_url.inner().clone()
+        ).await?
         .install_web_app(
           app_id.clone(),
           web_app_bundle,
@@ -60,8 +66,12 @@ pub async fn install_app(
     Err(_) => {
       let app_bundle = AppBundle::decode(&bytes).or(Err("Failed to read Web hApp bundle file"))?;
       manager
-        .get_or_launch_holochain(holochain_id, profile.inner().clone())
-        .await?
+        .get_or_launch_holochain(
+          holochain_id,
+          profile.inner().clone(),
+          bootstrap_server_url.inner().clone(),
+          signaling_server_url.inner().clone(),
+        ).await?
         .install_app(
           app_id.clone(),
           app_bundle,
