@@ -16,11 +16,11 @@ categories = ["command-line-utilities", "development-tools"]
 # NEW_VERSION update holochain dependencies
 holochain_client = "0.4.0"
 
-holochain_conductor_api = "0.2.0-beta-rc.6"
-holochain_types = "0.2.0-beta-rc.6"
-holochain_zome_types = "0.2.0-beta-rc.5"
+holochain_conductor_api = "0.2.0-beta-rc.7"
+holochain_types = "0.2.0-beta-rc.7"
+holochain_zome_types = "0.2.0-beta-rc.6"
 
-lair_keystore_api = "0.2.3"
+lair_keystore_api = "0.2.4"
 
 
 log = "0.4.14"
