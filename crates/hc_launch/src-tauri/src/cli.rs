@@ -104,6 +104,14 @@ impl HcLaunch {
       _ => (),
     }
 
+    match self.create.in_process_lair {
+      true => {
+        eprintln!("[hc launch] ERROR: The --in-process-lair flag is only supported by hc sandbox but not by hc launch.");
+        panic!("ERROR: The --in-process-lair flag is only supported by hc sandbox but not by hc launch.");
+      },
+      _ => (),
+    }
+
     if let Some(_port) = self.ui_port {
       println!("\n[hc launch] ------ WARNING ------");
       println!(r#"[hc launch] You are running hc launch pointing to a localhost server. This is meant for development purposes
