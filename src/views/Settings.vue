@@ -37,7 +37,7 @@
       style="height: 42px; margin-left: 11px"
     />
     <span style="font-size: 1.5em; margin-left: 13px">{{
-      $t("main.installedApps")
+      $t("main.settings")
     }}</span>
     <span style="display: flex; flex: 1"></span>
     <HCButton

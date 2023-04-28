@@ -86,7 +86,6 @@
       v-else-if="
         !$store.getters['oldFiles'] && !$store.getters[`databaseFileTypeError`]
       "
-      style="display: flex; flex: 1"
     ></Home>
     <About></About>
     <Config></Config>
@@ -231,11 +230,12 @@ body,
   flex: 1;
 }
 .flex-scrollable-container {
-  position: absolute;
+  width: 100%;
+  /* position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 0; */
 }
 .flex-scrollable-x {
   max-width: 100%;

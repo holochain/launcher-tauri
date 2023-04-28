@@ -2,12 +2,12 @@
   <HCLoading ref="downloading" :text="loadingText" />
 
   <div class="row center-content top-bar" style="position: sticky; top: 0; z-index: 1; width: 100%;">
-    <mwc-icon-button
+    <!-- <mwc-icon-button
       icon="arrow_back"
       @click="$emit('go-back')"
       :title="$t('buttons.back')"
       style="margin-left: 8px;"
-    ></mwc-icon-button>
+    ></mwc-icon-button> -->
 
     <span
       style="
@@ -42,7 +42,6 @@
       </div>
     </HCButton>
   </div>
-
 
   <div v-if="loading" class="column center-content" style="flex: 1; min-height: calc(100vh - 64px);">
     <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
