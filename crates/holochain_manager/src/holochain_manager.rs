@@ -6,7 +6,7 @@ use std::{fs, time::Duration};
 
 // NEW_VERSION change holochain_types version
 use holochain_client::{AdminWebsocket, AgentPubKey, AppInfo, InstallAppPayload};
-use holochain_types_0_2_0_rc7::prelude::{AppBundleSource, CellId, DisableCloneCellPayload, CloneCellId};
+use holochain_types_0_2_0::prelude::{AppBundleSource, CellId, DisableCloneCellPayload, CloneCellId};
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
 
