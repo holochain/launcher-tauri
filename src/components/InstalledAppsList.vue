@@ -702,7 +702,7 @@ export default defineComponent({
             appId: this.selectedApp!.webAppInfo.installed_app_info.installed_app_id,
             uiZipBytes: bytes,
             guiReleaseInfo: {
-              hrl: hrlToHrlB64(this.selectedApp!.guiUpdateAvailable!),
+              resource_locator: hrlToHrlB64(this.selectedApp!.guiUpdateAvailable!),
               version: this.selectedGuiUpdate?.version,
             },
           });
