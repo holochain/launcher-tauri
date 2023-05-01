@@ -125,12 +125,12 @@ export type WebUiInfo =
     };
 
 
-export interface Hrl {
+export interface ResourceLocator {
   dna_hash: DnaHash,
   resource_hash: AnyDhtHash,
 }
 
-export interface HrlB64 {
+export interface ResourceLocatorB64 {
   dna_hash: DnaHashB64,
   resource_hash: AnyDhtHashB64,
 }
@@ -151,7 +151,7 @@ export interface HolochainAppInfoExtended {
   webAppInfo: InstalledWebAppInfo;
   holochainId: HolochainId;
   holochainVersion: HolochainVersion;
-  guiUpdateAvailable: Hrl | undefined; // gui release entry hash if there is known to be a new gui release available in the DevHub
+  guiUpdateAvailable: ResourceLocator | undefined; // gui release entry hash if there is known to be a new gui release available in the DevHub
 }
 
 
@@ -178,6 +178,6 @@ export interface ReleaseData {
 }
 
 export interface ReleaseInfo {
-  hrl: HrlB64,
+  resource_locator: ResourceLocatorB64,
   version: string | undefined,
 }

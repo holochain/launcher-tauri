@@ -1,5 +1,5 @@
 use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile};
-use holochain_web_app_manager::{HrlB64, ReleaseInfo};
+use holochain_web_app_manager::ReleaseInfo;
 use mr_bundle::ResourceBytes;
 
 #[tauri::command]

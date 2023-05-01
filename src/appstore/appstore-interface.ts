@@ -1,8 +1,7 @@
-import { AgentPubKey, AppInfo, AppWebsocket, decodeHashFromBase64, DnaHash, DnaHashB64, encodeHashToBase64, EntryHash } from "@holochain/client";
+import { AgentPubKey, AppInfo, AppWebsocket, DnaHash, encodeHashToBase64, EntryHash } from "@holochain/client";
 import { getCellId } from "../utils";
 import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry, GUIReleaseEntry, FilePackage, HostAvailability, PublisherEntry } from "./types";
-import { Hrl } from "../types";
-import { DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../constants";
+import { ResourceLocator } from "../types";
 
 
 
@@ -211,7 +210,7 @@ async function getHappReleaseFromHost (
 export async function getHappReleases(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
-  forHapp: Hrl,
+  forHapp: ResourceLocator,
 ): Promise<Array<Entity<HappReleaseEntry>>> {
 
   // console.log("@getHappReleases: trying to get host.");
@@ -248,7 +247,7 @@ async function getHappReleasesFromHost (
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   host: AgentPubKey,
-  forHapp: Hrl,
+  forHapp: ResourceLocator,
 ): Promise<Array<Entity<HappReleaseEntry>>> {
 
   const input: CustomRemoteCallInput = {
@@ -298,7 +297,7 @@ async function getHappReleasesFromHost (
 export async function fetchGuiReleaseEntry(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
-  guiReleaseHrl: Hrl,
+  guiReleaseHrl: ResourceLocator,
 ) {
 
   const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
@@ -359,8 +358,8 @@ export async function fetchWebHapp(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   name: string,
-  happReleaseHrl: Hrl,
-  guiReleaseHrl: Hrl,
+  happReleaseHrl: ResourceLocator,
+  guiReleaseHrl: ResourceLocator,
 ): Promise<Uint8Array> {
 
   const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
@@ -414,7 +413,8 @@ export async function fetchWebHapp(
 export async function fetchGui(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
-  webAssetHrl: Hrl,
+  devhubDna: DnaHash,
+  guiReleaseHash: EntryHash,
 ): Promise<Uint8Array | undefined> {
 
   const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
@@ -425,22 +425,20 @@ export async function fetchGui(
     const host: AgentPubKey = await getAvailableHostForZomeFunction(
       appWebsocket,
       appStoreApp,
-      webAssetHrl.dna_hash,
+      devhubDna,
       "happ_library",
       "get_webasset",
     );
-
-    console.log("### @fetchGui: dna hash: ", encodeHashToBase64(webAssetHrl.dna_hash));
 
 
     const input: CustomRemoteCallInput = {
       host,
       call: {
-        dna: webAssetHrl.dna_hash,
+        dna: devhubDna,
         zome: "happ_library",
         function: "get_webasset",
         payload: {
-          id: webAssetHrl.resource_hash,
+          id: guiReleaseHash,
         },
       }
     }

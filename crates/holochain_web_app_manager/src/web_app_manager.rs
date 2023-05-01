@@ -29,21 +29,25 @@ use crate::{
 
 
 
+//// NOTE: This is not necessarily an HRL. For example UI's stored on the
+/// DevHub need to be accessed via the `happs` cell despite being actually
+/// stored in the `web_assets` cell. The DevHub is making a bridge call
+/// internally.
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct Hrl {
+pub struct ResourceLocator {
     dna_hash: DnaHash,
     resource_hash: AnyDhtHash,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct HrlB64 {
+pub struct ResourceLocatorB64 {
     dna_hash: DnaHashB64,
     resource_hash: AnyDhtHashB64,
 }
 
-impl Into<Hrl> for HrlB64 {
-  fn into(self) -> Hrl {
-    Hrl {
+impl Into<ResourceLocator> for ResourceLocatorB64 {
+  fn into(self) -> ResourceLocator {
+    ResourceLocator {
       dna_hash: DnaHash::from(self.dna_hash),
       resource_hash: AnyDhtHash::from(self.resource_hash),
     }
@@ -52,7 +56,7 @@ impl Into<Hrl> for HrlB64 {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ReleaseInfo {
-  hrl: HrlB64,
+  resource_locator: ResourceLocatorB64,
   version: Option<String>,
 }
 
@@ -550,7 +554,7 @@ impl WebAppManager {
     // if there is already a .guirelease file, store its contents to a .guirelease.previous file in order to be able
     // to revert upgrades if necessary
     if dot_guirelease_path.exists() {
-      let dot_guirelease_dot_previous_path = app_data_dir(&self.environment_path, app_id).join(".guirelease.previous");
+      let dot_guirelease_dot_previous_path = app_gui_dir.join(".guirelease.previous");
 
       std::fs::rename(dot_guirelease_path.clone(), dot_guirelease_dot_previous_path)
         .map_err(|e| format!("Failed to rename .guirelease file to .guirelease.previous file: {:?}", e))?;

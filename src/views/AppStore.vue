@@ -157,7 +157,7 @@ import HCLoading from "../components/subcomponents/HCLoading.vue";
 import HCDialog from "../components/subcomponents/HCDialog.vue";
 import SelectReleaseDialog from "../components/SelectReleaseDialog.vue";
 
-import { HolochainId, Hrl, ReleaseData, ReleaseInfo } from "../types";
+import { HolochainId, ResourceLocator, ReleaseData, ReleaseInfo } from "../types";
 import prettyBytes from "pretty-bytes";
 import { getCellId } from "../utils";
 import { i18n } from "../locale";
@@ -378,14 +378,14 @@ export default defineComponent({
       const guiReleaseHash = releaseInfo.happRelease.content.official_gui;
 
       this.selectedHappReleaseInfo = {
-        hrl: {
+        resource_locator: {
           dna_hash: encodeHashToBase64(releaseInfo.devhubDnaHash),
           resource_hash: encodeHashToBase64(happReleaseHash),
         },
         version: releaseInfo.happRelease.content.version,
       };
       this.selectedGuiReleaseInfo = guiReleaseHash ? {
-        hrl: {
+        resource_locator: {
           dna_hash: encodeHashToBase64(releaseInfo.devhubDnaHash),
           resource_hash: encodeHashToBase64(guiReleaseHash),
         },

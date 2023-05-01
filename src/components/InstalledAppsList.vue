@@ -303,7 +303,7 @@ import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
 
-import { HolochainAppInfo, HolochainAppInfoExtended, Hrl, StorageInfo } from "../types";
+import { HolochainAppInfo, HolochainAppInfoExtended, ResourceLocator, StorageInfo } from "../types";
 import { getCellId, isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
 import HCSelectCard from "./subcomponents/HCSelectCard.vue";
@@ -353,7 +353,7 @@ export default defineComponent({
     extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> | undefined;
     selectedApp: HolochainAppInfoExtended | undefined;
     selectedGuiUpdate: GUIReleaseEntry | undefined;
-    selectedGuiUpdateHrl: Hrl | undefined;
+    selectedGuiUpdateLocator: ResourceLocator | undefined;
     loadingText: string;
     errorText: string;
   } {
@@ -376,7 +376,7 @@ export default defineComponent({
       extendedAppInfos: undefined,
       selectedApp: undefined,
       selectedGuiUpdate: undefined,
-      selectedGuiUpdateHrl: undefined,
+      selectedGuiUpdateLocator: undefined,
       loadingText: "",
       errorText: "Unknown error occured",
     };
@@ -509,7 +509,7 @@ export default defineComponent({
       const updatableAppsByHrlDna: Record<DnaHashB64, HolochainAppInfo[]> = {};
 
       updatableApps.forEach((app) => {
-        const dnaHash = app.webAppInfo.happ_release_info!.hrl.dna_hash;
+        const dnaHash = app.webAppInfo.happ_release_info!.resource_locator.dna_hash;
         const apps = updatableAppsByHrlDna[dnaHash];
 
         if (apps) {
@@ -520,8 +520,8 @@ export default defineComponent({
       });
 
       await Promise.allSettled(Object.values(updatableAppsByHrlDna).map(async (apps) => {
-        const entryHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.hrl.resource_hash));
-        const devHubDnaHash = decodeHashFromBase64(apps[0].webAppInfo.happ_release_info!.hrl.dna_hash);
+        const entryHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator.resource_hash));
+        const devHubDnaHash = decodeHashFromBase64(apps[0].webAppInfo.happ_release_info!.resource_locator.dna_hash);
 
         try {
           console.log("@checkForUiPudates: entryHashes: ", entryHashes.map((eh) => encodeHashToBase64(eh)));
@@ -535,7 +535,7 @@ export default defineComponent({
             // if it's installed as a webapp and the happ release has an official GUI, check whether it's a new GUI
             if (app.webAppInfo.web_uis.default.type === "WebApp" && happReleases[idx]?.official_gui) {
               const guiReleaseInfo = app.webAppInfo.web_uis.default.gui_release_info;
-              const guiReleaseHash = app.webAppInfo.web_uis.default.gui_release_info?.hrl.resource_hash;
+              const guiReleaseHash = app.webAppInfo.web_uis.default.gui_release_info?.resource_locator.resource_hash;
               console.log("guiReleaseHash: ", guiReleaseHash);
               if (guiReleaseInfo && guiReleaseHash) {
                 if(guiReleaseHash != encodeHashToBase64(happReleases[idx]!.official_gui!)) {
@@ -607,12 +607,12 @@ export default defineComponent({
         const guiReleaseResponse = await fetchGuiReleaseEntry(this.appWebsocket as AppWebsocket, this.appstoreAppInfo, app.guiUpdateAvailable!);
 
         this.selectedGuiUpdate = guiReleaseResponse.content;
-        this.selectedGuiUpdateHrl = app.guiUpdateAvailable;
+        this.selectedGuiUpdateLocator = app.guiUpdateAvailable;
         console.log("Got GUI Release: ", guiReleaseResponse.content);
       } else {
         alert!("Error: AppWebsocket or Appstore AppInfo undefined.")
         this.selectedGuiUpdate = undefined;
-        this.selectedGuiUpdateHrl = undefined;
+        this.selectedGuiUpdateLocator = undefined;
       }
     },
     storageFractions(holochainVersion: string) {
@@ -678,15 +678,12 @@ export default defineComponent({
 
       let bytes = undefined;
 
-      console.log("#### @updateGui: selegtedGuiUpdate: ", this.selectedGuiUpdate);
-      console.log("#### @updateGui: selectedGuiUpdateHrl: ", hrlToHrlB64(this.selectedGuiUpdateHrl!));
-      console.log("#### @updateGui: selectedGuiUpdateHrl: ", this.selectedGuiUpdateHrl!);
-
       try {
         bytes = await fetchGui(
           this.appWebsocket! as AppWebsocket,
           this.appstoreAppInfo!,
-          this.selectedGuiUpdateHrl!,
+          this.selectedGuiUpdateLocator!.dna_hash,
+          this.selectedGuiUpdate!.web_asset_id,
         );
       } catch (e) {
         console.error("Error fetching the UI: ", e);
@@ -713,7 +710,7 @@ export default defineComponent({
           (this.$refs.downloading as typeof HCLoading).close();
           (this.$refs.updateGuiDialog as typeof HCGenericDialog).close();
           this.selectedGuiUpdate = undefined;
-          this.selectedGuiUpdateHrl = undefined;
+          this.selectedGuiUpdateLocator = undefined;
 
           // to remove the update button:
           await this.$store.dispatch(ActionTypes.fetchStateInfo);
