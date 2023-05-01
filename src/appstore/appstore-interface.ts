@@ -125,7 +125,7 @@ export async function getHappReleasesByEntryHashes(
   // make zome calls for each EntryHash to this one host
   const happReleases = await Promise.all(happReleaseEntryHashes.map( async (entryHash) => {
     if (entryHash) {
-      return getHappReleaseFromHost(appWebsocket, appStoreApp, host, DEVHUB_HAPP_LIBRARY_DNA_HASH, entryHash);
+      return getHappReleaseFromHost(appWebsocket, appStoreApp, devhubDna, host, entryHash);
     } else {
       return undefined;
     }
@@ -158,6 +158,8 @@ async function getHappReleaseFromHost (
   entryHash: EntryHash, // EntryHash of the HappReleaseEntry
 ): Promise<Entity<HappReleaseEntry>> {
 
+  console.log("@getHappReleaseFromHost: got host: ", encodeHashToBase64(host));
+
   const input: CustomRemoteCallInput = {
     host,
     call: {
@@ -189,6 +191,9 @@ async function getHappReleaseFromHost (
       payload: input,
       provenance: getCellId(portalCell)![1],
     });
+
+    console.log("@getHappReleaseFromHost: happReleaseResponse: ", happReleaseResponse);
+
 
     // maybe it needs to be entity.payload.content instead...
     return happReleaseResponse.payload.payload;
@@ -425,6 +430,8 @@ export async function fetchGui(
       "get_webasset",
     );
 
+    console.log("### @fetchGui: dna hash: ", encodeHashToBase64(webAssetHrl.dna_hash));
+
 
     const input: CustomRemoteCallInput = {
       host,
@@ -450,10 +457,10 @@ export async function fetchGui(
       if (response.payload.type === "success") {
         return response.payload.payload.content.bytes;
       } else {
-        return Promise.reject(`Failed to fetch UI: ${response.payload.payload}`);
+        return Promise.reject(`Failed to fetch UI: ${JSON.stringify(response.payload.payload)}`);
       }
     } else {
-      return Promise.reject(`Failed to fetch UI: ${response.payload}`);
+      return Promise.reject(`Failed to fetch UI: ${JSON.stringify(response.payload)}`);
     }
   }
 }
