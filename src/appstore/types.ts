@@ -1,4 +1,5 @@
 import { ActionHash, AgentPubKey, DnaHash, EntryHash, ZomeCallCapGrant } from "@holochain/client"
+import { Hrl } from "../types";
 
 
 export interface Entity<T> {
@@ -126,9 +127,9 @@ export interface DnaReference {
 export interface GUIReleaseEntry {
   version: string,
   changelog: string,
-  for_gui: EntryHash,
-  for_happ_releases: Array<EntryHash>,
-  web_asset_id: EntryHash,
+  for_gui: Hrl,
+  for_happ_releases: Array<Hrl>,
+  web_asset_hrl: Hrl,
   published_at: number,
   last_updated: number,
   metadata: Record<string, any>,

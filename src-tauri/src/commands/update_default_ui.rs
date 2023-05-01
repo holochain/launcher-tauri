@@ -1,4 +1,5 @@
 use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile};
+use holochain_web_app_manager::{HrlB64, ReleaseInfo};
 use mr_bundle::ResourceBytes;
 
 #[tauri::command]
@@ -9,7 +10,7 @@ pub async fn update_default_ui(
   holochain_id: HolochainId,
   app_id: String,
   ui_zip_bytes: Vec<u8>,
-  gui_release_hash: Option<String>,
+  gui_release_info: Option<ReleaseInfo>,
 ) -> Result<(), String> {
   if window.label() != "admin" {
     return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (Q)"))
@@ -18,7 +19,7 @@ pub async fn update_default_ui(
   let default_ui_name = String::from("default");
 
   log::info!("Installing: New UI for app '{}'", &app_id);
-  if gui_release_hash == None {
+  if gui_release_info.is_none() {
     log::warn!("WARNING: No GUI release hash passed to update_ui command. Automatically checking for updates will not work for this UI.");
   }
 
@@ -32,7 +33,7 @@ pub async fn update_default_ui(
       app_id.clone(),
       ResourceBytes::from(ui_zip_bytes),
       &default_ui_name,
-      gui_release_hash,
+      gui_release_info,
     )?;
 
   log::info!("Installed new UI for app '{}'", app_id);

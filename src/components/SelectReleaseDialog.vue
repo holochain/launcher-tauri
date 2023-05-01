@@ -66,19 +66,19 @@
           Available Releases:
         </div>
 
-        <div v-if="releaseInfos && releaseInfos.length > 0">
+        <div v-if="releaseDatas && releaseDatas.length > 0">
           <div class="column card">
             <div style="text-align: right; font-weight: 600">latest Release</div>
 
             <div class="row" style="align-items: flex-end;">
               <div class="column">
-                <div><span style="font-weight: 600;">hApp version:</span> {{ releaseInfos[0].happRelease.content.version }}</div>
-                <div><span style="font-weight: 600;">UI version: </span>{{ releaseInfos[0].guiRelease? releaseInfos[0].guiRelease.content.version : "no official UI" }}</div>
+                <div><span style="font-weight: 600;">hApp version:</span> {{ releaseDatas[0].happRelease.content.version }}</div>
+                <div><span style="font-weight: 600;">UI version: </span>{{ releaseDatas[0].guiRelease? releaseDatas[0].guiRelease.content.version : "no official UI" }}</div>
                 <!-- GUI version as well here? Needs to be fetched independently from a DevHub host -->
               </div>
               <span style="display: flex; flex: 1;"></span>
               <HCButton @click="() => {
-                $emit('release-selected', releaseInfos ? releaseInfos[0] : undefined);
+                $emit('release-selected', releaseDatas ? releaseDatas[0] : undefined);
                 close();
               }">Install</HCButton>
             </div>
@@ -109,24 +109,24 @@
           </div>
 
           <div v-show="showAdvanced" class="column" style="align-items: center; width: 100%;">
-            <div v-if="releaseInfos.length < 2" style="text-align: center;">
+            <div v-if="releaseDatas.length < 2" style="text-align: center;">
               No older releases available for this app.
             </div>
             <div v-else>
               <div
-                v-for="(releaseInfo) of releaseInfos.slice(1)"
-                :key="releaseInfo.happRelease.content.version"
+                v-for="(releaseData) of releaseDatas.slice(1)"
+                :key="releaseData.happRelease.content.version"
                 class="row card"
                 style="align-items: flex-end; padding-top: 15px;"
               >
                 <div class="column">
-                  <div><span style="font-weight: 600;">hApp version:</span> {{ releaseInfo.happRelease.content.version }}</div>
-                  <div><span style="font-weight: 600;">UI version: </span>{{ releaseInfo.guiRelease? releaseInfo.guiRelease.content.version : "no official UI" }}</div>
+                  <div><span style="font-weight: 600;">hApp version:</span> {{ releaseData.happRelease.content.version }}</div>
+                  <div><span style="font-weight: 600;">UI version: </span>{{ releaseData.guiRelease? releaseData.guiRelease.content.version : "no official UI" }}</div>
                   <!-- GUI version as well here? Needs to be fetched independently from a DevHub host -->
                 </div>
                 <span style="display: flex; flex: 1;"></span>
                 <HCButton @click="() => {
-                  $emit('release-selected', releaseInfos ? releaseInfos[0] : undefined);
+                  $emit('release-selected', releaseDatas ? releaseDatas[0] : undefined);
                   close();
                 }">Install</HCButton>
               </div>
@@ -135,13 +135,13 @@
           </div>
         </div>
 
-        <div v-else-if="releaseInfos && releaseInfos.length < 1" style="text-align: center;">
+        <div v-else-if="releaseDatas && releaseDatas.length < 1" style="text-align: center;">
           There are no installable releases available for this app.
         </div>
 
-        <div v-else-if="getReleaseInfosError" style="background: #f4b2b2; padding: 5px 10px; border-radius: 5px; width: 610px;">
+        <div v-else-if="getReleaseDatasError" style="background: #f4b2b2; padding: 5px 10px; border-radius: 5px; width: 610px;">
           <b>Error getting releases from peer host:</b><br>
-          {{ getReleaseInfosError }}
+          {{ getReleaseDatasError }}
         </div>
 
         <div v-else class="column" style="align-items: center; width: 100%;">
@@ -178,7 +178,7 @@ import HCButton from "./subcomponents/HCButton.vue";
 import HCDialog from "./subcomponents/HCDialog.vue";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 
-import { ReleaseInfo } from "../types";
+import { Hrl, ReleaseData } from "../types";
 import { AppEntry, Entity, HappReleaseEntry, PublisherEntry } from "../appstore/types";
 import { AppWebsocket } from "@holochain/client";
 import { APPSTORE_APP_ID } from "../constants";
@@ -211,8 +211,8 @@ export default defineComponent({
     error: boolean;
     publisher: PublisherEntry | undefined;
     locale: string;
-    releaseInfos: Array<ReleaseInfo> | undefined;
-    getReleaseInfosError: string | undefined;
+    releaseDatas: Array<ReleaseData> | undefined;
+    getReleaseDatasError: string | undefined;
   } {
     return {
       showAdvanced: false,
@@ -220,8 +220,8 @@ export default defineComponent({
       error: false,
       publisher: undefined,
       locale: "en-US",
-      releaseInfos: undefined,
-      getReleaseInfosError: undefined,
+      releaseDatas: undefined,
+      getReleaseDatasError: undefined,
     };
   },
   mounted () {
@@ -229,7 +229,7 @@ export default defineComponent({
     this.locale =  customLocale ? customLocale : navigator.language;
   },
   methods: {
-    async getReleaseInfos(): Promise<void> {
+    async getReleaseDatas(): Promise<void> {
 
       const appStoreInfo = await this.appWebsocket!.appInfo({
         installed_app_id: APPSTORE_APP_ID,
@@ -237,54 +237,66 @@ export default defineComponent({
 
       let happReleases: Array<Entity<HappReleaseEntry>> | undefined = undefined;
 
+      const happHrl: Hrl = {
+        dna_hash: this.app.devhub_address.dna,
+        resource_hash:  this.app.devhub_address.happ,
+      }
+
+      const devHubDnaHash = this.app.devhub_address.dna;
+
       try {
-        happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, this.app.devhub_address.happ)
+        happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, happHrl)
       } catch (e) {
-        this.getReleaseInfosError = `Failed to find available releases: ${JSON.stringify(e)}`;
+        this.getReleaseDatasError = `Failed to find available releases: ${JSON.stringify(e)}`;
         console.error(`Failed to find available releases: ${JSON.stringify(e)}`)
         return;
       }
 
       if (!happReleases) {
-        this.getReleaseInfosError = `Failed to find available releases: happReleases undefined.`;
+        this.getReleaseDatasError = `Failed to find available releases: happReleases undefined.`;
         return;
       }
 
       // this.selectedHappReleases = happReleases.map((entity) => entity.content).sort((a, b) => b.last_updated - a.last_updated);
-      let releaseInfos: Array<ReleaseInfo> = [];
+      let releaseDatas: Array<ReleaseData> = [];
 
-      console.log("@getReleaseInfos: fetching gui release entries...");
+      console.log("@getReleaseDatas: fetching gui release entries...");
 
       try {
         await Promise.all(happReleases.map(
           async (happReleaseEntity) => {
-            let releaseInfo: ReleaseInfo = {
+            let releaseData: ReleaseData = {
+              devhubDnaHash: devHubDnaHash,
               happRelease: happReleaseEntity,
               guiRelease: undefined,
             };
 
             const guiReleaseHash = happReleaseEntity.content.official_gui;
             if (guiReleaseHash) {
-              const guiReleaseEntry = await fetchGuiReleaseEntry(this.appWebsocket as AppWebsocket, appStoreInfo, guiReleaseHash);
-              releaseInfo.guiRelease = guiReleaseEntry;
+              const guiHrl: Hrl = {
+                dna_hash: devHubDnaHash,
+                resource_hash: guiReleaseHash,
+              };
+              const guiReleaseEntry = await fetchGuiReleaseEntry(this.appWebsocket as AppWebsocket, appStoreInfo, guiHrl);
+              releaseData.guiRelease = guiReleaseEntry;
             }
 
-            releaseInfos.push(releaseInfo);
+            releaseDatas.push(releaseData);
           })
         );
       } catch (e) {
         if (JSON.stringify(e).includes("No available peer host found")) {
-          this.getReleaseInfosError = "No available peer host found.";
+          this.getReleaseDatasError = "No available peer host found.";
           return;
         } else {
-          this.getReleaseInfosError = `Failed to find available releases: ${JSON.stringify(e)}`;
+          this.getReleaseDatasError = `Failed to find available releases: ${JSON.stringify(e)}`;
           console.error(`Failed to find available releases: ${JSON.stringify(e)}`)
           return;
         }
       }
 
-      this.releaseInfos = releaseInfos.sort((a, b) => b.happRelease.content.published_at - a.happRelease.content.published_at);
-      this.getReleaseInfosError = undefined;
+      this.releaseDatas = releaseDatas.sort((a, b) => b.happRelease.content.published_at - a.happRelease.content.published_at);
+      this.getReleaseDatasError = undefined;
     },
     async open() {
       (this.$refs.dialog as typeof HCDialog).open();
@@ -302,7 +314,7 @@ export default defineComponent({
         console.error(`Failed to get publisher info: ${JSON.stringify(e)}`)
       }
 
-      await this.getReleaseInfos();
+      await this.getReleaseDatas();
 
     },
     close() {
