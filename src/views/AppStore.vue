@@ -324,7 +324,9 @@ export default defineComponent({
       console.log("@fetchApps: allApps: ", allApps);
 
       // filter by apps of the relevant DevHub dna hash
-      this.installableApps = allApps.filter((appEntry) => JSON.stringify(appEntry.devhub_address.dna) === JSON.stringify(DEVHUB_HAPP_LIBRARY_DNA_HASH));
+      // this.installableApps = allApps.filter((appEntry) => JSON.stringify(appEntry.devhub_address.dna) === JSON.stringify(DEVHUB_HAPP_LIBRARY_DNA_HASH));
+
+      this.installableApps = allApps;
 
       this.loading = false;
 
