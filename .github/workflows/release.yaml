@@ -101,7 +101,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_0_2 }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
         with:
@@ -115,11 +115,6 @@ jobs:
       - name: build and sign the app (Windows only)
         if: matrix.platform == 'windows-2019'
         run: |
-
-          # attempting to fix 'LINK : fatal error LNK1181: cannot open input file 'sqlite3.lib'': https://github.com/rusqlite/rusqlite#notes-on-building-rusqlite-and-libsqlite3-sys
-          # vcpkg install sqlite3:x64-windows
-
-          # set VCPKGRS_DYNAMIC=1
 
           npm run build -- --verbose
 
@@ -147,7 +142,7 @@ jobs:
           CertUtil -hashfile "D:\a\launcher\launcher\target\release\bundle/msi/Holochain Launcher Beta 2_0.9.996_x64_en-US.msi.zip.sig" SHA256
 
         env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_0_2 }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
 
