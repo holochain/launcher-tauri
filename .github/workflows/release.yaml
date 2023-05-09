@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [windows-2019, macos-10.15, ubuntu-20.04]
+        platform: [macos-11]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -51,7 +51,7 @@ jobs:
 
 
       - name: setup binaries (macos only)
-        if: matrix.platform == 'macos-10.15'
+        if: matrix.platform == 'macos-11'
         run: |
           mkdir src-tauri/bins
 
@@ -91,7 +91,7 @@ jobs:
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
       - name: build the app (macOS and Linux only)
-        if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'macos-10.15'
+        if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'macos-11'
         uses: tauri-apps/tauri-action@dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
