@@ -24,14 +24,14 @@ anyhow = "1.0"
 futures = "0.3"
 
 holochain_client = { git = "https://github.com/holochain/holochain-client-rust" , branch = "holochain-0.1.5-beta-rc.0" }
-holochain_cli_sandbox = "0.1.5-beta-rc.0"
+holochain_cli_sandbox = "0.1.5-beta-rc.1"
 holochain_launcher_utils = { path = "../../holochain_launcher_utils" }
-holochain_types = "0.1.5-beta-rc.0"
+holochain_types = "0.1.5-beta-rc.1"
 holochain_util = { version="0.1.1-beta-rc.0", features = [ "pw" ] }
-holochain_zome_types = "0.1.3-beta-rc.0"
-holochain_conductor_api = "0.1.5-beta-rc.0"
+holochain_zome_types = "0.1.3-beta-rc.1"
+holochain_conductor_api = "0.1.5-beta-rc.1"
 
-holochain = "0.1.5-beta-rc.0"
+holochain = "0.1.5-beta-rc.1"
 
 
 lair_keystore_api = "0.2.3"
