@@ -4,6 +4,7 @@ use holochain_manager::versions::{
     web_app::WebAppBundle,
   },
 };
+use holochain_web_app_manager::ReleaseInfo;
 use std::{collections::HashMap, fs, sync::Arc};
 
 use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile};
@@ -19,8 +20,8 @@ pub async fn install_app(
   network_seed: Option<String>,
   membrane_proofs: HashMap<String, Vec<u8>>,
   reuse_agent_pub_key: Option<AgentPubKey>,
-  happ_release_hash: Option<String>,
-  gui_release_hash: Option<String>,
+  happ_release_info: Option<ReleaseInfo>,
+  gui_release_info: Option<ReleaseInfo>,
 ) -> Result<(), String> {
   if window.label() != "admin" {
     return Err(String::from("Unauthorized: Attempted to call tauri command 'install_app' which is not allowed in this window."))
@@ -41,6 +42,7 @@ pub async fn install_app(
 
   let bytes = fs::read(&app_bundle_path).or(Err("Failed to read Web hApp bundle file"))?;
 
+
   match WebAppBundle::decode(&bytes) {
     Ok(web_app_bundle) => {
       manager
@@ -52,8 +54,8 @@ pub async fn install_app(
           network_seed,
           converted_membrane_proofs,
           reuse_agent_pub_key,
-          happ_release_hash,
-          gui_release_hash,
+          happ_release_info,
+          gui_release_info,
         )
         .await?;
     }
@@ -68,7 +70,7 @@ pub async fn install_app(
           network_seed,
           converted_membrane_proofs,
           reuse_agent_pub_key,
-          happ_release_hash,
+          happ_release_info,
         )
         .await?;
     }
