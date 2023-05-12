@@ -8,13 +8,13 @@ import {
 import prettyBytes from "pretty-bytes";
 import { Base64 } from "js-base64";
 
-import { GossipProgress, Hrl, HrlB64 } from "./types";
+import { GossipProgress, ResourceLocator, ResourceLocatorB64 } from "./types";
 
 
-export function hrlToHrlB64(hrl: Hrl): HrlB64 {
+export function locatorToLocatorB64(locator: ResourceLocator): ResourceLocatorB64 {
   return {
-    dna_hash: encodeHashToBase64(hrl.dna_hash),
-    resource_hash: encodeHashToBase64(hrl.resource_hash),
+    dna_hash: encodeHashToBase64(locator.dna_hash),
+    resource_hash: encodeHashToBase64(locator.resource_hash),
   }
 }
 

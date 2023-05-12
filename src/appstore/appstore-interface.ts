@@ -297,7 +297,7 @@ async function getHappReleasesFromHost (
 export async function fetchGuiReleaseEntry(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
-  guiReleaseHrl: ResourceLocator,
+  guiReleaseLocator: ResourceLocator,
 ) {
 
   const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
@@ -310,7 +310,7 @@ export async function fetchGuiReleaseEntry(
     const host: AgentPubKey = await getAvailableHostForZomeFunction(
       appWebsocket,
       appStoreApp,
-      guiReleaseHrl.dna_hash,
+      guiReleaseLocator.dna_hash,
       "happ_library",
       "get_gui_release",
     );
@@ -320,11 +320,11 @@ export async function fetchGuiReleaseEntry(
     const input: CustomRemoteCallInput = {
       host,
       call: {
-        dna: guiReleaseHrl.dna_hash,
+        dna: guiReleaseLocator.dna_hash,
         zome: "happ_library",
         function: "get_gui_release",
         payload: {
-          id: guiReleaseHrl.resource_hash,
+          id: guiReleaseLocator.resource_hash,
         },
       }
     }
@@ -358,8 +358,8 @@ export async function fetchWebHapp(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   name: string,
-  happReleaseHrl: ResourceLocator,
-  guiReleaseHrl: ResourceLocator,
+  happReleaseLocator: ResourceLocator,
+  guiReleaseLocator: ResourceLocator,
 ): Promise<Uint8Array> {
 
   const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
@@ -372,7 +372,7 @@ export async function fetchWebHapp(
     const host: AgentPubKey = await getAvailableHostForZomeFunction(
       appWebsocket,
       appStoreApp,
-      happReleaseHrl.dna_hash,
+      happReleaseLocator.dna_hash,
       "happ_library",
       "get_webhapp_package",
     );
@@ -381,14 +381,14 @@ export async function fetchWebHapp(
 
     const payload: GetWebHappPackageInput = {
       name,
-      happ_release_id: happReleaseHrl.resource_hash,
-      gui_release_id: guiReleaseHrl.resource_hash,
+      happ_release_id: happReleaseLocator.resource_hash,
+      gui_release_id: guiReleaseLocator.resource_hash,
     };
 
     const input: CustomRemoteCallInput = {
       host,
       call: {
-        dna: happReleaseHrl.dna_hash,
+        dna: happReleaseLocator.dna_hash,
         zome: "happ_library",
         function: "get_webhapp_package",
         payload,

@@ -141,7 +141,7 @@ impl WebAppManager {
         // gui release hash will be stored during install_app_ui
       },
       (None, None) => (),
-      _ => return Err(String::from("Got only one of gui_release_hrl or happ_release_hrl. Pass either none of them if installing a .webhapp from filesystem or both if installing a .webhapp from the App Library."))
+      _ => return Err(String::from("Got only one of happ_release_info or gui_release_info. Pass either none of them if installing a .webhapp from filesystem or both if installing a .webhapp from the App Library."))
     }
 
     // Install app UI in folder
@@ -562,7 +562,7 @@ impl WebAppManager {
 
     // println!("Storing GUI release hash to the following path: {:?}", dot_guirelease_path);
     let info_value = serde_yaml::to_value(info)
-      .map_err(|e| format!("Failed to convert hrl of GUI release info to serde_yaml Value: {}", e))?;
+      .map_err(|e| format!("Failed to convert ResourceLocator of GUI release info to serde_yaml Value: {}", e))?;
 
     let info_string = serde_yaml::to_string(&info_value)
       .map_err(|e| format!("Failed to convert info of GUI release from serde_yaml Value to string: {}", e))?;
@@ -596,7 +596,7 @@ impl WebAppManager {
         match gui_release_info {
           Ok(info) => Some(info),
           Err(e) => {
-            log::error!("Failed to read GUI release hrl from .guirelease file: {}", e);
+            log::error!("Failed to read GUI release ResourceLocator from .guirelease file: {}", e);
             None
           }
         }

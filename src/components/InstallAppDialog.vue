@@ -205,13 +205,11 @@ import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 import {
   HolochainId,
   HolochainVersion,
-  Hrl,
   InstalledWebAppInfo,
   ReleaseInfo,
   WebAppInfo,
 } from "../types";
 import { DEVHUB_APP_ID } from "../constants";
-import { hrlToHrlB64 } from "../utils";
 
 export default defineComponent({
   name: "InstallAppDialog",

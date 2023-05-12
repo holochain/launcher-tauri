@@ -319,7 +319,7 @@ import { GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { ActionTypes } from "../store/actions";
 import { i18n } from "../locale";
 import { APPSTORE_APP_ID } from "../constants";
-import { hrlToHrlB64 } from "../utils";
+import { locatorToLocatorB64 } from "../utils";
 
 
 export default defineComponent({
@@ -505,21 +505,21 @@ export default defineComponent({
 
       const updatableApps = allApps.filter((app) => app.webAppInfo.happ_release_info);
 
-      // sort all happ release hrls by DnaHash of the DevHub they originate from
-      const updatableAppsByHrlDna: Record<DnaHashB64, HolochainAppInfo[]> = {};
+      // sort all happ release ResourceLocators by DnaHash of the DevHub they originate from
+      const updatableAppsByLocatorDna: Record<DnaHashB64, HolochainAppInfo[]> = {};
 
       updatableApps.forEach((app) => {
         const dnaHash = app.webAppInfo.happ_release_info!.resource_locator.dna_hash;
-        const apps = updatableAppsByHrlDna[dnaHash];
+        const apps = updatableAppsByLocatorDna[dnaHash];
 
         if (apps) {
-          updatableAppsByHrlDna[dnaHash] = [...apps, app]
+          updatableAppsByLocatorDna[dnaHash] = [...apps, app]
         } else {
-          updatableAppsByHrlDna[dnaHash] = [app!]
+          updatableAppsByLocatorDna[dnaHash] = [app!]
         }
       });
 
-      await Promise.allSettled(Object.values(updatableAppsByHrlDna).map(async (apps) => {
+      await Promise.allSettled(Object.values(updatableAppsByLocatorDna).map(async (apps) => {
         const entryHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator.resource_hash));
         const devHubDnaHash = decodeHashFromBase64(apps[0].webAppInfo.happ_release_info!.resource_locator.dna_hash);
 
@@ -702,7 +702,7 @@ export default defineComponent({
             appId: this.selectedApp!.webAppInfo.installed_app_info.installed_app_id,
             uiZipBytes: bytes,
             guiReleaseInfo: {
-              resource_locator: hrlToHrlB64(this.selectedApp!.guiUpdateAvailable!),
+              resource_locator: locatorToLocatorB64(this.selectedApp!.guiUpdateAvailable!),
               version: this.selectedGuiUpdate?.version,
             },
           });

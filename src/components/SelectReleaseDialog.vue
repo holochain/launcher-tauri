@@ -178,7 +178,7 @@ import HCButton from "./subcomponents/HCButton.vue";
 import HCDialog from "./subcomponents/HCDialog.vue";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 
-import { Hrl, ReleaseData } from "../types";
+import { ResourceLocator, ReleaseData } from "../types";
 import { AppEntry, Entity, HappReleaseEntry, PublisherEntry } from "../appstore/types";
 import { AppWebsocket } from "@holochain/client";
 import { APPSTORE_APP_ID } from "../constants";
@@ -237,7 +237,7 @@ export default defineComponent({
 
       let happReleases: Array<Entity<HappReleaseEntry>> | undefined = undefined;
 
-      const happHrl: Hrl = {
+      const happLocator: ResourceLocator = {
         dna_hash: this.app.devhub_address.dna,
         resource_hash:  this.app.devhub_address.happ,
       }
@@ -245,7 +245,7 @@ export default defineComponent({
       const devHubDnaHash = this.app.devhub_address.dna;
 
       try {
-        happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, happHrl)
+        happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, happLocator)
       } catch (e) {
         this.getReleaseDatasError = `Failed to find available releases: ${JSON.stringify(e)}`;
         console.error(`Failed to find available releases: ${JSON.stringify(e)}`)
@@ -273,11 +273,11 @@ export default defineComponent({
 
             const guiReleaseHash = happReleaseEntity.content.official_gui;
             if (guiReleaseHash) {
-              const guiHrl: Hrl = {
+              const guiLocator: ResourceLocator = {
                 dna_hash: devHubDnaHash,
                 resource_hash: guiReleaseHash,
               };
-              const guiReleaseEntry = await fetchGuiReleaseEntry(this.appWebsocket as AppWebsocket, appStoreInfo, guiHrl);
+              const guiReleaseEntry = await fetchGuiReleaseEntry(this.appWebsocket as AppWebsocket, appStoreInfo, guiLocator);
               releaseData.guiRelease = guiReleaseEntry;
             }
 

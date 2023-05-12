@@ -157,11 +157,9 @@ import HCLoading from "../components/subcomponents/HCLoading.vue";
 import HCDialog from "../components/subcomponents/HCDialog.vue";
 import SelectReleaseDialog from "../components/SelectReleaseDialog.vue";
 
-import { HolochainId, ResourceLocator, ReleaseData, ReleaseInfo } from "../types";
+import { HolochainId, ReleaseData, ReleaseInfo } from "../types";
 import prettyBytes from "pretty-bytes";
-import { getCellId } from "../utils";
-import { i18n } from "../locale";
-import { AppEntry, Entity, HappReleaseEntry, HostAvailability } from "../appstore/types";
+import { AppEntry, HostAvailability } from "../appstore/types";
 import { getAllApps } from "../appstore/appstore-interface";
 import { APPSTORE_APP_ID } from "../constants";
 
