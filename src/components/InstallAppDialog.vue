@@ -189,7 +189,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import { ActionTypes } from "../store/actions";
 import { flatten, uniq } from "lodash-es";
@@ -206,6 +206,7 @@ import {
   HolochainId,
   HolochainVersion,
   InstalledWebAppInfo,
+  ReleaseInfo,
   WebAppInfo,
 } from "../types";
 import { DEVHUB_APP_ID } from "../constants";
@@ -229,11 +230,11 @@ export default defineComponent({
     holochainSelection: {
       type: Boolean,
     },
-    happReleaseHash: {
-      type: String,
+    happReleaseInfo: {
+      type: Object as PropType<ReleaseInfo>,
     },
-    guiReleaseHash: {
-      type: String,
+    guiReleaseInfo: {
+      type: Object as PropType<ReleaseInfo>,
     },
   },
   data(): {
@@ -451,8 +452,8 @@ export default defineComponent({
           networkSeed,
           reuseAgentPubKey: this.reuseAgentPubKey,
           holochainId: this.holochainId,
-          happReleaseHash: this.happReleaseHash,
-          guiReleaseHash: this.guiReleaseHash,
+          happReleaseInfo: this.happReleaseInfo,
+          guiReleaseInfo: this.guiReleaseInfo,
         });
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
