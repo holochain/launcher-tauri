@@ -24,15 +24,15 @@ anyhow = "1.0"
 futures = "0.3"
 
 # NEW_VERSION update holochain dependencies
-holochain_client = "0.4.0"
-holochain_cli_sandbox = "0.2.0"
+holochain_client = { git = "https://github.com/matthme/holochain-client-rust", branch = "develop-8ec924" }
+holochain_cli_sandbox = { package = "holochain_cli_sandbox", git = "https://github.com/holochain/holochain", rev = "8ec9243509794c3284e58b7dda03a1ad72875929"}
 holochain_launcher_utils = { path = "../../holochain_launcher_utils" }
-holochain_types = "0.2.0"
-holochain_util = { version = "0.2.0", features = [ "pw" ] }
-holochain_zome_types = "0.2.0"
-holochain_conductor_api = "0.2.0"
+holochain_types = { package = "holochain_types", git = "https://github.com/holochain/holochain", rev = "8ec9243509794c3284e58b7dda03a1ad72875929"}
+holochain_util = { git = "https://github.com/holochain/holochain", rev = "8ec9243509794c3284e58b7dda03a1ad72875929", features = [ "pw" ] }
+holochain_zome_types = { package = "holochain_zome_types", git = "https://github.com/holochain/holochain", rev = "8ec9243509794c3284e58b7dda03a1ad72875929"}
+holochain_conductor_api = { package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev = "8ec9243509794c3284e58b7dda03a1ad72875929"}
 
-holochain = { version = "0.2.0", features = ["sqlite-encrypted"] }
+holochain = { git = "https://github.com/holochain/holochain", rev = "8ec9243509794c3284e58b7dda03a1ad72875929", features = ["sqlite-encrypted"] }
 
 
 lair_keystore_api = "0.2.4"
