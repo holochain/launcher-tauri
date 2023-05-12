@@ -236,6 +236,9 @@ export default defineComponent({
     guiReleaseInfo: {
       type: Object as PropType<ReleaseInfo>,
     },
+    iconSrc: {
+      type: String,
+    }
   },
   data(): {
     showAdvanced: boolean;
@@ -455,6 +458,11 @@ export default defineComponent({
           happReleaseInfo: this.happReleaseInfo,
           guiReleaseInfo: this.guiReleaseInfo,
         });
+
+
+        if (this.iconSrc) {
+          await invoke("store_icon_src", { appId, holochainId: this.holochainId, iconSrc: this.iconSrc });
+        }
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 

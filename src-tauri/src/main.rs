@@ -43,6 +43,7 @@ use crate::commands::{
   enable_app::{disable_app, enable_app, delete_clone},
   factory_reset::execute_factory_reset,
   get_app_info::get_app_info,
+  icon_src::{get_icon_src, store_icon_src},
   get_state_info::get_state_info,
   install_app::install_app,
   install_devhub::install_devhub,
@@ -74,6 +75,8 @@ fn main() {
       _ => {}
     })
     .invoke_handler(tauri::generate_handler![
+      get_icon_src,
+      store_icon_src,
       get_state_info,
       get_storage_info,
       open_app_ui,

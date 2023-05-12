@@ -20,4 +20,5 @@ pub struct InstalledWebAppInfo {
   pub installed_app_info: AppInfo,
   pub happ_release_info: Option<ReleaseInfo>,
   pub web_uis: HashMap<String, WebUiInfo>, // Name of the UI as key. Currently only "default"
+  pub icon_src: Option<String>,
 }

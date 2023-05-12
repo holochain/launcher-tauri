@@ -105,7 +105,7 @@
     v-if="selectedApp"
     :app="selectedApp"
     :appWebsocket="appWebsocket"
-    :imgSrc="selectedImgSrc"
+    :imgSrc="selectedIconSrc"
     ref="selectAppReleasesDialog"
     @cancel="() => {
       selectedApp = undefined;
@@ -120,6 +120,7 @@
     :holochainSelection="holochainSelection"
     :happReleaseInfo="selectedHappReleaseInfo"
     :guiReleaseInfo="selectedGuiReleaseInfo"
+    :iconSrc="selectedIconSrc"
     @app-installed="
       holochainSelection = true;
       installClosed();
@@ -201,7 +202,7 @@ export default defineComponent({
     selectedHappReleaseInfo: ReleaseInfo | undefined;
     selectedGuiReleaseInfo: ReleaseInfo | undefined;
     selectedApp: AppEntry | undefined;
-    selectedImgSrc: string | undefined;
+    selectedIconSrc: string | undefined;
   } {
     return {
       loadingText: "",
@@ -227,7 +228,7 @@ export default defineComponent({
       selectedHappReleaseInfo: undefined,
       selectedGuiReleaseInfo: undefined,
       selectedApp: undefined,
-      selectedImgSrc: undefined,
+      selectedIconSrc: undefined,
     };
   },
   beforeUnmount() {
@@ -349,7 +350,7 @@ export default defineComponent({
      */
     async requestInstall(app: AppEntry, imgSrc: string | undefined) {
 
-      this.selectedImgSrc = imgSrc ? imgSrc : undefined;
+      this.selectedIconSrc = imgSrc ? imgSrc : undefined;
       this.selectedApp = app;
 
       // 1. get happ releases for app from DevHub
@@ -426,6 +427,7 @@ export default defineComponent({
         this.selectedHappReleaseInfo = undefined;
         this.selectedGuiReleaseInfo = undefined;
         this.selectedApp = undefined;
+        this.selectedIconSrc = undefined;
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
         return;

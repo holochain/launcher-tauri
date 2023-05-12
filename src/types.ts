@@ -139,6 +139,7 @@ export interface InstalledWebAppInfo {
   installed_app_info: AppInfo;
   happ_release_info: ReleaseInfo | undefined;
   web_uis: Record<string, WebUiInfo>;
+  icon_src: string | undefined;
 }
 
 export interface HolochainAppInfo {

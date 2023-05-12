@@ -421,10 +421,13 @@ impl WebAppManager {
 
         let happ_release_info = self.get_happ_release_info(&installed_app.installed_app_id);
 
+        let icon_src = self.get_app_icon_src(&installed_app.installed_app_id);
+
         Ok(InstalledWebAppInfo {
           installed_app_info: installed_app,
           happ_release_info,
           web_uis,
+          icon_src,
         })
       })
       .collect::<Result<Vec<InstalledWebAppInfo>, String>>()?;
@@ -604,6 +607,34 @@ impl WebAppManager {
       Err(_) => None,
     }
   }
+
+  /// Stores the app icon src
+  /// The icon is expected to be a base64 string of the format 'data:image/png;base64,[...blabla...]'
+  pub fn store_app_icon_src(&self, icon_src: String, app_id: &String) -> Result<(), String> {
+
+    let app_data_dir = app_data_dir(&self.environment_path, app_id);
+
+    create_dir_if_necessary(&app_data_dir)
+      .map_err(|e| format!("Failed to create app's data directory before storing app icon src: {:?}", e))?;
+
+    let icon_path = app_data_dir.join(".icon");
+
+    std::fs::write(icon_path, icon_src)
+      .map_err(|e| format!("Failed to write icon src to .icon file: {:?}", e))
+  }
+
+  /// Reads the app icon src
+  /// The icon is expected to be a base64 string of the format 'data:image/png;base64,[...blabla...]'
+  pub fn get_app_icon_src(&self, app_id: &String) -> Option<String> {
+    match fs::read_to_string(app_data_dir(&self.environment_path, app_id).join(".icon")) {
+      Ok(s) => Some(s),
+      Err(_) => {
+        log::error!("Failed to load icon src for app with id {}", app_id);
+        None
+      },
+    }
+  }
+
 
 }
 
