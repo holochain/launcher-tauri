@@ -59,10 +59,9 @@ jobs:
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.4-x86_64-apple-darwin
 
-
           cargo install holochain --version 0.2.0 --locked --features sqlite-encrypted
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.2.0-x86_64-apple-darwin
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.2.0-Beta-x86_64-apple-darwin
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
