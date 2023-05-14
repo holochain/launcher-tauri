@@ -7,34 +7,17 @@
       />
       <span 
         :class="{ tab: true, selectedTab: view.type === 'launcher' }" 
-        style="font-size: 1.5em; margin-left: 13px"
         @click="view.type = 'launcher'"
       >
         {{$t("main.launcher")}}
       </span>
       <span 
         :class="{ tab: true, selectedTab: view.type === 'appStore' }" 
-        style="font-size: 1.5em; margin-left: 13px"
         @click="view.type = 'appStore'"
       >
         {{$t("appStore.appStore")}}
       </span>
-      <span 
-        :class="{ tab: true, selectedTab: view.type === 'settings' }" 
-        style="font-size: 1.5em; margin-left: 13px"
-        @click="view.type = 'settings'"
-      >
-        {{$t("main.settings")}}
-      </span>
       <span style="display: flex; flex: 1"></span>
-      <!-- <HCButton
-        outlined
-        @click="installDevHub()"
-        style="height: 36px; border-radius: 8px; padding: 0 20px"
-        title="Install DevHub"
-        :disabled="installingDevHub"
-        >{{ installingDevHub ? 'installing...' : 'Install DevHub' }}
-      </HCButton> -->
       <HCButton
         style="
           margin-left: 8px;
@@ -42,6 +25,7 @@
           height: 40px;
           border-radius: 8px;
           padding: 0 20px;
+          cursor: pointer;
         "
         :title="reportIssueUrl"
         @click="reportIssue()"
@@ -50,15 +34,26 @@
           <span style="margin-left: 5px">{{ $t("main.reportIssue") }}</span>
         </div>
       </HCButton>
+      <span 
+        :class="{ tab: true, selectedTab: view.type === 'settings' }" 
+        @click="view.type = 'settings'"
+      >
+        {{$t("main.settings")}}
+      </span>
     </div>
 
-    <div class="row" style="flex: 1; overflow-y: auto;">
+    <div
+      v-if="isLoading()"
+      class="column center-content" style="flex: 1; height: calc(100vh - 64px);"
+    >
+      <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"></LoadingDots>
+    </div>
+
+    <div v-else class="row" style="flex: 1; overflow-y: auto;">
       <div v-if="view.type === 'launcher'" class="flex-scrollable-parent">
         <div class="flex-scrollable-container">
           <div class="flex-scrollable-y">
-            <Launcher
-              style="display: flex; margin: 24px; margin-bottom: 50px;"
-            ></Launcher>
+            <Launcher></Launcher>
           </div>
         </div>
       </div>
@@ -74,9 +69,7 @@
       <div v-else style="flex: 1; display: flex">
         <div class="flex-scrollable-container">
           <div class="flex-scrollable-y">
-            <Settings
-              style="display: flex; margin: 24px; margin-bottom: 50px;"
-            ></Settings>
+            <Settings :installedApps="$store.getters[`allApps`]"></Settings>
           </div>
         </div>
       </div>
@@ -88,6 +81,9 @@
 import AppStore from "./AppStore.vue";
 import Launcher from "./Launcher.vue";
 import Settings from "./Settings.vue";
+import { ActionTypes } from "../store/actions";
+import HCButton from "../components/subcomponents/HCButton.vue";
+import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import "@material/mwc-fab";
@@ -107,7 +103,9 @@ export default defineComponent({
   name: "Home",
   components: {
     AppStore,
+    HCButton,
     Launcher,
+    LoadingDots,
     Settings
   },
   data(): {
@@ -123,7 +121,13 @@ export default defineComponent({
       },
     };
   },
+  async created() {
+    await this.$store.dispatch(ActionTypes.fetchStateInfo);
+  },
   methods: {
+    isLoading() {
+      return this.$store.state.launcherStateInfo === "loading";
+    },
     async reportIssue() {
       await invoke("open_url_cmd", {
         url: this.reportIssueUrl
@@ -145,6 +149,10 @@ export default defineComponent({
 
   .tab {
     display: inline-block;
+    cursor: pointer;
+    font-size: 1.5em; 
+    margin-left: 13px;
+    padding: 10px;
   }
   .selectedTab {
     background-color: blue;

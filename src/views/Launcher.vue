@@ -29,15 +29,14 @@
     </div>
   </HCDialog>
 
-  <div
+  <!-- <div
     v-if="isLoading()"
     class="column center-content" style="flex: 1; height: calc(100vh - 64px);"
   >
     <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"></LoadingDots>
-  </div>
+  </div> -->
 
   <div
-    v-else
     class="column"
     style="flex: 1; align-items: center; padding: 0 50px; margin-top: 20px"
   >
@@ -86,25 +85,20 @@ import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
 export default defineComponent({
-  name: "InstalledApps",
+  name: "Launcher",
   components: { InstalledAppsList, HCButton, HCSnackbar, HCDialog, ToggleSwitch, LoadingDots },
   data(): {
     snackbarText: string | undefined;
     showDevHubDevsOnlyWarning: boolean;
     devHubAppInfo: HolochainAppInfo | undefined;
     ignoreDevHubWaring: boolean;
-    installingDevHub: boolean;
   } {
     return {
       snackbarText: undefined,
       showDevHubDevsOnlyWarning: false,
       devHubAppInfo: undefined,
       ignoreDevHubWaring: false,
-      installingDevHub: false,
     };
-  },
-  async created() {
-    await this.$store.dispatch(ActionTypes.fetchStateInfo);
   },
   methods: {
     isLoading() {
@@ -225,6 +219,7 @@ export default defineComponent({
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
       }
     },
+    // TODO: remove
     async uninstallApp(app: HolochainAppInfo) {
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
 
@@ -240,18 +235,6 @@ export default defineComponent({
         await invoke("log", {
           log: error,
         });
-      }
-    },
-    async installDevHub() {
-      this.installingDevHub = true;
-      try {
-        await invoke("install_devhub", {});
-        this.installingDevHub = false;
-        window.location.reload();
-      } catch (e) {
-        alert(`Failed to install DevHub: ${JSON.stringify(e)}`);
-        console.error(`Failed to install DevHub: ${JSON.stringify(e)}`);
-        this.installingDevHub = false;
       }
     },
     showMessage(message: string) {

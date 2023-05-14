@@ -14,14 +14,11 @@
       style="
         position: relative;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         width: 100%;
         height: 120px;
       "
-      
-      @click="$emit('openApp', app)"
-      v-on:keyup.enter="$emit('openApp', app)"
     >
     <!-- App Logo with Holo Identicon -->
       <div style="position: relative">
@@ -29,8 +26,7 @@
         <!-- <div v-show="showPubKeyTooltip" class="tooltip">Copied!</div> -->
         <sl-tooltip class="tooltip" hoist placement="top" :content="showPubKeyTooltip ? $t('main.copied') : $t('main.yourPublicKey')">
           <HoloIdenticon
-            :class="{ holoIdenticon: !showMore, holoIdenticonMore: showMore }"
-            style="position: absolute; top: 78px; left: 78px; cursor: pointer"
+            class="holoIdenticon"
             :hash="getPubKey()"
             :size="42"
             tabindex="0"
@@ -41,12 +37,12 @@
 
         <img
           v-if="appIcon"
-          :class="{ appIcon: !showMore, appIconMore: showMore }"
+          :class="{ appIcon: true, appIconMore: showMore }"
           :src="`${appIcon}`"
         />
         <div
           v-else
-          :class="{ appIcon: !showMore, appIconMore: showMore }"
+          :class="{ appIcon: true, appIconMore: showMore }"
           class="column center-content"
           style="background-color: #372ba5"
         >
@@ -56,6 +52,46 @@
         </div>
       </div>
       <!-- ------------- -->
+
+
+
+      <!-- Installed App Id -->
+      <div
+        style="
+          display: flex;
+          font-size: 23px;
+          font-weight: 700;
+          margin-left: 40px;
+          margin-right: 30px;
+          word-break: break-all;
+        "
+      >
+        {{ app.webAppInfo.installed_app_info.installed_app_id }}
+      </div>
+      <!-- ---------------- -->
+
+      <!-- App status indicator -->
+      <sl-tooltip
+        style="--show-delay: 500"
+        hoist
+        placement="top"
+        :content="getAppStatus(app)"
+      >
+        <div
+          :class="{
+            running: isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info),
+            stopped: isAppDisabled(app.webAppInfo.installed_app_info),
+            paused: false,
+          }"
+          class="app-status"
+          style="margin-right: 29px"
+          tabindex="0"
+        ></div>
+      </sl-tooltip>
+      <!-- ----------------- -->
+
+      <!-- spacer -->
+      <div style="flex: 1;"></div>
 
       <!-- GUI update available Icon -->
       <div
@@ -84,31 +120,239 @@
       </div>
       <!-- -------------------- -->
 
-      <!-- App status indicator -->
+      <!-- Open App Icon Button -->
+      <div
+        v-if="
+          (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) && !isAppHeadless(app)
+        "
+        style="display: flex"
+      >
+        <sl-tooltip class="tooltip" hoist placement="top" content="Open App">
+          <img
+            tabindex="0"
+            style="margin-right: 29px; width: 24px; cursor: pointer"
+            src="/img/Open_App.svg"
+            @click="$emit('openApp', app)"
+            v-on:keyup.enter="$emit('openApp', app)"
+          />
+        </sl-tooltip>
+      </div>
+      <!-- ------------------- -->
+
+      <!-- Disable/enable switch -->
       <sl-tooltip
-        style="--show-delay: 500"
+        class="tooltip"
         hoist
         placement="top"
-        :content="getAppStatus(app)"
+        :content="
+          isAppRunning(app.webAppInfo.installed_app_info)
+            ? 'Disable App'
+            : 'Enable App'
+        "
       >
-        <div
-          :class="{
-            running: isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info),
-            stopped: isAppDisabled(app.webAppInfo.installed_app_info),
-            paused: false,
-          }"
-          class="app-status"
+        <ToggleSwitch
+          v-if="
+            isAppUninstallable(
+              app.webAppInfo.installed_app_info.installed_app_id
+            )
+          "
           style="margin-right: 29px"
-          tabindex="0"
-        ></div>
+          :sliderOn="isSliderOn"
+          @click="handleSlider(app)"
+          @keydown.enter="handleSlider(app)"
+        />
       </sl-tooltip>
-      <!-- ----------------- -->
+      <!-- ------------------- -->
 
-      <!-- Installed App Id -->
-      <div class="installed-app-name">
-        {{ app.webAppInfo.installed_app_info.installed_app_id }}
+      <!-- Triple dot icon to show app details -->
+      <sl-tooltip class="tooltip" hoist placement="top" content="App Details">
+        <HCMoreToggle
+          @toggle="showMore = !showMore"
+          style="margin-right: 33px"
+          tabindex="0"
+        />
+      </sl-tooltip>
+      <!-- ------------------- -->
+    </div>
+
+    <!-------------- App details --------------->
+    <div
+      v-if="showMore"
+      class="column"
+      style="align-items: left; width: 100%; margin-bottom: 20px"
+    >
+      <div class="row" style="margin-left: 140px">
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >{{ $t('main.holochainVersion') }}:</span
+        >
+        <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
+          app.holochainId.type === "CustomBinary"
+            ? "Custom Binary"
+            : app.holochainId.content
+        }}</span>
+        <!-- <span style="flex: 1;"></span>
+        <img
+          src="/img/refresh.png"
+          title="Refresh"
+          @click="refresh"
+          style="width: 20px; height: 20px; margin-right: 30px; cursor: pointer;"
+        > -->
       </div>
-      <!-- EO Installed App Id ---------------- -->
+
+      <!-- provisioned cells -->
+      <div
+        class="row"
+        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+      >
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >Provisioned Cells:</span
+        ><span style="display: flex; flex: 1">{{ provisionedCells.length }}</span>
+        <span
+          style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
+          @click="showProvisionedCells = !showProvisionedCells"
+          >{{ showProvisionedCells ? `[${$t('main.hide')}]` : `[${$t('main.show')}]` }}
+        </span>
+      </div>
+      <div v-if="showProvisionedCells" style="margin-left: 140px; margin-right: 20px">
+        <InstalledCellCard
+          v-for="[roleName, cellInfo] in provisionedCells"
+          :key="roleName"
+          style="margin: 12px 0"
+          :cellInfo="cellInfo"
+          :roleName="roleName"
+          :holochainId="app.holochainId"
+        >
+        </InstalledCellCard>
+      </div>
+
+      <!-- enabled cloned cells -->
+      <div
+        class="row"
+        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+      >
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >Cloned Cells:</span
+        ><span style="display: flex; flex: 1">{{ enabledClonedCells.length }}</span>
+        <span
+          style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
+          @click="showClonedCells = !showClonedCells"
+          >{{ showClonedCells ? `[${$t('main.hide')}]` : `[${$t('main.show')}]` }}
+        </span>
+      </div>
+      <div
+        v-if="showClonedCells"
+        style="margin-left: 140px; margin-right: 20px"
+      >
+        <div v-if="enabledClonedCells.length > 0">
+          <InstalledCellCard
+            v-for="[roleName, cellInfo] in enabledClonedCells"
+            :key="roleName"
+            :cellInfo="cellInfo"
+            :roleName="roleName"
+            :holochainId="app.holochainId"
+          >
+          </InstalledCellCard>
+        </div>
+
+        <div v-else style="text-align: center; opacity: 0.7">
+          {{ $t("main.noClonedCells") }}
+        </div>
+      </div>
+
+
+      <!-- disabled cloned cells -->
+      <div
+        class="row"
+        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+      >
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >Disabled Cloned Cells:</span
+        ><span style="display: flex; flex: 1">{{ disabledClonedCells.length }}</span>
+        <span
+          style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
+          @click="showDisabledClonedCells = !showDisabledClonedCells"
+          >{{ showDisabledClonedCells ? `[${$t('main.hide')}]` : `[${$t('main.show')}]` }}
+        </span>
+      </div>
+      <div
+        v-if="showDisabledClonedCells"
+        style="margin-left: 140px; margin-right: 20px"
+      >
+        <div v-if="disabledClonedCells.length > 0">
+          <DisabledCloneCard
+            v-for="[roleName, cellInfo] in disabledClonedCells"
+            :key="roleName"
+            style="margin: 12px 0;"
+            :cellInfo="cellInfo"
+            :roleName="roleName"
+            :holochainId="app.holochainId"
+            :appId="app.webAppInfo.installed_app_info.installed_app_id"
+          >
+          </DisabledCloneCard>
+        </div>
+
+        <div v-else style="text-align: center; opacity: 0.7">
+          {{ $t("main.noDisabledClonedCells") }}
+        </div>
+      </div>
+      
+      <span
+        v-if="getReason(app.webAppInfo.installed_app_info)"
+        style="margin-top: 16px; margin-left: 140px"
+      >
+        {{ getReason(app.webAppInfo.installed_app_info) }}
+      </span>
+
+      <div
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-end;
+          margin-top: 40px;
+          margin-right: 20px;
+        "
+      >
+        <HCButton
+          class="btn"
+          style="--hc-primary-color: #d80d0d"
+          @click="requestUninstall"
+          v-if="
+            isAppUninstallable(
+              app.webAppInfo.installed_app_info.installed_app_id
+            )
+          "
+          outlined
+          >{{ $t("buttons.uninstall") }}
+        </HCButton>
+
+        <HCButton
+          style="--hc-primary-color: #dd821a"
+          v-if="
+            !isAppDisabled(app.webAppInfo.installed_app_info) &&
+            !isAppPaused(app.webAppInfo.installed_app_info) &&
+            isAppUninstallable(
+              app.webAppInfo.installed_app_info.installed_app_id
+            )
+          "
+          outlined
+          @click="disableApp(app)"
+          >{{ $t("buttons.disable") }}
+        </HCButton>
+        <HCButton
+          style="--hc-primary-color: #008704"
+          v-if="isAppDisabled(app.webAppInfo.installed_app_info)"
+          @click="enableApp(app)"
+          outlined
+          >{{ $t("buttons.enable") }}
+        </HCButton>
+        <HCButton
+          style="--hc-primary-color: #008704;"
+          v-if="false"
+          @click="startApp(app)"
+          outlined
+          >{{ $t("buttons.start") }}
+        </HCButton>
+      </div>
     </div>
   </div>
 </template>
@@ -125,15 +369,20 @@ import "@shoelace-style/shoelace/dist/themes/light.css";
 // import "@holochain-open-dev/utils/dist/holo-identicon";
 import HoloIdenticon from "../components/subcomponents/HoloIdenticon.vue";
 
+import ToggleSwitch from "./subcomponents/ToggleSwitch.vue";
+import HCButton from "./subcomponents/HCButton.vue";
+import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
 import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
 import DisabledCloneCard from "./subcomponents/DisabledCloneCard.vue";
 import { APPSTORE_APP_ID } from "../constants";
 
-
 export default defineComponent({
-  name: "InstalledAppCard",
+  name: "AppSettingsCard",
   components: {
+    ToggleSwitch,
+    HCButton,
+    HCMoreToggle,
     HCGenericDialog,
     HoloIdenticon,
     InstalledCellCard,
@@ -280,11 +529,11 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   background: #ffffff;
-  border-radius: 22px;
-  width: 120px;
+  width: 100%;
+  max-width: 1100px;
+  min-width: 900px;
   margin: 8px;
-  /* box-shadow: 0 0 2px rgb(131, 128, 176); */
-  box-shadow: 0 0px 5px #9b9b9b;
+  border-bottom: 1px dotted gray;
 }
 
 .btn {
@@ -301,29 +550,23 @@ export default defineComponent({
 
 .appIcon {
   display: flex;
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   padding: 0;
-  border-radius: 22px;
+  border-radius: 12px;
   object-fit: cover;
-  cursor: pointer;
 }
 
 .appIconMore {
-  display: flex;
-  width: 120px;
-  height: 120px;
-  padding: 0;
-  border-radius: 22px 0 22px 0;
-  object-fit: cover;
+  box-shadow: 0 0px 5px #9b9b9b;
 }
 
 .holoIdenticon {
   border-radius: 12px;
-}
-
-.holoIdenticonMore {
-  border-radius: 12px 0 22px 0;
+  position: absolute; 
+  top: 38px; 
+  left: 38px; 
+  cursor: pointer;
 }
 
 .app-status {
@@ -371,11 +614,4 @@ export default defineComponent({
   opacity: 0.6;
 }
 
-.installed-app-name {
-  width: 120px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 700;
-  word-break: break-all;
-}
 </style>

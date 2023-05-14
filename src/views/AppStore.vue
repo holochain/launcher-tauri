@@ -1,48 +1,6 @@
 <template>
   <HCLoading ref="downloading" :text="loadingText" />
 
-  <div class="row center-content top-bar" style="position: sticky; top: 0; z-index: 1; width: 100%;">
-    <!-- <mwc-icon-button
-      icon="arrow_back"
-      @click="$emit('go-back')"
-      :title="$t('buttons.back')"
-      style="margin-left: 8px;"
-    ></mwc-icon-button> -->
-
-    <span
-      style="
-        flex: 1;
-        font-size: 1.5em;
-        margin-left: 4px;
-      "
-      >{{ $t("appStore.appStore") }}</span
-    >
-    <HCButton
-      outlined
-      @click="howToPublish()"
-      style="height: 36px; border-radius: 8px; padding: 0 20px"
-      :title="howToPublishUrl"
-      >{{ $t("appStore.howToPublishAnApp") }}
-    </HCButton>
-    <HCButton
-      style="
-        margin-left: 8px;
-        margin-right: 8px;
-        height: 40px;
-        border-radius: 8px;
-        padding: 0 20px;
-      "
-      @click="selectFromFileSystem()"
-    >
-      <div class="row center-content">
-        <mwc-icon>folder</mwc-icon>
-        <span style="margin-left: 5px">{{
-          $t("appStore.selectAppFromFileSystem")
-        }}</span>
-      </div>
-    </HCButton>
-  </div>
-
   <div v-if="loading" class="column center-content" style="flex: 1; min-height: calc(100vh - 64px);">
     <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
   </div>
@@ -53,17 +11,6 @@
     style="flex: 1; min-height: calc(100vh - 64px);"
   >
     <span>{{ $t("appStore.noAppsInStore") }}</span>
-    <span style="margin-top: 8px"
-      ><span
-        style="cursor: pointer; text-decoration: underline;"
-        :title="howToPublishUrl"
-        @click="howToPublish()"
-        @keydown.enter="howToPublish()"
-        tabindex="0"
-        >{{ $t("appStore.readThis") }}</span
-      >
-      {{ $t("appStore.readThisToPublish") }}</span
-    >
     <HCButton
       outlined
       @click="fetchApps()"
@@ -83,6 +30,26 @@
     </div>
   </div>
 
+  <HCButton
+    style="
+      height: 40px;
+      border-radius: 8px;
+      padding: 0 20px;
+      position:fixed;
+      bottom: 20px;
+      left: 50%;
+      margin-left: -140px;
+    "
+    @click="selectFromFileSystem()"
+  >
+    <div class="row center-content">
+      <mwc-icon>folder</mwc-icon>
+      <span style="margin-left: 5px">{{
+        $t("appStore.selectAppFromFileSystem")
+      }}</span>
+    </div>
+  </HCButton>
+  
   <!-- Indicator of online peer hosts -->
   <div
     class="peer-host-indicator column"
@@ -184,7 +151,6 @@ export default defineComponent({
     loading: boolean;
     installableApps: Array<AppEntry>;
     selectedAppBundlePath: string | undefined;
-    howToPublishUrl: string;
     holochainId: HolochainId | undefined;
     holochainSelection: boolean;
     peerHostStatus: HostAvailability | undefined;
@@ -209,8 +175,6 @@ export default defineComponent({
       loading: true,
       installableApps: [],
       selectedAppBundlePath: undefined,
-      howToPublishUrl:
-        "https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-devhub",
       holochainId: undefined,
       holochainSelection: true,
       peerHostStatus: undefined,
@@ -330,11 +294,6 @@ export default defineComponent({
       // console.log("ALL APPS: ", allApps);
       // console.log("FILTERED APPS: ", this.installableApps);
       // console.log("hdk versions: ", hdk_versions);
-    },
-    async howToPublish() {
-      await invoke("open_url_cmd", {
-        url: this.howToPublishUrl,
-      });
     },
     async peerToPeer() {
       await invoke("open_url_cmd", {

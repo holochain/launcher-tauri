@@ -70,18 +70,20 @@ const messages = {
     },
     appStore: {
       activeDataExchanges: "currently ongoing data exchanges with peers",
-      appStore: "App Library",
+      appStore: "App Store",
       appLibrarySynchronization: "App Library Synchronization",
       fullSynchronizationRequired: "Full synchronization with peers required to reliably download all apps.",
-      howToPublishAnApp: "How to publish an app",
       noOngoingPeerSynchronization: "no ongoing peer synchronization",
       selectAppFromFileSystem: "Select app from Filesystem",
       noAppsInStore:
         "There are no apps available yet in the App Library or Synchronization with Peers is not complete.",
-      synchronizationNotCompleteError: "App Library Synchronization not Complete. Please try again later.",
+      synchronizationNotCompleteError: "App Library Synchronization not Complete. Please try again later."
+    },
+    settings: {
+      howToPublishAnApp: "How to publish an app",
       readThis: "Read this",
       readThisToPublish:
-        " to learn how to publish a Holochain application to the App Library.",
+        " to learn how to publish a Holochain application to the App Library."
     },
     buttons: {
       back: "Back",
