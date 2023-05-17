@@ -52,12 +52,16 @@ impl HolochainManager {
           current_config_str,
           config.admin_port,
           config.keystore_connection_url.clone(),
-        )
+          config.bootstrap_server_url,
+          config.signaling_server_url,
+        ).map_err(|e| LaunchHolochainError::FailedToOverwriteConfig(e))?
       }
       false => version_manager.initial_config(
         config.admin_port,
         config.environment_path.clone(),
         config.keystore_connection_url.clone(),
+        config.bootstrap_server_url,
+        config.signaling_server_url,
       ),
     };
 

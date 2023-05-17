@@ -16,6 +16,8 @@ pub enum LaunchHolochainError {
   CouldNotConnectToConductor(String),
   #[error("Could not initialize conductor: `{0}`")]
   CouldNotInitializeConductor(#[from] InitializeConductorError),
+  #[error("Failed to overwrite config: `{0}`")]
+  FailedToOverwriteConfig(String),
   #[error("Impossible error: `{0}`")]
   ImpossibleError(String),
 }

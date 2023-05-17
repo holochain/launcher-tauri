@@ -23,6 +23,8 @@ pub trait VersionManager {
     admin_port: u16,
     conductor_environment_path: PathBuf,
     keystore_connection_url: Url2,
+    bootstrap_server_url: Option<String>,
+    signaling_server_url: Option<String>,
   ) -> String;
 
   fn overwrite_config(
@@ -30,7 +32,9 @@ pub trait VersionManager {
     conductor_config: String,
     admin_port: u16,
     keystore_connection_url: Url2,
-  ) -> String {
+    bootstrap_server_url: Option<String>,
+    signaling_server_url: Option<String>,
+  ) -> Result<String, String> {
     let mut config = serde_yaml::from_str::<serde_yaml::Mapping>(conductor_config.as_str())
       .expect("Couldn't convert string to conductor config");
 
@@ -71,6 +75,67 @@ pub trait VersionManager {
       Value::Mapping(keystore_mapping),
     );
 
-    serde_yaml::to_string(&config).expect("Could not convert conductor config to string")
+    // set signal_url and bootstrap_service
+    let maybe_network_mapping = config.get_mut(&Value::String(String::from("network")));
+
+    let network_mapping = match signaling_server_url {
+      Some(url) => {
+        let mut web_rtc_config = Mapping::new();
+        web_rtc_config.insert(Value::String(String::from("type")), Value::String(String::from("webrtc")));
+        web_rtc_config.insert(Value::String(String::from("signal_url")), Value::String(url));
+
+        // ATTENTION: We are assuming that there is only one transport pool item (webrtc) and we overwrite any existing
+        // transport pool items. If that assumption were wrong, we would need to check for others and selectively overwrite
+        // only the one of type webrtc
+        let mut transport_pool = Vec::new();
+        transport_pool.push(Value::Mapping(web_rtc_config));
+
+        let network_mapping = match maybe_network_mapping {
+          Some(value) => {
+            match value {
+              Value::Mapping(mapping) => {
+                mapping.insert(Value::String(String::from("transport_pool")), Value::Sequence(transport_pool));
+                mapping.clone()
+              },
+              _ => {
+                return Err(String::from("Failed to overwrite config: 'network' value of conductor-config.yaml is of unexpected type: {:?}"));
+              }
+            }
+          },
+          None => {
+            let mut mapping = Mapping::new();
+            mapping.insert(Value::String(String::from("transport_pool")), Value::Sequence(transport_pool));
+            mapping
+          }
+        };
+
+        Some(network_mapping)
+      },
+      None => None,
+    };
+
+    let network_mapping = match bootstrap_server_url {
+      Some(url) => {
+        match network_mapping {
+          Some(mut mapping) => {
+            mapping.insert(Value::String(String::from("bootstrap_service")), Value::String(url));
+            Some(mapping)
+          },
+          None => {
+            let mut mapping = Mapping::new();
+            mapping.insert(Value::String(String::from("bootstrap_service")), Value::String(url));
+            Some(mapping)
+          }
+        }
+      },
+      None => network_mapping
+    };
+
+    if let Some(mapping) = network_mapping {
+      config.insert(Value::String(String::from("network")), Value::Mapping(mapping));
+    }
+
+
+    Ok(serde_yaml::to_string(&config).expect("Could not convert conductor config to string"))
   }
 }

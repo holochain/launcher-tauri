@@ -11,7 +11,7 @@ pub async fn write_config(
 ) -> Result<(), LauncherError> {
 
   if window.label() != "admin" {
-    return Err(LauncherError::Unauthorized("Unauthorized: Attempted to call an unauthorized tauri command. (C)".into()))
+    return Err(LauncherError::Unauthorized("Unauthorized: Attempted to call an tauri command 'write_config' which is not allowed in that window.".into()))
   }
 
   config.write()?;

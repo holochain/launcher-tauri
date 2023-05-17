@@ -27,8 +27,10 @@ pub async fn update_default_ui(
   let manager = mutex.get_running()?;
 
   manager
-    .get_or_launch_holochain(holochain_id, profile.inner().clone())
-    .await?
+    .get_or_launch_holochain(
+      holochain_id,
+      profile.inner().clone(),
+    ).await?
     .update_app_ui(
       app_id.clone(),
       ResourceBytes::from(ui_zip_bytes),

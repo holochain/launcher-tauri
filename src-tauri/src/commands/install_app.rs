@@ -46,8 +46,10 @@ pub async fn install_app(
   match WebAppBundle::decode(&bytes) {
     Ok(web_app_bundle) => {
       manager
-        .get_or_launch_holochain(holochain_id, profile.inner().clone())
-        .await?
+        .get_or_launch_holochain(
+          holochain_id,
+          profile.inner().clone(),
+        ).await?
         .install_web_app(
           app_id.clone(),
           web_app_bundle,
@@ -62,8 +64,10 @@ pub async fn install_app(
     Err(_) => {
       let app_bundle = AppBundle::decode(&bytes).or(Err("Failed to read Web hApp bundle file"))?;
       manager
-        .get_or_launch_holochain(holochain_id, profile.inner().clone())
-        .await?
+        .get_or_launch_holochain(
+          holochain_id,
+          profile.inner().clone(),
+        ).await?
         .install_app(
           app_id.clone(),
           app_bundle,

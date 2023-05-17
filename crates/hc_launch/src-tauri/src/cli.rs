@@ -130,7 +130,7 @@ impl HcLaunch {
     if let Some(NetworkCmd::Network(n)) = self.create.clone().network {
       match n.transport {
         NetworkType::WebRTC { signal_url: s } => {
-          if (s == String::from("ws://signal.holotest.net") || s == String::from("wss://signal.holotest.net")) && self.force_production == false {
+          if (s == String::from("ws://signal.holo.host") || s == String::from("wss://signal.holo.host")) && self.force_production == false {
             eprintln!(r#"
 ERROR
 

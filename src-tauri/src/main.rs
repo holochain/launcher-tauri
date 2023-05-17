@@ -62,6 +62,9 @@ use crate::setup::logs::setup_logs;
 use crate::system_tray::handle_system_tray_event;
 use crate::file_system::Profile;
 
+pub type BootstrapServerUrl = Option<String>;
+pub type SignalingServerUrl = Option<String>;
+
 
 
 fn main() {
