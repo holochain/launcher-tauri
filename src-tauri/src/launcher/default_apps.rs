@@ -9,7 +9,7 @@ use holochain_web_app_manager::WebAppManager;
 pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, window: tauri::window::Window) -> Result<(), String> {
   let apps = manager.list_apps().await?;
 
-  let appstore_app_id = String::from("AppStore Admin");
+  let appstore_app_id = String::from("AppStore");
 
   if apps.iter()
     .map(|info| info.installed_app_info.installed_app_id.clone())
@@ -17,7 +17,7 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
     .contains(&appstore_app_id) == false {
 
     // emitting signal to the front-end for progress indication
-    window.emit("progress-update", String::from("Installing AppStore Admin"))
+    window.emit("progress-update", String::from("Installing AppStore"))
       .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
     let appstore_bundle = WebAppBundle::decode(include_bytes!("../../../AppStore.webhapp"))
