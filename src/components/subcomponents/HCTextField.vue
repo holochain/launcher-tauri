@@ -57,6 +57,12 @@ export default defineComponent({
       this.value = this.default;
     }
   },
+  methods: {
+    setValue(value: string) {
+      this.value = value;
+  }
+
+  }
 });
 </script>
 

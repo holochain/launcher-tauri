@@ -128,7 +128,7 @@ import { HolochainId, ReleaseData, ReleaseInfo } from "../types";
 import prettyBytes from "pretty-bytes";
 import { AppEntry, HostAvailability } from "../appstore/types";
 import { getAllApps } from "../appstore/appstore-interface";
-import { APPSTORE_APP_ID } from "../constants";
+import { APPSTORE_APP_ID, DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../constants";
 
 
 
@@ -216,27 +216,27 @@ export default defineComponent({
 
     // With multiple possible DevHub networks, available peers are not necessarily unique
 
-    // try {
-    //   const result = await getVisibleHostsForZomeFunction(this.appWebsocket as AppWebsocket, appStoreInfo, 'happ_library', 'get_webhapp_package');
-    //   this.peerHostStatus = result;
-    // } catch (e) {
-    //   console.error(`Failed to get peer host statuses: ${JSON.stringify(e)}`);
-    // }
+    try {
+      const result = await getVisibleHostsForZomeFunction(this.appWebsocket as AppWebsocket, appStoreInfo, DEVHUB_HAPP_LIBRARY_DNA_HASH, 'happ_library', 'get_webhapp_package');
+      this.peerHostStatus = result;
+    } catch (e) {
+      console.error(`Failed to get peer host statuses: ${JSON.stringify(e)}`);
+    }
 
+    this.pollInterval = window.setInterval(
+      async () => {
+        const result = await getVisibleHostsForZomeFunction(
+          this.appWebsocket as AppWebsocket,
+          appStoreInfo,
+          DEVHUB_HAPP_LIBRARY_DNA_HASH,
+          "happ_library",
+          "get_webhapp_package"
+        );
 
-    // this.pollInterval = window.setInterval(
-    //   async () => {
-    //     const result = await getVisibleHostsForZomeFunction(
-    //       this.appWebsocket as AppWebsocket,
-    //       appStoreInfo,
-    //       "happ_library",
-    //       "get_webhapp_package"
-    //     );
-
-    //     this.peerHostStatus = result;
-    //   },
-    //   60000
-    // );
+        this.peerHostStatus = result;
+      },
+      60000
+    );
   },
   methods: {
     toSrc,

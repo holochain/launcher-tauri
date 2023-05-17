@@ -1,9 +1,11 @@
 use holochain_manager::versions::HolochainVersion;
+use holochain_manager::versions::common::{bootstrap_service, signaling_server};
+
 use log::Level;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, fs};
 
-use crate::file_system::{Profile, launcher_config_path};
+use crate::{file_system::{Profile, launcher_config_path}, SignalingServerUrl, BootstrapServerUrl};
 
 use super::error::LauncherError;
 
@@ -11,6 +13,8 @@ use super::error::LauncherError;
 pub struct LauncherConfig {
   pub log_level: Level,
   pub custom_binary_path: Option<String>,
+  pub signaling_server_url: SignalingServerUrl,
+  pub bootstrap_server_url: BootstrapServerUrl,
 
   pub running_versions: HashSet<HolochainVersion>,
   profile: Profile,
@@ -23,6 +27,8 @@ impl Default for LauncherConfig {
       custom_binary_path: None,
       running_versions: HashSet::from([HolochainVersion::default()]),
       profile: String::from("default"),
+      bootstrap_server_url: Some(bootstrap_service().to_string()),
+      signaling_server_url: Some(signaling_server()),
     }
   }
 }
@@ -36,6 +42,8 @@ impl LauncherConfig {
       custom_binary_path: None,
       running_versions: HashSet::from([HolochainVersion::default()]),
       profile: profile,
+      bootstrap_server_url: Some(bootstrap_service().to_string()),
+      signaling_server_url: Some(signaling_server()),
     }
   }
 

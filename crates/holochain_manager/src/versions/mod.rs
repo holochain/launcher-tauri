@@ -10,7 +10,7 @@ pub use holochain_types_0_2_0 as holochain_types_latest;
 use lair_keystore_manager::versions::LairKeystoreVersion;
 pub use mr_bundle as mr_bundle_latest;
 
-mod common;
+pub mod common;
 pub mod version_manager;
 use version_manager::VersionManager;
 

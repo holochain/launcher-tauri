@@ -1,5 +1,3 @@
-use futures::lock::Mutex;
-use hdk::prelude::AgentPubKey;
 use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
 use holochain_manager::config::LaunchHolochainConfig;
 use holochain_manager::errors::{LaunchHolochainError, InitializeConductorError};
@@ -125,7 +123,11 @@ impl LauncherManager {
 
   /// Initializes a new keystore with the given password, then lanuches LairKeystoreManager, HolochainManager(s)
   /// and WebAppManager(s).
-  pub async fn initialize_keystore_and_launch(&mut self, password: String, profile: Profile) -> Result<(), String> {
+  pub async fn initialize_keystore_and_launch(
+    &mut self,
+    password: String,
+    profile: Profile,
+  ) -> Result<(), String> {
 
     // emitting signal to the front-end for progress indication
     self.app_handle.get_window("admin").unwrap()
@@ -155,7 +157,11 @@ impl LauncherManager {
 
 
   /// Launches LairKeystoreManager, HolochainManager(s) and WebAppManager(s).
-  pub async fn launch_managers(&mut self, password: String, profile: Profile) -> Result<(), String> {
+  pub async fn launch_managers(
+    &mut self,
+    password: String,
+    profile: Profile,
+  ) -> Result<(), String> {
 
     let keystore_path = keystore_data_dir(LairKeystoreManagerV0_2::lair_keystore_version(), profile.clone())
       .map_err(|e| format!("Failed to get keystore data dir: {}", e))?;
@@ -262,13 +268,20 @@ impl LauncherManager {
       conductor_config_dir: conductor_config_path,
       environment_path,
       keystore_connection_url,
+      bootstrap_server_url: self.config.bootstrap_server_url.clone(),
+      signaling_server_url: self.config.signaling_server_url.clone(),
     };
 
     let version_str: String = version.into();
 
     let admin_window = self.app_handle.get_window("admin").unwrap();
 
-    let state = match WebAppManager::launch(version, config, self.app_handle.clone(), password).await {
+    let state = match WebAppManager::launch(
+      version,
+      config,
+      self.app_handle.clone(),
+      password,
+    ).await {
       Ok(mut manager) => match version.eq(&HolochainVersion::default()) {
         true => match install_default_apps_if_necessary(&mut manager, admin_window).await {
           Ok(()) => {
@@ -487,6 +500,7 @@ impl LauncherManager {
 
     // set window size to 80% of a common screen resolution of 1920 x 1080.
     window_builder = window_builder.inner_size(1536.0, 864.0);
+
 
 
     // placeholder for when apps come shipped with their custom icons:

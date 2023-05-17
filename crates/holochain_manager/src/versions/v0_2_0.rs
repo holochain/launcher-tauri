@@ -8,7 +8,7 @@ use holochain_conductor_api_0_2_0::{
 };
 use holochain_p2p_0_2_0::kitsune_p2p::{KitsuneP2pConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
 
-use super::{version_manager::VersionManager, HdkVersion, HdiVersion, common::bootstrap_service};
+use super::{version_manager::VersionManager, HdkVersion, HdiVersion, common::{bootstrap_service, signaling_server}};
 
 pub struct HolochainV0_2_0;
 
@@ -29,15 +29,24 @@ impl VersionManager for HolochainV0_2_0 {
     admin_port: u16,
     conductor_environment_path: PathBuf,
     keystore_connection_url: Url2,
+    bootstrap_server_url: Option<String>,
+    signaling_server_url: Option<String>,
   ) -> String {
     let mut network_config = KitsuneP2pConfig::default();
-    network_config.bootstrap_service = Some(bootstrap_service());
+    network_config.bootstrap_service = Some( match bootstrap_server_url {
+      Some(url) => url2::url2!("{}", url),
+      None => bootstrap_service()
+    });
 
     let tuning_params = KitsuneP2pTuningParams::default();
 
     network_config.tuning_params = Arc::new(tuning_params);
 
-    network_config.transport_pool.push(TransportConfig::WebRTC { signal_url: String::from("wss://signal.holotest.net") });
+    network_config.transport_pool.push(TransportConfig::WebRTC { signal_url: match signaling_server_url {
+        Some(url) => url,
+        None => signaling_server(),
+      }
+    });
 
     let config = ConductorConfig {
       environment_path: conductor_environment_path.into(),
