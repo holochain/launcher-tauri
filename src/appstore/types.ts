@@ -180,7 +180,7 @@ export interface FilePackage {
 
 
 export interface HostAvailability {
-  responded: number,
+  responded: AgentPubKey[],
   totalHosts: number,
   pingTimestamp: number,
 }

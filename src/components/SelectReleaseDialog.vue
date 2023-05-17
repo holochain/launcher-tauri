@@ -257,6 +257,8 @@ export default defineComponent({
         return;
       }
 
+      console.log("@getReleaseDatas: got happReleases: ", happReleases);
+
       // this.selectedHappReleases = happReleases.map((entity) => entity.content).sort((a, b) => b.last_updated - a.last_updated);
       let releaseDatas: Array<ReleaseData> = [];
 

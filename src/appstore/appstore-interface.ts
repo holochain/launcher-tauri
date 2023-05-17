@@ -175,6 +175,10 @@ async function getHappReleaseFromHost (
 
 /**
  * Get happ releases for a happ. Searches for an online DevHub host first.
+ *
+ * ATTENTION: This returns just an empty array if there is no happ entry found at
+ * the requested entry hash
+ *
  * @param appWebsocket
  * @param appStoreApp
  * @param forHapp
@@ -252,23 +256,14 @@ export async function fetchGuiReleaseEntry(
   guiReleaseLocator: ResourceLocator,
 ) {
 
-  const host: AgentPubKey = await getAvailableHostForZomeFunction(
-    appWebsocket,
-    appStoreApp,
-    guiReleaseLocator.dna_hash,
-    "happ_library",
-    "get_gui_release",
-  );
-
   const payload = {
     id: guiReleaseLocator.resource_hash,
   };
 
-  return remoteCallToDevHubHost<Entity<GUIReleaseEntry>>(
+  return remoteCallToAvailableHost<Entity<GUIReleaseEntry>>(
     appWebsocket,
     appStoreApp,
     guiReleaseLocator.dna_hash,
-    host,
     "happ_library",
     "get_gui_release",
     payload,
@@ -436,6 +431,7 @@ export async function getVisibleHostsForZomeFunction(
   devhubDna: DnaHash,
   zome_name: string,
   fn_name: string,
+  timeoutMs: number = 6000,
 ): Promise<HostAvailability> {
 
     const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
@@ -444,7 +440,7 @@ export async function getVisibleHostsForZomeFunction(
       return Promise.reject("Failed to get hosts for zome function: portal cell not found.");
     }
 
-    let responded = 0;
+    let responded: AgentPubKey[] = [];
 
     const pingTimestamp = Date.now();
 
@@ -462,13 +458,13 @@ export async function getVisibleHostsForZomeFunction(
             cell_id: getCellId(portalCell)!,
             payload: hostEntry.author,
             provenance: getCellId(portalCell)![1],
-          }, 6000);
+          }, timeoutMs);
 
           if (result.type === "failure") {
               return Promise.reject(`Failed to ping host: ${result.payload}`);
           }
 
-          responded += 1;
+          responded.push(hostEntry.author)
 
         } catch (e) {
           return Promise.reject(`Failed to ping host: ${e}`);
@@ -703,3 +699,107 @@ export async function remoteCallToDevHubHost<T>(
     }
   }
 }
+
+
+
+/**
+ * Helper function to make a remote call to first responsive host
+ *
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param devhubDna
+ * @param zome_name
+ * @param fn_name
+ * @param payload
+ */
+export async function remoteCallToAvailableHost<T>(
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  devhubDna: DnaHash,
+  zome_name: string,
+  fn_name: string,
+  payload: any,
+): Promise<T> {
+
+  const host: AgentPubKey = await getAvailableHostForZomeFunction(
+    appWebsocket,
+    appStoreApp,
+    devhubDna,
+    zome_name,
+    fn_name,
+  );
+
+  return remoteCallToDevHubHost<T>(
+    appWebsocket,
+    appStoreApp,
+    devhubDna,
+    host,
+    zome_name,
+    fn_name,
+    payload
+  );
+}
+
+
+
+// /**
+//  * Helper function to make a remote call to hosts in a cascading manner, i.e. if the first
+//  * responsive host fails to deliver the promise, go on to proceeding hosts etc.
+//  *
+//  * @param appWebsocket
+//  * @param appStoreApp
+//  * @param devhubDna
+//  * @param zome_name
+//  * @param fn_name
+//  * @param payload
+//  */
+// export async function remoteCallCascadeToAvailableHosts<T>(
+//   appWebsocket: AppWebsocket,
+//   appStoreApp: AppInfo,
+//   devhubDna: DnaHash,
+//   zome_name: string,
+//   fn_name: string,
+//   payload: any,
+//   pingTimeout: number = 4000,
+// ): Promise<T> {
+
+//   const pingResult = await getVisibleHostsForZomeFunction(
+//     appWebsocket,
+//     appStoreApp,
+//     devhubDna,
+//     zome_name,
+//     fn_name,
+//     pingTimeout,
+//   );
+
+//   const availableHosts = pingResult.responded;
+
+//   let success = false;
+
+//   // for each host, try to get stuff then
+
+
+//   availableHosts.forEach((host) => {
+//     try {
+//       const result = remoteCallToDevHubHost<T>(
+//         appWebsocket,
+//         appStoreApp,
+//         devhubDna,
+//         host,
+//         zome_name,
+//         fn_name,
+//         payload,
+//       );
+
+//       return result;
+//     } catch (e) {
+
+//     }
+//   })
+// }
+
+
+
+
+
+
