@@ -76,25 +76,26 @@ pub trait VersionManager {
     );
 
     // set signal_url and bootstrap_service
-    let network_mapping = config.get(&Value::String(String::from("network")));
+    let maybe_network_mapping = config.get_mut(&Value::String(String::from("network")));
 
-    match signaling_server_url {
+    let network_mapping = match signaling_server_url {
       Some(url) => {
-        let signal_url = Mapping::new();
-        signal_url.insert(Value::String(String::from("signal_url")), Value::String(url));
-        let transport_type = Mapping::new();
-        transport_type.insert(Value::String(String::from("type")), Value::String(String::from("webrtc")));
+        let mut web_rtc_config = Mapping::new();
+        web_rtc_config.insert(Value::String(String::from("type")), Value::String(String::from("webrtc")));
+        web_rtc_config.insert(Value::String(String::from("signal_url")), Value::String(url));
 
-        let transport_pool = Vec::new();
-        transport_pool.push(Value::Mapping(transport_type));
-        transport_pool.push(Value::Mapping(signal_url));
+        // ATTENTION: We are assuming that there is only one transport pool item (webrtc) and we overwrite any existing
+        // transport pool items. If that assumption were wrong, we would need to check for others and selectively overwrite
+        // only the one of type webrtc
+        let mut transport_pool = Vec::new();
+        transport_pool.push(Value::Mapping(web_rtc_config));
 
-        let network_mapping = match network_mapping {
+        let network_mapping = match maybe_network_mapping {
           Some(value) => {
             match value {
               Value::Mapping(mapping) => {
                 mapping.insert(Value::String(String::from("transport_pool")), Value::Sequence(transport_pool));
-                mapping
+                mapping.clone()
               },
               _ => {
                 return Err(String::from("Failed to overwrite config: 'network' value of conductor-config.yaml is of unexpected type: {:?}"));
@@ -102,15 +103,36 @@ pub trait VersionManager {
             }
           },
           None => {
-            let mapping = Mapping::new();
+            let mut mapping = Mapping::new();
             mapping.insert(Value::String(String::from("transport_pool")), Value::Sequence(transport_pool));
-            &mapping
+            mapping
           }
         };
 
-        config.insert(Value::String(String::from("network")), Value::Mapping(network_mapping.to_owned()));
+        Some(network_mapping)
       },
-      None => (),
+      None => None,
+    };
+
+    let network_mapping = match bootstrap_server_url {
+      Some(url) => {
+        match network_mapping {
+          Some(mut mapping) => {
+            mapping.insert(Value::String(String::from("bootstrap_service")), Value::String(url));
+            Some(mapping)
+          },
+          None => {
+            let mut mapping = Mapping::new();
+            mapping.insert(Value::String(String::from("bootstrap_service")), Value::String(url));
+            Some(mapping)
+          }
+        }
+      },
+      None => network_mapping
+    };
+
+    if let Some(mapping) = network_mapping {
+      config.insert(Value::String(String::from("network")), Value::Mapping(mapping));
     }
 
 

@@ -8,7 +8,7 @@ use holochain_conductor_api_0_2_0::{
 };
 use holochain_p2p_0_2_0::kitsune_p2p::{KitsuneP2pConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
 
-use super::{version_manager::VersionManager, HdkVersion, HdiVersion, common::bootstrap_service};
+use super::{version_manager::VersionManager, HdkVersion, HdiVersion, common::{bootstrap_service, signaling_server}};
 
 pub struct HolochainV0_2_0;
 
@@ -44,7 +44,7 @@ impl VersionManager for HolochainV0_2_0 {
 
     network_config.transport_pool.push(TransportConfig::WebRTC { signal_url: match signaling_server_url {
         Some(url) => url,
-        None => String::from("wss://signal.holotest.net")
+        None => signaling_server(),
       }
     });
 

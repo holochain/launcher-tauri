@@ -74,8 +74,6 @@ impl WebAppManager {
     mut config: LaunchHolochainConfig,
     app_handle: Arc<AppHandle>,
     password: String,
-    bootstrap_server_url: Option<String>,
-    signaling_server_url: Option<String>,
   ) -> Result<Self, LaunchWebAppManagerError> {
     let environment_path = config.environment_path.clone();
 
@@ -88,7 +86,7 @@ impl WebAppManager {
     create_dir_if_necessary(&conductor_data_path)?;
     create_dir_if_necessary(&apps_data_dir)?;
 
-    let holochain_manager = HolochainManager::launch(version, config, password, bootstrap_server_url, signaling_server_url)
+    let holochain_manager = HolochainManager::launch(version, config, password)
       .await
       .map_err(|err| LaunchWebAppManagerError::LaunchHolochainError(err))?;
 

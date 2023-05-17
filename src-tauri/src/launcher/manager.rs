@@ -1,5 +1,3 @@
-use futures::lock::Mutex;
-use hdk::prelude::AgentPubKey;
 use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
 use holochain_manager::config::LaunchHolochainConfig;
 use holochain_manager::errors::{LaunchHolochainError, InitializeConductorError};
@@ -130,8 +128,6 @@ impl LauncherManager {
     &mut self,
     password: String,
     profile: Profile,
-    bootstrap_server_url: BootstrapServerUrl,
-    signaling_server_url: SignalingServerUrl,
   ) -> Result<(), String> {
 
     // emitting signal to the front-end for progress indication
@@ -155,7 +151,7 @@ impl LauncherManager {
     // sleep for 300ms to prevent potential issue with DevHub's public key missing in lair keystore (https://github.com/holochain/launcher/issues/146)
     std::thread::sleep(std::time::Duration::from_millis(300));
 
-    self.launch_managers(password, profile, bootstrap_server_url, signaling_server_url).await?;
+    self.launch_managers(password, profile).await?;
 
     Ok(())
   }
@@ -166,8 +162,6 @@ impl LauncherManager {
     &mut self,
     password: String,
     profile: Profile,
-    bootstrap_server_url: Option<String>,
-    signaling_server_url: Option<String>,
   ) -> Result<(), String> {
 
     let keystore_path = keystore_data_dir(LairKeystoreManagerV0_2::lair_keystore_version(), profile.clone())
@@ -193,12 +187,12 @@ impl LauncherManager {
         .emit("progress-update", format!("Launching Holochain version {}", version.to_string()))
         .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
-      self.launch_holochain_manager(version, None, profile.clone(), bootstrap_server_url.clone(), signaling_server_url.clone()).await?;
+      self.launch_holochain_manager(version, None, profile.clone()).await?;
     }
 
     if let Some(path) = self.config.custom_binary_path.clone() {
       self
-        .launch_holochain_manager(HolochainVersion::custom(), Some(path), profile.clone(), bootstrap_server_url, signaling_server_url)
+        .launch_holochain_manager(HolochainVersion::custom(), Some(path), profile.clone())
         .await?;
     } else {
       // If no custom holochain binary is specified in launcher-config.yaml, remove the data associated to previous
@@ -222,8 +216,6 @@ impl LauncherManager {
     version: HolochainVersion,
     custom_binary_path: Option<String>,
     profile: Profile, // custom root path for config files etc.
-    bootstrap_server_url: Option<String>,
-    signaling_server_url: Option<String>,
   ) -> Result<(), String> {
     // If we are trying to launch Holochain from a custom binary path, but there is nothing in that path, error and exit immediately
     if let Some(path) = custom_binary_path.clone() {
@@ -277,8 +269,8 @@ impl LauncherManager {
       conductor_config_dir: conductor_config_path,
       environment_path,
       keystore_connection_url,
-      bootstrap_server_url: bootstrap_server_url.clone(),
-      signaling_server_url: signaling_server_url.clone(),
+      bootstrap_server_url: self.config.bootstrap_server_url.clone(),
+      signaling_server_url: self.config.signaling_server_url.clone(),
     };
 
     let version_str: String = version.into();
@@ -290,8 +282,6 @@ impl LauncherManager {
       config,
       self.app_handle.clone(),
       password,
-      bootstrap_server_url,
-      signaling_server_url,
     ).await {
       Ok(mut manager) => match version.eq(&HolochainVersion::default()) {
         true => match install_default_apps_if_necessary(&mut manager, admin_window).await {
@@ -381,7 +371,7 @@ impl LauncherManager {
     match holochain_id {
       HolochainId::HolochainVersion(version) => {
         if let None = self.holochain_managers.get(&version) {
-          self.launch_holochain_manager(version.clone(), None, profile, bootstrap_server_url, signaling_server_url).await?;
+          self.launch_holochain_manager(version.clone(), None, profile).await?;
         }
       }
       HolochainId::CustomBinary => {
@@ -393,7 +383,7 @@ impl LauncherManager {
 
         if let None = self.custom_binary_manager {
           self
-            .launch_holochain_manager(HolochainVersion::custom(), Some(path), profile, bootstrap_server_url, signaling_server_url)
+            .launch_holochain_manager(HolochainVersion::custom(), Some(path), profile)
             .await?;
         }
       }

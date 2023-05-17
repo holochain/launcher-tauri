@@ -2,6 +2,7 @@
   <HCGenericDialog
     ref="dialog"
     @confirm="saveConfig()"
+    @closing="restoreDefaults()"
     primaryButtonLabel="Save and Restart"
     closeOnSideClick
   >
@@ -17,7 +18,7 @@
       <div class="row" style="margin-top: 20px; margin-bottom: 16px">
         <HCSelect
           ref="selectLogLevel"
-          style="margin: 5px; width: 360px"
+          style="margin: 5px; width: 380px;"
           label="Log Level"
           :items="levels"
           @item-selected="newConfig.log_level = $event"
@@ -25,7 +26,21 @@
         </HCSelect>
       </div>
 
-      <div class="row" style="margin: 5px">
+      <HCTextField
+        ref="bootstrapServerField"
+        placeholder="https://bootstrap.holo.host"
+        style="margin: 5px; width: 380px;"
+        label="Bootstrap Server URL"
+      ></HCTextField>
+
+      <HCTextField
+        ref="signalingServerField"
+        placeholder="wss://signal.holo.host"
+        style="margin: 5px; margin-top: 20px; width: 380px;"
+        label="Signaling Server URL"
+      ></HCTextField>
+
+      <div class="row" style="margin: 5px; margin-top: 20px;">
         <ToggleSwitch
           ref="slider"
           :sliderOn="customBinary"
@@ -65,6 +80,8 @@ export default defineComponent({
     customBinary: boolean;
     customBinaryPath: string;
     currentLogLevel: [string, string] | undefined;
+    signalingUrl: string | undefined;
+    bootstrapUrl: string | undefined;
   } {
     return {
       levels: [
@@ -78,6 +95,8 @@ export default defineComponent({
       customBinary: false,
       customBinaryPath: "/sample/path",
       currentLogLevel: undefined,
+      signalingUrl: undefined,
+      bootstrapUrl: undefined,
     };
   },
   mounted() {
@@ -85,26 +104,7 @@ export default defineComponent({
       const dialog = this.$refs.dialog as typeof HCGenericDialog;
       await getCurrent().listen("open-config", async () => {
         //await this.$store.dispatch(ActionTypes.fetchStateInfo);
-        const currentConfig = (this.$store.state.launcherStateInfo as any)
-          .config;
-        this.newConfig = currentConfig;
-        this.currentLogLevel = this.levels.find(
-          (level) => level[1] === currentConfig.log_level
-        );
-        (this.$refs.selectLogLevel as typeof HCSelect).select(
-          this.currentLogLevel
-        );
-        const currentCustomBinaryPath = (this.newConfig as any)
-          .custom_binary_path;
-
-        if (!this.customBinary) {
-          this.customBinary =
-            currentCustomBinaryPath && currentCustomBinaryPath !== "";
-        }
-
-        if (currentCustomBinaryPath !== "") {
-          this.customBinaryPath = currentCustomBinaryPath;
-        }
+        this.restoreDefaults();
 
         dialog.open();
       });
@@ -119,12 +119,61 @@ export default defineComponent({
       } else {
         (this.newConfig as any).custom_binary_path = null;
       }
+
+      if (this.signalingUrl) {
+        (this.newConfig as any).signaling_server_url = (this.$refs.signalingServerField as typeof HCTextField).value;
+      }
+
+      if (this.bootstrapUrl) {
+        (this.newConfig as any).bootstrap_server_url = (this.$refs.bootstrapServerField as typeof HCTextField).value;
+      }
+
       // console.log("newConfig: ", this.newConfig);
       await invoke("write_config", { config: this.newConfig });
       window.location.reload();
     },
     handleSlider() {
       this.customBinary = !this.customBinary;
+    },
+    restoreDefaults() {
+      const currentConfig = (this.$store.state.launcherStateInfo as any).config;
+
+      this.newConfig = currentConfig;
+
+      this.currentLogLevel = this.levels.find(
+        (level) => level[1] === currentConfig.log_level
+      );
+
+      (this.$refs.selectLogLevel as typeof HCSelect).select(
+        this.currentLogLevel
+      );
+      const currentCustomBinaryPath = (this.newConfig as any)
+        .custom_binary_path;
+
+      if (!this.customBinary) {
+        this.customBinary =
+          currentCustomBinaryPath && currentCustomBinaryPath !== "";
+      }
+
+      if (currentCustomBinaryPath !== "") {
+        this.customBinaryPath = currentCustomBinaryPath;
+      }
+
+      const currentSignalingUrl = (this.newConfig as any)
+        .signaling_server_url;
+
+      if (currentSignalingUrl && currentSignalingUrl !== "") {
+        (this.$refs.signalingServerField as typeof HCTextField).setValue(currentSignalingUrl);
+        this.signalingUrl = currentSignalingUrl;
+      }
+
+      const currentBootstrapUrl = (this.newConfig as any)
+        .bootstrap_server_url;
+
+      if (currentBootstrapUrl && currentBootstrapUrl !== "") {
+        (this.$refs.bootstrapServerField as typeof HCTextField).setValue(currentBootstrapUrl);
+        this.bootstrapUrl = currentBootstrapUrl;
+      }
     },
   },
 });
