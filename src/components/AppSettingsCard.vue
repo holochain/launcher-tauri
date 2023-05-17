@@ -295,7 +295,7 @@
           {{ $t("main.noDisabledClonedCells") }}
         </div>
       </div>
-      
+
       <span
         v-if="getReason(app.webAppInfo.installed_app_info)"
         style="margin-top: 16px; margin-left: 140px"
@@ -563,9 +563,9 @@ export default defineComponent({
 
 .holoIdenticon {
   border-radius: 12px;
-  position: absolute; 
-  top: 38px; 
-  left: 38px; 
+  position: absolute;
+  top: 38px;
+  left: 38px;
   cursor: pointer;
 }
 

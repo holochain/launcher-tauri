@@ -1,7 +1,7 @@
 <template>
   <div style="display: flex; margin: 24px; margin-bottom: 50px; flex-direction: column; align-items: center;">
     <div class='column' style="flex: 1 1 0%; margin-bottom: 80px; padding: 0px 30px; width: 70%; min-width: 900px;">
-  
+
       <!-- Holochain version info -->
       <div
         class="row section-title"
@@ -23,7 +23,7 @@
           {{ $t("main.refresh") }}
         </span>
       </div>
-      
+
       <div
         class="column"
         style="margin-bottom: 50px; width: 100%;"
@@ -226,11 +226,11 @@
             <AppSettingsCard
               v-if="app.webAppInfo.web_uis.default.type !== 'Headless'"
               :app="app"
-              @openApp="$emit('openApp', $event)"
-              @uninstallApp="$emit('uninstall-app', $event)"
-              @disableApp="$emit('disable-app', $event)"
-              @enableApp="$emit('enable-app', $event)"
-              @startApp="$emit('startApp', $event)"
+              @openApp="openApp($event)"
+              @uninstallApp="uninstallApp($event)"
+              @disableApp="disableApp($event)"
+              @enableApp="enableApp($event)"
+              @startApp="startApp($event)"
               @updateGui="openUpdateGuiDialog($event)"
             />
           </div>
@@ -279,13 +279,13 @@
             <AppSettingsCard
               v-if="app.webAppInfo.web_uis.default.type === 'Headless'"
               :app="app"
-              @openApp="$emit('openApp', $event)"
-              @uninstallApp="$emit('uninstall-app', $event)"
-              @disableApp="$emit('disable-app', $event)"
-              @enableApp="$emit('enable-app', $event)"
+              @openApp="openApp($event)"
+              @uninstallApp="uninstallApp($event)"
+              @disableApp="disableApp($event)"
+              @enableApp="enableApp($event)"
             />
           </div>
-        </div>  
+        </div>
       </div>
     </div>
   </div>
@@ -357,11 +357,11 @@ import { locatorToLocatorB64 } from "../utils";
 
 export default defineComponent({
   name: "Settings",
-  components: { 
-    HCButton, 
-    HCSnackbar, 
-    HCDialog, 
-    ToggleSwitch, 
+  components: {
+    HCButton,
+    HCSnackbar,
+    HCDialog,
+    ToggleSwitch,
     LoadingDots,
     AppSettingsCard,
     HCSelectCard,
@@ -488,7 +488,7 @@ export default defineComponent({
     //     return this.$store.getters["allApps"];
     //   },
     //   set() {
-    //     // Can't set 
+    //     // Can't set
     //   }
     // },
     sortedApps() {
@@ -691,6 +691,7 @@ export default defineComponent({
       }
     },
     async uninstallApp(app: HolochainAppInfo) {
+
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
 
       try {
@@ -948,7 +949,7 @@ export default defineComponent({
 
 <style scoped>
 h2 {
-  font-weight: 600; 
+  font-weight: 600;
   font-size: 1.2em;
 }
 

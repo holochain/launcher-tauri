@@ -19,7 +19,7 @@
         width: 100%;
         height: 120px;
       "
-      
+
       @click="$emit('openApp', app)"
       v-on:keyup.enter="$emit('openApp', app)"
     >
