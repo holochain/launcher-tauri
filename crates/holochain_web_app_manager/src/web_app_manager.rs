@@ -131,8 +131,6 @@ impl WebAppManager {
     // Assuming only one single default UI per app at the moment.
     let default_ui_name = String::from("default");
 
-    println!("Installing webhapp. ReleaseInfos: {:?}, {:?}", happ_release_info, gui_release_info);
-
     // Try to write hashes first so if that fails, don't even install the app
     match (happ_release_info, gui_release_info.clone()) {
       (Some(h_info), Some(_g_info)) => {

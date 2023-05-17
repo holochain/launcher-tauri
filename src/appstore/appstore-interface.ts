@@ -157,46 +157,19 @@ async function getHappReleaseFromHost (
   entryHash: EntryHash, // EntryHash of the HappReleaseEntry
 ): Promise<Entity<HappReleaseEntry>> {
 
-  console.log("@getHappReleaseFromHost: got host: ", encodeHashToBase64(host));
+  const payload = {
+    id: entryHash,
+  };
 
-  const input: CustomRemoteCallInput = {
+  return remoteCallToDevHubHost<Entity<HappReleaseEntry>>(
+    appWebsocket,
+    appStoreApp,
+    devhubDna,
     host,
-    call: {
-      dna: devhubDna,
-      zome: "happ_library",
-      function: "get_happ_release",
-      payload: {
-        id: entryHash,
-      }
-    }
-  }
-
-  console.log("@getHappReleaseFromHost: input: ", input);
-  console.log("@getHappReleaseFromHost: entryHash: ", encodeHashToBase64(entryHash));
-
-  const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
-
-  if (!portalCell) {
-    throw new Error("portal cell not found.")
-  } else {
-
-    console.log("@getHappReleaseFromHost: portalCell: ", portalCell);
-    console.log("@getHappReleaseFromHost: cell id of portal cell", getCellId(portalCell)!.map((key) => encodeHashToBase64(key)));
-
-    const happReleaseResponse: DevHubResponse<Response<Entity<HappReleaseEntry>>> = await appWebsocket.callZome({
-      fn_name: "custom_remote_call",
-      zome_name: "portal_api",
-      cell_id: getCellId(portalCell)!,
-      payload: input,
-      provenance: getCellId(portalCell)![1],
-    });
-
-    console.log("@getHappReleaseFromHost: happReleaseResponse: ", happReleaseResponse);
-
-
-    // maybe it needs to be entity.payload.content instead...
-    return happReleaseResponse.payload.payload;
-  }
+    "happ_library",
+    "get_happ_release",
+    payload
+  );
 }
 
 
@@ -250,40 +223,19 @@ async function getHappReleasesFromHost (
   forHapp: ResourceLocator,
 ): Promise<Array<Entity<HappReleaseEntry>>> {
 
-  const input: CustomRemoteCallInput = {
+  const payload = {
+    for_happ: forHapp.resource_hash,
+  };
+
+  return remoteCallToDevHubHost<Array<Entity<HappReleaseEntry>>>(
+    appWebsocket,
+    appStoreApp,
+    forHapp.dna_hash,
     host,
-    call: {
-      dna: forHapp.dna_hash,
-      zome: "happ_library",
-      function: "get_happ_releases",
-      payload: {
-        for_happ: forHapp.resource_hash,
-      }
-    }
-  }
-
-  console.log("@getHappReleasesFromHost: entryHash: ", encodeHashToBase64(forHapp.resource_hash));
-  const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
-
-  if (!portalCell) {
-    throw new Error("portal cell not found.")
-  } else {
-
-    const happReleaseEntities: DevHubResponse<DevHubResponse<Array<Entity<HappReleaseEntry>>>> = await appWebsocket.callZome({
-      fn_name: "custom_remote_call",
-      zome_name: "portal_api",
-      cell_id: getCellId(portalCell)!,
-      payload: input,
-      provenance: getCellId(portalCell)![1],
-    });
-
-    happReleaseEntities.payload.payload.forEach((entity) => {
-      console.log("@getHappReleasesFromHost: found release at entryHash: ", encodeHashToBase64(entity.id));
-    });
-
-    // maybe it needs to be entity.payload.content instead...
-    return happReleaseEntities.payload.payload;
-  }
+    "happ_library",
+    "get_happ_releases",
+    payload,
+  );
 }
 
 
@@ -300,47 +252,27 @@ export async function fetchGuiReleaseEntry(
   guiReleaseLocator: ResourceLocator,
 ) {
 
-  const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
-  if (!portalCell) {
-    throw new Error("portal cell not found.")
-  } else {
+  const host: AgentPubKey = await getAvailableHostForZomeFunction(
+    appWebsocket,
+    appStoreApp,
+    guiReleaseLocator.dna_hash,
+    "happ_library",
+    "get_gui_release",
+  );
 
-    console.log("@fetchGuiReleaseEntry: trying to fetch GUI release entry...");
+  const payload = {
+    id: guiReleaseLocator.resource_hash,
+  };
 
-    const host: AgentPubKey = await getAvailableHostForZomeFunction(
-      appWebsocket,
-      appStoreApp,
-      guiReleaseLocator.dna_hash,
-      "happ_library",
-      "get_gui_release",
-    );
-
-    console.log("@fetchGuiReleaseEntry: got host: ", encodeHashToBase64(host));
-
-    const input: CustomRemoteCallInput = {
-      host,
-      call: {
-        dna: guiReleaseLocator.dna_hash,
-        zome: "happ_library",
-        function: "get_gui_release",
-        payload: {
-          id: guiReleaseLocator.resource_hash,
-        },
-      }
-    }
-
-
-    const guiReleaseEntryResponse: DevHubResponse<DevHubResponse<Entity<GUIReleaseEntry>>> = await appWebsocket.callZome({
-      fn_name: "custom_remote_call",
-      zome_name: "portal_api",
-      cell_id: getCellId(portalCell)!,
-      payload: input,
-      provenance: getCellId(portalCell)![1],
-    });
-
-
-    return guiReleaseEntryResponse.payload.payload;
-  }
+  return remoteCallToDevHubHost<Entity<GUIReleaseEntry>>(
+    appWebsocket,
+    appStoreApp,
+    guiReleaseLocator.dna_hash,
+    host,
+    "happ_library",
+    "get_gui_release",
+    payload,
+  );
 }
 
 
@@ -367,8 +299,6 @@ export async function fetchWebHapp(
     throw new Error("portal cell not found.")
   } else {
 
-    console.log("@fetchWebHapp: trying to fetch webhapp...");
-
     const host: AgentPubKey = await getAvailableHostForZomeFunction(
       appWebsocket,
       appStoreApp,
@@ -377,35 +307,21 @@ export async function fetchWebHapp(
       "get_webhapp_package",
     );
 
-    console.log("@fetchWebHapp: got host: ", encodeHashToBase64(host));
-
     const payload: GetWebHappPackageInput = {
       name,
       happ_release_id: happReleaseLocator.resource_hash,
       gui_release_id: guiReleaseLocator.resource_hash,
     };
 
-    const input: CustomRemoteCallInput = {
+    return remoteCallToDevHubHost<Uint8Array>(
+      appWebsocket,
+      appStoreApp,
+      happReleaseLocator.dna_hash,
       host,
-      call: {
-        dna: happReleaseLocator.dna_hash,
-        zome: "happ_library",
-        function: "get_webhapp_package",
-        payload,
-      }
-    }
-
-    console.log("@fetchWebHapp: calling portal API with payload: ", input);
-
-    const webHappBytesResponse: DevHubResponse<DevHubResponse<Uint8Array>> = await appWebsocket.callZome({
-      fn_name: "custom_remote_call",
-      zome_name: "portal_api",
-      cell_id: getCellId(portalCell)!,
-      payload: input,
-      provenance: getCellId(portalCell)![1],
-    });
-
-    return webHappBytesResponse.payload.payload;
+      "happ_library",
+      "get_webhapp_package",
+      payload
+    );
   }
 }
 
@@ -415,52 +331,29 @@ export async function fetchGui(
   appStoreApp: AppInfo,
   devhubDna: DnaHash,
   guiReleaseHash: EntryHash,
-): Promise<Uint8Array | undefined> {
+): Promise<Entity<FilePackage>> {
 
-  const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
-  if (!portalCell) {
-    throw new Error("portal cell not found.")
-  } else {
+  const host: AgentPubKey = await getAvailableHostForZomeFunction(
+    appWebsocket,
+    appStoreApp,
+    devhubDna,
+    "happ_library",
+    "get_webasset",
+  );
 
-    const host: AgentPubKey = await getAvailableHostForZomeFunction(
-      appWebsocket,
-      appStoreApp,
-      devhubDna,
-      "happ_library",
-      "get_webasset",
-    );
+  const payload = {
+    id: guiReleaseHash,
+  };
 
-
-    const input: CustomRemoteCallInput = {
-      host,
-      call: {
-        dna: devhubDna,
-        zome: "happ_library",
-        function: "get_webasset",
-        payload: {
-          id: guiReleaseHash,
-        },
-      }
-    }
-
-    const response: DevHubResponse<DevHubResponse<Entity<FilePackage>>> = await appWebsocket.callZome({
-      fn_name: "custom_remote_call",
-      zome_name: "portal_api",
-      cell_id: getCellId(portalCell)!,
-      payload: input,
-      provenance: getCellId(portalCell)![1],
-    });
-
-    if (response.type === "success") {
-      if (response.payload.type === "success") {
-        return response.payload.payload.content.bytes;
-      } else {
-        return Promise.reject(`Failed to fetch UI: ${JSON.stringify(response.payload.payload)}`);
-      }
-    } else {
-      return Promise.reject(`Failed to fetch UI: ${JSON.stringify(response.payload)}`);
-    }
-  }
+  return remoteCallToDevHubHost<Entity<FilePackage>>(
+    appWebsocket,
+    appStoreApp,
+    devhubDna,
+    host,
+    "happ_library",
+    "get_webasset",
+    payload
+  );
 }
 
 
@@ -750,4 +643,63 @@ export async function collectBytes(
     // return allApps.payload.map((appEntity) => appEntity.content)
   }
 
+}
+
+
+/**
+ * Makes a remote call to a specified DevHub host for the specified function and zome and with the
+ * specified payload
+ *
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param devhubDna
+ * @param host
+ * @param fn_name
+ * @param zome_name
+ * @param payload
+ * @returns
+ */
+export async function remoteCallToDevHubHost<T>(
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  devhubDna: DnaHash,
+  host: AgentPubKey, // public key of the devhub host to call to
+  zome_name: string,
+  fn_name: string,
+  payload: any,
+): Promise<T> {
+
+  const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+  if (!portalCell) {
+    throw new Error("portal cell not found.")
+  } else {
+
+    const input: CustomRemoteCallInput = {
+      host,
+      call: {
+        dna: devhubDna,
+        zome: zome_name,
+        function: fn_name,
+        payload,
+      }
+    }
+
+    const response: DevHubResponse<DevHubResponse<T>> = await appWebsocket.callZome({
+      fn_name: "custom_remote_call",
+      zome_name: "portal_api",
+      cell_id: getCellId(portalCell)!,
+      payload: input,
+      provenance: getCellId(portalCell)![1],
+    });
+
+    if (response.type === "success") {
+      if (response.payload.type === "success") {
+        return response.payload.payload;
+      } else {
+        return Promise.reject(`Failed to fetch UI: ${JSON.stringify(response.payload.payload)}`);
+      }
+    } else {
+      return Promise.reject(`Failed to fetch UI: ${JSON.stringify(response.payload)}`);
+    }
+  }
 }

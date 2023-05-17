@@ -315,7 +315,7 @@ import prettyBytes from "pretty-bytes";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 import { getHappReleasesByEntryHashes, fetchGui, appstoreCells, fetchGuiReleaseEntry } from "../appstore/appstore-interface";
 import { AppInfo, AppWebsocket, decodeHashFromBase64, DnaHashB64, encodeHashToBase64, EntryHash, InstalledAppId } from "@holochain/client";
-import { GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
+import { Entity, FilePackage, GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { ActionTypes } from "../store/actions";
 import { i18n } from "../locale";
 import { APPSTORE_APP_ID } from "../constants";
@@ -679,12 +679,13 @@ export default defineComponent({
       let bytes = undefined;
 
       try {
-        bytes = await fetchGui(
+        const guiResponse: Entity<FilePackage> = await fetchGui(
           this.appWebsocket! as AppWebsocket,
           this.appstoreAppInfo!,
           this.selectedGuiUpdateLocator!.dna_hash,
           this.selectedGuiUpdate!.web_asset_id,
         );
+        bytes = guiResponse.content.bytes;
       } catch (e) {
         console.error("Error fetching the UI: ", e);
         this.errorText = `Error fetching the UI: ${e}`;
