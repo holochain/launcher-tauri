@@ -3,6 +3,7 @@ pub mod choose_version;
 pub mod enable_app;
 pub mod factory_reset;
 pub mod get_app_info;
+pub mod icon_src;
 pub mod get_state_info;
 pub mod install_app;
 pub mod install_devhub;

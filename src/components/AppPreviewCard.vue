@@ -79,6 +79,7 @@ import { AppEntry } from "../appstore/types";
 import { collectBytes } from "../appstore/appstore-interface";
 import { AppWebsocket } from "@holochain/client";
 import { APPSTORE_APP_ID } from "../constants";
+import { toSrc } from "../utils";
 
 export default defineComponent({
   name: "AppPreviewCard",
@@ -116,7 +117,7 @@ export default defineComponent({
     });
 
     const collectedBytes = await collectBytes(this.appWebsocket, appStoreInfo, iconHash);
-    this.imgSrc = URL.createObjectURL(new Blob([collectedBytes],  { type: "image/png" }));
+    this.imgSrc = toSrc(collectedBytes);
   },
 });
 </script>
