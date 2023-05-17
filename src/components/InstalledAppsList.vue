@@ -174,7 +174,7 @@ import { AppInfo, AppWebsocket, decodeHashFromBase64, DnaHashB64, encodeHashToBa
 import { GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { ActionTypes } from "../store/actions";
 import { i18n } from "../locale";
-import { APPSTORE_APP_ID } from "../constants";
+import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
 import { locatorToLocatorB64 } from "../utils";
 
 
@@ -278,6 +278,11 @@ export default defineComponent({
           guiUpdateAvailable: undefined,
         }
       });
+
+      // Filter out App Store and DevHub
+      sortedAppList = sortedAppList.filter(
+        (app) => app.webAppInfo.installed_app_info.installed_app_id !== APPSTORE_APP_ID && app.webAppInfo.installed_app_info.installed_app_id !== DEVHUB_APP_ID
+      );
 
       if (this.selectedHolochainVersion !== "All Versions") {
         sortedAppList = sortedAppList.filter(
