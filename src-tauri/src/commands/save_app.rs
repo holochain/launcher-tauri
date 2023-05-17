@@ -1,8 +1,8 @@
-use std::{env::temp_dir, fs, path::PathBuf, time::SystemTime, collections::HashMap, sync::Arc, str::FromStr};
+use std::{env::temp_dir, fs, path::PathBuf, time::SystemTime};
 
 
 use devhub_types::DevHubResponse;
-use holochain_types::{prelude::{DnaHash, AgentPubKeyB64, EntryHashB64, CellProvisioning, AppRoleManifest}, web_app::WebAppBundle};
+use holochain_types::{prelude::{DnaHash, AgentPubKeyB64, EntryHashB64}, web_app::WebAppBundle};
 use lair_keystore_manager::LairKeystoreManager;
 use holochain_manager::versions::holochain_conductor_api_latest::CellInfo;
 use holochain_state::nonce::fresh_nonce;
@@ -11,9 +11,7 @@ use hdk::prelude::{
   EntryHash, ExternIO, FunctionName, Serialize, Timestamp, ZomeCallUnsigned, ZomeName, Deserialize
 };
 
-use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile, BootstrapServerUrl, SignalingServerUrl};
-
-use super::get_app_info::WebAppInfo;
+use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile};
 
 
 #[tauri::command]
@@ -44,8 +42,6 @@ pub async fn fetch_and_save_app(
   window: tauri::Window,
   state: tauri::State<'_, LauncherState>,
   profile: tauri::State<'_, Profile>,
-  bootstrap_server_url: tauri::State<'_, BootstrapServerUrl>,
-  signaling_server_url: tauri::State<'_, SignalingServerUrl>,
   holochain_id: HolochainId,
   appstore_app_id: String,
   app_title: String,
@@ -73,8 +69,6 @@ pub async fn fetch_and_save_app(
       manager.get_or_launch_holochain(
         holochain_id,
         profile.inner().clone(),
-        bootstrap_server_url.inner().clone(),
-        signaling_server_url.inner().clone()
       ).await?.app_interface_port(),
       &appstore_app_id,
       &appstore_pub_key,

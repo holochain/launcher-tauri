@@ -141,11 +141,6 @@ fn main() {
 
       app.manage(profile.clone());
 
-      let bootstrap_server_url: BootstrapServerUrl = None;
-      let signaling_server_url: SignalingServerUrl = None;
-      app.manage(bootstrap_server_url);
-      app.manage(signaling_server_url);
-
       if let Err(err) = setup_logs(profile.clone()) {
         println!("Error setting up the logs: {:?}", err);
       }

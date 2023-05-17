@@ -17,7 +17,6 @@ use tauri::{CustomMenuItem, Menu, Submenu};
 use holochain_manager::versions::HolochainVersion;
 use holochain_web_app_manager::WebAppManager;
 
-use crate::{BootstrapServerUrl, SignalingServerUrl};
 use crate::file_system::{
   conductor_config_dir, holochain_version_data_dir, keystore_data_dir,
   profile_holochain_data_dir, profile_lair_dir, profile_config_dir, Profile, launcher_config_dir,
@@ -365,8 +364,6 @@ impl LauncherManager {
     &mut self,
     holochain_id: HolochainId,
     profile: String,
-    bootstrap_server_url: BootstrapServerUrl,
-    signaling_server_url: SignalingServerUrl,
   ) -> Result<&mut WebAppManager, String> {
     match holochain_id {
       HolochainId::HolochainVersion(version) => {

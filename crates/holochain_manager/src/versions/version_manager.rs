@@ -136,8 +136,6 @@ pub trait VersionManager {
     }
 
 
-    println!("Got final config: {:?}", config);
-
     Ok(serde_yaml::to_string(&config).expect("Could not convert conductor config to string"))
   }
 }
