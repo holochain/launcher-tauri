@@ -80,46 +80,41 @@
         </div>
       </div>
 
-      <div class="column section-container">
-        <h2>Developer Mode</h2>
-        <span>Activates DevHub + empowers you to create apps</span>
-        <!-- Disable/enable switch -->
-        <sl-tooltip
-          class="tooltip"
-          hoist
-          placement="top"
-          :content="
-            devHubAppInfo && isAppRunning(devHubAppInfo?.webAppInfo.installed_app_info)
-              ? 'Disable Dev Mode'
-              : 'Enable Dev Mode'
-          "
-        >
-          <ToggleSwitch
-            style="margin-right: 29px"
-            :sliderOn="!!devHubAppInfo && isAppRunning(devHubAppInfo?.webAppInfo.installed_app_info)"
-            @click="toggleDevMode()"
-            @keydown.enter="toggleDevMode()"
-          />
-        </sl-tooltip>
-
-        <span style="margin-top: 8px"
-          ><span
-            style="cursor: pointer; text-decoration: underline;"
-            :title="howToPublishUrl"
-            @click="howToPublish()"
-            @keydown.enter="howToPublish()"
-            tabindex="0"
-            >{{ $t("settings.readThis") }}</span
+      <div class="column section-container" style="display: flex; flex-direction: column;">
+        <div class="row">
+          <div style="flex: 1;">
+            <h2>Developer Mode</h2>
+            <span>Activates DevHub + empowers you to create apps</span>
+          </div>
+          <!-- Disable/enable switch -->
+          <sl-tooltip
+            class="tooltip"
+            hoist
+            placement="top"
+            :content="
+              devHubAppInfo && isAppRunning(devHubAppInfo?.webAppInfo.installed_app_info)
+                ? 'Disable Dev Mode'
+                : 'Enable Dev Mode'
+            "
           >
-          {{ $t("settings.readThisToPublish") }}</span
-        >
-        <HCButton
-          outlined
-          @click="howToPublish()"
-          style="height: 36px; border-radius: 8px; padding: 0 20px"
-          :title="howToPublishUrl"
-          >{{ $t("settings.howToPublishAnApp") }}
-        </HCButton>
+            <ToggleSwitch
+              style="margin-right: 29px"
+              :sliderOn="!!devHubAppInfo && isAppRunning(devHubAppInfo?.webAppInfo.installed_app_info)"
+              @click="toggleDevMode()"
+              @keydown.enter="toggleDevMode()"
+            />
+          </sl-tooltip>
+        </div>
+
+        <div class="row">
+          <HCButton
+            outlined
+            @click="howToPublish()"
+            style="height: 36px; border-radius: 8px; padding: 0 20px"
+            :title="howToPublishUrl"
+            >{{ $t("settings.publishAnApp") }}
+          </HCButton>
+        </div>
       </div>
 
       <!-- <div
@@ -951,6 +946,7 @@ export default defineComponent({
 h2 {
   font-weight: 600;
   font-size: 1.2em;
+  margin: 0;
 }
 
 .section-title {

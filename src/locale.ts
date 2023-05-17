@@ -80,10 +80,7 @@ const messages = {
       synchronizationNotCompleteError: "App Library Synchronization not Complete. Please try again later."
     },
     settings: {
-      howToPublishAnApp: "How to publish an app",
-      readThis: "Read this",
-      readThisToPublish:
-        " to learn how to publish a Holochain application to the App Library."
+      publishAnApp: "Publish an app"
     },
     buttons: {
       back: "Back",
@@ -229,15 +226,14 @@ const messages = {
       appStore: "App Store",
       appLibrarySynchronization: "App Store Synchronisation",
       fullSynchronizationRequired: "Vollständige Synchronisation mit Peers erforderlich, um alle Apps herunterladen zu können.",
-      howToPublishAnApp: "Eigene App Publizieren",
       noOngoingPeerSynchronization: "keine aktiven Synchronisationen mit Peers",
       selectAppFromFileSystem: "Installiere App von Datei",
       noAppsInStore:
         "Es sind noch keine Apps im App Store verfügbar oder die Synchronisierung mit Peers ist noch unvollständig.",
-      synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut.",
-      readThis: "Lese dies",
-      readThisToPublish:
-        " um zu lernen, wie man eine Holochain App publiziert.",
+      synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut."
+    },
+    settings: {
+      publishAnApp: "Eigene App Publizieren",
     },
     buttons: {
       back: "Zurück",
