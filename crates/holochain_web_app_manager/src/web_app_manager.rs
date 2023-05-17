@@ -3,7 +3,7 @@ use holochain_manager::{
   versions::{
     holochain_conductor_api_latest::AppInfo,
     holochain_types_latest::{
-      prelude::{AgentPubKey, AppBundle, MembraneProof, CellId},
+      prelude::{AgentPubKey, AppBundle, MembraneProof, CellId, DnaHash, AnyDhtHash, DnaHashB64, AnyDhtHashB64},
       web_app::WebAppBundle,
     },
     mr_bundle_latest::ResourceBytes,
@@ -29,7 +29,36 @@ use crate::{
 
 
 
+//// NOTE: This is not necessarily an HRL. For example UI's stored on the
+/// DevHub need to be accessed via the `happs` cell despite being actually
+/// stored in the `web_assets` cell. The DevHub is making a bridge call
+/// internally.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ResourceLocator {
+    dna_hash: DnaHash,
+    resource_hash: AnyDhtHash,
+}
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ResourceLocatorB64 {
+    dna_hash: DnaHashB64,
+    resource_hash: AnyDhtHashB64,
+}
+
+impl Into<ResourceLocator> for ResourceLocatorB64 {
+  fn into(self) -> ResourceLocator {
+    ResourceLocator {
+      dna_hash: DnaHash::from(self.dna_hash),
+      resource_hash: AnyDhtHash::from(self.resource_hash),
+    }
+  }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ReleaseInfo {
+  resource_locator: ResourceLocatorB64,
+  version: Option<String>,
+}
 
 
 pub struct WebAppManager {
@@ -87,8 +116,8 @@ impl WebAppManager {
     network_seed: Option<String>,
     membrane_proofs: HashMap<String, MembraneProof>,
     agent_pub_key: Option<AgentPubKey>,
-    happ_release_hash: Option<String>,
-    gui_release_hash: Option<String>,
+    happ_release_info: Option<ReleaseInfo>,
+    gui_release_info: Option<ReleaseInfo>,
   ) -> Result<(), String> {
     let app_bundle = web_app_bundle
       .happ_bundle()
@@ -104,21 +133,21 @@ impl WebAppManager {
     // Assuming only one single default UI per app at the moment.
     let default_ui_name = String::from("default");
 
-    // println!("Installing webhapp. Hashes: {:?}, {:?}", happ_release_hash, gui_release_hash);
+    println!("Installing webhapp. ReleaseInfos: {:?}, {:?}", happ_release_info, gui_release_info);
 
     // Try to write hashes first so if that fails, don't even install the app
-    match (happ_release_hash, gui_release_hash.clone()) {
-      (Some(h_hash), Some(_g_hash)) => {
-        self.store_happ_release_hash(h_hash, &app_id)
+    match (happ_release_info, gui_release_info.clone()) {
+      (Some(h_info), Some(_g_info)) => {
+        self.store_happ_release_info(h_info, &app_id)
           .map_err(|e| format!("Failed to store happ release hash to .happrelease file: {:?}", e))?;
         // gui release hash will be stored during install_app_ui
       },
       (None, None) => (),
-      _ => return Err(String::from("Got only one of gui_release_hash or happ_release_hash. Pass either none of them if installing a .webhapp from filesystem or both if installing a .webhapp from the App Library."))
+      _ => return Err(String::from("Got only one of happ_release_info or gui_release_info. Pass either none of them if installing a .webhapp from filesystem or both if installing a .webhapp from the App Library."))
     }
 
     // Install app UI in folder
-    self.install_app_ui(app_id.clone(), web_ui_zip_bytes.into_owned(), &default_ui_name, gui_release_hash)?;
+    self.install_app_ui(app_id.clone(), web_ui_zip_bytes.into_owned(), &default_ui_name, gui_release_info)?;
 
     // Install app in conductor manager
     if let Err(err) = self
@@ -151,11 +180,11 @@ impl WebAppManager {
     app_id: String,
     web_ui_zip_bytes: ResourceBytes,
     ui_name: &String,
-    gui_release_hash: Option<String>,
+    gui_release_info: Option<ReleaseInfo>,
   ) -> Result<(), String> {
 
-    if let Some(hash) = gui_release_hash {
-      self.store_gui_release_hash(hash, &app_id, &ui_name)?;
+    if let Some(info) = gui_release_info {
+      self.store_gui_release_info(info, &app_id, &ui_name)?;
     }
 
     // Careful! The ui_folder_path here needs to be the same as the one being deleted in update_app_ui()
@@ -178,7 +207,7 @@ impl WebAppManager {
     app_id: String,
     web_ui_zip_bytes: ResourceBytes,
     ui_name: &String,
-    gui_release_hash: Option<String>,
+    gui_release_info: Option<ReleaseInfo>,
   ) -> Result<(), String> {
     // move folder of previous assets to a temporary backup folder in case installation fails
     let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, ui_name);
@@ -186,12 +215,12 @@ impl WebAppManager {
     fs::rename(ui_folder_path.clone(), temp_old_ui_path.clone())
       .map_err(|e| format!("Failed to move currently installed UI assets to temporary backup location: {:?}", e))?;
 
-    if gui_release_hash == None {
+    if gui_release_info.is_none() {
       log::warn!("WARNING: App UI updated without passing a gui release hash. This only expected if a GUI is updated from the filesystem instead of through fetching it form the DevHub");
     }
 
     // write zip file with new UI assets to disk in order to unpack it
-    match self.install_app_ui(app_id, web_ui_zip_bytes, ui_name, gui_release_hash) {
+    match self.install_app_ui(app_id, web_ui_zip_bytes, ui_name, gui_release_info) {
       Ok(()) => (),
       Err(e) => {
         log::error!("Failed to install app ui during update_app_ui: {:?}", e);
@@ -250,7 +279,7 @@ impl WebAppManager {
   fn get_web_ui_info(&self, app_id: String, ui_name: &String) -> Result<WebUiInfo, String> {
     let ui_folder_path = app_assets_dir(&self.environment_path, &app_id, ui_name);
 
-    let gui_release_hash = self.get_gui_release_hash(&app_id, ui_name);
+    let gui_release_info = self.get_gui_release_info(&app_id, ui_name);
 
     match self.is_web_app(app_id.clone()) {
       true => Ok(WebUiInfo::WebApp {
@@ -263,7 +292,7 @@ impl WebAppManager {
             app_id,
           ))?
           .clone(),
-        gui_release_hash,
+          gui_release_info,
       }),
       false => Ok(WebUiInfo::Headless),
     }
@@ -291,14 +320,14 @@ impl WebAppManager {
     network_seed: Option<String>,
     membrane_proofs: HashMap<String, MembraneProof>,
     agent_pub_key: Option<AgentPubKey>,
-    happ_release_hash: Option<String>,
+    happ_release_info: Option<ReleaseInfo>,
   ) -> Result<(), String> {
 
     // Try to write hashes first so if that fails, don't even install the app
     // Note: a hApp release hash will only be passed if the hApp is installed
     // from the AppLibrary
-    if let Some(hash) = happ_release_hash {
-      self.store_happ_release_hash(hash, &app_id)?;
+    if let Some(info) = happ_release_info {
+      self.store_happ_release_info(info, &app_id)?;
     }
 
     // Install app in conductor manager
@@ -392,12 +421,15 @@ impl WebAppManager {
         let mut web_uis = HashMap::new();
         web_uis.insert(default_ui_name.clone(), web_ui_info);
 
-        let happ_release_hash = self.get_happ_release_hash(&installed_app.installed_app_id);
+        let happ_release_info = self.get_happ_release_info(&installed_app.installed_app_id);
+
+        let icon_src = self.get_app_icon_src(&installed_app.installed_app_id);
 
         Ok(InstalledWebAppInfo {
           installed_app_info: installed_app,
-          happ_release_hash,
+          happ_release_info,
           web_uis,
+          icon_src,
         })
       })
       .collect::<Result<Vec<InstalledWebAppInfo>, String>>()?;
@@ -485,9 +517,10 @@ impl WebAppManager {
   }
 
 
-  /// Stores the hash of a happ release of the given hApp to the filesystem
+  /// Stores the hash of a happ release of the given hApp to the filesystem in a yaml file
+  /// called .happrelease
   /// EntryHash must be passed as a base64 string
-  pub fn store_happ_release_hash(&self, hash: String, app_id: &String) -> Result<(), String> {
+  pub fn store_happ_release_info(&self, info: ReleaseInfo, app_id: &String) -> Result<(), String> {
 
     let app_data_dir = app_data_dir(&self.environment_path, app_id);
 
@@ -504,14 +537,19 @@ impl WebAppManager {
     }
 
     // println!("Storing happ release hash to the following path: {:?}", dot_happrelease_path);
+    let info_value = serde_yaml::to_value(info)
+      .map_err(|e| format!("Failed to convert info of happ release to serde_yaml Value: {}", e))?;
 
-    std::fs::write(dot_happrelease_path, hash)
-      .map_err(|e| format!("Failed to write happ release hash to .happrelease file: {:?}", e))
+    let info_string = serde_yaml::to_string(&info_value)
+      .map_err(|e| format!("Failed to convert info of happ release from serde_yaml Value to string: {}", e))?;
+
+    std::fs::write(dot_happrelease_path, info_string)
+      .map_err(|e| format!("Failed to write happ release info to .happrelease file: {:?}", e))
   }
 
   /// Stores the hash of a gui release of the given hApp to the filesystem
   /// EntryHash must be passed as a base64 string
-  pub fn store_gui_release_hash(&self, hash: String, app_id: &String, ui_name: &String) -> Result<(), String> {
+  pub fn store_gui_release_info(&self, info: ReleaseInfo, app_id: &String, ui_name: &String) -> Result<(), String> {
 
     let app_gui_dir = app_ui_dir(&self.environment_path, app_id, ui_name);
     create_dir_if_necessary(&app_gui_dir)
@@ -521,33 +559,84 @@ impl WebAppManager {
     // if there is already a .guirelease file, store its contents to a .guirelease.previous file in order to be able
     // to revert upgrades if necessary
     if dot_guirelease_path.exists() {
-      let dot_guirelease_dot_previous_path = app_data_dir(&self.environment_path, app_id).join(".guirelease.previous");
+      let dot_guirelease_dot_previous_path = app_gui_dir.join(".guirelease.previous");
 
       std::fs::rename(dot_guirelease_path.clone(), dot_guirelease_dot_previous_path)
         .map_err(|e| format!("Failed to rename .guirelease file to .guirelease.previous file: {:?}", e))?;
     }
 
     // println!("Storing GUI release hash to the following path: {:?}", dot_guirelease_path);
+    let info_value = serde_yaml::to_value(info)
+      .map_err(|e| format!("Failed to convert ResourceLocator of GUI release info to serde_yaml Value: {}", e))?;
 
-    std::fs::write(dot_guirelease_path, hash)
-      .map_err(|e| format!("Failed to write GUI release hash to .guirelease file: {:?}", e))
+    let info_string = serde_yaml::to_string(&info_value)
+      .map_err(|e| format!("Failed to convert info of GUI release from serde_yaml Value to string: {}", e))?;
+
+    std::fs::write(dot_guirelease_path, info_string)
+      .map_err(|e| format!("Failed to write GUI release info to .guirelease file: {:?}", e))
   }
 
   /// Reads the happ release hash of an app
-  pub fn get_happ_release_hash(&self, app_id: &String) -> Option<String> {
+  pub fn get_happ_release_info(&self, app_id: &String) -> Option<ReleaseInfo> {
     match fs::read_to_string(app_data_dir(&self.environment_path, app_id).join(".happrelease")) {
-      Ok(s) => Some(s),
+      Ok(s) => {
+        let happ_release_info = serde_yaml::from_str::<ReleaseInfo>(s.as_str());
+        match happ_release_info {
+          Ok(info) => Some(info),
+          Err(e) => {
+            log::error!("Failed to read happ release info from .happrelease file: {}", e);
+            None
+          }
+        }
+      },
       Err(_) => None,
     }
   }
 
   /// Reads the gui release hash of an app UI
-  pub fn get_gui_release_hash(&self, app_id: &String, ui_name: &String) -> Option<String> {
+  pub fn get_gui_release_info(&self, app_id: &String, ui_name: &String) -> Option<ReleaseInfo> {
     match fs::read_to_string(app_ui_dir(&self.environment_path, app_id, ui_name).join(".guirelease")) {
-      Ok(s) => Some(s),
+      Ok(s) => {
+        let gui_release_info = serde_yaml::from_str::<ReleaseInfo>(s.as_str());
+        match gui_release_info {
+          Ok(info) => Some(info),
+          Err(e) => {
+            log::error!("Failed to read GUI release ResourceLocator from .guirelease file: {}", e);
+            None
+          }
+        }
+      },
       Err(_) => None,
     }
   }
+
+  /// Stores the app icon src
+  /// The icon is expected to be a base64 string of the format 'data:image/png;base64,[...blabla...]'
+  pub fn store_app_icon_src(&self, icon_src: String, app_id: &String) -> Result<(), String> {
+
+    let app_data_dir = app_data_dir(&self.environment_path, app_id);
+
+    create_dir_if_necessary(&app_data_dir)
+      .map_err(|e| format!("Failed to create app's data directory before storing app icon src: {:?}", e))?;
+
+    let icon_path = app_data_dir.join(".icon");
+
+    std::fs::write(icon_path, icon_src)
+      .map_err(|e| format!("Failed to write icon src to .icon file: {:?}", e))
+  }
+
+  /// Reads the app icon src
+  /// The icon is expected to be a base64 string of the format 'data:image/png;base64,[...blabla...]'
+  pub fn get_app_icon_src(&self, app_id: &String) -> Option<String> {
+    match fs::read_to_string(app_data_dir(&self.environment_path, app_id).join(".icon")) {
+      Ok(s) => Some(s),
+      Err(_) => {
+        log::error!("Failed to load icon src for app with id {}", app_id);
+        None
+      },
+    }
+  }
+
 
 }
 

@@ -1,8 +1,12 @@
 import {
   AgentPubKey,
+  AnyDhtHash,
   AppRoleManifest,
   AppInfo,
   EntryHash,
+  DnaHash,
+  DnaHashB64,
+  AnyDhtHashB64,
 } from "@holochain/client";
 import { Entity, GUIReleaseEntry, HappReleaseEntry } from "./appstore/types";
 
@@ -117,13 +121,25 @@ export type WebUiInfo =
       type: "WebApp";
       path_to_web_app: string;
       app_ui_port: number;
-      gui_release_hash: string | undefined;
+      gui_release_info: ReleaseInfo | undefined;
     };
+
+
+export interface ResourceLocator {
+  dna_hash: DnaHash,
+  resource_hash: AnyDhtHash,
+}
+
+export interface ResourceLocatorB64 {
+  dna_hash: DnaHashB64,
+  resource_hash: AnyDhtHashB64,
+}
 
 export interface InstalledWebAppInfo {
   installed_app_info: AppInfo;
-  happ_release_hash: string | undefined;
+  happ_release_info: ReleaseInfo | undefined;
   web_uis: Record<string, WebUiInfo>;
+  icon_src: string | undefined;
 }
 
 export interface HolochainAppInfo {
@@ -136,7 +152,7 @@ export interface HolochainAppInfoExtended {
   webAppInfo: InstalledWebAppInfo;
   holochainId: HolochainId;
   holochainVersion: HolochainVersion;
-  guiUpdateAvailable: EntryHash | undefined; // gui release entry hash if there is known to be a new gui release available in the DevHub
+  guiUpdateAvailable: ResourceLocator | undefined; // gui release entry hash if there is known to be a new gui release available in the DevHub
 }
 
 
@@ -156,7 +172,13 @@ export interface StorageInfo {
 }
 
 
-export interface ReleaseInfo {
+export interface ReleaseData {
+  devhubDnaHash: DnaHash,
   happRelease: Entity<HappReleaseEntry>,
   guiRelease: Entity<GUIReleaseEntry> | undefined,
+}
+
+export interface ReleaseInfo {
+  resource_locator: ResourceLocatorB64,
+  version: string | undefined,
 }

@@ -37,9 +37,9 @@
         </sl-tooltip>
 
         <img
-          v-if="appIcon"
+          v-if="app.webAppInfo.icon_src"
           :class="{ appIcon: !showMore, appIconMore: showMore }"
-          :src="`${appIcon}`"
+          :src="`${app.webAppInfo.icon_src}`"
         />
         <div
           v-else
@@ -393,9 +393,6 @@ export default defineComponent({
     DisabledCloneCard,
   },
   props: {
-    appIcon: {
-      type: String,
-    },
     app: {
       type: Object as PropType<HolochainAppInfoExtended>,
       required: true,

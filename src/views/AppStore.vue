@@ -105,7 +105,7 @@
     v-if="selectedApp"
     :app="selectedApp"
     :appWebsocket="appWebsocket"
-    :imgSrc="selectedImgSrc"
+    :imgSrc="selectedIconSrc"
     ref="selectAppReleasesDialog"
     @cancel="() => {
       selectedApp = undefined;
@@ -118,8 +118,9 @@
     v-if="selectedAppBundlePath"
     :appBundlePath="selectedAppBundlePath"
     :holochainSelection="holochainSelection"
-    :happReleaseHash="selectedHappReleaseHash"
-    :guiReleaseHash="selectedGuiReleaseHash"
+    :happReleaseInfo="selectedHappReleaseInfo"
+    :guiReleaseInfo="selectedGuiReleaseInfo"
+    :iconSrc="selectedIconSrc"
     @app-installed="
       holochainSelection = true;
       installClosed();
@@ -140,7 +141,7 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket, NetworkInfo, CellInfo, EntryHashB64, encodeHashToBase64, AgentPubKey } from "@holochain/client";
+import { AppWebsocket, NetworkInfo, CellInfo, EntryHashB64, encodeHashToBase64, AgentPubKey, AnyDhtHash } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 import { toSrc } from "../utils";
@@ -157,11 +158,9 @@ import HCLoading from "../components/subcomponents/HCLoading.vue";
 import HCDialog from "../components/subcomponents/HCDialog.vue";
 import SelectReleaseDialog from "../components/SelectReleaseDialog.vue";
 
-import { HolochainId, ReleaseInfo } from "../types";
+import { HolochainId, ReleaseData, ReleaseInfo } from "../types";
 import prettyBytes from "pretty-bytes";
-import { getCellId } from "../utils";
-import { i18n } from "../locale";
-import { AppEntry, Entity, HappReleaseEntry, HostAvailability } from "../appstore/types";
+import { AppEntry, HostAvailability } from "../appstore/types";
 import { getAllApps } from "../appstore/appstore-interface";
 import { APPSTORE_APP_ID, DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../constants";
 
@@ -200,10 +199,10 @@ export default defineComponent({
     downloadFailed: boolean;
     errorText: string;
     appWebsocket: AppWebsocket | undefined;
-    selectedHappReleaseHash: EntryHashB64 | undefined;
-    selectedGuiReleaseHash: EntryHashB64 | undefined;
+    selectedHappReleaseInfo: ReleaseInfo | undefined;
+    selectedGuiReleaseInfo: ReleaseInfo | undefined;
     selectedApp: AppEntry | undefined;
-    selectedImgSrc: string | undefined;
+    selectedIconSrc: string | undefined;
   } {
     return {
       loadingText: "",
@@ -226,10 +225,10 @@ export default defineComponent({
       downloadFailed: false,
       errorText: "Unknown error occured.",
       appWebsocket: undefined,
-      selectedHappReleaseHash: undefined,
-      selectedGuiReleaseHash: undefined,
+      selectedHappReleaseInfo: undefined,
+      selectedGuiReleaseInfo: undefined,
       selectedApp: undefined,
-      selectedImgSrc: undefined,
+      selectedIconSrc: undefined,
     };
   },
   beforeUnmount() {
@@ -252,19 +251,21 @@ export default defineComponent({
       installed_app_id: APPSTORE_APP_ID,
     });
 
+    // With multiple possible DevHub networks, available peers are not necessarily unique
+
     try {
-      const result = await getVisibleHostsForZomeFunction(this.appWebsocket as AppWebsocket, appStoreInfo, 'happ_library', 'get_webhapp_package');
+      const result = await getVisibleHostsForZomeFunction(this.appWebsocket as AppWebsocket, appStoreInfo, DEVHUB_HAPP_LIBRARY_DNA_HASH, 'happ_library', 'get_webhapp_package');
       this.peerHostStatus = result;
     } catch (e) {
       console.error(`Failed to get peer host statuses: ${JSON.stringify(e)}`);
     }
-
 
     this.pollInterval = window.setInterval(
       async () => {
         const result = await getVisibleHostsForZomeFunction(
           this.appWebsocket as AppWebsocket,
           appStoreInfo,
+          DEVHUB_HAPP_LIBRARY_DNA_HASH,
           "happ_library",
           "get_webhapp_package"
         );
@@ -324,7 +325,9 @@ export default defineComponent({
       console.log("@fetchApps: allApps: ", allApps);
 
       // filter by apps of the relevant DevHub dna hash
-      this.installableApps = allApps.filter((appEntry) => JSON.stringify(appEntry.devhub_address.dna) === JSON.stringify(DEVHUB_HAPP_LIBRARY_DNA_HASH));
+      // this.installableApps = allApps.filter((appEntry) => JSON.stringify(appEntry.devhub_address.dna) === JSON.stringify(DEVHUB_HAPP_LIBRARY_DNA_HASH));
+
+      this.installableApps = allApps;
 
       this.loading = false;
 
@@ -347,7 +350,7 @@ export default defineComponent({
      */
     async requestInstall(app: AppEntry, imgSrc: string | undefined) {
 
-      this.selectedImgSrc = imgSrc ? imgSrc : undefined;
+      this.selectedIconSrc = imgSrc ? imgSrc : undefined;
       this.selectedApp = app;
 
       // 1. get happ releases for app from DevHub
@@ -359,7 +362,7 @@ export default defineComponent({
         (this.$refs.selectAppReleasesDialog as typeof SelectReleaseDialog).open();
       });
     },
-    async saveApp(releaseInfo: ReleaseInfo) {
+    async saveApp(releaseInfo: ReleaseData) {
       // // if downloading, always take holochain version of DevHub
       this.holochainSelection = false;
       this.loadingText = "searching available peer host";
@@ -373,12 +376,25 @@ export default defineComponent({
       const happReleaseHash = releaseInfo.happRelease.id;
       const guiReleaseHash = releaseInfo.happRelease.content.official_gui;
 
-      this.selectedHappReleaseHash = encodeHashToBase64(happReleaseHash);
-      this.selectedGuiReleaseHash = guiReleaseHash ? encodeHashToBase64(guiReleaseHash) : undefined;
+      this.selectedHappReleaseInfo = {
+        resource_locator: {
+          dna_hash: encodeHashToBase64(releaseInfo.devhubDnaHash),
+          resource_hash: encodeHashToBase64(happReleaseHash),
+        },
+        version: releaseInfo.happRelease.content.version,
+      };
+      this.selectedGuiReleaseInfo = guiReleaseHash ? {
+        resource_locator: {
+          dna_hash: encodeHashToBase64(releaseInfo.devhubDnaHash),
+          resource_hash: encodeHashToBase64(guiReleaseHash),
+        },
+        version: releaseInfo.guiRelease?.content.version
+      } : undefined;
 
       const host: AgentPubKey = await getAvailableHostForZomeFunction(
         this.appWebsocket as AppWebsocket,
         appStoreInfo,
+        releaseInfo.devhubDnaHash,
         "happ_library",
         "get_webhapp_package",
       );
@@ -391,7 +407,7 @@ export default defineComponent({
           appstoreAppId: appStoreInfo.installed_app_id,
           appTitle: this.selectedApp!.title,
           host: Array.from(host),
-          devhubHappLibraryDnaHash: Array.from(DEVHUB_HAPP_LIBRARY_DNA_HASH), // DNA hash of the DevHub to which the remote call shall be made
+          devhubHappLibraryDnaHash: Array.from(releaseInfo.devhubDnaHash), // DNA hash of the DevHub to which the remote call shall be made
           appstorePubKey: encodeHashToBase64(appStoreInfo.agent_pub_key),
           happReleaseHash: encodeHashToBase64(happReleaseHash),
           guiReleaseHash: guiReleaseHash ? encodeHashToBase64(guiReleaseHash) : undefined,
@@ -408,9 +424,10 @@ export default defineComponent({
       } catch (e) {
         console.error("Error fetching the webhapp from the DevHub host: ", e);
         this.errorText = "Failed to fetch webhapp from DevHub host.";
-        this.selectedHappReleaseHash = undefined;
-        this.selectedGuiReleaseHash = undefined;
+        this.selectedHappReleaseInfo = undefined;
+        this.selectedGuiReleaseInfo = undefined;
         this.selectedApp = undefined;
+        this.selectedIconSrc = undefined;
         (this.$refs as any).snackbar.show();
         (this.$refs.downloading as typeof HCLoading).close();
         return;

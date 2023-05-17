@@ -1,4 +1,4 @@
-import { CellInfo } from "@holochain/client";
+import { CellInfo, encodeHashToBase64 } from "@holochain/client";
 import { CellId } from "@holochain/client";
 import {
   DisabledAppReason,
@@ -8,8 +8,15 @@ import {
 import prettyBytes from "pretty-bytes";
 import { Base64 } from "js-base64";
 
-import { GossipProgress } from "./types";
+import { GossipProgress, ResourceLocator, ResourceLocatorB64 } from "./types";
 
+
+export function locatorToLocatorB64(locator: ResourceLocator): ResourceLocatorB64 {
+  return {
+    dna_hash: encodeHashToBase64(locator.dna_hash),
+    resource_hash: encodeHashToBase64(locator.resource_hash),
+  }
+}
 
 export function isAppRunning(app: AppInfo): boolean {
   return (app.status as any) === "running";
