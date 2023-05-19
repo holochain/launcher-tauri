@@ -152,7 +152,10 @@ export default defineComponent({
     cursor: pointer;
     font-size: 1.5em; 
     margin-left: 13px;
-    padding: 10px;
+    padding: 0 10px;
+    height: 64px;
+    line-height: 64px;
+    vertical-align: middle;;
   }
   .selectedTab {
     background-color: blue;
