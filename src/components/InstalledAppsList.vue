@@ -1,5 +1,6 @@
 <template>
 
+  <!-- TODO: remove this, but add little dot to settings when there are ui updates to do -->
   <HCGenericDialog
     @confirm="updateGui"
     ref="updateGuiDialog"
@@ -48,64 +49,12 @@
       min-width: 900px;
     "
   >
-    <div
-      class="row"
-      style="
-        width: 100%;
-        justify-content: flex-end;
-        align-items: center;
-        max-width: 1100px;
-        margin-top: 20px;
-        margin-bottom: -5px;
-      "
-    >
-      <HCSelectCard
-        style="
-          width: 200px;
-          margin-right: 5px;
-          box-shadow: 0 0px 3px -1px #9b9b9b;
-          --hc-label-background: #e8e8eb;
-        "
-        :placeholder="$t('main.holochainVersions')"
-        :items="holochainVersionOptions"
-        @item-selected="selectedHolochainVersion = $event"
-      ></HCSelectCard>
-      <img
-        src="/img/Square284x284Logo.png"
-        style="
-          height: 30px;
-          filter: grayscale(50%);
-          margin-right: 20px;
-          margin-left: -2px;
-        "
-      />
-
-      <HCSelectCard
-        style="
-          width: 200px;
-          margin-right: 5px;
-          box-shadow: 0 0px 3px -1px #9b9b9b;
-          --hc-label-background: #e8e8eb;
-        "
-        :placeholder="$t('main.sortBy')"
-        :items="sortOptions"
-        @item-selected="sortOption = $event"
-      ></HCSelectCard>
-      <mwc-icon style="color: #482edf; text-shadow: 0 0px 5px #9b9b9b"
-        >sort</mwc-icon
-      >
-    </div>
 
     <!-- Web Apps -->
     <div
       class="row section-title"
       style="margin-top: -18px"
     >
-      <!-- <span
-        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
-        :title="$t('main.webAppsHelper')"
-        >{{ $t("main.webApps") }}</span
-      > -->
       <span
         @click="showWebApps = !showWebApps"
         class="show-hide"
