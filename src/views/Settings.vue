@@ -26,7 +26,7 @@
 
       <div
         class="column"
-        style="margin-bottom: 50px; width: 100%;"
+        style="margin-bottom: 15px; width: 100%;"
       >
         <div
           v-if="noHolochainVersions"
@@ -81,10 +81,11 @@
       </div>
 
       <div class="column section-container" style="display: flex; flex-direction: column;">
+      <div class="row section-container" style="display: flex; flex-direction: column;">
         <div class="row">
           <div style="flex: 1;">
             <h2>Developer Mode</h2>
-            <span>Activates DevHub + empowers you to create apps</span>
+            <span>Activates DevHub and enables you to publish apps</span>
           </div>
           <!-- Disable/enable switch -->
           <sl-tooltip
@@ -135,7 +136,6 @@
             width: 100%;
             justify-content: flex-end;
             align-items: center;
-            margin-top: 20px;
             margin-bottom: -5px;
           "
         >
@@ -179,12 +179,12 @@
         <div
           class="row section-title"
           :class="{ borderBottomed: showWebApps }"
-          style="margin-top: -18px"
+          style="margin-top: -25px"
         >
           <span
             style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
-            :title="$t('main.webAppsHelper')"
-            >{{ $t("main.webApps") }}</span
+            :title="$t('settings.appSettingsHelper')"
+            >{{ $t("settings.appSettings") }}</span
           >
           <span
             @click="showWebApps = !showWebApps"
@@ -194,12 +194,12 @@
             {{ showWebApps ? "[-]" : "[show]" }}
           </span>
         </div>
-        <div v-if="showWebApps" class='section-container' style="margin-bottom: 50px; width: 100%">
+        <div v-if="showWebApps" class='section-container' style="margin-bottom: 50px;">
           <div
             v-if="noWebApps"
             style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
           >
-            {{ $t("main.noWebApps") }}
+            {{ $t("settings.noWebApps") }}
             {{
               selectedHolochainVersion === "All Versions"
                 ? "."
@@ -233,13 +233,14 @@
 
         <!-- Headless Apps -->
         <div
+          v-if="!noHeadlessApps"
           class="row section-title"
           :class="{ borderBottomed: showHeadlessApps }"
         >
           <span
             style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
-            :title="$t('main.headlessAppsHelper')"
-            >{{ $t("main.headlessApps") }}</span
+            :title="$t('settings.headlessAppsHelper')"
+            >{{ $t("settings.headlessApps") }}</span
           >
           <span
             @click="showHeadlessApps = !showHeadlessApps"
@@ -249,18 +250,7 @@
             {{ showHeadlessApps ? "[-]" : "[show]" }}
           </span>
         </div>
-        <div v-if="showHeadlessApps" style="margin-bottom: 50px; width: 100%">
-          <div
-            v-if="noHeadlessApps"
-            style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
-          >
-            {{ $t("main.noHeadlessApps") }}
-            {{
-              selectedHolochainVersion === "All Versions"
-                ? "."
-                : " in this Holochain Version."
-            }}
-          </div>
+        <div v-if="showHeadlessApps && !noHeadlessApps" style="margin-bottom: 50px; width: 100%">
           <div
             v-for="app in sortedApps"
             :key="app.webAppInfo.installed_app_info.installed_app_id"
@@ -950,7 +940,7 @@ h2 {
 }
 
 .section-title {
-  margin: 10px;
+  margin: 10px 0;
   padding-bottom: 3px;
   align-items: center;
 }
@@ -960,6 +950,7 @@ h2 {
   background-color: white;
   padding: 15px;
   box-shadow: 0 0px 5px #9b9b9b;
+  margin-bottom: 20px;
 }
 
 .hc-version {

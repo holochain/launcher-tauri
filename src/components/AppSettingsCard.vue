@@ -22,28 +22,14 @@
     >
     <!-- App Logo with Holo Identicon -->
       <div style="position: relative">
-        <!-- assumes same agent pub key for all cells (just taking the first one) -->
-        <!-- <div v-show="showPubKeyTooltip" class="tooltip">Copied!</div> -->
-        <sl-tooltip class="tooltip" hoist placement="top" :content="showPubKeyTooltip ? $t('main.copied') : $t('main.yourPublicKey')">
-          <HoloIdenticon
-            class="holoIdenticon"
-            :hash="getPubKey()"
-            :size="42"
-            tabindex="0"
-            @click="copyPubKey()"
-            @keypress.enter="copyPubKey()"
-          ></HoloIdenticon>
-        </sl-tooltip>
-
         <img
-          v-if="appIcon"
-          :class="{ appIcon: true, appIconMore: showMore }"
-          :src="`${appIcon}`"
+          v-if="app.webAppInfo.icon_src"
+          class="appIcon"
+          :src="`${app.webAppInfo.icon_src}`"
         />
         <div
           v-else
-          :class="{ appIcon: true, appIconMore: showMore }"
-          class="column center-content"
+          class="appIcon column center-content"
           style="background-color: #372ba5"
         >
           <div style="color: white; font-size: 45px; font-weight: 600">
@@ -52,8 +38,6 @@
         </div>
       </div>
       <!-- ------------- -->
-
-
 
       <!-- Installed App Id -->
       <div
@@ -178,10 +162,10 @@
     <!-------------- App details --------------->
     <div
       v-if="showMore"
-      class="column"
-      style="align-items: left; width: 100%; margin-bottom: 20px"
+      class="column appDetails"
+      style="align-items: left; margin-bottom: 20px; padding-left: 65px;"
     >
-      <div class="row" style="margin-left: 140px">
+      <div class="row">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >{{ $t('main.holochainVersion') }}:</span
         >
@@ -199,10 +183,29 @@
         > -->
       </div>
 
+      <!-- Public Key -->
+      <div class="row" style="align-items: center;">
+        <!-- assumes same agent pub key for all cells (just taking the first one) -->
+        <!-- <div v-show="showPubKeyTooltip" class="tooltip">Copied!</div> -->
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em; vertical-align: middle;"
+          >{{ $t('settings.publicKey') }}:</span
+        >
+        <sl-tooltip class="tooltip" hoist placement="top" :content="showPubKeyTooltip ? $t('main.copied') : $t('main.yourPublicKey')">
+          <HoloIdenticon
+            class="holoIdenticon"
+            :hash="getPubKey()"
+            :size="42"
+            tabindex="0"
+            @click="copyPubKey()"
+            @keypress.enter="copyPubKey()"
+          ></HoloIdenticon>
+        </sl-tooltip>
+      </div>
+
       <!-- provisioned cells -->
       <div
         class="row"
-        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+        style="margin-right: 30px"
       >
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Provisioned Cells:</span
@@ -213,7 +216,7 @@
           >{{ showProvisionedCells ? `[${$t('main.hide')}]` : `[${$t('main.show')}]` }}
         </span>
       </div>
-      <div v-if="showProvisionedCells" style="margin-left: 140px; margin-right: 20px">
+      <div v-if="showProvisionedCells" style="margin-right: 20px">
         <InstalledCellCard
           v-for="[roleName, cellInfo] in provisionedCells"
           :key="roleName"
@@ -228,7 +231,7 @@
       <!-- enabled cloned cells -->
       <div
         class="row"
-        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+        style="margin-top: 20px; margin-right: 30px"
       >
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Cloned Cells:</span
@@ -241,7 +244,7 @@
       </div>
       <div
         v-if="showClonedCells"
-        style="margin-left: 140px; margin-right: 20px"
+        style="margin-right: 20px"
       >
         <div v-if="enabledClonedCells.length > 0">
           <InstalledCellCard
@@ -263,7 +266,7 @@
       <!-- disabled cloned cells -->
       <div
         class="row"
-        style="margin-top: 20px; margin-left: 140px; margin-right: 30px"
+        style="margin-top: 20px; margin-right: 30px"
       >
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Disabled Cloned Cells:</span
@@ -276,7 +279,7 @@
       </div>
       <div
         v-if="showDisabledClonedCells"
-        style="margin-left: 140px; margin-right: 20px"
+        style="margin-right: 20px"
       >
         <div v-if="disabledClonedCells.length > 0">
           <DisabledCloneCard
@@ -298,7 +301,7 @@
 
       <span
         v-if="getReason(app.webAppInfo.installed_app_info)"
-        style="margin-top: 16px; margin-left: 140px"
+        style="margin-top: 16px;"
       >
         {{ getReason(app.webAppInfo.installed_app_info) }}
       </span>
@@ -530,9 +533,6 @@ export default defineComponent({
   align-items: center;
   background: #ffffff;
   width: 100%;
-  max-width: 1100px;
-  min-width: 900px;
-  margin: 8px;
   border-bottom: 1px dotted gray;
 }
 
@@ -557,15 +557,12 @@ export default defineComponent({
   object-fit: cover;
 }
 
-.appIconMore {
-  box-shadow: 0 0px 5px #9b9b9b;
+.appDetails .row {
+  margin-top: 20px;
 }
 
 .holoIdenticon {
   border-radius: 12px;
-  position: absolute;
-  top: 38px;
-  left: 38px;
   cursor: pointer;
 }
 
