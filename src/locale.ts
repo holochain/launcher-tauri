@@ -37,8 +37,6 @@ const messages = {
       copyDnaHash: "Copy Dna Hash",
       copyNetworkSeed: "Copy Network Seed",
       cloneName: "Name",
-      headlessApps: "Headless Apps",
-      headlessAppsHelper: "Holochain Apps without Graphical User Interface",
       hide: "Hide",
       hideNetworkSeed: "Hide Network Seed",
       holochainVersions: "Holochain Versions",
@@ -53,8 +51,6 @@ const messages = {
       networkSeed: "Network Seed",
       noClonedCells: "There are no cloned cells in this app.",
       noDisabledClonedCells: "There are no disabled cloned cells in this app.",
-      noHeadlessApps: "There are no headless apps installed",
-      noWebApps: "There are no web apps installed",
       noHolochainVersions: "There are no Holochain versions installed.",
       outgoing: "outgoing",
       refresh: "Refresh",
@@ -64,8 +60,6 @@ const messages = {
       show: "Show",
       showNetworkSeed: "Show Network Seed",
       visiblePeers: "Visible Peers",
-      webApps: "Web Apps",
-      webAppsHelper: "Holochain Apps with Graphical User Interface",
       yourPublicKey: "Your Public Key",
     },
     appStore: {
@@ -80,6 +74,13 @@ const messages = {
       synchronizationNotCompleteError: "App Library Synchronization not Complete. Please try again later."
     },
     settings: {
+      appSettings: "App Settings",
+      appSettingsHelper: "Settings for Holochain Apps with Graphical User Interfaces",
+      headlessApps: "Headless Apps",
+      headlessAppsHelper: "Holochain Apps without Graphical User Interface",
+      noHeadlessApps: "There are no headless apps installed",
+      noWebApps: "There are no web apps installed",
+      publicKey: "Public Key",
       publishAnApp: "Publish an app"
     },
     buttons: {
@@ -191,8 +192,6 @@ const messages = {
       copyDnaHash: "Dna Hash kopieren",
       copyNetworkSeed: "Network Seed kopieren",
       cloneName: "Name",
-      headlessApps: "Headless Apps",
-      headlessAppsHelper: "Holochain Apps ohne Graphische Benutzeroberfläche",
       hide: "Verbergen",
       hideNetworkSeed: "Network Seed verbergen",
       holochainVersions: "Holochain Versionen",
@@ -207,8 +206,6 @@ const messages = {
       networkSeed: "Network Seed",
       noClonedCells: "Diese App hat keine Cloned Cells.",
       noDisabledClonedCells: "Diese App hat keine deaktivierten Cloned Cells.",
-      noHeadlessApps: "Es sind keine Headless Apps installiert",
-      noWebApps: "Es sind keine Web Apps installiert",
       noHolochainVersions: "Es sind keine Holochain Versionen installiert.",
       outgoing: "ausgehend",
       refresh: "Aktualisieren",
@@ -217,8 +214,6 @@ const messages = {
       showNetworkSeed: "Network Seed anzeigen",
       sortBy: "sortiere nach",
       visiblePeers: "Sichtbare Peers",
-      webApps: "Web Apps",
-      webAppsHelper: "Holochain Apps mit Graphischer Benutzeroberfläche",
       yourPublicKey: "Dein Public Key",
     },
     appStore: {
@@ -233,6 +228,13 @@ const messages = {
       synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut."
     },
     settings: {
+      appSettings: "App Settings",
+      appSettingsHelper: "Settings for Holochain Apps mit Graphischer Benutzeroberfläche",
+      headlessApps: "Headless Apps",
+      headlessAppsHelper: "Holochain Apps ohne Graphische Benutzeroberfläche",
+      noHeadlessApps: "Es sind keine Headless Apps installiert",
+      noWebApps: "Es sind keine Web Apps installiert",
+      publicKey: "Public Key",
       publishAnApp: "Eigene App Publizieren",
     },
     buttons: {
