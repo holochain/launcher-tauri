@@ -397,8 +397,6 @@ export async function getAvailableHostForZomeFunction(
               provenance: getCellId(portalCell)![1],
             });
 
-            console.log("@getAvailableHostForZomeFunction Sent ping to host and got result: ", result);
-
             if (result.type === "failure") {
               return Promise.reject(`Failed to ping host: ${result.payload}`);
             }
@@ -692,10 +690,10 @@ export async function remoteCallToDevHubHost<T>(
       if (response.payload.type === "success") {
         return response.payload.payload;
       } else {
-        return Promise.reject(`Failed to fetch UI: ${JSON.stringify(response.payload.payload)}`);
+        return Promise.reject(`remote call for function '${fn_name}' of zome '${zome_name}' failed: ${JSON.stringify(response.payload.payload)}`);
       }
     } else {
-      return Promise.reject(`Failed to fetch UI: ${JSON.stringify(response.payload)}`);
+      return Promise.reject(`remote call for function '${fn_name}' of zome '${zome_name}' failed: ${JSON.stringify(response.payload)}`);
     }
   }
 }
@@ -703,7 +701,9 @@ export async function remoteCallToDevHubHost<T>(
 
 
 /**
- * Helper function to make a remote call to first responsive host
+ * Helper function to make a remote call to first responsive host. It is possible
+ * that this host does not have the app synchronized and thus is unable to deliver it.
+ * In that case, other hosts should be tried which is not supported by this function.
  *
  * @param appWebsocket
  * @param appStoreApp
@@ -742,61 +742,76 @@ export async function remoteCallToAvailableHost<T>(
 
 
 
-// /**
-//  * Helper function to make a remote call to hosts in a cascading manner, i.e. if the first
-//  * responsive host fails to deliver the promise, go on to proceeding hosts etc.
-//  *
-//  * @param appWebsocket
-//  * @param appStoreApp
-//  * @param devhubDna
-//  * @param zome_name
-//  * @param fn_name
-//  * @param payload
-//  */
-// export async function remoteCallCascadeToAvailableHosts<T>(
-//   appWebsocket: AppWebsocket,
-//   appStoreApp: AppInfo,
-//   devhubDna: DnaHash,
-//   zome_name: string,
-//   fn_name: string,
-//   payload: any,
-//   pingTimeout: number = 4000,
-// ): Promise<T> {
+/**
+ * Helper function to make a remote call to hosts in a cascading manner, i.e. if the first
+ * responsive host fails to deliver the promise, go on to proceeding hosts etc.
+ *
+ * WARNING: Untested.
+ *
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param devhubDna
+ * @param zome_name
+ * @param fn_name
+ * @param payload
+ */
+export async function remoteCallCascadeToAvailableHosts<T>(
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  devhubDna: DnaHash,
+  zome_name: string,
+  fn_name: string,
+  payload: any,
+  pingTimeout: number = 4000, // hosts that do not respond to the ping quicker than this are ignored
+): Promise<T> {
 
-//   const pingResult = await getVisibleHostsForZomeFunction(
-//     appWebsocket,
-//     appStoreApp,
-//     devhubDna,
-//     zome_name,
-//     fn_name,
-//     pingTimeout,
-//   );
+  const pingResult = await getVisibleHostsForZomeFunction(
+    appWebsocket,
+    appStoreApp,
+    devhubDna,
+    zome_name,
+    fn_name,
+    pingTimeout,
+  );
 
-//   const availableHosts = pingResult.responded;
+  const availableHosts = pingResult.responded;
 
-//   let success = false;
+  let result: T | undefined = undefined;
 
-//   // for each host, try to get stuff then
+  let errors = [];
 
+  // for each host, try to get stuff and if it succeeded, return,
+  // otherwise go to next host
+  for (const host of availableHosts) {
+    try {
+      const response = await remoteCallToDevHubHost<T>(
+        appWebsocket,
+        appStoreApp,
+        devhubDna,
+        host,
+        zome_name,
+        fn_name,
+        payload,
+      );
 
-//   availableHosts.forEach((host) => {
-//     try {
-//       const result = remoteCallToDevHubHost<T>(
-//         appWebsocket,
-//         appStoreApp,
-//         devhubDna,
-//         host,
-//         zome_name,
-//         fn_name,
-//         payload,
-//       );
+      result = response;
+      break;
 
-//       return result;
-//     } catch (e) {
+    } catch (e) {
+      if (JSON.stringify(e).includes("EntryNotFoundError")) {
+        alert("Entry not found!");
+      }
 
-//     }
-//   })
-// }
+      errors.push(e);
+    }
+  }
+
+  if (result) {
+    return result
+  } else {
+    return Promise.reject(`Failed to do remote call for function '${fn_name}' of zome '${zome_name}' for all available hosts.\nErrors: ${errors}`);
+  }
+}
 
 
 

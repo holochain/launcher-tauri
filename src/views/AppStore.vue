@@ -391,17 +391,19 @@ export default defineComponent({
         version: releaseInfo.guiRelease?.content.version
       } : undefined;
 
-      const host: AgentPubKey = await getAvailableHostForZomeFunction(
-        this.appWebsocket as AppWebsocket,
-        appStoreInfo,
-        releaseInfo.devhubDnaHash,
-        "happ_library",
-        "get_webhapp_package",
-      );
-
-      this.loadingText = "fetching app from peer host...";
 
       try {
+
+        const host: AgentPubKey = await getAvailableHostForZomeFunction(
+          this.appWebsocket as AppWebsocket,
+          appStoreInfo,
+          releaseInfo.devhubDnaHash,
+          "happ_library",
+          "get_webhapp_package",
+        );
+
+        this.loadingText = `fetching app from peer host...`;
+
         this.selectedAppBundlePath = await invoke("fetch_and_save_app", {
           holochainId: this.holochainId,
           appstoreAppId: appStoreInfo.installed_app_id,
@@ -421,16 +423,81 @@ export default defineComponent({
         });
 
         console.log("@saveApp: selectedAppBundlePath: ", this.selectedAppBundlePath);
+
       } catch (e) {
-        console.error("Error fetching the webhapp from the DevHub host: ", e);
-        this.errorText = "Failed to fetch webhapp from DevHub host.";
-        this.selectedHappReleaseInfo = undefined;
-        this.selectedGuiReleaseInfo = undefined;
-        this.selectedApp = undefined;
-        this.selectedIconSrc = undefined;
-        (this.$refs as any).snackbar.show();
-        (this.$refs.downloading as typeof HCLoading).close();
-        return;
+        if (JSON.stringify(e).includes("EntryNotFoundError") || JSON.stringify(e).includes("NetworkError( timeout )")) {
+
+          console.log("@saveApp: Failed to fetch webhapp from initial host");
+
+          // get all visible hosts and try one by one
+          let hostAvailabilities: HostAvailability | undefined = undefined;
+
+          try {
+            hostAvailabilities = await getVisibleHostsForZomeFunction(
+              this.appWebsocket as AppWebsocket,
+              appStoreInfo,
+              releaseInfo.devhubDnaHash,
+              "happ_library",
+              "get_webhapp_package",
+            );
+          } catch (e) {
+            console.log("@saveApp: No other hosts found.");
+            console.error("Error fetching webhapp from DevHub host: ", e);
+            this.errorText = "Failed to fetch webhapp from DevHub host.";
+            this.selectedHappReleaseInfo = undefined;
+            this.selectedGuiReleaseInfo = undefined;
+            this.selectedApp = undefined;
+            this.selectedIconSrc = undefined;
+            (this.$refs as any).snackbar.show();
+            (this.$refs.downloading as typeof HCLoading).close();
+            return;
+          }
+
+          const allVisibleHosts: AgentPubKey[] = hostAvailabilities.responded;
+
+          for (const otherHost of allVisibleHosts) {
+            try {
+              this.loadingText = `retry with host ${encodeHashToBase64(otherHost).slice(0,8)}...`;
+              console.log("@saveApp: Trying with new host: ", encodeHashToBase64(otherHost));
+
+              this.selectedAppBundlePath = await invoke("fetch_and_save_app", {
+                holochainId: this.holochainId,
+                appstoreAppId: appStoreInfo.installed_app_id,
+                appTitle: this.selectedApp!.title,
+                host: Array.from(otherHost),
+                devhubHappLibraryDnaHash: Array.from(releaseInfo.devhubDnaHash), // DNA hash of the DevHub to which the remote call shall be made
+                appstorePubKey: encodeHashToBase64(appStoreInfo.agent_pub_key),
+                happReleaseHash: encodeHashToBase64(happReleaseHash),
+                guiReleaseHash: guiReleaseHash ? encodeHashToBase64(guiReleaseHash) : undefined,
+              });
+
+              (this.$refs.downloading as typeof HCLoading).close();
+              this.loadingText = "";
+
+              this.$nextTick(() => {
+                (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
+              });
+
+              return;
+
+            } catch (e) {
+              console.log("@saveApp: Failed to fetch webhapp from host ", encodeHashToBase64(otherHost));
+            }
+
+            console.log("@saveApp: Tried all available hosts...");
+          }
+
+        } else {
+          console.error("Error fetching webhapp from DevHub host: ", e);
+          this.errorText = "Failed to fetch webhapp from DevHub host.";
+          this.selectedHappReleaseInfo = undefined;
+          this.selectedGuiReleaseInfo = undefined;
+          this.selectedApp = undefined;
+          this.selectedIconSrc = undefined;
+          (this.$refs as any).snackbar.show();
+          (this.$refs.downloading as typeof HCLoading).close();
+          return;
+        }
       }
     },
     async selectFromFileSystem() {

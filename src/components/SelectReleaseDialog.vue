@@ -309,9 +309,7 @@ export default defineComponent({
         appStoreInfo = await this.appWebsocket!.appInfo({
           installed_app_id: APPSTORE_APP_ID,
         });
-        console.log("@mounted: getting publisher...");
         this.publisher = await getPublisher(this.appWebsocket, appStoreInfo, this.app.publisher);
-        console.log("@mounted: got publisher: ", this.publisher);
       } catch (e) {
         console.error(`Failed to get publisher info: ${JSON.stringify(e)}`)
       }
