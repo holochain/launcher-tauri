@@ -179,10 +179,11 @@ import HCDialog from "./subcomponents/HCDialog.vue";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 
 import { ResourceLocator, ReleaseData } from "../types";
-import { AppEntry, Entity, HappReleaseEntry, PublisherEntry } from "../appstore/types";
-import { AppWebsocket } from "@holochain/client";
+import { AppEntry, Entity, GUIReleaseEntry, HappReleaseEntry, PublisherEntry } from "../appstore/types";
+import { AppWebsocket, encodeHashToBase64 } from "@holochain/client";
 import { APPSTORE_APP_ID } from "../constants";
-import { collectBytes, fetchGuiReleaseEntry, getHappReleases, getPublisher } from "../appstore/appstore-interface";
+import { collectBytes, fetchGuiReleaseEntry, getHappReleases, getHappReleasesFromHost, getPublisher, remoteCallToDevHubHost, tryWithHosts } from "../appstore/appstore-interface";
+import { HappEntry } from "../devhub/types";
 
 export default defineComponent({
   name: "SelectReleaseDialog",
@@ -248,7 +249,36 @@ export default defineComponent({
       // otherwise cascade to another host.
 
       try {
-        happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, happLocator)
+        happReleases = await tryWithHosts(
+          async (host) => {
+            // first check whether HappEntry can be fetched since 'get_happ_releases'
+            // also succeeds (but with an empty array) if the devhub host does not yet
+            // have the HappEntry which would misleadingly end up suggesting that there
+            // are no happ releases for that happ.
+            const happEntry = await remoteCallToDevHubHost<Entity<HappEntry>>(
+              this.appWebsocket as AppWebsocket,
+              appStoreInfo,
+              happLocator.dna_hash,
+              host,
+              "happ_library",
+              "get_happ",
+              { id: happLocator.resource_hash }
+            );
+
+            return getHappReleasesFromHost(
+              this.appWebsocket as AppWebsocket,
+              appStoreInfo,
+              host,
+              happLocator,
+            )
+          },
+          this.appWebsocket as AppWebsocket,
+          appStoreInfo,
+          happLocator.dna_hash,
+          "happ_library",
+          "get_happ_releases",
+        )
+        // happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, happLocator)
       } catch (e) {
         this.getReleaseDatasError = `Failed to find available releases: ${JSON.stringify(e)}`;
         console.error(`Failed to find available releases: ${JSON.stringify(e)}`)
@@ -278,11 +308,23 @@ export default defineComponent({
 
             const guiReleaseHash = happReleaseEntity.content.official_gui;
             if (guiReleaseHash) {
-              const guiLocator: ResourceLocator = {
-                dna_hash: devHubDnaHash,
-                resource_hash: guiReleaseHash,
-              };
-              const guiReleaseEntry = await fetchGuiReleaseEntry(this.appWebsocket as AppWebsocket, appStoreInfo, guiLocator);
+              const guiReleaseEntry = await tryWithHosts(
+                (host) => remoteCallToDevHubHost<Entity<GUIReleaseEntry>>(
+                  this.appWebsocket as AppWebsocket,
+                  appStoreInfo,
+                  devHubDnaHash,
+                  host,
+                  "happ_library",
+                  "get_gui_release",
+                  { id: guiReleaseHash }
+                ),
+                this.appWebsocket as AppWebsocket,
+                appStoreInfo,
+                devHubDnaHash,
+                "happ_library",
+                "get_gui_release",
+              );
+
               releaseData.guiRelease = guiReleaseEntry;
             }
 

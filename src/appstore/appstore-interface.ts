@@ -252,7 +252,7 @@ export async function getHappReleases(
  * @param host
  * @param forHapp
  */
-async function getHappReleasesFromHost (
+export async function getHappReleasesFromHost (
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   host: AgentPubKey,
@@ -418,7 +418,7 @@ export async function getAvailableHostForZomeFunction(
       try {
         const availableHost = await Promise.any(hosts.map(async (hostEntry) => {
           const hostPubKey = hostEntry.author;
-          console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
+          // console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
 
           try{
             const result: Response<any> = await appWebsocket.callZome({
@@ -433,8 +433,7 @@ export async function getAvailableHostForZomeFunction(
               return Promise.reject(`Failed to ping host: ${result.payload}`);
             }
           } catch (e) {
-            console.error("Failed to ping host: ", e);
-            console.log("Failed to ping host: stringified error: ", JSON.stringify(e));
+            // console.error("Failed to ping host: ", e);
             return Promise.reject("Failed to ping host.");
           }
           // what happens in the "false" case? Can this happen?
@@ -794,7 +793,7 @@ export async function remoteCallCascadeToAvailableHosts<T>(
   zome_name: string,
   fn_name: string,
   payload: any,
-  pingTimeout: number = 4000, // hosts that do not respond to the ping quicker than this are ignored
+  pingTimeout: number = 3000, // hosts that do not respond to the ping quicker than this are ignored
 ): Promise<T> {
 
   const pingResult = await getVisibleHostsForZomeFunction(
@@ -838,7 +837,6 @@ export async function remoteCallCascadeToAvailableHosts<T>(
 }
 
 
-
 export async function tryWithHosts<T>(
   fn: (host: AgentPubKey) => T,
   appWebsocket: AppWebsocket,
@@ -846,7 +844,7 @@ export async function tryWithHosts<T>(
   devhubDna: DnaHash,
   zome_name: string,
   fn_name: string,
-  pingTimeout: number = 4000,
+  pingTimeout: number = 3000,
   ): Promise<T>{
 
   // try with first responding host
