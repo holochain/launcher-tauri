@@ -117,10 +117,10 @@ export function gossipProgressString(progress: GossipProgress | undefined) {
 }
 
 
-export function toSrc(png: Uint8Array | undefined): string | undefined {
-  if (png) {
-    const base64Data = Base64.fromUint8Array(png);
-    return "data:image/png;base64," + base64Data;
+export function toSrc(data: Uint8Array | undefined, mimeType?: string): string | undefined {
+  if (data) {
+    const base64Data = Base64.fromUint8Array(data);
+    return `data:${mimeType ? mimeType : 'image/png'};base64,${base64Data}`;
   }
 
   return undefined;

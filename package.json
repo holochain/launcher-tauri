@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test:unit": "vue-cli-service test:unit",
     "tauri": "tauri",
-    "prepare": "curl -L --output DevHub.webhapp https://github.com/holochain/devhub-gui/releases/download/v0.13.1/DevHub.webhapp && curl -L --output AppStore.webhapp https://github.com/holochain/app-store-gui/releases/download/v0.1.1/appstore.webhapp"
+    "prepare": "curl -L --output DevHub.webhapp https://github.com/holochain/devhub-gui/releases/download/v0.13.1/DevHub.webhapp && curl -L --output AppStore.webhapp https://github.com/holochain/app-store-gui/releases/download/v0.1.2/appstore.webhapp"
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",

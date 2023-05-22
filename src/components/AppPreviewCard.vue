@@ -109,15 +109,13 @@ export default defineComponent({
   },
   emits: ["installApp"],
   async mounted () {
-    console.log("Preview card is mounted...");
     const iconHash = this.app.icon;
-    console.log("@mounted: Getting mere_memory data for hash: ", iconHash);
     const appStoreInfo = await this.appWebsocket!.appInfo({
       installed_app_id: APPSTORE_APP_ID,
     });
 
     const collectedBytes = await collectBytes(this.appWebsocket, appStoreInfo, iconHash);
-    this.imgSrc = toSrc(collectedBytes);
+    this.imgSrc = toSrc(collectedBytes, this.app.metadata.icon_mime_type);
   },
 });
 </script>
