@@ -142,6 +142,38 @@ export async function getHappReleasesByEntryHashes(
   });
 }
 
+
+/**
+ * Get the the HappEntry of an entry hash from a specific DevHub host
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param host
+ * @param entryHash
+ */
+async function getHappEntryFromHost (
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  devhubDna: DnaHash,
+  host: AgentPubKey,
+  entryHash: EntryHash, // EntryHash of the HappEntry
+): Promise<Entity<HappReleaseEntry>> {
+
+  const payload = {
+    id: entryHash,
+  };
+
+  return remoteCallToDevHubHost<Entity<HappReleaseEntry>>(
+    appWebsocket,
+    appStoreApp,
+    devhubDna,
+    host,
+    "happ_library",
+    "get_happ",
+    payload
+  );
+}
+
+
 /**
  * Get the happ released associated to a happ release entry hash from a specific DevHub host
  * @param appWebsocket
@@ -798,10 +830,6 @@ export async function remoteCallCascadeToAvailableHosts<T>(
       break;
 
     } catch (e) {
-      if (JSON.stringify(e).includes("EntryNotFoundError")) {
-        alert("Entry not found!");
-      }
-
       errors.push(e);
     }
   }
@@ -814,6 +842,71 @@ export async function remoteCallCascadeToAvailableHosts<T>(
 }
 
 
+
+
+
+export async function tryWithHosts<T>(
+  fn: (host: AgentPubKey) => T,
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  devhubDna: DnaHash,
+  zome_name: string,
+  fn_name: string,
+  pingTimeout: number = 4000,
+  ): Promise<T>{
+
+  // try with first responding host
+  const host: AgentPubKey = await getAvailableHostForZomeFunction(
+    appWebsocket,
+    appStoreApp,
+    devhubDna,
+    zome_name,
+    fn_name,
+  );
+
+  try {
+    const result = await fn(host);
+    return result;
+  } catch (e) {
+    console.log("@tryWithHosts: Failed with first host: ", JSON.stringify(e));
+    // if it fails with the first host, try other hosts
+    const pingResult = await getVisibleHostsForZomeFunction(
+      appWebsocket,
+      appStoreApp,
+      devhubDna,
+      zome_name,
+      fn_name,
+      pingTimeout,
+    );
+
+    const availableHosts = pingResult.responded;
+
+    console.log("@tryWithHosts: availableHosts: ", availableHosts);
+
+    let result: T | undefined = undefined;
+
+    let errors = [];
+
+    // for each host, try to get stuff and if it succeeded, return,
+    // otherwise go to next host
+    for (const host of availableHosts) {
+      try {
+        const response = await fn(host);
+        result = response;
+        break;
+      } catch (e) {
+        errors.push(e);
+      }
+    }
+
+    if (result) {
+      return result
+    } else {
+      return Promise.reject(`Callback for function '${fn_name}' of zome '${zome_name}' failed for all available hosts.\nErrors: ${errors}`);
+    }
+  }
+
+}
 
 
 

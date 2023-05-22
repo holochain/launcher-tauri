@@ -454,6 +454,7 @@ export default defineComponent({
           }
 
           const allVisibleHosts: AgentPubKey[] = hostAvailabilities.responded;
+          let errors = [];
 
           for (const otherHost of allVisibleHosts) {
             try {
@@ -482,9 +483,19 @@ export default defineComponent({
 
             } catch (e) {
               console.log("@saveApp: Failed to fetch webhapp from host ", encodeHashToBase64(otherHost));
+              errors.push(e);
             }
 
             console.log("@saveApp: Tried all available hosts...");
+            console.error("Fetching webhapp failed with all available hosts: ", errors);
+            this.errorText = "Failed to fetch webhapp from all available hosts.";
+            this.selectedHappReleaseInfo = undefined;
+            this.selectedGuiReleaseInfo = undefined;
+            this.selectedApp = undefined;
+            this.selectedIconSrc = undefined;
+            (this.$refs as any).snackbar.show();
+            (this.$refs.downloading as typeof HCLoading).close();
+
           }
 
         } else {

@@ -244,6 +244,9 @@ export default defineComponent({
 
       const devHubDnaHash = this.app.devhub_address.dna;
 
+      // first try to get HappEntry to ensure that happ is available at all
+      // otherwise cascade to another host.
+
       try {
         happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, happLocator)
       } catch (e) {
