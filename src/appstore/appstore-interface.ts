@@ -460,7 +460,7 @@ export async function getVisibleHostsForZomeFunction(
   devhubDna: DnaHash,
   zome_name: string,
   fn_name: string,
-  timeoutMs: number = 6000,
+  timeoutMs: number = 4000,
 ): Promise<HostAvailability> {
 
     const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
@@ -474,6 +474,7 @@ export async function getVisibleHostsForZomeFunction(
     const pingTimestamp = Date.now();
 
     try {
+
       const hosts = await getHostsForZomeFunction(appWebsocket, appStoreApp, devhubDna, zome_name, fn_name)
 
       // 2. ping each of them and take the first one that responds
@@ -500,12 +501,6 @@ export async function getVisibleHostsForZomeFunction(
         };
 
       }))
-
-      console.log("@getVisibleHostsForZomeFunction: all Promises settled: result: ", {
-        responded,
-        totalHosts: hosts.length,
-        pingTimestamp,
-      });
 
       return {
         responded,
@@ -550,18 +545,6 @@ export async function getHostsForZomeFunction(
   } else {
     // console.log("@getHostsForZomeFunction: searching hosts.");
 
-    const registeredHosts: DevHubResponse<Array<Entity<HostEntry>>> = await appWebsocket.callZome({
-      fn_name: "get_registered_hosts",
-      zome_name: "portal_api",
-      cell_id: getCellId(portalCell)!,
-      payload: {
-        dna: devhubDna,
-      },
-      provenance: getCellId(portalCell)![1],
-    });
-
-    // console.log("Registered Hosts overall: ", registeredHosts);
-
     // 1. get all registered hosts for this zome function
     const hosts: DevHubResponse<Array<Entity<HostEntry>>> = await appWebsocket.callZome({
       fn_name: "get_hosts_for_zome_function",
@@ -576,12 +559,12 @@ export async function getHostsForZomeFunction(
     })
 
     // console.log("@getHostsForZomeFunction: found hosts: ", hosts);
-    let b64Hosts = hosts.payload.map((entity) => encodeHashToBase64(entity.content.author));
+    // let b64Hosts = hosts.payload.map((entity) => encodeHashToBase64(entity.content.author));
     // console.log("@getHostsForZomeFunction: b64 hosts: ", b64Hosts);
 
-    if (hosts.payload.length === 0) {
-      return Promise.reject(`Found no registered hosts for zome ${zome_name} and function ${fn_name}.`);
-    }
+    // if (hosts.payload.length === 0) {
+    //   return Promise.reject(`Found no registered hosts for zome ${zome_name} and function ${fn_name}.`);
+    // }
 
     return hosts.payload.map((host) => host.content);
   }
