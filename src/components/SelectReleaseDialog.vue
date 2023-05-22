@@ -244,6 +244,9 @@ export default defineComponent({
 
       const devHubDnaHash = this.app.devhub_address.dna;
 
+      // first try to get HappEntry to ensure that happ is available at all
+      // otherwise cascade to another host.
+
       try {
         happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, happLocator)
       } catch (e) {
@@ -309,9 +312,7 @@ export default defineComponent({
         appStoreInfo = await this.appWebsocket!.appInfo({
           installed_app_id: APPSTORE_APP_ID,
         });
-        console.log("@mounted: getting publisher...");
         this.publisher = await getPublisher(this.appWebsocket, appStoreInfo, this.app.publisher);
-        console.log("@mounted: got publisher: ", this.publisher);
       } catch (e) {
         console.error(`Failed to get publisher info: ${JSON.stringify(e)}`)
       }

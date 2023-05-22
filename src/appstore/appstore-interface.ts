@@ -142,6 +142,38 @@ export async function getHappReleasesByEntryHashes(
   });
 }
 
+
+/**
+ * Get the the HappEntry of an entry hash from a specific DevHub host
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param host
+ * @param entryHash
+ */
+async function getHappEntryFromHost (
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  devhubDna: DnaHash,
+  host: AgentPubKey,
+  entryHash: EntryHash, // EntryHash of the HappEntry
+): Promise<Entity<HappReleaseEntry>> {
+
+  const payload = {
+    id: entryHash,
+  };
+
+  return remoteCallToDevHubHost<Entity<HappReleaseEntry>>(
+    appWebsocket,
+    appStoreApp,
+    devhubDna,
+    host,
+    "happ_library",
+    "get_happ",
+    payload
+  );
+}
+
+
 /**
  * Get the happ released associated to a happ release entry hash from a specific DevHub host
  * @param appWebsocket
@@ -397,8 +429,6 @@ export async function getAvailableHostForZomeFunction(
               provenance: getCellId(portalCell)![1],
             });
 
-            console.log("@getAvailableHostForZomeFunction Sent ping to host and got result: ", result);
-
             if (result.type === "failure") {
               return Promise.reject(`Failed to ping host: ${result.payload}`);
             }
@@ -519,7 +549,7 @@ export async function getHostsForZomeFunction(
   if (!portalCell) {
     return Promise.reject("Failed to get hosts for zome function: portal cell not found.");
   } else {
-    console.log("@getHostsForZomeFunction: searching hosts.");
+    // console.log("@getHostsForZomeFunction: searching hosts.");
 
     const registeredHosts: DevHubResponse<Array<Entity<HostEntry>>> = await appWebsocket.callZome({
       fn_name: "get_registered_hosts",
@@ -548,7 +578,7 @@ export async function getHostsForZomeFunction(
 
     // console.log("@getHostsForZomeFunction: found hosts: ", hosts);
     let b64Hosts = hosts.payload.map((entity) => encodeHashToBase64(entity.content.author));
-    console.log("@getHostsForZomeFunction: b64 hosts: ", b64Hosts);
+    // console.log("@getHostsForZomeFunction: b64 hosts: ", b64Hosts);
 
     if (hosts.payload.length === 0) {
       return Promise.reject(`Found no registered hosts for zome ${zome_name} and function ${fn_name}.`);
@@ -692,10 +722,10 @@ export async function remoteCallToDevHubHost<T>(
       if (response.payload.type === "success") {
         return response.payload.payload;
       } else {
-        return Promise.reject(`Failed to fetch UI: ${JSON.stringify(response.payload.payload)}`);
+        return Promise.reject(`remote call for function '${fn_name}' of zome '${zome_name}' failed: ${JSON.stringify(response.payload.payload)}`);
       }
     } else {
-      return Promise.reject(`Failed to fetch UI: ${JSON.stringify(response.payload)}`);
+      return Promise.reject(`remote call for function '${fn_name}' of zome '${zome_name}' failed: ${JSON.stringify(response.payload)}`);
     }
   }
 }
@@ -703,7 +733,9 @@ export async function remoteCallToDevHubHost<T>(
 
 
 /**
- * Helper function to make a remote call to first responsive host
+ * Helper function to make a remote call to first responsive host. It is possible
+ * that this host does not have the app synchronized and thus is unable to deliver it.
+ * In that case, other hosts should be tried which is not supported by this function.
  *
  * @param appWebsocket
  * @param appStoreApp
@@ -742,63 +774,131 @@ export async function remoteCallToAvailableHost<T>(
 
 
 
-// /**
-//  * Helper function to make a remote call to hosts in a cascading manner, i.e. if the first
-//  * responsive host fails to deliver the promise, go on to proceeding hosts etc.
-//  *
-//  * @param appWebsocket
-//  * @param appStoreApp
-//  * @param devhubDna
-//  * @param zome_name
-//  * @param fn_name
-//  * @param payload
-//  */
-// export async function remoteCallCascadeToAvailableHosts<T>(
-//   appWebsocket: AppWebsocket,
-//   appStoreApp: AppInfo,
-//   devhubDna: DnaHash,
-//   zome_name: string,
-//   fn_name: string,
-//   payload: any,
-//   pingTimeout: number = 4000,
-// ): Promise<T> {
+/**
+ * Helper function to make a remote call to hosts in a cascading manner, i.e. if the first
+ * responsive host fails to deliver the promise, go on to proceeding hosts etc.
+ *
+ * WARNING: Untested.
+ *
+ * @param appWebsocket
+ * @param appStoreApp
+ * @param devhubDna
+ * @param zome_name
+ * @param fn_name
+ * @param payload
+ */
+export async function remoteCallCascadeToAvailableHosts<T>(
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  devhubDna: DnaHash,
+  zome_name: string,
+  fn_name: string,
+  payload: any,
+  pingTimeout: number = 4000, // hosts that do not respond to the ping quicker than this are ignored
+): Promise<T> {
 
-//   const pingResult = await getVisibleHostsForZomeFunction(
-//     appWebsocket,
-//     appStoreApp,
-//     devhubDna,
-//     zome_name,
-//     fn_name,
-//     pingTimeout,
-//   );
+  const pingResult = await getVisibleHostsForZomeFunction(
+    appWebsocket,
+    appStoreApp,
+    devhubDna,
+    zome_name,
+    fn_name,
+    pingTimeout,
+  );
 
-//   const availableHosts = pingResult.responded;
+  const availableHosts = pingResult.responded;
 
-//   let success = false;
+  let result: T | undefined = undefined;
 
-//   // for each host, try to get stuff then
+  let errors = [];
+
+  // for each host, try to get stuff and if it succeeded, return,
+  // otherwise go to next host
+  for (const host of availableHosts) {
+    try {
+      const response = await remoteCallToDevHubHost<T>(
+        appWebsocket,
+        appStoreApp,
+        devhubDna,
+        host,
+        zome_name,
+        fn_name,
+        payload,
+      );
+
+      return response;
+
+    } catch (e) {
+      errors.push(e);
+    }
+  }
+
+  return Promise.reject(`Failed to do remote call for function '${fn_name}' of zome '${zome_name}' for all available hosts.\nErrors: ${errors}`);
+
+}
 
 
-//   availableHosts.forEach((host) => {
-//     try {
-//       const result = remoteCallToDevHubHost<T>(
-//         appWebsocket,
-//         appStoreApp,
-//         devhubDna,
-//         host,
-//         zome_name,
-//         fn_name,
-//         payload,
-//       );
 
-//       return result;
-//     } catch (e) {
+export async function tryWithHosts<T>(
+  fn: (host: AgentPubKey) => T,
+  appWebsocket: AppWebsocket,
+  appStoreApp: AppInfo,
+  devhubDna: DnaHash,
+  zome_name: string,
+  fn_name: string,
+  pingTimeout: number = 4000,
+  ): Promise<T>{
 
-//     }
-//   })
-// }
+  // try with first responding host
+  const host: AgentPubKey = await getAvailableHostForZomeFunction(
+    appWebsocket,
+    appStoreApp,
+    devhubDna,
+    zome_name,
+    fn_name,
+  );
 
+  try {
+    // console.log("@tryWithHosts: trying with first responding host: ", encodeHashToBase64(host));
+    const result = await fn(host);
+    return result;
+  } catch (e) {
+    // console.log("@tryWithHosts: Failed with first host: ", JSON.stringify(e));
+    // if it fails with the first host, try other hosts
+    const pingResult = await getVisibleHostsForZomeFunction(
+      appWebsocket,
+      appStoreApp,
+      devhubDna,
+      zome_name,
+      fn_name,
+      pingTimeout,
+    );
 
+    const availableHosts = pingResult.responded;
+
+    // console.log("@tryWithHosts: other available hosts: ", availableHosts.map((hash) => encodeHashToBase64(hash)));
+
+    let result: T | undefined = undefined;
+
+    let errors = [];
+
+    // for each host, try to get stuff and if it succeeded, return,
+    // otherwise go to next host
+    for (const otherHost of availableHosts) {
+      try {
+        // console.log("@tryWithHosts: retrying with other host: ", encodeHashToBase64(otherHost));
+        const response = await fn(otherHost);
+        return response;
+      } catch (e) {
+        errors.push(e);
+      }
+    }
+
+    return Promise.reject(`Callback for function '${fn_name}' of zome '${zome_name}' failed for all available hosts.\nErrors: ${JSON.stringify(errors)}`);
+
+  }
+
+}
 
 
 
