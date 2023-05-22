@@ -549,7 +549,7 @@ export async function getHostsForZomeFunction(
   if (!portalCell) {
     return Promise.reject("Failed to get hosts for zome function: portal cell not found.");
   } else {
-    console.log("@getHostsForZomeFunction: searching hosts.");
+    // console.log("@getHostsForZomeFunction: searching hosts.");
 
     const registeredHosts: DevHubResponse<Array<Entity<HostEntry>>> = await appWebsocket.callZome({
       fn_name: "get_registered_hosts",
@@ -578,7 +578,7 @@ export async function getHostsForZomeFunction(
 
     // console.log("@getHostsForZomeFunction: found hosts: ", hosts);
     let b64Hosts = hosts.payload.map((entity) => encodeHashToBase64(entity.content.author));
-    console.log("@getHostsForZomeFunction: b64 hosts: ", b64Hosts);
+    // console.log("@getHostsForZomeFunction: b64 hosts: ", b64Hosts);
 
     if (hosts.payload.length === 0) {
       return Promise.reject(`Found no registered hosts for zome ${zome_name} and function ${fn_name}.`);
@@ -826,22 +826,16 @@ export async function remoteCallCascadeToAvailableHosts<T>(
         payload,
       );
 
-      result = response;
-      break;
+      return response;
 
     } catch (e) {
       errors.push(e);
     }
   }
 
-  if (result) {
-    return result
-  } else {
-    return Promise.reject(`Failed to do remote call for function '${fn_name}' of zome '${zome_name}' for all available hosts.\nErrors: ${errors}`);
-  }
+  return Promise.reject(`Failed to do remote call for function '${fn_name}' of zome '${zome_name}' for all available hosts.\nErrors: ${errors}`);
+
 }
-
-
 
 
 
@@ -865,10 +859,11 @@ export async function tryWithHosts<T>(
   );
 
   try {
+    // console.log("@tryWithHosts: trying with first responding host: ", encodeHashToBase64(host));
     const result = await fn(host);
     return result;
   } catch (e) {
-    console.log("@tryWithHosts: Failed with first host: ", JSON.stringify(e));
+    // console.log("@tryWithHosts: Failed with first host: ", JSON.stringify(e));
     // if it fails with the first host, try other hosts
     const pingResult = await getVisibleHostsForZomeFunction(
       appWebsocket,
@@ -881,7 +876,7 @@ export async function tryWithHosts<T>(
 
     const availableHosts = pingResult.responded;
 
-    console.log("@tryWithHosts: availableHosts: ", availableHosts);
+    // console.log("@tryWithHosts: other available hosts: ", availableHosts.map((hash) => encodeHashToBase64(hash)));
 
     let result: T | undefined = undefined;
 
@@ -889,21 +884,18 @@ export async function tryWithHosts<T>(
 
     // for each host, try to get stuff and if it succeeded, return,
     // otherwise go to next host
-    for (const host of availableHosts) {
+    for (const otherHost of availableHosts) {
       try {
-        const response = await fn(host);
-        result = response;
-        break;
+        // console.log("@tryWithHosts: retrying with other host: ", encodeHashToBase64(otherHost));
+        const response = await fn(otherHost);
+        return response;
       } catch (e) {
         errors.push(e);
       }
     }
 
-    if (result) {
-      return result
-    } else {
-      return Promise.reject(`Callback for function '${fn_name}' of zome '${zome_name}' failed for all available hosts.\nErrors: ${errors}`);
-    }
+    return Promise.reject(`Callback for function '${fn_name}' of zome '${zome_name}' failed for all available hosts.\nErrors: ${JSON.stringify(errors)}`);
+
   }
 
 }
