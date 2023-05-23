@@ -145,6 +145,8 @@ impl WebAppManager {
     // Install app UI in folder
     self.install_app_ui(app_id.clone(), web_ui_zip_bytes.into_owned(), &default_ui_name, gui_release_info)?;
 
+    println!("@install_web_app: about to install app via holochain manager...");
+
     // Install app in conductor manager
     if let Err(err) = self
       .holochain_manager
@@ -161,6 +163,8 @@ impl WebAppManager {
 
       return Err(err);
     }
+
+    println!("@install_web_app: about to run on_running_apps_changed()...");
 
     self.on_running_apps_changed().await?;
 
@@ -393,6 +397,7 @@ impl WebAppManager {
   }
 
   pub async fn list_apps(&mut self) -> Result<Vec<InstalledWebAppInfo>, String> {
+    println!("@list_apps: listing apps.");
     let installed_apps = self.holochain_manager.list_apps().await?;
 
     let mut updated_pubkey_map: HashMap<String, AgentPubKey> = HashMap::new();
@@ -404,10 +409,15 @@ impl WebAppManager {
 
     *self.app_handle.state::<Arc<Mutex<HashMap<String, AgentPubKey>>>>().lock().await = updated_pubkey_map;
 
+    println!("@list_apps: allocating necessary ports...");
+
     self.allocate_necessary_ports(&installed_apps);
 
     // Assuming only one single default UI per app at the moment.
     let default_ui_name = String::from("default");
+
+    println!("@list_apps: iterating to get InstalledWebAppInfos...");
+
 
     let installed_web_apps = installed_apps
       .into_iter()
@@ -429,6 +439,8 @@ impl WebAppManager {
         })
       })
       .collect::<Result<Vec<InstalledWebAppInfo>, String>>()?;
+
+    println!("@list_apps: finished with installed_web_apps: {:?}", installed_web_apps);
 
     Ok(installed_web_apps)
   }

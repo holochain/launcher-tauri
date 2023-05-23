@@ -80,9 +80,12 @@ pub async fn install_app(
     }
   }
 
+  println!("\n@installApp: installed app: {}", app_id);
   log::info!("Installed hApp {}", app_id);
 
   manager.on_apps_changed().await?;
+
+  println!("\n@installApp: on_apps_changed() awaited.");
 
   Ok(())
 }

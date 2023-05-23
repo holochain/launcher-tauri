@@ -447,6 +447,7 @@ export default defineComponent({
 
         // console.log("@InstallAppDialog: guiReleaseHash: ", this.guiReleaseHash);
         // console.log("@InstallAppDialog: happReleaseHash: ", this.happReleaseHash);
+        console.log("@InstallAppDialog: invoking install_app");
 
         await invoke("install_app", {
           appId,
@@ -459,18 +460,30 @@ export default defineComponent({
           guiReleaseInfo: this.guiReleaseInfo,
         });
 
+        console.log("@InstallAppDialog: invoked install_app");
+
 
         if (this.iconSrc) {
           await invoke("store_icon_src", { appId, holochainId: this.holochainId, iconSrc: this.iconSrc });
         }
 
+        console.log("@InstallAppDialog: stored icon.");
+
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
+
+        console.log("@InstallAppDialog: fetched state info.");
 
         this.showMessage(`Installed ${this.appId}`);
 
+        console.log("@InstallAppDialog: showed message.");
+
         this.$emit("app-installed", this.appId);
 
+        console.log("@InstallAppDialog: app-installed emitted.");
+
         this.installing = false;
+
+        console.log("@InstallAppDialog: set installing to false:");
 
       } catch (e) {
         console.log("Error installing the app: ", e);
