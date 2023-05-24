@@ -5,14 +5,14 @@
         src="/img/Square284x284Logo.png"
         style="height: 42px; margin-left: 11px"
       />
-      <span 
-        :class="{ tab: true, selectedTab: view.type === 'launcher' }" 
+      <span
+        :class="{ tab: true, selectedTab: view.type === 'launcher' }"
         @click="view.type = 'launcher'"
       >
         {{$t("main.launcher")}}
       </span>
-      <span 
-        :class="{ tab: true, selectedTab: view.type === 'appStore' }" 
+      <span
+        :class="{ tab: true, selectedTab: view.type === 'appStore' }"
         @click="view.type = 'appStore'"
       >
         {{$t("appStore.appStore")}}
@@ -34,8 +34,8 @@
           <span style="margin-left: 5px">{{ $t("main.reportIssue") }}</span>
         </div>
       </HCButton>
-      <span 
-        :class="{ tab: true, selectedTab: view.type === 'settings' }" 
+      <span
+        :class="{ tab: true, selectedTab: view.type === 'settings' }"
         @click="view.type = 'settings'"
       >
         {{$t("main.settings")}}
@@ -91,7 +91,7 @@ import "@material/mwc-fab";
 type View =
   | {
       type: "launcher";
-    }  
+    }
   | {
       type: "appStore";
     }
@@ -150,7 +150,7 @@ export default defineComponent({
   .tab {
     display: inline-block;
     cursor: pointer;
-    font-size: 1.5em; 
+    font-size: 1.5em;
     margin-left: 13px;
     padding: 0 10px;
     height: 64px;
