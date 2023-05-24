@@ -19,7 +19,7 @@
     </HCButton>
   </div>
 
-  <div v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px); margin-bottom: 200px;">
+  <div v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px); margin-bottom: 200px; align-content: flex-start;">
     <div
       v-for="(app, i) of installableApps"
       :key="i"
@@ -49,7 +49,7 @@
       }}</span>
     </div>
   </HCButton>
-  
+
   <!-- Indicator of online peer hosts -->
   <div
     class="peer-host-indicator column"
