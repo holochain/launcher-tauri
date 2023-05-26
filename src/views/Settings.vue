@@ -80,7 +80,10 @@
         </div>
       </div>
 
-      <div class="column section-container" style="display: flex; flex-direction: column;">
+      <!-- <div class="row section-container" style="display: flex; flex-direction: row;">
+        Language
+      </div> -->
+
       <div class="row section-container" style="display: flex; flex-direction: column;">
         <div class="row">
           <div style="flex: 1;">
@@ -92,16 +95,12 @@
             class="tooltip"
             hoist
             placement="top"
-            :content="
-              devHubAppInfo && isAppRunning(devHubAppInfo?.webAppInfo.installed_app_info)
-                ? 'Disable Dev Mode'
-                : 'Enable Dev Mode'
-            "
+            :content="devModeOn ? 'Disable Dev Mode' : 'Enable Dev Mode'"
           >
             <ToggleSwitch
               style="margin-right: 29px"
               :sliderOn="!!devHubAppInfo && isAppRunning(devHubAppInfo?.webAppInfo.installed_app_info)"
-              @click="toggleDevMode()"
+              @click.stop.prevent="toggleDevMode()"
               @keydown.enter="toggleDevMode()"
             />
           </sl-tooltip>
@@ -110,9 +109,9 @@
         <div class="row">
           <HCButton
             outlined
-            @click="howToPublish()"
-            style="height: 36px; border-radius: 8px; padding: 0 20px"
-            :title="howToPublishUrl"
+            :disabled="!devModeOn"
+            @click="openPublishAppDialog"
+            style="height: 36px; border-radius: 8px; padding: 0 20px; margin-top: 10px;"
             >{{ $t("settings.publishAnApp") }}
           </HCButton>
         </div>
@@ -276,32 +275,65 @@
   </div>
 
   <!-- Dialogs -->
-  <HCDialog ref="devHubDevsOnlyWarning">
+  <HCDialog ref="devModeDevsOnlyWarning">
     <div
       class="column"
       style="padding: 30px; align-items: center; max-width: 500px"
     >
       <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
-        DevHub
+        Dev Mode
       </div>
       <div>
-        DevHub is the place where <span style="font-weight: bold; white-space: nowrap;">app developers</span> can upload their apps such that they appear in the App Library.<br><br>
-        If you instead want to install other apps, click on the <span style="font-weight: bold; white-space: nowrap;">"Install New App"</span> button in the bottom right corner of the
-        main window. It will lead you to the <span style="font-weight: bold; white-space: nowrap;">App Library</span>.
+        Turning on Dev Mode installs the DevHub app. DevHub is the place where
+        <span style="font-weight: bold; white-space: nowrap;">app developers</span>
+        can upload their apps such that they appear in the App Store.<br><br>
+        Installing DevHub will download a lot of data, are you sure you want to continue?
       </div>
 
       <div class="row" style="margin-top: 30px; margin-bottom: 10px; margin-left: 50px; width: 100%;">
         <ToggleSwitch
-          :sliderOn="ignoreDevHubWaring"
-          @click="() => ignoreDevHubWaring = !ignoreDevHubWaring"
-          @keydown.enter="() => ignoreDevHubWaring = !ignoreDevHubWaring"
+          :sliderOn="ignoreDevModeWarning"
+          @click="() => ignoreDevModeWarning = !ignoreDevModeWarning"
+          @keydown.enter="() => ignoreDevModeWarning = !ignoreDevModeWarning"
         />
         <span style="margin-left: 10px;">Don't show this message again.</span>
       </div>
 
       <div class="row" style="margin-top: 20px;">
-        <HCButton style="height: 30px; margin: 4px 6px;" outlined @click="closeDevHubNote">Cancel</HCButton>
-        <HCButton style="margin: 4px 6px;" @click="handleOpenDevHub">Open DevHub</HCButton>
+        <HCButton style="height: 30px; margin: 4px 6px;" outlined @click="closeDevModeWarning">Cancel</HCButton>
+        <HCButton style="margin: 4px 6px;" @click="handleInstallDevHub">Install DevHub</HCButton>
+      </div>
+    </div>
+  </HCDialog>
+
+  <HCDialog ref="publishAppDialog" close-on-side-click>
+    <div
+      class="column"
+      style="padding: 30px; align-items: center; max-width: 500px"
+    >
+      <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
+        How to Publish An App
+      </div>
+
+      <div>
+        To publish your own Holochain App you will need to upload it first to the Dev Hub and then to the App Store.
+        First read the <a :href='howToPublishUrl' target="_blank">full instructions here</a>, then open the Dev Hub and App Store below.
+      </div>
+
+      <div class="row" style="margin-top: 20px;">
+        <HCButton
+          style="height: 30px; margin: 4px 6px;"
+          outlined
+          @click="openApp(devHubAppInfo as HolochainAppInfo); "
+        >
+          {{ $t("settings.openDevHub") }}
+        </HCButton>
+        <HCButton
+          style="margin: 4px 6px;"
+          @click="openApp(appstoreHolochainAppInfo as HolochainAppInfo); closePublishAppDialog();"
+        >
+          {{ $t("settings.openAppStore") }}
+        </HCButton>
       </div>
     </div>
   </HCDialog>
@@ -363,12 +395,13 @@ export default defineComponent({
   data(): {
     appWebsocket: AppWebsocket | undefined;
     appstoreAppInfo: AppInfo | undefined;
+    appstoreHolochainAppInfo: HolochainAppInfo | undefined;
     devHubAppInfo: HolochainAppInfo | undefined;
     devModeEnabled: boolean;
     errorText: string;
     extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> | undefined;
     howToPublishUrl: string;
-    ignoreDevHubWaring: boolean;
+    ignoreDevModeWarning: boolean;
     installingDevHub: boolean;
     loadingText: string;
     refreshing: boolean;
@@ -379,7 +412,7 @@ export default defineComponent({
     selectedGuiUpdateHash: EntryHash | undefined;
     selectedGuiUpdateLocator: ResourceLocator | undefined;
     selectedHolochainVersion: string;
-    showDevHubDevsOnlyWarning: boolean;
+    showDevModeDevsOnlyWarning: boolean; // TODO: unused right now
     showHeadlessApps: boolean;
     showWebApps: boolean;
     snackbarText: string | undefined;
@@ -388,17 +421,18 @@ export default defineComponent({
     storageInfos: Record<string, StorageInfo>;
   } {
     return {
+      appstoreAppInfo: undefined,
+      appstoreHolochainAppInfo: undefined,
+      appWebsocket: undefined,
       devHubAppInfo: undefined,
       devModeEnabled: false,
       howToPublishUrl:
         "https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-devhub",
       snackbarText: undefined,
       reportIssueUrl: "https://github.com/holochain/launcher/issues/new",
-      showDevHubDevsOnlyWarning: false,
-      ignoreDevHubWaring: false,
+      showDevModeDevsOnlyWarning: false,
+      ignoreDevModeWarning: false,
       installingDevHub: false,
-      appWebsocket: undefined,
-      appstoreAppInfo: undefined,
       sortOptions: [
         [i18n.global.t('main.name'), "name"],
         [i18n.global.t('main.nameDescending'), "name descending"],
@@ -422,12 +456,16 @@ export default defineComponent({
   },
   emits: ["openApp", "uninstall-app", "enable-app", "disable-app", "startApp", "open-app-store"],
   async mounted() {
-    console.log("mounted settings")
     await Promise.all(
       this.installedApps.map(async (app) => {
         // Check if DevHub is installed and if so store info about it locally
         if (app.webAppInfo.installed_app_info.installed_app_id === DEVHUB_APP_ID) {
           this.devHubAppInfo = app
+        }
+
+        // Store app store for later use
+        if (app.webAppInfo.installed_app_info.installed_app_id === APPSTORE_APP_ID) {
+          this.appstoreHolochainAppInfo = app
         }
 
         return this.storageInfos[app.holochainVersion] = await invoke(
@@ -467,19 +505,10 @@ export default defineComponent({
     await this.checkForUiUpdates();
   },
   computed: {
-    // installedApps: {
-    //   get(): Array<HolochainAppInfo> {
-    //     console.log("getting installed apps")
-    //     return this.$store.getters["allApps"];
-    //   },
-    //   set() {
-    //     // Can't set
-    //   }
-    // },
+    devModeOn() {
+      return !!this.devHubAppInfo && (isAppRunning(this.devHubAppInfo.webAppInfo.installed_app_info) || isAppPaused(this.devHubAppInfo.webAppInfo.installed_app_info))
+    },
     sortedApps() {
-      // if extended happ releases are not yet fetched from the DevHub to include potential
-      // GUI updates, just return installedApps with guiUpdateAvailable undefined
-      console.log("sorted apps, installed = ", this.installedApps, "extended = ", this.extendedAppInfos)
       // if extended happ releases are not yet fetched from the DevHub to include potential
       // GUI updates, just return installedApps with guiUpdateAvailable undefined
       let sortedAppList: Array<HolochainAppInfoExtended> = this.extendedAppInfos
@@ -556,44 +585,35 @@ export default defineComponent({
     isLoading() {
       return this.$store.state.launcherStateInfo === "loading";
     },
-    closeDevHubNote() {
-      if (this.ignoreDevHubWaring) {
-        window.localStorage.setItem("ignoreDevHubDevsOnlyWarning", "true");
-      }
-      (this.$refs["devHubDevsOnlyWarning"] as typeof HCDialog).close();
+    openPublishAppDialog() {
+      (this.$refs["publishAppDialog"] as typeof HCDialog).open();
     },
-    async handleOpenDevHub() {
-      if (this.ignoreDevHubWaring) {
-        window.localStorage.setItem("ignoreDevHubDevsOnlyWarning", "true");
+    closePublishAppDialog() {
+      (this.$refs["publishAppDialog"] as typeof HCDialog).close();
+    },
+    closeDevModeWarning() {
+      if (this.ignoreDevModeWarning) {
+        window.localStorage.setItem("ignoreDevModeDevsOnlyWarning", "true");
       }
-      const appId = this.devHubAppInfo!.webAppInfo.installed_app_info.installed_app_id;
-      (this.$refs["devHubDevsOnlyWarning"] as typeof HCDialog).close();
+      (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).close();
+    },
+    async handleInstallDevHub() {
+      if (this.ignoreDevModeWarning) {
+        window.localStorage.setItem("ignoreDevModeDevsOnlyWarning", "true");
+      }
+      (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).close();
+      this.installingDevHub = true; // TODO: why is this useful?
       try {
-        await invoke("open_app_ui", { appId, holochainId: this.devHubAppInfo!.holochainId });
-        this.showMessage(`App ${appId} opened`);
+        await invoke("install_devhub", {});
+        this.installingDevHub = false;
+        window.location.reload();
       } catch (e) {
-        const error = `Error opening app ${appId}: ${JSON.stringify(e)}`;
-        this.showMessage(error);
-        await invoke("log", {
-          log: error,
-        });
+        alert(`Failed to install DevHub: ${JSON.stringify(e)}`);
+        console.error(`Failed to install DevHub: ${JSON.stringify(e)}`);
+        this.installingDevHub = false;
       }
-    },
-    async howToPublish() {
-      await invoke("open_url_cmd", {
-        url: this.howToPublishUrl,
-      });
     },
     async openApp(app: HolochainAppInfo) {
-      // if the DevHub is requested to be opened, show a warning dialog that
-      // this is intended for developers
-
-      if ((app.webAppInfo.installed_app_info.installed_app_id == `DevHub-${app.holochainId.content}`)
-       && (!window.localStorage.ignoreDevHubDevsOnlyWarning)) {
-        (this.$refs["devHubDevsOnlyWarning"] as typeof HCDialog).open();
-        return;
-      }
-
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
       try {
         await invoke("open_app_ui", { appId, holochainId: app.holochainId });
@@ -695,23 +715,19 @@ export default defineComponent({
     },
     async toggleDevMode() {
       // TODO: track devModeEnabled in Tauri so it can be used all over the app?
-      if (this.devHubAppInfo && (isAppRunning(this.devHubAppInfo.webAppInfo.installed_app_info) || isAppPaused(this.devHubAppInfo.webAppInfo.installed_app_info))) {
-        await this.disableApp(this.devHubAppInfo);
+      if (this.devModeOn) {
+        await this.disableApp(this.devHubAppInfo as HolochainAppInfo);
       } else {
         if (!this.devHubAppInfo) {
-          this.installingDevHub = true;
-          try {
-            await invoke("install_devhub", {});
-            this.installingDevHub = false;
-            window.location.reload();
-          } catch (e) {
-            alert(`Failed to install DevHub: ${JSON.stringify(e)}`);
-            console.error(`Failed to install DevHub: ${JSON.stringify(e)}`);
-            this.installingDevHub = false;
+          // if the DevMode is requested to be turned on for the first time,
+          // show a warning dialog that this is intended for developers
+
+          if (!window.localStorage.ignoreDevModeDevsOnlyWarning) {
+            (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).open();
+            return false;
           }
-        } else {
-          this.enableApp(this.devHubAppInfo);
         }
+        this.enableApp(this.devHubAppInfo as HolochainAppInfo);
       }
     },
     async reportIssue() {

@@ -1,33 +1,4 @@
 <template>
-  <HCDialog ref="devHubDevsOnlyWarning">
-    <div
-      class="column"
-      style="padding: 30px; align-items: center; max-width: 500px"
-    >
-      <div style="font-weight: 600; font-size: 27px; margin-bottom: 25px">
-        DevHub
-      </div>
-      <div>
-        DevHub is the place where <span style="font-weight: bold; white-space: nowrap;">app developers</span> can upload their apps such that they appear in the App Library.<br><br>
-        If you instead want to install other apps, click on the <span style="font-weight: bold; white-space: nowrap;">"Install New App"</span> button in the bottom right corner of the
-        main window. It will lead you to the <span style="font-weight: bold; white-space: nowrap;">App Library</span>.
-      </div>
-
-      <div class="row" style="margin-top: 30px; margin-bottom: 10px; margin-left: 50px; width: 100%;">
-        <ToggleSwitch
-          :sliderOn="ignoreDevHubWaring"
-          @click="() => ignoreDevHubWaring = !ignoreDevHubWaring"
-          @keydown.enter="() => ignoreDevHubWaring = !ignoreDevHubWaring"
-        />
-        <span style="margin-left: 10px;">Don't show this message again.</span>
-      </div>
-
-      <div class="row" style="margin-top: 20px;">
-        <HCButton style="height: 30px; margin: 4px 6px;" outlined @click="closeDevHubNote">Cancel</HCButton>
-        <HCButton style="margin: 4px 6px;" @click="handleOpenDevHub">Open DevHub</HCButton>
-      </div>
-    </div>
-  </HCDialog>
 
   <!-- <div
     v-if="isLoading()"
@@ -50,24 +21,6 @@
     />
   </div>
 
-  <!-- <HCButton
-    tabindex="0"
-    @click="$emit('open-app-store')"
-    class="btn-install"
-    style="
-      font-family: Poppins;
-      margin: 16px;
-      height: 54px;
-      position: absolute;
-      right: 0;
-      bottom: 0;
-    "
-    ><div class="row center-content" style="font-size: 18px">
-      <mwc-icon style="margin-right: 10px; font-size: 26px">add</mwc-icon
-      >{{ $t("main.installNewApp") }}
-    </div>
-  </HCButton> -->
-
   <HCSnackbar leading :labelText="snackbarText" ref="snackbar"></HCSnackbar>
 </template>
 
@@ -89,54 +42,17 @@ export default defineComponent({
   components: { InstalledAppsList, HCButton, HCSnackbar, HCDialog, ToggleSwitch, LoadingDots },
   data(): {
     snackbarText: string | undefined;
-    showDevHubDevsOnlyWarning: boolean;
-    devHubAppInfo: HolochainAppInfo | undefined;
-    ignoreDevHubWaring: boolean;
   } {
     return {
-      snackbarText: undefined,
-      showDevHubDevsOnlyWarning: false,
-      devHubAppInfo: undefined,
-      ignoreDevHubWaring: false,
+      snackbarText: undefined
+
     };
   },
   methods: {
     isLoading() {
       return this.$store.state.launcherStateInfo === "loading";
     },
-    closeDevHubNote() {
-      if (this.ignoreDevHubWaring) {
-        window.localStorage.setItem("ignoreDevHubDevsOnlyWarning", "true");
-      }
-      (this.$refs["devHubDevsOnlyWarning"] as typeof HCDialog).close();
-    },
-    async handleOpenDevHub() {
-      if (this.ignoreDevHubWaring) {
-        window.localStorage.setItem("ignoreDevHubDevsOnlyWarning", "true");
-      }
-      const appId = this.devHubAppInfo!.webAppInfo.installed_app_info.installed_app_id;
-      (this.$refs["devHubDevsOnlyWarning"] as typeof HCDialog).close();
-      try {
-        await invoke("open_app_ui", { appId, holochainId: this.devHubAppInfo!.holochainId });
-        this.showMessage(`App ${appId} opened`);
-      } catch (e) {
-        const error = `Error opening app ${appId}: ${JSON.stringify(e)}`;
-        this.showMessage(error);
-        await invoke("log", {
-          log: error,
-        });
-      }
-    },
     async openApp(app: HolochainAppInfo) {
-      // if the DevHub is requested to be opened, show a warning dialog that
-      // this is intended for developers
-
-      if ((app.webAppInfo.installed_app_info.installed_app_id == `DevHub-${app.holochainId.content}`)
-       && (!window.localStorage.ignoreDevHubDevsOnlyWarning)) {
-        this.devHubAppInfo = app;
-        (this.$refs["devHubDevsOnlyWarning"] as typeof HCDialog).open();
-        return;
-      }
 
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
       try {

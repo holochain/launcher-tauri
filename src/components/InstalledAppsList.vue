@@ -68,7 +68,7 @@
         v-if="noWebApps"
         style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
       >
-        {{ $t("main.noWebApps") }}
+        {{ $t("main.noApps") }}
         {{
           selectedHolochainVersion === "All Versions"
             ? "."
