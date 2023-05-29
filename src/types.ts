@@ -179,6 +179,6 @@ export interface ReleaseData {
 }
 
 export interface ReleaseInfo {
-  resource_locator: ResourceLocatorB64,
+  resource_locator: ResourceLocatorB64 | undefined,
   version: string | undefined,
 }

@@ -503,13 +503,13 @@ export default defineComponent({
       // check for GUI updates
       const allApps: Array<HolochainAppInfo> = this.$store.getters["allApps"];
 
-      const updatableApps = allApps.filter((app) => app.webAppInfo.happ_release_info);
+      const updatableApps = allApps.filter((app) => app.webAppInfo.happ_release_info?.resource_locator);
 
       // sort all happ release ResourceLocators by DnaHash of the DevHub they originate from
       const updatableAppsByLocatorDna: Record<DnaHashB64, HolochainAppInfo[]> = {};
 
       updatableApps.forEach((app) => {
-        const dnaHash = app.webAppInfo.happ_release_info!.resource_locator.dna_hash;
+        const dnaHash = app.webAppInfo.happ_release_info!.resource_locator!.dna_hash;
         const apps = updatableAppsByLocatorDna[dnaHash];
 
         if (apps) {
@@ -520,8 +520,8 @@ export default defineComponent({
       });
 
       await Promise.allSettled(Object.values(updatableAppsByLocatorDna).map(async (apps) => {
-        const entryHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator.resource_hash));
-        const devHubDnaHash = decodeHashFromBase64(apps[0].webAppInfo.happ_release_info!.resource_locator.dna_hash);
+        const entryHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator!.resource_hash));
+        const devHubDnaHash = decodeHashFromBase64(apps[0].webAppInfo.happ_release_info!.resource_locator!.dna_hash);
 
         try {
           console.log("@checkForUiPudates: entryHashes: ", entryHashes.map((eh) => encodeHashToBase64(eh)));
@@ -535,7 +535,7 @@ export default defineComponent({
             // if it's installed as a webapp and the happ release has an official GUI, check whether it's a new GUI
             if (app.webAppInfo.web_uis.default.type === "WebApp" && happReleases[idx]?.official_gui) {
               const guiReleaseInfo = app.webAppInfo.web_uis.default.gui_release_info;
-              const guiReleaseHash = app.webAppInfo.web_uis.default.gui_release_info?.resource_locator.resource_hash;
+              const guiReleaseHash = app.webAppInfo.web_uis.default.gui_release_info?.resource_locator!.resource_hash;
               console.log("guiReleaseHash: ", guiReleaseHash);
               if (guiReleaseInfo && guiReleaseHash) {
                 if(guiReleaseHash != encodeHashToBase64(happReleases[idx]!.official_gui!)) {

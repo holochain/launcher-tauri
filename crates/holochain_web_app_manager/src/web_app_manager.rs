@@ -56,8 +56,8 @@ impl Into<ResourceLocator> for ResourceLocatorB64 {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ReleaseInfo {
-  resource_locator: ResourceLocatorB64,
-  version: Option<String>,
+  pub resource_locator: Option<ResourceLocatorB64>,
+  pub version: Option<String>,
 }
 
 
@@ -171,7 +171,7 @@ impl WebAppManager {
     self.allocated_ports.get(app_id).map(|u| u.clone())
   }
 
-  fn install_app_ui(
+  pub fn install_app_ui(
     &mut self,
     app_id: String,
     web_ui_zip_bytes: ResourceBytes,
