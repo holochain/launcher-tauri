@@ -39,7 +39,6 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { getCurrent } from "@tauri-apps/api/window";
 import { defineComponent } from "vue";
 import { HolochainId } from "../../types";
-import { syntaxHighlight } from "../../utils";
 
 import HCGenericDialog from "../subcomponents/HCGenericDialog.vue";
 import HCSelect from "../subcomponents/HCSelect.vue";
@@ -74,7 +73,6 @@ export default defineComponent({
     });
   },
   methods: {
-    syntaxHighlight,
     async open() {
       let holochainVersions: [string, HolochainId][] = [];
       this.$store.getters["runningHolochainIds"].forEach(async (id: HolochainId) => {
