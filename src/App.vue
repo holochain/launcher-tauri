@@ -91,6 +91,7 @@
     <About></About>
     <Config></Config>
     <ChangeLanguage ref="change-language"></ChangeLanguage>
+    <NetworkStats ref="network-stats"></NetworkStats>
     <HCGenericDialog
       @confirm="restartLauncher"
       ref="restartDialog"
@@ -115,6 +116,7 @@ import Setup from "./components/setup/Setup.vue";
 import About from "./components/settings/About.vue";
 import HCGenericDialog from "./components/subcomponents/HCGenericDialog.vue";
 import ChangeLanguage from "./components/settings/ChangeLanguage.vue";
+import NetworkStats from "./components/settings/NetworkStats.vue";
 
 import { defineComponent } from "vue";
 import { ActionTypes } from "./store/actions";
@@ -140,6 +142,7 @@ export default defineComponent({
     AlreadyRunning,
     HCGenericDialog,
     ChangeLanguage,
+    NetworkStats,
   },
   mounted() {
     // define window.__HC_LAUNCHER_ENV__ so that js-client routes zome-call signing to tauri

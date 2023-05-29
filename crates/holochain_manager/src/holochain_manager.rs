@@ -250,4 +250,15 @@ impl HolochainManager {
 
     Ok(installed_apps)
   }
+
+  pub async fn dump_network_stats(&mut self) -> Result<String, String> {
+    let network_stats = self
+      .ws
+      .dump_network_stats()
+      .await
+      .map_err(|e| format!("Failed to get network stats: {:?}", e))?;
+
+    Ok(network_stats)
+  }
+
 }

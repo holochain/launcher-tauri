@@ -85,6 +85,7 @@ const messages = {
     buttons: {
       back: "Back",
       cancel: "Cancel",
+      close: "Close",
       continue: "continue",
       disable: "Disable",
       enable: "Enable",
@@ -161,6 +162,10 @@ const messages = {
       },
       confirmUninstallApp: "Are you sure you want to uninstall this App? This will irrevocably delete all data stored in it.",
       confirmUninstallCell: "Are you sure you want to delete this cell? This will irrevocably delete all data stored in it.",
+      networkStats: {
+        networkStats: "Network Statistics",
+        changeHolochainVersion: "Choose Holochain Version",
+      },
     },
   },
 
@@ -239,6 +244,7 @@ const messages = {
     buttons: {
       back: "Zurück",
       cancel: "Abbrechen",
+      close: "Schliessen",
       continue: "Weiter",
       disable: "Deaktivieren",
       enable: "Aktivieren",
@@ -315,6 +321,10 @@ const messages = {
       },
       confirmUninstallApp: "Bist du sicher, dass du diese App deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
       confirmUninstallCell: "Bist du sicher, dass du diese Cell deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
+      networkStats: {
+        networkStats: "Netzwerkstatistik",
+        changeHolochainVersion: "Holochain Version",
+      },
     },
   },
 };

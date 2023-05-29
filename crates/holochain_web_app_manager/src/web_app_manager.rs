@@ -634,6 +634,11 @@ impl WebAppManager {
   }
 
 
+  pub async fn dump_network_stats(&mut self) -> Result<String, String> {
+    self.holochain_manager.dump_network_stats().await
+  }
+
+
 }
 
 
