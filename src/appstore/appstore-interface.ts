@@ -844,6 +844,9 @@ export async function tryWithHosts<T>(
     const result = await fn(host);
     return result;
   } catch (e) {
+    let errors = [];
+    errors.push(e);
+
     // console.log("@tryWithHosts: Failed with first host: ", JSON.stringify(e));
     // if it fails with the first host, try other hosts
     const pingResult = await getVisibleHostsForZomeFunction(
@@ -860,8 +863,6 @@ export async function tryWithHosts<T>(
     // console.log("@tryWithHosts: other available hosts: ", availableHosts.map((hash) => encodeHashToBase64(hash)));
 
     let result: T | undefined = undefined;
-
-    let errors = [];
 
     // for each host, try to get stuff and if it succeeded, return,
     // otherwise go to next host
