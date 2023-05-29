@@ -73,6 +73,7 @@ const messages = {
       appLibrarySynchronization: "App Library Synchronization",
       fullSynchronizationRequired: "Full synchronization with peers required to reliably download all apps.",
       howToPublishAnApp: "How to publish an app",
+      inQueue: "in queue",
       noOngoingPeerSynchronization: "no ongoing peer synchronization",
       selectAppFromFileSystem: "Select app from Filesystem",
       noAppsInStore:
@@ -81,6 +82,7 @@ const messages = {
       readThis: "Read this",
       readThisToPublish:
         " to learn how to publish a Holochain application to the App Library.",
+      receivingData: "Receiving new data",
     },
     buttons: {
       back: "Back",
@@ -232,6 +234,7 @@ const messages = {
       appLibrarySynchronization: "App Store Synchronisation",
       fullSynchronizationRequired: "Vollständige Synchronisation mit Peers erforderlich, um alle Apps herunterladen zu können.",
       howToPublishAnApp: "Eigene App Publizieren",
+      inQueue: "ausstehend",
       noOngoingPeerSynchronization: "keine aktiven Synchronisationen mit Peers",
       selectAppFromFileSystem: "Installiere App von Datei",
       noAppsInStore:
@@ -240,6 +243,7 @@ const messages = {
       readThis: "Lese dies",
       readThisToPublish:
         " um zu lernen, wie man eine Holochain App publiziert.",
+      receivingData: "Neue Daten werden empfangen",
     },
     buttons: {
       back: "Zurück",

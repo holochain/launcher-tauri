@@ -84,12 +84,23 @@
     </div>
   </div>
 
-  <!-- Indicator of online peer hosts -->
-  <!-- <div
-    class="peer-host-indicator column"
-  >
 
-  </div> -->
+  <!-- AppStore synchronization spinner -->
+  <div v-show="showLoadingSpinner" class="progress-indicator">
+    <div style="padding: 0 15px;">
+      <div
+        style="margin-bottom: 5px; font-weight: 600; font-size: 18px;"
+        :title="$t('appStore.fullSynchronizationRequired')"
+      >
+        {{ $t('appStore.receivingData') }}...
+      </div>
+      <div style="text-align: right; margin-bottom: 10px;" :title="$t('appStore.amountOfData')">
+        <b>{{ prettyBytesLocal(queuedBytes) }}</b> {{ $t('appStore.inQueue') }}
+      </div>
+    </div>
+    <span :class="queuedBytes ? 'loader' : 'inactive-loader'" style="position: absolute; bottom: 0;"></span>
+  </div>
+
 
   <!-- Dialog to select releases -->
   <SelectReleaseDialog
@@ -135,13 +146,13 @@ import "@material/mwc-icon-button";
 import { AppWebsocket, NetworkInfo, CellInfo, EntryHashB64, encodeHashToBase64, AgentPubKey, AnyDhtHash } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
-import { toSrc } from "../utils";
+import { toSrc, getCellId } from "../utils";
 
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
-import { getHappReleases, getAvailableHostForZomeFunction, fetchGuiReleaseEntry, getVisibleHostsForZomeFunction, tryWithHosts } from "../appstore/appstore-interface";
+import { tryWithHosts } from "../appstore/appstore-interface";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
@@ -171,6 +182,7 @@ export default defineComponent({
     SelectReleaseDialog,
   },
   data(): {
+    appWebsocket: AppWebsocket | undefined;
     loadingText: string;
     loading: boolean;
     installableApps: Array<AppEntry>;
@@ -181,19 +193,19 @@ export default defineComponent({
     provisionedCells: [string, CellInfo | undefined][] | undefined;
     networkStates: (number | undefined)[];
     cachedMaxExpected: (number | undefined)[];
-    latestNetworkUpdates: number[]; // timestamps of the latest non-zero gossipInfo update
-    idleStates: boolean[];
-    maxExceeded: boolean[];
+    latestQueuedBytesUpdate: number;
     showProgressIndicator: boolean;
-    downloadFailed: boolean;
     errorText: string;
-    appWebsocket: AppWebsocket | undefined;
+    pollInterval: number | null;
+    queuedBytes: number | undefined;
     selectedHappReleaseInfo: ReleaseInfo | undefined;
     selectedGuiReleaseInfo: ReleaseInfo | undefined;
     selectedApp: AppEntry | undefined;
     selectedIconSrc: string | undefined;
+    showLoadingSpinner: boolean;
   } {
     return {
+      appWebsocket: undefined,
       loadingText: "",
       loading: true,
       installableApps: [],
@@ -205,18 +217,20 @@ export default defineComponent({
       provisionedCells: undefined,
       networkStates: [undefined, undefined, undefined],
       cachedMaxExpected: [undefined, undefined, undefined],
-      latestNetworkUpdates: [0, 0, 0],
-      idleStates: [true, true, true],
-      maxExceeded: [false, false, false],
+      latestQueuedBytesUpdate: 0,
       showProgressIndicator: false,
-      downloadFailed: false,
       errorText: "Unknown error occured.",
-      appWebsocket: undefined,
+      pollInterval: null,
+      queuedBytes: undefined,
       selectedHappReleaseInfo: undefined,
       selectedGuiReleaseInfo: undefined,
       selectedApp: undefined,
       selectedIconSrc: undefined,
+      showLoadingSpinner: false,
     };
+  },
+  beforeUnmount() {
+    window.clearInterval(this.pollInterval!);
   },
   async mounted() {
     try {
@@ -224,6 +238,12 @@ export default defineComponent({
     } catch (e) {
       console.error(`Failed to fetch apps in mounted() hook: ${e}`);
     }
+
+    await this.getQueuedBytes();
+    this.pollInterval = window.setInterval(
+      async () => await this.getQueuedBytes(),
+      2000
+    );
   },
   methods: {
     toSrc,
@@ -402,6 +422,36 @@ export default defineComponent({
       this.selectedApp = undefined;
       // this.hdkVersionForApp = undefined;
     },
+    /**
+    * Gets aggregated bytes that are in queue for the DevHub cells
+    */
+    async getQueuedBytes() {
+      if (!this.appWebsocket) {
+        await this.connectAppWebsocket();
+      }
+      const networkInfo: NetworkInfo[] = await this.appWebsocket!.networkInfo({
+        agent_pub_key: getCellId(this.provisionedCells![0][1]!)![1],
+        dnas: this.provisionedCells!.filter(([_roleName, cellInfo]) => !!cellInfo)
+          .map(([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array),
+      } as any);
+      let queuedBytes = 0;
+      networkInfo.forEach((info, _idx) => {
+        queuedBytes += info.fetch_pool_info.op_bytes_to_fetch;
+      });
+      this.queuedBytes = queuedBytes;
+      const now = Date.now();
+      if (!!queuedBytes && queuedBytes > 0) {
+        this.latestQueuedBytesUpdate = now;
+        // console.log("updated timestamp: ", this.latestQueuedBytesUpdate);
+      }
+      if ((now - this.latestQueuedBytesUpdate) < 5000) {
+        this.showLoadingSpinner = true;
+      } else {
+        this.showLoadingSpinner = false;
+      }
+
+      return queuedBytes;
+    },
     // async getNetworkState() {
     //   if (!this.appWebsocket) {
     //     await this.connectAppWebsocket();
@@ -502,17 +552,16 @@ export default defineComponent({
   box-shadow: 0 0px 5px #9b9b9b;
 }
 
-.peer-host-indicator {
+.progress-indicator {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  padding: 10px 15px;
+  padding: 10px 0 0 0;
   background-color: white;
   box-shadow: 0 0px 5px #9b9b9b;
   border-radius: 10px 10px 6px 6px;
-  min-width: 220px;
+  min-width: 350px;
 }
-
 
 .refresh-button {
   height: 30px;
