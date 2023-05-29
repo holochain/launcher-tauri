@@ -163,7 +163,7 @@
     <div
       v-if="showMore"
       class="column appDetails"
-      style="align-items: left; margin-bottom: 20px; padding-left: 65px;"
+      style="align-items: left; margin-bottom: 20px; padding-left: 115px;"
     >
       <div class="row">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
@@ -558,7 +558,7 @@ export default defineComponent({
 }
 
 .appDetails .row {
-  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .holoIdenticon {
