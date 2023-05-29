@@ -85,20 +85,11 @@
   </div>
 
   <!-- Indicator of online peer hosts -->
-  <div
+  <!-- <div
     class="peer-host-indicator column"
   >
-    <div class="row" style="align-items: center;" title="number of peers that are part of the app distribution peer network and currently responsive">
-      <span style="background-color: #17d310; border-radius: 50%; width: 10px; height: 10px; margin-right: 10px;"></span>
-      <span v-if="peerHostStatus"><span style="font-weight: 600;">{{ peerHostStatus.responded.length }} available</span> peer host{{ peerHostStatus.responded.length === 1 ? "" : "s"}}</span>
-      <span v-else>pinging peer hosts...</span>
-    </div>
-    <div class="row" style="align-items: center;" title="number of peers that registered themselves in the app distribution peer network but are currently unresponsive">
-      <span style="background-color: #bfbfbf; border-radius: 50%; width: 10px; height: 10px; margin-right: 10px;"></span>
-      <span v-if="peerHostStatus"><span style="font-weight: 600;">{{ peerHostStatus.totalHosts - peerHostStatus.responded.length }} unresponsive</span> peer host{{ (peerHostStatus.totalHosts - peerHostStatus.responded.length) === 1 ? "" : "s"}}</span>
-      <span v-else>pinging peer hosts...</span>
-    </div>
-  </div>
+
+  </div> -->
 
   <!-- Dialog to select releases -->
   <SelectReleaseDialog
@@ -187,8 +178,6 @@ export default defineComponent({
     howToPublishUrl: string;
     holochainId: HolochainId | undefined;
     holochainSelection: boolean;
-    peerHostStatus: HostAvailability | undefined;
-    pollInterval: number | null;
     provisionedCells: [string, CellInfo | undefined][] | undefined;
     networkStates: (number | undefined)[];
     cachedMaxExpected: (number | undefined)[];
@@ -213,8 +202,6 @@ export default defineComponent({
         "https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-devhub",
       holochainId: undefined,
       holochainSelection: true,
-      peerHostStatus: undefined,
-      pollInterval: null,
       provisionedCells: undefined,
       networkStates: [undefined, undefined, undefined],
       cachedMaxExpected: [undefined, undefined, undefined],
@@ -231,49 +218,12 @@ export default defineComponent({
       selectedIconSrc: undefined,
     };
   },
-  beforeUnmount() {
-    window.clearInterval(this.pollInterval!);
-  },
   async mounted() {
-
-
     try {
       await this.fetchApps();
     } catch (e) {
       console.error(`Failed to fetch apps in mounted() hook: ${e}`);
     }
-
-    await this.connectAppWebsocket();
-
-    // set up polling loop to periodically get gossip progress, global scope (window) seems to
-    // be required to clear it again on beforeUnmount()
-    const appStoreInfo = await this.appWebsocket!.appInfo({
-      installed_app_id: APPSTORE_APP_ID,
-    });
-
-    // With multiple possible DevHub networks, available peers are not necessarily unique
-
-    try {
-      const result = await getVisibleHostsForZomeFunction(this.appWebsocket as AppWebsocket, appStoreInfo, DEVHUB_HAPP_LIBRARY_DNA_HASH, 'happ_library', 'get_webhapp_package');
-      this.peerHostStatus = result;
-    } catch (e) {
-      console.error(`Failed to get peer host statuses: ${JSON.stringify(e)}`);
-    }
-
-    this.pollInterval = window.setInterval(
-      async () => {
-        const result = await getVisibleHostsForZomeFunction(
-          this.appWebsocket as AppWebsocket,
-          appStoreInfo,
-          DEVHUB_HAPP_LIBRARY_DNA_HASH,
-          "happ_library",
-          "get_webhapp_package",
-        );
-
-        this.peerHostStatus = result;
-      },
-      60000
-    );
   },
   methods: {
     toSrc,
