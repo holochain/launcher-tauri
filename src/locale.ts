@@ -237,7 +237,6 @@ const messages = {
       selectAppFromFileSystem: "Installiere App von Datei",
       noAppsInStore:
         "Es sind noch keine Apps im App Store verfügbar oder die Synchronisierung mit Peers ist noch unvollständig.",
-      synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut.",
       receivingData: "Neue Daten werden empfangen",
       synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut."
     },
