@@ -154,8 +154,7 @@ export default defineComponent({
       }
     },
     showMessage(message: string) {
-      this.snackbarText = message;
-      (this.$refs as any).snackbar.show();
+      this.$emit("show-message", message);
     },
   },
 });

@@ -42,18 +42,11 @@
       </span>
     </div>
 
-    <div
-      v-if="isLoading()"
-      class="column center-content" style="flex: 1; height: calc(100vh - 64px);"
-    >
-      <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"></LoadingDots>
-    </div>
-
-    <div v-else class="row" style="flex: 1; overflow-y: auto;">
+    <div class="row" style="flex: 1; overflow-y: auto;">
       <div v-if="view.type === 'launcher'" class="flex-scrollable-parent">
         <div class="flex-scrollable-container">
           <div class="flex-scrollable-y">
-            <Launcher></Launcher>
+            <Launcher @show-message="showMessage($event)"></Launcher>
           </div>
         </div>
       </div>
@@ -61,7 +54,7 @@
       <div v-else-if="view.type === 'appStore'" class="flex-scrollable-parent">
         <div class="flex-scrollable-container">
           <div class="flex-scrollable-y">
-            <AppStore></AppStore>
+            <AppStore @show-message="showMessage($event)"></AppStore>
           </div>
         </div>
       </div>
@@ -69,12 +62,15 @@
       <div v-else style="flex: 1; display: flex">
         <div class="flex-scrollable-container">
           <div class="flex-scrollable-y">
-            <Settings :installedApps="$store.getters[`allApps`]"></Settings>
+            <Settings :installedApps="$store.getters[`allApps`]" @show-message="showMessage($event)"></Settings>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <HCSnackbar leading :labelText="snackbarText" ref="snackbar"></HCSnackbar>
+
 </template>
 
 <script lang="ts">
@@ -83,6 +79,7 @@ import Launcher from "./Launcher.vue";
 import Settings from "./Settings.vue";
 import { ActionTypes } from "../store/actions";
 import HCButton from "../components/subcomponents/HCButton.vue";
+import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
@@ -104,9 +101,10 @@ export default defineComponent({
   components: {
     AppStore,
     HCButton,
+    HCSnackbar,
     Launcher,
     LoadingDots,
-    Settings
+    Settings,
   },
   data(): {
     reportIssueUrl: string;
@@ -132,6 +130,10 @@ export default defineComponent({
       await invoke("open_url_cmd", {
         url: this.reportIssueUrl
       });
+    },
+    showMessage(message: string) {
+      this.snackbarText = message;
+      (this.$refs as any).snackbar.show();
     },
   },
 });
