@@ -465,39 +465,7 @@ export default defineComponent({
   },
   emits: ["openApp", "uninstall-app", "enable-app", "disable-app", "startApp", "open-app-store", "show-message"],
   async mounted() {
-    await Promise.all(
-      this.installedApps.map(async (app) => {
-        // Check if DevHub is installed and if so store info about it locally
-        if (app.webAppInfo.installed_app_info.installed_app_id === DEVHUB_APP_ID) {
-          this.devHubAppInfo = app
-        }
-
-        // Store app store for later use
-        if (app.webAppInfo.installed_app_info.installed_app_id === APPSTORE_APP_ID) {
-          this.appstoreHolochainAppInfo = app
-        }
-
-        return this.storageInfos[app.holochainVersion] = await invoke(
-          "get_storage_info",
-          { holochainId: app.holochainId }
-        );
-      })
-    );
-
-    const holochainId = this.$store.getters["holochainIdForDevhub"];
-    // connect to AppWebsocket
-    const port = this.$store.getters["appInterfacePort"](holochainId);
-    // TODO: check why post is not available
-    console.log("porttt", port)
-    const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
-    this.appWebsocket = appWebsocket;
-    // TODO add correct installed app id here.
-    const appstoreAppInfo = await appWebsocket.appInfo({
-      installed_app_id: APPSTORE_APP_ID,
-    });
-    this.appstoreAppInfo = appstoreAppInfo;
-
-    await this.refreshExtendedAppInfos();
+    await this.refreshAppStates();
   },
   computed: {
     devModeOn() {
@@ -592,6 +560,44 @@ export default defineComponent({
       }
       (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).close();
     },
+    async refreshAppStates() {
+
+      await this.$store.dispatch(ActionTypes.fetchStateInfo);
+
+      await Promise.all(
+        this.installedApps.map(async (app) => {
+          // Check if DevHub is installed and if so store info about it locally
+          if (app.webAppInfo.installed_app_info.installed_app_id === DEVHUB_APP_ID) {
+            this.devHubAppInfo = app
+          }
+
+          // Store app store for later use
+          if (app.webAppInfo.installed_app_info.installed_app_id === APPSTORE_APP_ID) {
+            this.appstoreHolochainAppInfo = app
+          }
+
+          return this.storageInfos[app.holochainVersion] = await invoke(
+            "get_storage_info",
+            { holochainId: app.holochainId }
+          );
+        })
+      );
+
+      const holochainId = this.$store.getters["holochainIdForDevhub"];
+      // connect to AppWebsocket
+      const port = this.$store.getters["appInterfacePort"](holochainId);
+      // TODO: check why post is not available
+      console.log("porttt", port)
+      const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      this.appWebsocket = appWebsocket;
+      // TODO add correct installed app id here.
+      const appstoreAppInfo = await appWebsocket.appInfo({
+        installed_app_id: APPSTORE_APP_ID,
+      });
+      this.appstoreAppInfo = appstoreAppInfo;
+
+      await this.refreshExtendedAppInfos();
+    },
     async refreshExtendedAppInfos() {
       const extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> = {};
 
@@ -642,9 +648,9 @@ export default defineComponent({
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
       try {
         await invoke("disable_app", { appId, holochainId: app.holochainId });
-
-        await this.$store.dispatch(ActionTypes.fetchStateInfo);
+        await this.refreshAppStates();
         this.showMessage(`Disabled ${appId}`);
+
       } catch (e) {
         const error = `Disable app ${appId} failed: ${JSON.stringify(e)}`;
 
@@ -666,8 +672,7 @@ export default defineComponent({
 
       try {
         await invoke("enable_app", { appId, holochainId: app.holochainId });
-
-        await this.$store.dispatch(ActionTypes.fetchStateInfo);
+        await this.refreshAppStates();
         this.showMessage(`Enabled ${appId}`);
       } catch (e) {
         const error = `Enable app ${appId} failed: ${JSON.stringify(e)}`;
@@ -693,7 +698,7 @@ export default defineComponent({
         await invoke("enable_app", { appId, holochainId: app.holochainId });
         // console.log("@InstalledApps: @startApp: app enabled.");
 
-        await this.$store.dispatch(ActionTypes.fetchStateInfo);
+        await this.refreshAppStates();
 
         this.showMessage(`Started ${appId}`);
       } catch (e) {
@@ -713,13 +718,8 @@ export default defineComponent({
 
       try {
         await invoke("uninstall_app", { appId, holochainId: app.holochainId });
-
-        await this.$store.dispatch(ActionTypes.fetchStateInfo);
-
-        await this.refreshExtendedAppInfos();
-
+        await this.refreshAppStates();
         this.showMessage(`Uninstalled ${appId}`);
-
       } catch (e) {
         const error = `Uninstall app ${appId} failed: ${JSON.stringify(e)}`;
         this.showMessage(error);
