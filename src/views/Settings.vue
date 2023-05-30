@@ -1,5 +1,13 @@
 <template>
-  <div style="display: flex; margin: 24px; margin-bottom: 50px; flex-direction: column; align-items: center;">
+
+  <div
+    v-if="isLoading()"
+    class="column center-content" style="flex: 1; height: calc(100vh - 64px);"
+  >
+    <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"></LoadingDots>
+  </div>
+
+  <div v-else style="display: flex; margin: 24px; margin-bottom: 50px; flex-direction: column; align-items: center;">
     <div class='column' style="flex: 1 1 0%; margin-bottom: 80px; padding: 0px 30px; width: 70%; min-width: 900px;">
 
       <!-- Holochain version info -->
@@ -84,6 +92,10 @@
         Language
       </div> -->
 
+
+      <!-- Dev Mode section -->
+
+
       <div class="row section-container" style="display: flex; flex-direction: column;">
         <div class="row">
           <div style="flex: 1;">
@@ -117,12 +129,10 @@
         </div>
       </div>
 
-      <!-- <div
-        v-if="isLoading()"
-        class="column center-content" style="flex: 1; height: calc(100vh - 64px);"
-      >
-        <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"></LoadingDots>
-      </div> -->
+
+
+
+      <!-- Installed apps list -->
 
       <div
         class="column"
@@ -338,7 +348,6 @@
     </div>
   </HCDialog>
 
-  <HCSnackbar leading :labelText="snackbarText" ref="snackbar"></HCSnackbar>
 </template>
 
 <script lang="ts">
@@ -454,7 +463,7 @@ export default defineComponent({
       errorText: "Unknown error occured",
     };
   },
-  emits: ["openApp", "uninstall-app", "enable-app", "disable-app", "startApp", "open-app-store"],
+  emits: ["openApp", "uninstall-app", "enable-app", "disable-app", "startApp", "open-app-store", "show-message"],
   async mounted() {
     await Promise.all(
       this.installedApps.map(async (app) => {
@@ -488,21 +497,7 @@ export default defineComponent({
     });
     this.appstoreAppInfo = appstoreAppInfo;
 
-    const extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> = {};
-
-    // TODO: do i need this here?
-    this.installedApps.forEach((app) => {
-      extendedAppInfos[app.webAppInfo.installed_app_info.installed_app_id] = {
-        webAppInfo: app.webAppInfo,
-        holochainId: app.holochainId,
-        holochainVersion: app.holochainVersion,
-        guiUpdateAvailable: undefined,
-      }
-    });
-
-    this.extendedAppInfos = extendedAppInfos;
-
-    await this.checkForUiUpdates();
+    await this.refreshExtendedAppInfos();
   },
   computed: {
     devModeOn() {
@@ -596,6 +591,23 @@ export default defineComponent({
         window.localStorage.setItem("ignoreDevModeDevsOnlyWarning", "true");
       }
       (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).close();
+    },
+    async refreshExtendedAppInfos() {
+      const extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> = {};
+
+      // TODO: do i need this here?
+      this.installedApps.forEach((app) => {
+        extendedAppInfos[app.webAppInfo.installed_app_info.installed_app_id] = {
+          webAppInfo: app.webAppInfo,
+          holochainId: app.holochainId,
+          holochainVersion: app.holochainVersion,
+          guiUpdateAvailable: undefined,
+        }
+      });
+
+      this.extendedAppInfos = extendedAppInfos;
+
+      await this.checkForUiUpdates();
     },
     async handleInstallDevHub() {
       if (this.ignoreDevModeWarning) {
@@ -704,7 +716,10 @@ export default defineComponent({
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
+        await this.refreshExtendedAppInfos();
+
         this.showMessage(`Uninstalled ${appId}`);
+
       } catch (e) {
         const error = `Uninstall app ${appId} failed: ${JSON.stringify(e)}`;
         this.showMessage(error);
@@ -940,8 +955,7 @@ export default defineComponent({
       }
     },
     showMessage(message: string) {
-      this.snackbarText = message;
-      (this.$refs as any).snackbar.show();
+      this.$emit("show-message", message);
     },
   },
 });

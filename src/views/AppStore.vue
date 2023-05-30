@@ -45,7 +45,7 @@
     </div>
     <span :class="queuedBytes ? 'loader' : 'inactive-loader'" style="position: absolute; bottom: 0;"></span>
   </div>
-  
+
   <!-- Select from filesystem button -->
    <HCButton
     style="
@@ -92,10 +92,11 @@
     @app-installed="
       holochainSelection = true;
       installClosed();
+      showMessage(`Installed App ${$event}`);
       $emit('go-back');
     "
     @closing-dialog="installClosed()"
-    @error="(e) => showError(e)"
+    @error="(e) => showMessage(e)"
     ref="install-app-dialog"
   ></InstallAppDialog>
   <HCSnackbar
@@ -354,12 +355,11 @@ export default defineComponent({
 
       } catch (e) {
         console.error("Error fetching webhapp from DevHub host(s): ", e);
-        this.errorText = "Failed to fetch webhapp from DevHub host(s).";
         this.selectedHappReleaseInfo = undefined;
         this.selectedGuiReleaseInfo = undefined;
         this.selectedApp = undefined;
         this.selectedIconSrc = undefined;
-        (this.$refs as any).snackbar.show();
+        this.showMessage("Failed to fetch webhapp from DevHub host(s).");
         (this.$refs.downloading as typeof HCLoading).close();
         return;
       }
@@ -465,11 +465,9 @@ export default defineComponent({
     //     }
     //   });
 
-
     // },
-    showError(e: string) {
-      this.errorText = e;
-      (this.$refs as any).snackbar.show();
+    showMessage(message: string) {
+      this.$emit("show-message", message);
     },
     progressRatio(idx: number) {
       if ((this.networkStates[idx] || this.networkStates[idx] === 0) && this.cachedMaxExpected[idx]) {
