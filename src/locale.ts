@@ -68,10 +68,12 @@ const messages = {
       appStore: "App Store",
       appLibrarySynchronization: "App Library Synchronization",
       fullSynchronizationRequired: "Full synchronization with peers required to reliably download all apps.",
+      inQueue: "in queue",
       noOngoingPeerSynchronization: "no ongoing peer synchronization",
       selectAppFromFileSystem: "Select app from Filesystem",
       noAppsInStore:
         "There are no apps available yet in the App Library or Synchronization with Peers is not complete.",
+      receivingData: "Receiving new data",
       synchronizationNotCompleteError: "App Library Synchronization not Complete. Please try again later."
     },
     settings: {
@@ -89,6 +91,7 @@ const messages = {
     buttons: {
       back: "Back",
       cancel: "Cancel",
+      close: "Close",
       continue: "continue",
       disable: "Disable",
       enable: "Enable",
@@ -165,6 +168,10 @@ const messages = {
       },
       confirmUninstallApp: "Are you sure you want to uninstall this App? This will irrevocably delete all data stored in it.",
       confirmUninstallCell: "Are you sure you want to delete this cell? This will irrevocably delete all data stored in it.",
+      networkStats: {
+        networkStats: "Network Statistics",
+        changeHolochainVersion: "Choose Holochain Version",
+      },
     },
   },
 
@@ -225,10 +232,13 @@ const messages = {
       appStore: "App Store",
       appLibrarySynchronization: "App Store Synchronisation",
       fullSynchronizationRequired: "Vollständige Synchronisation mit Peers erforderlich, um alle Apps herunterladen zu können.",
+      inQueue: "ausstehend",
       noOngoingPeerSynchronization: "keine aktiven Synchronisationen mit Peers",
       selectAppFromFileSystem: "Installiere App von Datei",
       noAppsInStore:
         "Es sind noch keine Apps im App Store verfügbar oder die Synchronisierung mit Peers ist noch unvollständig.",
+      synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut.",
+      receivingData: "Neue Daten werden empfangen",
       synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut."
     },
     settings: {
@@ -246,6 +256,7 @@ const messages = {
     buttons: {
       back: "Zurück",
       cancel: "Abbrechen",
+      close: "Schliessen",
       continue: "Weiter",
       disable: "Deaktivieren",
       enable: "Aktivieren",
@@ -322,6 +333,10 @@ const messages = {
       },
       confirmUninstallApp: "Bist du sicher, dass du diese App deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
       confirmUninstallCell: "Bist du sicher, dass du diese Cell deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
+      networkStats: {
+        networkStats: "Netzwerkstatistik",
+        changeHolochainVersion: "Holochain Version",
+      },
     },
   },
 };

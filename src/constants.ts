@@ -8,10 +8,10 @@ export const DEVHUB_APP_ID = "DevHub";
 
 // production environment hash
 
-export const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0kaOhZYtxEJmRwDsD-KClb7f0rbr96B5iAFHJVJagYeeAnM6OZ";
+// export const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0kOkT0l0srUiAq-LUywFMjIfD4Kx1pzBtGtDMu418KZLGytXZz";
+export const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0ktLhtxeQNXCDFL9dMazx5PkgBQVoK-5-XZk7ISPCpW8E9aT9w";
 export const DEVHUB_HAPP_LIBRARY_DNA_HASH: DnaHash = decodeHashFromBase64(DEVHUB_HAPP_LIBRARY_DNA_HASH_B64);
 
 // dev environment hash:
-// export const DEVHUB_HAPP_LIBRARY_DNA_HASH_B64: DnaHashB64 = "uhC0k4_LyUyi9kuDIVdmCtHoaeIcVuMYb4ZYRq982qYnzmxMkxKyN";
 
 

@@ -35,7 +35,7 @@ pub async fn install_devhub(
     let devhub_bundle = WebAppBundle::decode(include_bytes!("../../../DevHub.webhapp"))
       .or(Err("Malformed webhapp bundle file"))?;
 
-    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { Some(String::from("test-network-0.994")) };
+    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev2")) } else { Some(String::from("test-network-0.994")) };
 
     webapp_manager
       .install_web_app(
