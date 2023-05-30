@@ -158,7 +158,7 @@ export default defineComponent({
 
 .input-field {
   cursor: pointer;
-  height: 48px;
+  height: 40px;
   padding: 0 10px;
   /* outline: 2px solid rgba(59, 61, 115, 0.25); */
   border-radius: 10px;

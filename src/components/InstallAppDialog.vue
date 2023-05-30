@@ -283,7 +283,7 @@ export default defineComponent({
       return false;
     },
     isLoadingFile() {
-      if (this.appBundlePath && !this.appInfo &&!this.error) return true;
+      if (this.appBundlePath && !this.appInfo && !this.error) return true;
       return false;
     },
     allPubKeys() {
@@ -304,7 +304,9 @@ export default defineComponent({
     },
   },
   async created() {
-    await this.$store.dispatch(ActionTypes.fetchStateInfo);
+    // XXX: Fetching here breaks things because it reloads the AppStore component when stateInfo gets set to "loading"
+    //      see if commenting this out breaks anything
+    //await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
     const { holochain_versions }: { holochain_versions: HolochainVersion[] } =
       await invoke("get_supported_versions", {});
@@ -335,10 +337,10 @@ export default defineComponent({
 
     try {
       console.log("@created: this.appBundlePath: ", this.appBundlePath);
-      this.appInfo = (await invoke("get_app_info", {
-        appBundlePath: this.appBundlePath,
-      })) as WebAppInfo;
-      this.appId = this.appInfo.app_name;
+    this.appInfo = (await invoke("get_app_info", {
+      appBundlePath: this.appBundlePath,
+    })) as WebAppInfo;
+    this.appId = this.appInfo.app_name;
 
       this.$nextTick(() => {
         const appIdField = this.$refs["app-id-field"] as typeof HCTextField;

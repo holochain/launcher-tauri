@@ -1,5 +1,6 @@
 <template>
 
+  <!-- TODO: remove this, but add little dot to settings when there are ui updates to do -->
   <HCGenericDialog
     @confirm="updateGui"
     ref="updateGuiDialog"
@@ -36,7 +37,6 @@
     ref="snackbar"
   ></HCSnackbar>
 
-
   <div
     style="
       display: flex;
@@ -49,71 +49,18 @@
       min-width: 900px;
     "
   >
-    <div
-      class="row"
-      style="
-        width: 100%;
-        justify-content: flex-end;
-        align-items: center;
-        max-width: 1100px;
-        margin-top: 20px;
-        margin-bottom: -5px;
-      "
-    >
-      <HCSelectCard
-        style="
-          width: 200px;
-          margin-right: 5px;
-          box-shadow: 0 0px 3px -1px #9b9b9b;
-          --hc-label-background: #e8e8eb;
-        "
-        :placeholder="$t('main.holochainVersions')"
-        :items="holochainVersionOptions"
-        @item-selected="selectedHolochainVersion = $event"
-      ></HCSelectCard>
-      <img
-        src="/img/Square284x284Logo.png"
-        style="
-          height: 30px;
-          filter: grayscale(50%);
-          margin-right: 20px;
-          margin-left: -2px;
-        "
-      />
-
-      <HCSelectCard
-        style="
-          width: 200px;
-          margin-right: 5px;
-          box-shadow: 0 0px 3px -1px #9b9b9b;
-          --hc-label-background: #e8e8eb;
-        "
-        :placeholder="$t('main.sortBy')"
-        :items="sortOptions"
-        @item-selected="sortOption = $event"
-      ></HCSelectCard>
-      <mwc-icon style="color: #482edf; text-shadow: 0 0px 5px #9b9b9b"
-        >sort</mwc-icon
-      >
-    </div>
 
     <!-- Web Apps -->
     <div
       class="row section-title"
-      :class="{ borderBottomed: showWebApps }"
       style="margin-top: -18px"
     >
-      <span
-        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
-        :title="$t('main.webAppsHelper')"
-        >{{ $t("main.webApps") }}</span
-      >
       <span
         @click="showWebApps = !showWebApps"
         class="show-hide"
         style="opacity: 0.7; cursor: pointer; margin-left: 10px"
       >
-        {{ showWebApps ? "[-]" : "[show]" }}
+        &nbsp;<!-- {{ showWebApps ? "[-]" : "[show]" }} -->
       </span>
     </div>
     <div v-if="showWebApps" style="margin-bottom: 50px; width: 100%">
@@ -121,7 +68,7 @@
         v-if="noWebApps"
         style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
       >
-        {{ $t("main.noWebApps") }}
+        {{ $t("main.noApps") }}
         {{
           selectedHolochainVersion === "All Versions"
             ? "."
@@ -131,164 +78,22 @@
 
       <div
         v-else
-        v-for="app in sortedApps"
-        :key="app.webAppInfo.installed_app_info.installed_app_id"
-        style="
-          display: flex;
-          flex-direction: column;
-          width: 100%;
-          align-items: center;
-        "
+        class="app-grid-container"
       >
-        <InstalledAppCard
-          v-if="app.webAppInfo.web_uis.default.type !== 'Headless'"
-          style="margin: 5px; display: flex; flex: 1"
-          :app="app"
-          @openApp="$emit('openApp', $event)"
-          @uninstallApp="$emit('uninstall-app', $event)"
-          @disableApp="$emit('disable-app', $event)"
-          @enableApp="$emit('enable-app', $event)"
-          @startApp="$emit('startApp', $event)"
-          @updateGui="openUpdateGuiDialog($event)"
-        />
-      </div>
-    </div>
-
-    <!-- Headless Apps -->
-    <div
-      class="row section-title"
-      :class="{ borderBottomed: showHeadlessApps }"
-    >
-      <span
-        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
-        :title="$t('main.headlessAppsHelper')"
-        >{{ $t("main.headlessApps") }}</span
-      >
-      <span
-        @click="showHeadlessApps = !showHeadlessApps"
-        class="show-hide"
-        style="opacity: 0.7; cursor: pointer; margin-left: 10px"
-      >
-        {{ showHeadlessApps ? "[-]" : "[show]" }}
-      </span>
-    </div>
-    <div v-if="showHeadlessApps" style="margin-bottom: 50px; width: 100%">
-      <div
-        v-if="noHeadlessApps"
-        style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
-      >
-        {{ $t("main.noHeadlessApps") }}
-        {{
-          selectedHolochainVersion === "All Versions"
-            ? "."
-            : " in this Holochain Version."
-        }}
-      </div>
-      <div
-        v-for="app in sortedApps"
-        :key="app.webAppInfo.installed_app_info.installed_app_id"
-        style="
-          display: flex;
-          flex-direction: column;
-          width: 100%;
-          align-items: center;
-        "
-      >
-        <InstalledAppCard
-          v-if="app.webAppInfo.web_uis.default.type === 'Headless'"
-          style="margin: 5px; display: flex; flex: 1"
-          :app="app"
-          @openApp="$emit('openApp', $event)"
-          @uninstallApp="$emit('uninstall-app', $event)"
-          @disableApp="$emit('disable-app', $event)"
-          @enableApp="$emit('enable-app', $event)"
-        />
-      </div>
-    </div>
-
-    <!-- Holochain verison info -->
-    <div
-      class="row section-title"
-      :class="{ borderBottomed: showHolochainVersions }"
-    >
-      <span
-        style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
-        :title="$t('main.holochainVersionsHelper')"
-        >{{ $t("main.holochainVersions") }}</span
-      >
-      <span
-        @click="showHolochainVersions = !showHolochainVersions"
-        class="show-hide"
-        style="opacity: 0.7; cursor: pointer; margin-left: 10px"
-      >
-        {{ showHolochainVersions ? "[-]" : "[show]" }}
-      </span>
-      <span style="flex: 1"></span>
-      <span
-        @click="refreshStorageInfo"
-        style="margin-right: 5px; margin-bottom: -8px; cursor: pointer"
-      >
-        <img
-          src="/img/refresh.png"
-          style="height: 12px; margin-right: 3px; opacity: 0.7"
-        />
-        {{ $t("main.refresh") }}
-      </span>
-    </div>
-    <div
-      v-if="showHolochainVersions"
-      class="column"
-      style="margin-bottom: 50px; width: 100%; align-items: center"
-    >
-      <div
-        v-if="noHolochainVersions"
-        style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
-      >
-        {{ $t("main.noHolochainVersions") }}
-      </div>
-      <div v-else style="max-width: 1090px; width: 99%">
         <div
-          v-for="hcVersion in holochainVersions"
-          :key="hcVersion"
-          style="
-            display: flex;
-            flex: 1;
-            flex-direction: column;
-            width: 100%;
-            align-items: center;
-          "
+          v-for="app in sortedApps"
+          :key="app.webAppInfo.installed_app_info.installed_app_id"
         >
-          <div class="row hc-version" style="margin: 5px 0">
-            <img
-              src="/img/Square284x284Logo.png"
-              style="height: 42px; margin-left: 11px; margin-right: 11px"
-            />
-            <div style="font-weight: 600; font-size: 1.1em">
-              {{ hcVersion }}
-            </div>
-            <span style="display: flex; flex: 1"></span>
-            <span
-              v-if="storageInfos && !refreshing"
-              style="font-weight: 600; margin-right: 15px"
-              >{{ totalStorageString(hcVersion) }}</span
-            >
-            <StackedChart
-              v-if="storageInfos && !refreshing"
-              :fractions="storageFractions(hcVersion)"
-              :labels="storageLabels(hcVersion)"
-              style="width: 200px; height: 34px; margin-right: 12px"
-            ></StackedChart>
-            <!-- <span style="width: 120px; text-align: center">{{
-              storageInfos[hcVersion]
-                ? prettyBytes(storageInfos[hcVersion].conductor)
-                : "?"
-            }}</span>
-            <span style="width: 120px; text-align: center">{{
-              storageInfos[hcVersion]
-                ? prettyBytes(storageInfos[hcVersion].uis)
-                : "?"
-            }}</span> -->
-          </div>
+          <InstalledAppCard
+            v-if="app.webAppInfo.web_uis.default.type !== 'Headless'"
+            :app="app"
+            @openApp="$emit('openApp', $event)"
+            @uninstallApp="$emit('uninstall-app', $event)"
+            @disableApp="$emit('disable-app', $event)"
+            @enableApp="$emit('enable-app', $event)"
+            @startApp="$emit('startApp', $event)"
+            @updateGui="openUpdateGuiDialog($event)"
+          />
         </div>
       </div>
     </div>
@@ -318,7 +123,7 @@ import { AppInfo, AppWebsocket, decodeHashFromBase64, DnaHashB64, encodeHashToBa
 import { Entity, FilePackage, GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { ActionTypes } from "../store/actions";
 import { i18n } from "../locale";
-import { APPSTORE_APP_ID } from "../constants";
+import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
 import { locatorToLocatorB64 } from "../utils";
 
 
@@ -347,7 +152,6 @@ export default defineComponent({
     showHeadlessApps: boolean;
     showWebApps: boolean;
     showHolochainVersions: boolean;
-    storageInfos: Record<string, StorageInfo>;
     refreshing: boolean;
     refreshTimeout: number | null;
     extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> | undefined;
@@ -370,7 +174,6 @@ export default defineComponent({
       showHeadlessApps: true,
       showWebApps: true,
       showHolochainVersions: true,
-      storageInfos: {},
       refreshing: false,
       refreshTimeout: null,
       extendedAppInfos: undefined,
@@ -383,15 +186,6 @@ export default defineComponent({
   },
   emits: ["openApp", "uninstall-app", "enable-app", "disable-app", "startApp"],
   async mounted() {
-    await Promise.all(
-      this.installedApps.map(async (app) => {
-        this.storageInfos[app.holochainVersion] = await invoke(
-          "get_storage_info",
-          { holochainId: app.holochainId }
-        );
-      })
-    );
-
     const holochainId = this.$store.getters["holochainIdForDevhub"];
     // connect to AppWebsocket
     const port = this.$store.getters["appInterfacePort"](holochainId);
@@ -405,6 +199,7 @@ export default defineComponent({
 
     const extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> = {};
 
+    // TODO: do i need this here?
     this.installedApps.forEach((app) => {
       extendedAppInfos[app.webAppInfo.installed_app_info.installed_app_id] = {
         webAppInfo: app.webAppInfo,
@@ -432,6 +227,11 @@ export default defineComponent({
           guiUpdateAvailable: undefined,
         }
       });
+
+      // Filter out App Store and DevHub
+      sortedAppList = sortedAppList.filter(
+        (app) => app.webAppInfo.installed_app_info.installed_app_id !== APPSTORE_APP_ID && app.webAppInfo.installed_app_info.installed_app_id !== DEVHUB_APP_ID
+      );
 
       if (this.selectedHolochainVersion !== "All Versions") {
         sortedAppList = sortedAppList.filter(
@@ -462,18 +262,10 @@ export default defineComponent({
 
       return sortedAppList;
     },
-    noHeadlessApps(): boolean {
-      return !this.sortedApps.some(
-        (app) => app.webAppInfo.web_uis.default.type === "Headless"
-      );
-    },
     noWebApps(): boolean {
       return this.sortedApps.every(
         (app) => app.webAppInfo.web_uis.default.type === "Headless"
       );
-    },
-    noHolochainVersions(): boolean {
-      return this.noWebApps && this.noHeadlessApps;
     },
     holochainVersions(): string[] {
       const allApps = this.installedApps;
@@ -615,61 +407,6 @@ export default defineComponent({
         this.selectedGuiUpdateLocator = undefined;
       }
     },
-    storageFractions(holochainVersion: string) {
-      const storageInfo: StorageInfo = this.storageInfos[holochainVersion];
-      if (storageInfo) {
-        const totalStorage = this.totalStorage(holochainVersion);
-        const fractions = Object.values(storageInfo).map(
-          (value: number) => (value / totalStorage!) * 100
-        );
-        return fractions;
-      } else {
-        return undefined;
-      }
-    },
-    totalStorage(holochainVersion: string): number | undefined {
-      const storageInfo = this.storageInfos[holochainVersion];
-      if (storageInfo) {
-        return Object.values(storageInfo).reduce(
-          (acc, currValue) => acc + currValue
-        );
-      } else {
-        return undefined;
-      }
-    },
-    storageLabels(holochainVersion: string) {
-      const storageInfo = this.storageInfos[holochainVersion];
-      if (storageInfo) {
-        return Object.entries(storageInfo).map(
-          ([key, value]) => `${key} (${prettyBytes(value)})`
-        );
-      } else {
-        return undefined;
-      }
-    },
-    async refreshStorageInfo() {
-      this.refreshing = true;
-      this.refreshTimeout = window.setTimeout(
-        () => (this.refreshing = false),
-        200
-      );
-      await Promise.all(
-        this.installedApps.map(async (app) => {
-          this.storageInfos[app.holochainVersion] = await invoke(
-            "get_storage_info",
-            { holochainId: app.holochainId }
-          );
-        })
-      );
-    },
-    totalStorageString(hcVersion: string) {
-      const totalStorageBytes = this.totalStorage(hcVersion);
-      if (totalStorageBytes) {
-        return prettyBytes(totalStorageBytes);
-      } else {
-        return "?";
-      }
-    },
     async updateGui() {
       this.loadingText = "Connecting with DevHub";
       (this.$refs.downloading as typeof HCLoading).open();
@@ -753,15 +490,11 @@ export default defineComponent({
   border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 }
 
-.hc-version {
-  align-items: center;
-  flex: 1;
-  width: 100%;
-  max-width: 1090px;
-  margin-top: 8px;
-  border-radius: 15px;
-  padding: 8px 0;
-  background: white;
-  box-shadow: 0 0px 5px #9b9b9b;
+.app-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  /* This is better for small screens, once min() is better supported */
+  /* grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); */
+  gap: 1rem;
 }
 </style>
