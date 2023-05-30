@@ -86,12 +86,12 @@
     </div>
 
     <!-- visible peers -->
-    <div style="display: flex; flex-direction: row; align-items: center; min-width: 500px; position: relative; margin-bottom: 10px;">
+    <!-- <div style="display: flex; flex-direction: row; align-items: center; min-width: 500px; position: relative; margin-bottom: 10px;">
       <span style="margin-right: 30px">{{ $t('main.visiblePeers') }}:</span>
       <span style="opacity: 0.7; font-family: monospace; font-size: 15px"
         >{{ networkInfo ? networkInfo.current_number_of_peers - 1 : "unknown" }}
       </span>
-    </div>
+    </div> -->
 
     <!-- Active Peer Synchronization -->
     <div>
