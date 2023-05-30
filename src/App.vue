@@ -1,6 +1,6 @@
 <template>
   <div style="flex: 1; display: flex">
-    <div class="beta-indicator">Beta 0.2</div>
+    <div class="beta-indicator">Beta 0.1</div>
     <AlreadyRunning v-if="$store.getters[`isAlreadyRunning`]"> </AlreadyRunning>
     <Error
       v-else-if="

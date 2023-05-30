@@ -23,7 +23,7 @@
         >About</span
       > -->
       <div class="column">
-        <span> Holochain Launcher v{{ launcherVersion }} (Beta 0.2)</span>
+        <span> Holochain Launcher v{{ launcherVersion }} (Beta 0.1)</span>
         <span
           style="margin-top: 8px"
           v-for="version in holochainVersions"
@@ -31,6 +31,7 @@
         >
           Holochain v{{ version }}
         </span>
+        <!-- NEW_VERSION update lair_keystore version here if required -->
         <span style="margin-top: 8px"> Lair Keystore v0.2.3 </span>
       </div>
     </div>
