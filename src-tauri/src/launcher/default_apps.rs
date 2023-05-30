@@ -5,11 +5,11 @@ use holochain_web_app_manager::{WebAppManager, ReleaseInfo};
 // use holochain_manager::versions::version_manager::VersionManager;
 
 
-// Versions of Appstore and Devhub (commit hash of Github release of the UI).
+// Versions of Appstore and Devhub (commit hash of Github release of the UI or shasum of the .webhapp file).
 // Those are used to install new Appstore/DevHub UI's if necessary
 // NEW_VERSION Change appstore and devhub versions here if required
-const APPSTORE_VERSION: &str = "36b8793";
-const DEVHUB_VERSION: &str = "92417d3";
+const APPSTORE_VERSION: &str = "2f48b5753c12b8bc02b490035e2bdafc74f0fe07";
+const DEVHUB_VERSION: &str = "0ddd115221be91f06964a58a9848e605e70340df";
 
 const APPSTORE_APP_ID: &str = "AppStore";
 const DEVHUB_APP_ID: &str = "DevHub";

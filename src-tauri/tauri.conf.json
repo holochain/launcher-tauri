@@ -1,6 +1,6 @@
 {
   "package": {
-    "productName": "Holochain Launcher",
+    "productName": "Holochain Launcher Beta 1",
     "version": "0.9.990"
   },
   "build": {
@@ -26,7 +26,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "holochain-launcher",
+      "identifier": "holochain-launcher-0.1",
       "publisher": "Holochain Foundation",
       "icon": [
         "icons/icon.png",
