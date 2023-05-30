@@ -13,7 +13,7 @@ use tokio::process::Child;
 
 use crate::launch_tauri::launch_tauri;
 use crate::prepare_webapp;
-use holochain_cli_sandbox::cmds::{Create, Existing, NetworkCmd, NetworkType};
+use holochain_cli_sandbox::cmds::{Create, Existing};
 
 
 #[derive(Debug, StructOpt)]
@@ -108,13 +108,13 @@ impl HcLaunch {
       _ => (),
     }
 
-    match self.create.in_process_lair {
-      true => {
-        eprintln!("[hc launch] ERROR: The --in-process-lair flag is only supported by hc sandbox but not by hc launch.");
-        panic!("ERROR: The --in-process-lair flag is only supported by hc sandbox but not by hc launch.");
-      },
-      _ => (),
-    }
+    // match self.create.in_process_lair {
+    //   true => {
+    //     eprintln!("[hc launch] ERROR: The --in-process-lair flag is only supported by hc sandbox but not by hc launch.");
+    //     panic!("ERROR: The --in-process-lair flag is only supported by hc sandbox but not by hc launch.");
+    //   },
+    //   _ => (),
+    // }
 
     if let Some(_port) = self.ui_port {
       println!("\n[hc launch] ------ WARNING ------");
@@ -127,25 +127,25 @@ impl HcLaunch {
     }
 
     // Fail if production signaling server is used unless the --force-production flag is used
-    if let Some(NetworkCmd::Network(n)) = self.create.clone().network {
-      match n.transport {
-        NetworkType::WebRTC { signal_url: s } => {
-          if (s == String::from("ws://signal.holo.host") || s == String::from("wss://signal.holo.host")) && self.force_production == false {
-            eprintln!(r#"
-ERROR
+//     if let Some(NetworkCmd::Network(n)) = self.create.clone().network {
+//       match n.transport {
+//         NetworkType::WebRTC { signal_url: s } => {
+//           if (s == String::from("ws://signal.holo.host") || s == String::from("wss://signal.holo.host")) && self.force_production == false {
+//             eprintln!(r#"
+// ERROR
 
-You are attempting to use the official production signaling server of holochain.
-It is recommended to instead use the `hc signal-srv` command of the holochain CLI to spawn a local signaling server for testing.
-If you are sure that you want to use the production signaling server with hc launch, use the --force-production flag.
+// You are attempting to use the official production signaling server of holochain.
+// It is recommended to instead use the `hc signal-srv` command of the holochain CLI to spawn a local signaling server for testing.
+// If you are sure that you want to use the production signaling server with hc launch, use the --force-production flag.
 
-"#);
+// "#);
 
-            panic!("Attempted to use production signaling server without explicitly allowing it.");
-          }
-        },
-        _ => ()
-      }
-    }
+//             panic!("Attempted to use production signaling server without explicitly allowing it.");
+//           }
+//         },
+//         _ => ()
+//       }
+//     }
 
 
     match self.path {
@@ -497,7 +497,7 @@ pub async fn run(
   holochain_cli_sandbox::save::lock_live(std::env::current_dir()?, &sandbox_path, port).await?;
   println!("Connected successfully to a running holochain");
   let _e = format!("Failed to run holochain at {}", sandbox_path.display());
-  Ok((holochain, lair))
+  Ok((holochain, Some(lair)))
 }
 
 

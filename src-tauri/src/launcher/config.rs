@@ -1,5 +1,5 @@
 use holochain_manager::versions::HolochainVersion;
-use holochain_manager::versions::common::{bootstrap_service, signaling_server};
+use holochain_manager::versions::common::{bootstrap_service, proxy_url};
 
 use log::Level;
 use serde::{Deserialize, Serialize};
@@ -13,7 +13,7 @@ use super::error::LauncherError;
 pub struct LauncherConfig {
   pub log_level: Level,
   pub custom_binary_path: Option<String>,
-  pub signaling_server_url: SignalingServerUrl,
+  pub proxy_server_url: SignalingServerUrl,
   pub bootstrap_server_url: BootstrapServerUrl,
 
   pub running_versions: HashSet<HolochainVersion>,
@@ -28,7 +28,7 @@ impl Default for LauncherConfig {
       running_versions: HashSet::from([HolochainVersion::default()]),
       profile: String::from("default"),
       bootstrap_server_url: Some(bootstrap_service().to_string()),
-      signaling_server_url: Some(signaling_server()),
+      proxy_server_url: Some(proxy_url().to_string()),
     }
   }
 }
@@ -43,7 +43,7 @@ impl LauncherConfig {
       running_versions: HashSet::from([HolochainVersion::default()]),
       profile: profile,
       bootstrap_server_url: Some(bootstrap_service().to_string()),
-      signaling_server_url: Some(signaling_server()),
+      proxy_server_url: Some(proxy_url().to_string()),
     }
   }
 

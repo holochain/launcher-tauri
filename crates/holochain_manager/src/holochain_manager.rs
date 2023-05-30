@@ -6,7 +6,7 @@ use std::{fs, time::Duration};
 
 // NEW_VERSION change holochain_types version
 use holochain_client::{AdminWebsocket, AgentPubKey, AppInfo, InstallAppPayload};
-use holochain_types_0_2_0::prelude::{AppBundleSource, CellId, DisableCloneCellPayload, CloneCellId};
+use holochain_types_0_1_5::prelude::{AppBundleSource, CellId, DisableCloneCellPayload, CloneCellId};
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
 
@@ -53,7 +53,7 @@ impl HolochainManager {
           config.admin_port,
           config.keystore_connection_url.clone(),
           config.bootstrap_server_url,
-          config.signaling_server_url,
+          config.proxy_server_url,
         ).map_err(|e| LaunchHolochainError::FailedToOverwriteConfig(e))?
       }
       false => version_manager.initial_config(
@@ -61,7 +61,7 @@ impl HolochainManager {
         config.environment_path.clone(),
         config.keystore_connection_url.clone(),
         config.bootstrap_server_url,
-        config.signaling_server_url,
+        config.proxy_server_url,
       ),
     };
 
@@ -251,14 +251,14 @@ impl HolochainManager {
     Ok(installed_apps)
   }
 
-  pub async fn dump_network_stats(&mut self) -> Result<String, String> {
-    let network_stats = self
-      .ws
-      .dump_network_stats()
-      .await
-      .map_err(|e| format!("Failed to get network stats: {:?}", e))?;
+  // pub async fn dump_network_stats(&mut self) -> Result<String, String> {
+  //   let network_stats = self
+  //     .ws
+  //     .dump_network_stats()
+  //     .await
+  //     .map_err(|e| format!("Failed to get network stats: {:?}", e))?;
 
-    Ok(network_stats)
-  }
+  //   Ok(network_stats)
+  // }
 
 }

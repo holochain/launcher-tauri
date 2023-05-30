@@ -34,10 +34,10 @@
       ></HCTextField>
 
       <HCTextField
-        ref="signalingServerField"
-        placeholder="wss://signal.holo.host"
+        ref="proxyServerField"
+        placeholder="kitsune-proxy://f3gH2VMkJ4qvZJOXx0ccL_Zo5n-s_CnBjSzAsEHHDCA/kitsune-quic/h/137.184.142.208/p/5788/--"
         style="margin: 5px; margin-top: 20px; width: 380px;"
-        label="Signaling Server URL"
+        label="Proxy Server URL"
       ></HCTextField>
 
       <div class="row" style="margin: 5px; margin-top: 20px;">
@@ -80,7 +80,7 @@ export default defineComponent({
     customBinary: boolean;
     customBinaryPath: string;
     currentLogLevel: [string, string] | undefined;
-    signalingUrl: string | undefined;
+    proxyUrl: string | undefined;
     bootstrapUrl: string | undefined;
   } {
     return {
@@ -95,7 +95,7 @@ export default defineComponent({
       customBinary: false,
       customBinaryPath: "/sample/path",
       currentLogLevel: undefined,
-      signalingUrl: undefined,
+      proxyUrl: undefined,
       bootstrapUrl: undefined,
     };
   },
@@ -120,8 +120,8 @@ export default defineComponent({
         (this.newConfig as any).custom_binary_path = null;
       }
 
-      if (this.signalingUrl) {
-        (this.newConfig as any).signaling_server_url = (this.$refs.signalingServerField as typeof HCTextField).value;
+      if (this.proxyUrl) {
+        (this.newConfig as any).proxy_server_url = (this.$refs.proxyServerField as typeof HCTextField).value;
       }
 
       if (this.bootstrapUrl) {
@@ -159,12 +159,12 @@ export default defineComponent({
         this.customBinaryPath = currentCustomBinaryPath;
       }
 
-      const currentSignalingUrl = (this.newConfig as any)
-        .signaling_server_url;
+      const currentProxyUrl = (this.newConfig as any)
+        .proxy_server_url;
 
-      if (currentSignalingUrl && currentSignalingUrl !== "") {
-        (this.$refs.signalingServerField as typeof HCTextField).setValue(currentSignalingUrl);
-        this.signalingUrl = currentSignalingUrl;
+      if (currentProxyUrl && currentProxyUrl !== "") {
+        (this.$refs.proxyServerField as typeof HCTextField).setValue(currentProxyUrl);
+        this.proxyUrl = currentProxyUrl;
       }
 
       const currentBootstrapUrl = (this.newConfig as any)

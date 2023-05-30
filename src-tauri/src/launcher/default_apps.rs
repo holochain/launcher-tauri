@@ -5,7 +5,7 @@ use holochain_web_app_manager::{WebAppManager, ReleaseInfo};
 // use holochain_manager::versions::version_manager::VersionManager;
 
 
-// Versions of Appstore and Devhub (commit hash of Github release).
+// Versions of Appstore and Devhub (commit hash of Github release of the UI).
 // Those are used to install new Appstore/DevHub UI's if necessary
 // NEW_VERSION Change appstore and devhub versions here if required
 const APPSTORE_VERSION: &str = "36b8793";
@@ -32,7 +32,7 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
     window.emit("progress-update", String::from("Installing AppStore"))
       .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
-    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev2")) } else { Some(String::from("test-network-0.994")) };
+    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { Some(String::from("test-network-0.990")) };
 
     manager
       .install_web_app(

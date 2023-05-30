@@ -34,14 +34,14 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.4 lair_keystore
+          cargo install --version 0.2.3 lair_keystore
           LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.4-x86_64-unknown-linux-gnu
+          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.3-x86_64-unknown-linux-gnu
 
 
-          cargo install holochain --version 0.2.1-beta-dev.0 --locked --features sqlite-encrypted
+          cargo install holochain --version 0.1.5-beta-rc.1 --locked --features sqlite-encrypted
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.2.1-beta-dev.0-x86_64-unknown-linux-gnu
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.1.5-beta-rc.1-x86_64-unknown-linux-gnu
 
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
