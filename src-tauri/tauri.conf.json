@@ -1,7 +1,7 @@
 {
   "package": {
-    "productName": "Holochain Launcher",
-    "version": "0.9.990"
+    "productName": "Holochain Launcher Beta 2",
+    "version": "0.9.999"
   },
   "build": {
     "distDir": "../dist",
@@ -26,7 +26,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "holochain-launcher",
+      "identifier": "holochain-launcher-0.2",
       "publisher": "Holochain Foundation",
       "icon": [
         "icons/icon.png",
@@ -38,8 +38,8 @@
       ],
       "resources": [],
       "externalBin": [
-        "bins/holochain-v0.1.5-beta-rc.1",
-        "bins/lair-keystore-v0.2.3"
+        "bins/holochain-v0.2.1-beta-dev.0",
+        "bins/lair-keystore-v0.2.4"
       ],
       "copyright": "",
       "category": "DeveloperTool",
@@ -59,11 +59,11 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://s3.eu-central-2.wasabisys.com/holochain-launcher/automatic-updates/updater.json",
-        "https://drive.switch.ch/index.php/s/GciuZZq04VLkFCH/download"
+        "https://s3.eu-central-2.wasabisys.com/holochain-launcher/automatic-updates/updater_0_2.json",
+        "https://drive.switch.ch/index.php/s/gTcgvbHAJPA56xA/download"
       ],
       "dialog": true,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEEyMTcxOTUxRjM1OEYzOEQKUldTTjgxanpVUmtYb3IreVVTYWNKdmltNlUwcnN1Y09CNHd1alVBT3VENWpKd3VrRWo1dm5qdDgK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI3RkNGRjMxMDQ0QTg0RDEKUldUUmhFb0VNZi84SnluN2J3N0hHNkQrOHhvYmtnMXdLR1hKQ09Ja3c3eUNGYUgxUllDZlhNWmIK"
     },
     "allowlist": {
       "clipboard": {

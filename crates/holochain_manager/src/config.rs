@@ -11,5 +11,5 @@ pub struct LaunchHolochainConfig {
   pub environment_path: PathBuf,
   pub keystore_connection_url: Url2,
   pub bootstrap_server_url: Option<String>,
-  pub proxy_server_url: Option<String>,
+  pub signaling_server_url: Option<String>,
 }

@@ -7,7 +7,7 @@ pub mod get_state_info;
 pub mod icon_src;
 pub mod install_app;
 pub mod install_devhub;
-// pub mod network_stats;
+pub mod network_stats;
 pub mod open_app;
 pub mod password;
 pub mod quit;
