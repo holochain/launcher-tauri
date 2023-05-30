@@ -24,7 +24,7 @@ pub trait VersionManager {
     conductor_environment_path: PathBuf,
     keystore_connection_url: Url2,
     bootstrap_server_url: Option<String>,
-    signaling_server_url: Option<String>,
+    proxy_server_url: Option<String>,
   ) -> String;
 
   fn overwrite_config(
@@ -33,7 +33,7 @@ pub trait VersionManager {
     admin_port: u16,
     keystore_connection_url: Url2,
     bootstrap_server_url: Option<String>,
-    signaling_server_url: Option<String>,
+    proxy_server_url: Option<String>,
   ) -> Result<String, String> {
     let mut config = serde_yaml::from_str::<serde_yaml::Mapping>(conductor_config.as_str())
       .expect("Couldn't convert string to conductor config");
@@ -75,20 +75,39 @@ pub trait VersionManager {
       Value::Mapping(keystore_mapping),
     );
 
-    // set signal_url and bootstrap_service
+    // set proxy_url and bootstrap_service
+    // ATTENTION We overwrite here also variables like 'override_host', 'bind_to', ... This will be problematic
+    // if people set them manually in the conductor-config.yaml
     let maybe_network_mapping = config.get_mut(&Value::String(String::from("network")));
 
-    let network_mapping = match signaling_server_url {
+    let network_mapping = match proxy_server_url {
       Some(url) => {
-        let mut web_rtc_config = Mapping::new();
-        web_rtc_config.insert(Value::String(String::from("type")), Value::String(String::from("webrtc")));
-        web_rtc_config.insert(Value::String(String::from("signal_url")), Value::String(url));
+        let mut proxy_pool_config = Mapping::new();
 
-        // ATTENTION: We are assuming that there is only one transport pool item (webrtc) and we overwrite any existing
+        proxy_pool_config.insert(Value::String(String::from("type")), Value::String(String::from("proxy")));
+
+        let mut sub_transport = Mapping::new();
+
+        sub_transport.insert(Value::String(String::from("type")), Value::String(String::from("quic")));
+        sub_transport.insert(Value::String(String::from("bind_to")), Value::Null);
+        sub_transport.insert(Value::String(String::from("override_host")), Value::Null);
+        sub_transport.insert(Value::String(String::from("override_port")), Value::Null);
+
+        proxy_pool_config.insert(Value::String(String::from("sub_transport")), Value::Mapping(sub_transport));
+
+        let mut proxy_config = Mapping::new();
+
+        proxy_config.insert(Value::String(String::from("type")), Value::String(String::from("remote_proxy_client")));
+        proxy_config.insert(Value::String(String::from("proxy_url")), Value::String(url));
+
+        proxy_pool_config.insert(Value::String(String::from("proxy_config")), Value::Mapping(proxy_config));
+
+
+        // ATTENTION: We are assuming that there is only one transport pool item (proxy) and we overwrite any existing
         // transport pool items. If that assumption were wrong, we would need to check for others and selectively overwrite
         // only the one of type webrtc
         let mut transport_pool = Vec::new();
-        transport_pool.push(Value::Mapping(web_rtc_config));
+        transport_pool.push(Value::Mapping(proxy_pool_config));
 
         let network_mapping = match maybe_network_mapping {
           Some(value) => {
