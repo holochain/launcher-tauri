@@ -3,9 +3,9 @@ on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
   push:
-    branches: [main, develop]
+    branch: launcher-hc-beta-0.1-appstore
   pull_request:
-    branches: [main, develop]
+    branches: launcher-hc-beta-0.1-appstore
 
 jobs:
   testbuild:
