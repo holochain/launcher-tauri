@@ -1,6 +1,5 @@
 <template>
   <div style="flex: 1; display: flex">
-    <div class="beta-indicator">Beta 0.2</div>
     <AlreadyRunning v-if="$store.getters[`isAlreadyRunning`]"> </AlreadyRunning>
     <Error
       v-else-if="
@@ -87,6 +86,14 @@
         !$store.getters['oldFiles'] && !$store.getters[`databaseFileTypeError`]
       "
     ></Home>
+    <div class="bottom-bar">
+      <img
+          src="/img/Square284x284Logo.png"
+          style="height: 30px; margin-left: 11px; z-index: -1px;"
+        />
+      <span class="beta-indicator">Beta 0.2</span>
+    </div>
+
     <About></About>
     <Config></Config>
     <ChangeLanguage ref="change-language"></ChangeLanguage>
@@ -201,12 +208,24 @@ body,
   color: #42b983;
 }
 
-.beta-indicator {
-  font-size: 35px;
-  opacity: 0.3;
+.bottom-bar {
+  height: 30px;
   position: fixed;
-  bottom: 6px;
-  left: 18px;
+  bottom: 0;
+  width: 100%;
+  z-index: 0;
+  vertical-align: middle;
+}
+
+.bottom-bar img {
+  vertical-align: middle;
+}
+
+.beta-indicator {
+  margin-left: 10px;
+  font-size: 20px;
+  opacity: 0.3;
+  vertical-align: middle;
 }
 
 .column {
