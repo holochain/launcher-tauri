@@ -91,7 +91,7 @@
           src="/img/Square284x284Logo.png"
           style="height: 30px; margin-left: 11px; z-index: -1px;"
         />
-      <span class="beta-indicator">Beta 0.2</span>
+      <span class="beta-indicator">Beta 0.3</span>
     </div>
 
     <About></About>

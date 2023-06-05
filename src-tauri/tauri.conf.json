@@ -1,7 +1,7 @@
 {
   "package": {
     "productName": "Holochain Launcher Beta 2",
-    "version": "0.9.999"
+    "version": "0.9.880"
   },
   "build": {
     "distDir": "../dist",
@@ -38,7 +38,7 @@
       ],
       "resources": [],
       "externalBin": [
-        "bins/holochain-v0.2.1-beta-dev.0",
+        "bins/holochain-v0.3.0-8cdd45",
         "bins/lair-keystore-v0.2.4"
       ],
       "copyright": "",

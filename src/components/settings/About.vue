@@ -23,7 +23,7 @@
         >About</span
       > -->
       <div class="column">
-        <span> Holochain Launcher v{{ launcherVersion }} (Beta 0.2)</span>
+        <span> Holochain Launcher v{{ launcherVersion }} (Beta 0.3)</span>
         <span
           style="margin-top: 8px"
           v-for="version in holochainVersions"
