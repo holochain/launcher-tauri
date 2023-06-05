@@ -1,44 +1,31 @@
 <template>
   <div style="width: 100%;">
     <div class="row center-content top-bar" style="position: sticky; top: 0; z-index: 1">
-      <img
-        src="/img/Square284x284Logo.png"
-        style="height: 42px; margin-left: 11px"
-      />
       <span
         :class="{ tab: true, selectedTab: view.type === 'launcher' }"
         @click="view.type = 'launcher'"
       >
-        {{$t("main.launcher")}}
+        <img src="/img/launch_icon.svg" />
+        <span>{{$t("main.launcher")}}</span>
       </span>
       <span
         :class="{ tab: true, selectedTab: view.type === 'appStore' }"
         @click="view.type = 'appStore'"
       >
-        {{$t("appStore.appStore")}}
+        <img src="/img/home_icon.svg" />
+        <span>{{$t("appStore.appStore")}}</span>
       </span>
       <span style="display: flex; flex: 1"></span>
-      <HCButton
-        style="
-          margin-left: 8px;
-          margin-right: 12px;
-          height: 40px;
-          border-radius: 8px;
-          padding: 0 20px;
-          cursor: pointer;
-        "
-        :title="reportIssueUrl"
-        @click="reportIssue()"
-      >
-        <div class="row center-content">
-          <span style="margin-left: 5px">{{ $t("main.reportIssue") }}</span>
-        </div>
-      </HCButton>
+      <div class="row center-content" style="padding: 0 15px;">
+        <img src="/img/bug_icon.png" style="cursor: pointer; width: 20px; margin-top: 3px;"
+          :title="reportIssueUrl"
+          @click="reportIssue()" />
+      </div>
       <span
         :class="{ tab: true, selectedTab: view.type === 'settings' }"
         @click="view.type = 'settings'"
       >
-        {{$t("main.settings")}}
+        <img src="/img/gear_icon.svg" />
       </span>
     </div>
 
@@ -153,14 +140,33 @@ export default defineComponent({
     display: inline-block;
     cursor: pointer;
     font-size: 1.5em;
-    margin-left: 13px;
-    padding: 0 10px;
+    padding: 0 15px;
     height: 64px;
     line-height: 64px;
-    vertical-align: middle;;
+    vertical-align: middle;
+    color: #9E9EA2;
   }
+
+  .tab img {
+    height: 24px;
+    /* Turn SVG gray using https://codepen.io/sosuke/pen/Pjoqqp */
+    filter: invert(76%) sepia(0%) saturate(1356%) hue-rotate(209deg) brightness(82%) contrast(84%);
+    vertical-align: middle;
+  }
+
+  .tab span {
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
   .selectedTab {
-    background-color: blue;
     color: white;
+    background: linear-gradient(228.21deg, #BB2FD8 0%, #2F87D8 94.99%);
+    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .selectedTab img {
+    /* Turn the SVG white using https://codepen.io/sosuke/pen/Pjoqqp */
+    filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%);
   }
   </style>
