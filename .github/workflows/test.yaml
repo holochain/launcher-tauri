@@ -38,7 +38,7 @@ jobs:
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.4-x86_64-unknown-linux-gnu
 
-          cargo install --git https://github.com/holochain/holochain --rev 8cdd455839f4050bbfb6bfb0c4b618b87789db67 --locked --features sqlite-encrypted
+          cargo install holochain --git https://github.com/holochain/holochain --rev 8cdd455839f4050bbfb6bfb0c4b618b87789db67 --locked --features sqlite-encrypted
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-8cdd455-beta-dev.0-x86_64-unknown-linux-gnu
 
