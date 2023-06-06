@@ -45,7 +45,7 @@ jobs:
 
           cargo install holochain --git https://github.com/holochain/holochain --rev 8cdd455839f4050bbfb6bfb0c4b618b87789db67 --locked --features sqlite-encrypted
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
-          Copy-Item $HcPath -Destination src-tauri/bins/holochain-8cdd455-x86_64-pc-windows-msvc.exe
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-8cdd45-x86_64-pc-windows-msvc.exe
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
@@ -61,7 +61,7 @@ jobs:
 
           cargo install holochain --git https://github.com/holochain/holochain --rev 8cdd455839f4050bbfb6bfb0c4b618b87789db67 --locked --features sqlite-encrypted
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-8cdd455-x86_64-apple-darwin
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-8cdd45-x86_64-apple-darwin
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
@@ -84,7 +84,7 @@ jobs:
 
           cargo install holochain --git https://github.com/holochain/holochain --rev 8cdd455839f4050bbfb6bfb0c4b618b87789db67 --locked --features sqlite-encrypted
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-8cdd455-beta-dev.0-x86_64-unknown-linux-gnu
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-8cdd45-beta-dev.0-x86_64-unknown-linux-gnu
 
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
