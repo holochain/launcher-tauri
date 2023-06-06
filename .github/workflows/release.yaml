@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [windows-2019, macos-11, ubuntu-20.04]
+        platform: [ubuntu-20.04]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -84,7 +84,7 @@ jobs:
 
           cargo install holochain --git https://github.com/holochain/holochain --rev 8cdd455839f4050bbfb6bfb0c4b618b87789db67 --locked --features sqlite-encrypted
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.3.0-8cdd45-beta-dev.0-x86_64-unknown-linux-gnu
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.3.0-8cdd45-x86_64-unknown-linux-gnu
 
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
