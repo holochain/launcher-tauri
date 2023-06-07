@@ -17,7 +17,7 @@
         flex-direction: row;
         align-items: center;
         width: 100%;
-        height: 120px;
+        height: 110px;
       "
     >
     <!-- App Logo with Holo Identicon -->
@@ -533,7 +533,11 @@ export default defineComponent({
   align-items: center;
   background: #ffffff;
   width: 100%;
-  border-bottom: 1px dotted gray;
+  border-radius: 15px;
+  background-color: white;
+  padding: 0 15px;
+  box-shadow: 0 0px 5px #9b9b9b;
+  margin-bottom: 12px;
 }
 
 .btn {

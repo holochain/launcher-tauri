@@ -18,12 +18,13 @@
       <span style="display: flex; flex: 1"></span>
       <div class="row center-content" style="padding: 0 15px;">
         <img src="/img/bug_icon.png" style="cursor: pointer; width: 20px; margin-top: 3px;"
-          :title="reportIssueUrl"
+          :title="`Report Bug on GitHub (${reportIssueUrl})`"
           @click="reportIssue()" />
       </div>
       <span
         :class="{ tab: true, selectedTab: view.type === 'settings' }"
         @click="view.type = 'settings'"
+        :title="$t('main.settings')"
       >
         <img src="/img/gear_icon.svg" />
       </span>
@@ -145,6 +146,10 @@ export default defineComponent({
     line-height: 64px;
     vertical-align: middle;
     color: #9E9EA2;
+  }
+
+  .tab:not(.selectedTab):hover {
+    background: linear-gradient(228.21deg, #bc2fd834 0%, #2f86d840 94.99%);
   }
 
   .tab img {

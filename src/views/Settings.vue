@@ -1,5 +1,7 @@
 <template>
 
+  <HCLoading ref="downloading" :text="loadingText"></HCLoading>
+
   <div
     v-if="isLoading()"
     class="column center-content" style="flex: 1; height: calc(100vh - 64px);"
@@ -95,12 +97,20 @@
 
       <!-- Dev Mode section -->
 
+      <div
+        class="row section-title"
+      >
+        <span
+          style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
+          >{{ $t("main.developerMode") }}</span
+        >
+      </div>
+
 
       <div class="row section-container" style="display: flex; flex-direction: column;">
         <div class="row">
           <div style="flex: 1;">
-            <h2>Developer Mode</h2>
-            <span>Activates DevHub and enables you to publish apps</span>
+            <span>{{ $t("main.activateDevMode") }}</span>
           </div>
           <!-- Disable/enable switch -->
           <sl-tooltip
@@ -118,7 +128,7 @@
           </sl-tooltip>
         </div>
 
-        <div class="row">
+        <div class="row" style="margin-top: 10px;">
           <HCButton
             outlined
             :disabled="!devModeOn"
@@ -138,7 +148,6 @@
         class="column"
         style="flex: 1; margin-top: 20px"
       >
-        <!-- Web Apps -->
         <div
           class="row"
           style="
@@ -185,6 +194,8 @@
           >
         </div>
 
+        <!-- Web Apps -->
+
         <div
           class="row section-title"
           :class="{ borderBottomed: showWebApps }"
@@ -203,7 +214,8 @@
             {{ showWebApps ? "[-]" : "[show]" }}
           </span>
         </div>
-        <div v-if="showWebApps" class='section-container' style="margin-bottom: 50px;">
+
+        <div v-if="showWebApps" style="margin-bottom: 50px; padding: 0 15px;">
           <div
             v-if="noWebApps"
             style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
@@ -241,6 +253,7 @@
         </div>
 
         <!-- Headless Apps -->
+
         <div
           v-if="!noHeadlessApps"
           class="row section-title"
@@ -259,7 +272,8 @@
             {{ showHeadlessApps ? "[-]" : "[show]" }}
           </span>
         </div>
-        <div v-if="showHeadlessApps && !noHeadlessApps" style="margin-bottom: 50px; width: 100%">
+
+        <div v-if="showHeadlessApps && !noHeadlessApps" style="margin-bottom: 50px; padding: 0 15px;">
           <div
             v-for="app in sortedApps"
             :key="app.webAppInfo.installed_app_info.installed_app_id"
@@ -412,7 +426,6 @@ export default defineComponent({
     extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> | undefined;
     howToPublishUrl: string;
     ignoreDevModeWarning: boolean;
-    installingDevHub: boolean;
     loadingText: string;
     refreshing: boolean;
     refreshTimeout: number | null;
@@ -442,7 +455,6 @@ export default defineComponent({
       reportIssueUrl: "https://github.com/holochain/launcher/issues/new",
       showDevModeDevsOnlyWarning: false,
       ignoreDevModeWarning: false,
-      installingDevHub: false,
       sortOptions: [
         [i18n.global.t('main.name'), "name"],
         [i18n.global.t('main.nameDescending'), "name descending"],
@@ -621,15 +633,19 @@ export default defineComponent({
         window.localStorage.setItem("ignoreDevModeDevsOnlyWarning", "true");
       }
       (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).close();
-      this.installingDevHub = true; // TODO: why is this useful?
+      this.loadingText = "Installing DevHub...";
+      (this.$refs.downloading as typeof HCLoading).open();
+
       try {
         await invoke("install_devhub", {});
-        this.installingDevHub = false;
-        window.location.reload();
+        (this.$refs.downloading as typeof HCLoading).close();
+        this.loadingText = "";
+        await this.refreshAppStates();
       } catch (e) {
         alert(`Failed to install DevHub: ${JSON.stringify(e)}`);
         console.error(`Failed to install DevHub: ${JSON.stringify(e)}`);
-        this.installingDevHub = false;
+        (this.$refs.downloading as typeof HCLoading).close();
+        this.loadingText = "";
       }
     },
     async openApp(app: HolochainAppInfo) {
