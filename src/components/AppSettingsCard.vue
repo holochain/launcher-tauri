@@ -82,7 +82,7 @@
         v-if="
           app.guiUpdateAvailable
         "
-        style="display: flex"
+        style="display: flex; position: relative;"
       >
         <sl-tooltip class="tooltip" hoist placement="top" content="New UI available">
           <!-- <img
@@ -100,6 +100,7 @@
           >
             Update
           </div>
+          <div style="background: rgb(255, 217, 0); border-radius: 50%; height: 15px; width: 15px; position: absolute; bottom: 20px; right: 22px;"></div>
         </sl-tooltip>
       </div>
       <!-- -------------------- -->

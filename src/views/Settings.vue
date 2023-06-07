@@ -368,7 +368,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { ActionTypes } from "../store/actions";
-import { HolochainAppInfo, HolochainAppInfoExtended, HolochainId, InstalledWebAppInfo, StorageInfo, ResourceLocator } from "../types";
+import { HolochainAppInfo, HolochainAppInfoExtended, StorageInfo, ResourceLocator } from "../types";
 import "@material/mwc-icon";
 import { invoke } from "@tauri-apps/api/tauri";
 import HCButton from "../components/subcomponents/HCButton.vue";
@@ -599,8 +599,6 @@ export default defineComponent({
       const holochainId = this.$store.getters["holochainIdForDevhub"];
       // connect to AppWebsocket
       const port = this.$store.getters["appInterfacePort"](holochainId);
-      // TODO: check why post is not available
-      console.log("porttt", port)
       const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       this.appWebsocket = appWebsocket;
       // TODO add correct installed app id here.
@@ -825,6 +823,7 @@ export default defineComponent({
         }
 
       }))
+
     },
     async openUpdateGuiDialog(app: HolochainAppInfoExtended) {
       this.selectedApp = app;

@@ -24,9 +24,11 @@
       <span
         :class="{ tab: true, selectedTab: view.type === 'settings' }"
         @click="view.type = 'settings'"
-        :title="$t('main.settings')"
+        :title="`${$t('main.settings')}${updatesAvailable ? $t('main.updatesAvailable') : ''}`"
+        style="position: relative;"
       >
         <img src="/img/gear_icon.svg" />
+        <div v-if="updatesAvailable" style="background: rgb(255, 217, 0); border-radius: 50%; height: 15px; width: 15px; position: absolute; bottom: 32px; right: 10px;"></div>
       </span>
     </div>
 
@@ -72,6 +74,11 @@ import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import "@material/mwc-fab";
+import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
+import { HolochainAppInfo } from "../types";
+import { AppWebsocket, decodeHashFromBase64, DnaHashB64, encodeHashToBase64 } from "@holochain/client";
+import { getHappReleasesByEntryHashes } from "../appstore/appstore-interface";
+import { HappReleaseEntry } from "../appstore/types";
 
 type View =
   | {
@@ -97,11 +104,13 @@ export default defineComponent({
   data(): {
     reportIssueUrl: string;
     snackbarText: string | undefined;
+    updatesAvailable: boolean;
     view: View;
   } {
     return {
       reportIssueUrl: "https://github.com/holochain/launcher/issues/new",
       snackbarText: undefined,
+      updatesAvailable: false,
       view: {
         type: "launcher",
       },
@@ -109,6 +118,71 @@ export default defineComponent({
   },
   async created() {
     await this.$store.dispatch(ActionTypes.fetchStateInfo);
+
+    const installedApps: Array<HolochainAppInfo> = this.$store.getters[`allApps`];
+    console.log("installedApps: ", installedApps);
+    // Check for UI updates
+
+    const holochainId = this.$store.getters["holochainIdForDevhub"];
+    // connect to AppWebsocket
+    const port = this.$store.getters["appInterfacePort"](holochainId);
+    const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+    // TODO add correct installed app id here.
+    const appstoreAppInfo = await appWebsocket.appInfo({
+      installed_app_id: APPSTORE_APP_ID,
+    });
+
+    const updatableApps = installedApps.filter((app) => app.webAppInfo.happ_release_info?.resource_locator);
+
+    // sort all happ release ResourceLocators by DnaHash of the DevHub they originate from
+    const updatableAppsByLocatorDna: Record<DnaHashB64, HolochainAppInfo[]> = {};
+
+    updatableApps.forEach((app) => {
+      const dnaHash = app.webAppInfo.happ_release_info!.resource_locator!.dna_hash;
+      const apps = updatableAppsByLocatorDna[dnaHash];
+
+      if (apps) {
+        updatableAppsByLocatorDna[dnaHash] = [...apps, app]
+      } else {
+        updatableAppsByLocatorDna[dnaHash] = [app!]
+      }
+    });
+
+    console.log("updatableAppsByLocatorDna: ", updatableAppsByLocatorDna);
+
+    this.updatesAvailable = false;
+
+    await Promise.allSettled(Object.values(updatableAppsByLocatorDna).map(async (apps) => {
+      const entryHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator!.resource_hash));
+      const devHubDnaHash = decodeHashFromBase64(apps[0].webAppInfo.happ_release_info!.resource_locator!.dna_hash);
+
+      try {
+        console.log("@Home.vue @created: entryHashes: ", entryHashes.map((eh) => encodeHashToBase64(eh)));
+        const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByEntryHashes((appWebsocket as AppWebsocket), appstoreAppInfo, devHubDnaHash, entryHashes);
+
+        apps.forEach((app, idx) => {
+          if (happReleases[idx]) {
+            console.log("official_gui: ", happReleases[idx]!.official_gui ? encodeHashToBase64(happReleases[idx]!.official_gui!) : undefined)
+          }
+
+          // if it's installed as a webapp and the happ release has an official GUI, check whether it's a new GUI
+          if (app.webAppInfo.web_uis.default.type === "WebApp" && happReleases[idx]?.official_gui) {
+            const guiReleaseInfo = app.webAppInfo.web_uis.default.gui_release_info;
+            const guiReleaseHash = app.webAppInfo.web_uis.default.gui_release_info?.resource_locator!.resource_hash;
+            console.log("guiReleaseHash: ", guiReleaseHash);
+            if (guiReleaseInfo && guiReleaseHash) {
+              if(guiReleaseHash != encodeHashToBase64(happReleases[idx]!.official_gui!)) {
+                this.updatesAvailable = true;
+              }
+            }
+          }
+        })
+
+      } catch (e) {
+        console.error(`Failed to get happ releases from DevHub host of network with DNA hash ${encodeHashToBase64(devHubDnaHash)}: ${JSON.stringify(e)}`);
+      }
+
+    }))
   },
   methods: {
     isLoading() {
