@@ -12,4 +12,5 @@ pub struct LaunchHolochainConfig {
   pub keystore_connection_url: Url2,
   pub bootstrap_server_url: Option<String>,
   pub proxy_server_url: Option<String>,
+  pub mdns: bool,
 }

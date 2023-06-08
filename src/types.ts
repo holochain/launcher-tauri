@@ -109,8 +109,13 @@ export type LogLevel = "Error" | "Warn" | "Info" | "Debug" | "Trace";
 
 export interface LauncherConfig {
   log_level: LogLevel;
+  proxy_server_url: string,
+  bootstrap_server_url: string,
+  mdns: boolean;
+
   running_versions: HolochainVersion[];
   custom_binary_path: string | undefined;
+  profile: string;
 }
 
 export type WebUiInfo =

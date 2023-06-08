@@ -39,7 +39,7 @@ use crate::commands::restart::restart;
 use crate::commands::quit::quit;
 use crate::commands::{
   choose_version::choose_version_for_hdk,
-  config::write_config,
+  config::{write_config, get_default_bootstrap, get_default_proxy},
   enable_app::{disable_app, enable_app, delete_clone},
   factory_reset::execute_factory_reset,
   get_app_info::get_app_info,
@@ -87,6 +87,8 @@ fn main() {
       execute_factory_reset,
       fetch_and_save_app,
       get_app_info,
+      get_default_bootstrap,
+      get_default_proxy,
       get_icon_src,
       get_state_info,
       get_storage_info,

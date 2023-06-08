@@ -2,8 +2,8 @@
   <HCGenericDialog
     ref="dialog"
     @confirm="saveConfig()"
-    @closing="restoreDefaults()"
-    primaryButtonLabel="Save and Restart"
+    @closing="restoreCurrent()"
+    :primaryButtonLabel="$t('dialogs.config.saveAndRestart')"
     closeOnSideClick
   >
     <div
@@ -40,7 +40,16 @@
         label="Proxy Server URL"
       ></HCTextField>
 
-      <div class="row" style="margin: 5px; margin-top: 20px;">
+      <div class="row" style="margin: 5px; margin-top: 20px; width: 380px;">
+        <ToggleSwitch
+          ref="sliderMdns"
+          :sliderOn="mdns"
+          @click="handleSliderMdns"
+        />
+        <span style="margin-left: 10px">{{ $t('dialogs.config.useMdns') }} <i>{{ $t('dialogs.config.useMdnsNote') }}</i></span>
+      </div>
+
+      <div class="row" style="margin: 5px; margin-top: 20px; width: 380px;">
         <ToggleSwitch
           ref="slider"
           :sliderOn="customBinary"
@@ -58,6 +67,14 @@
         :default="customBinaryPath"
       ></HCTextField>
     </div>
+
+    <HCButton
+      outlined
+      style="min-width: 270px; height: 30px; margin-bottom: -15px; margin-top: 10px;"
+      @click="restoreDefaults()"
+    >{{ $t('dialogs.config.restoreDefaults') }}
+    </HCButton>
+
   </HCGenericDialog>
 </template>
 
@@ -70,16 +87,18 @@ import HCGenericDialog from "../subcomponents/HCGenericDialog.vue";
 import HCSelect from "../subcomponents/HCSelect.vue";
 import HCTextField from "../subcomponents/HCTextField.vue";
 import ToggleSwitch from "../subcomponents/ToggleSwitch.vue";
+import HCButton from "../subcomponents/HCButton.vue";
 
 export default defineComponent({
   name: "Config",
-  components: { HCGenericDialog, HCSelect, HCTextField, ToggleSwitch },
+  components: { HCButton, HCGenericDialog, HCSelect, HCTextField, ToggleSwitch },
   data(): {
     levels: [string, string][];
     newConfig: any;
     customBinary: boolean;
     customBinaryPath: string;
     currentLogLevel: [string, string] | undefined;
+    mdns: boolean;
     proxyUrl: string | undefined;
     bootstrapUrl: string | undefined;
   } {
@@ -95,6 +114,7 @@ export default defineComponent({
       customBinary: false,
       customBinaryPath: "/sample/path",
       currentLogLevel: undefined,
+      mdns: false,
       proxyUrl: undefined,
       bootstrapUrl: undefined,
     };
@@ -104,7 +124,7 @@ export default defineComponent({
       const dialog = this.$refs.dialog as typeof HCGenericDialog;
       await getCurrent().listen("open-config", async () => {
         //await this.$store.dispatch(ActionTypes.fetchStateInfo);
-        this.restoreDefaults();
+        this.restoreCurrent();
 
         dialog.open();
       });
@@ -119,6 +139,8 @@ export default defineComponent({
       } else {
         (this.newConfig as any).custom_binary_path = null;
       }
+
+      (this.newConfig as any).mdns = this.mdns;
 
       if (this.proxyUrl) {
         (this.newConfig as any).proxy_server_url = (this.$refs.proxyServerField as typeof HCTextField).value;
@@ -135,7 +157,13 @@ export default defineComponent({
     handleSlider() {
       this.customBinary = !this.customBinary;
     },
-    restoreDefaults() {
+    handleSliderMdns() {
+      this.mdns = !this.mdns;
+    },
+    /**
+     * Restoring to the values as they are currently stored in the launcher-config.yaml
+     */
+    restoreCurrent() {
       const currentConfig = (this.$store.state.launcherStateInfo as any).config;
 
       this.newConfig = currentConfig;
@@ -159,6 +187,12 @@ export default defineComponent({
         this.customBinaryPath = currentCustomBinaryPath;
       }
 
+      const mdns = (this.newConfig as any).mdns;
+
+      if (mdns) {
+        this.mdns = true;
+      }
+
       const currentProxyUrl = (this.newConfig as any)
         .proxy_server_url;
 
@@ -174,6 +208,23 @@ export default defineComponent({
         (this.$refs.bootstrapServerField as typeof HCTextField).setValue(currentBootstrapUrl);
         this.bootstrapUrl = currentBootstrapUrl;
       }
+    },
+    async restoreDefaults() {
+      this.currentLogLevel = this.levels[1];
+      (this.$refs.selectLogLevel as typeof HCSelect).select(
+        this.currentLogLevel
+      );
+
+      const bootstrapUrl: string = await invoke("get_default_bootstrap", {});
+      this.bootstrapUrl = bootstrapUrl;
+      (this.$refs.bootstrapServerField as typeof HCTextField).setValue(bootstrapUrl);
+
+      const proxyUrl: string = await invoke("get_default_proxy", {});
+      this.proxyUrl = proxyUrl;
+      (this.$refs.proxyServerField as typeof HCTextField).setValue(proxyUrl);
+
+      this.mdns = false;
+      this.customBinary = false;
     },
   },
 });

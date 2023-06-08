@@ -54,6 +54,7 @@ impl HolochainManager {
           config.keystore_connection_url.clone(),
           config.bootstrap_server_url,
           config.proxy_server_url,
+          config.mdns,
         ).map_err(|e| LaunchHolochainError::FailedToOverwriteConfig(e))?
       }
       false => version_manager.initial_config(

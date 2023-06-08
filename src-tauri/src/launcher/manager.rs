@@ -270,6 +270,7 @@ impl LauncherManager {
       keystore_connection_url,
       bootstrap_server_url: self.config.bootstrap_server_url.clone(),
       proxy_server_url: self.config.proxy_server_url.clone(),
+      mdns: self.config.mdns,
     };
 
     let version_str: String = version.into();

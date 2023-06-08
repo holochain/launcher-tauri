@@ -15,9 +15,10 @@ pub struct LauncherConfig {
   pub custom_binary_path: Option<String>,
   pub proxy_server_url: SignalingServerUrl,
   pub bootstrap_server_url: BootstrapServerUrl,
+  pub mdns: bool,
 
   pub running_versions: HashSet<HolochainVersion>,
-  profile: Profile,
+  pub profile: Profile,
 }
 
 impl Default for LauncherConfig {
@@ -29,6 +30,7 @@ impl Default for LauncherConfig {
       profile: String::from("default"),
       bootstrap_server_url: Some(bootstrap_service().to_string()),
       proxy_server_url: Some(proxy_url().to_string()),
+      mdns: false,
     }
   }
 }
@@ -44,6 +46,7 @@ impl LauncherConfig {
       profile: profile,
       bootstrap_server_url: Some(bootstrap_service().to_string()),
       proxy_server_url: Some(proxy_url().to_string()),
+      mdns: false,
     }
   }
 

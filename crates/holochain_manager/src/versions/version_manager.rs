@@ -1,3 +1,4 @@
+use holochain_p2p_0_1_5::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::lair_keystore_api::dependencies::serde_yaml::mapping;
 use serde_yaml::{Mapping, Value};
 use std::path::PathBuf;
 
@@ -34,6 +35,7 @@ pub trait VersionManager {
     keystore_connection_url: Url2,
     bootstrap_server_url: Option<String>,
     proxy_server_url: Option<String>,
+    mdns: bool,
   ) -> Result<String, String> {
     let mut config = serde_yaml::from_str::<serde_yaml::Mapping>(conductor_config.as_str())
       .expect("Couldn't convert string to conductor config");
@@ -149,6 +151,37 @@ pub trait VersionManager {
       },
       None => network_mapping
     };
+
+
+    let network_mapping = match mdns {
+      true => {
+        match network_mapping {
+          Some(mut mapping) => {
+            mapping.insert(Value::String(String::from("network_type")), Value::String(String::from("quic_mdns")));
+            Some(mapping)
+          },
+          None => {
+            let mut mapping = Mapping::new();
+            mapping.insert(Value::String(String::from("network_type")), Value::String(String::from("quic_mdns")));
+            Some(mapping)
+          }
+        }
+      },
+      false => {
+        match network_mapping {
+          Some(mut mapping) => {
+            mapping.insert(Value::String(String::from("network_type")), Value::String(String::from("quic_bootstrap")));
+            Some(mapping)
+          },
+          None => {
+            let mut mapping = Mapping::new();
+            mapping.insert(Value::String(String::from("network_type")), Value::String(String::from("quic_bootstrap")));
+            Some(mapping)
+          }
+        }
+      },
+    };
+
 
     if let Some(mapping) = network_mapping {
       config.insert(Value::String(String::from("network")), Value::Mapping(mapping));

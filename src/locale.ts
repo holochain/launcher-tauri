@@ -110,6 +110,12 @@ const messages = {
       yes: "Yes",
     },
     dialogs: {
+      config: {
+        restoreDefaults: "Reset to Default Values",
+        useMdns: "Use MDNS.",
+        useMdnsNote: "This will disable bootstrap & proxy configurations.",
+        saveAndRestart:"Save and Restart",
+      },
       restart:
         "Do you want to clean up all holochain processes and restart the Holochain Launcher?",
       setupPassword: {
@@ -274,6 +280,12 @@ const messages = {
       yes: "Ja",
     },
     dialogs: {
+      config: {
+        restoreDefaults: "Zurücksetzen zu Standardwerten",
+        useMdns: "Benutze MDNS.",
+        useMdnsNote: "Dies deaktiviert die Bootstrap & Proxy Konfigurationen.",
+        saveAndRestart:"Speichern und Neustart",
+      },
       restart:
         "Möchtest du alle Holochain Prozesse beenden und den Holochain Launcher neu starten?",
       setupPassword: {
