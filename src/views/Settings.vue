@@ -259,7 +259,7 @@
             {{ showHeadlessApps ? "[-]" : "[show]" }}
           </span>
         </div>
-        <div v-if="showHeadlessApps && !noHeadlessApps" style="margin-bottom: 50px; width: 100%">
+        <div v-if="showHeadlessApps && !noHeadlessApps" class='section-container' style="margin-bottom: 50px;">
           <div
             v-for="app in sortedApps"
             :key="app.webAppInfo.installed_app_info.installed_app_id"
@@ -296,8 +296,9 @@
       <div>
         Turning on Dev Mode installs the DevHub app. DevHub is the place where
         <span style="font-weight: bold; white-space: nowrap;">app developers</span>
-        can upload their apps such that they appear in the App Store.<br><br>
-        Installing DevHub will download a lot of data, are you sure you want to continue?
+        can upload and manage their apps, and is required to publish apps to the AppStore.<br><br>
+        Installing DevHub will download a lot of data, and synchronization with other DevHub nodes may take a long time.
+        Are you sure you want to continue?
       </div>
 
       <div class="row" style="margin-top: 30px; margin-bottom: 10px; margin-left: 50px; width: 100%;">
