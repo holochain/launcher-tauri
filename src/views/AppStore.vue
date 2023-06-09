@@ -208,6 +208,11 @@ export default defineComponent({
       async () => await this.getQueuedBytes(),
       2000
     );
+
+    if (window.localStorage.getItem("installFromFs")) {
+      window.localStorage.removeItem("installFromFs");
+      this.selectFromFileSystem();
+    }
   },
   methods: {
     toSrc,

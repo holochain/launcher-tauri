@@ -9,11 +9,12 @@
 
   <div
     class="column"
-    style="flex: 1; align-items: center; padding: 0 50px; margin-top: 20px"
+    style="flex: 1; min-height: calc(100vh - 64px); align-items: center;"
   >
     <InstalledAppsList
       :installedApps="$store.getters[`allApps`]"
       @openApp="openApp($event)"
+      @select-view="$emit('select-view', $event)"
     />
   </div>
 
@@ -22,7 +23,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { ActionTypes } from "../store/actions";
 import { HolochainAppInfo } from "../types";
 import "@material/mwc-icon";
 import { invoke } from "@tauri-apps/api/tauri";

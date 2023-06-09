@@ -1,30 +1,30 @@
 <template>
-
-  <div class="container">
+  <div>
     <div
       style="
         position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 100%;
+        width: 120px;
         height: 120px;
+        box-shadow: 0 0px 5px #9b9b9b;
+        border-radius: 22px;
       "
       tabindex="0"
       @click="$emit('openApp', app)"
       v-on:keyup.enter="$emit('openApp', app)"
     >
       <!-- App Logo -->
-      <div style="position: relative">
+      <div class="appIcon" style="position: relative">
         <img
           v-if="app.webAppInfo.icon_src"
-          :class="{ appIcon: !showMore, appIconMore: showMore }"
+          class="appIcon"
           :src="`${app.webAppInfo.icon_src}`"
         />
         <div
           v-else
-          :class="{ appIcon: !showMore, appIconMore: showMore }"
-          class="column center-content"
+          class="appIcon column center-content"
           style="background-color: #372ba5"
         >
           <div style="color: white; font-size: 45px; font-weight: 600">
@@ -55,11 +55,11 @@
       </sl-tooltip>
       <!-- ----------------- -->
 
-      <!-- Installed App Id -->
-      <div class="installed-app-name">
-        {{ app.webAppInfo.installed_app_info.installed_app_id }}
-      </div>
       <!-- EO Installed App Id ---------------- -->
+    </div>
+          <!-- Installed App Id -->
+    <div class="installed-app-name">
+      {{ app.webAppInfo.installed_app_info.installed_app_id }}
     </div>
   </div>
 </template>
@@ -94,11 +94,9 @@ export default defineComponent({
     },
   },
   data(): {
-    showMore: boolean;
     showPubKeyTooltip: boolean;
   } {
     return {
-      showMore: false,
       showPubKeyTooltip: false,
     };
   },
@@ -133,12 +131,8 @@ export default defineComponent({
   flex: 1;
   flex-direction: column;
   align-items: center;
-  background: #ffffff;
-  border-radius: 22px;
-  width: 120px;
   margin: 8px;
   /* box-shadow: 0 0 2px rgb(131, 128, 176); */
-  box-shadow: 0 0px 5px #9b9b9b;
 }
 
 .btn {
@@ -163,14 +157,6 @@ export default defineComponent({
   cursor: pointer;
 }
 
-.appIconMore {
-  display: flex;
-  width: 120px;
-  height: 120px;
-  padding: 0;
-  border-radius: 22px 0 22px 0;
-  object-fit: cover;
-}
 
 .running {
   background-color: rgb(0, 185, 0);

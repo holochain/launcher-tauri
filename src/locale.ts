@@ -80,6 +80,10 @@ const messages = {
       receivingData: "Receiving new data",
       synchronizationNotCompleteError: "App Library Synchronization not Complete. Please try again later."
     },
+    launcher: {
+      filesystem: "Filesystem",
+      getStarted: "To get started, install your first app:",
+    },
     settings: {
       appSettings: "App Settings",
       appSettingsHelper: "Settings for Holochain Apps with Graphical User Interfaces",
@@ -248,6 +252,10 @@ const messages = {
         "Es sind noch keine Apps im App Store verfügbar oder die Synchronisierung mit Peers ist noch unvollständig.",
       receivingData: "Neue Daten werden empfangen",
       synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut."
+    },
+    launcher: {
+      filesystem: "Aus Datei",
+      getStarted: "Leg los und installiere deine erste App:",
     },
     settings: {
       appSettings: "App Settings",

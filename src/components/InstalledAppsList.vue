@@ -7,66 +7,63 @@
     ref="snackbar"
   ></HCSnackbar>
 
+
+  <!-- Web Apps -->
   <div
-    style="
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      margin-bottom: 80px;
-      padding: 0 30px;
-      width: 70%;
-      align-items: center;
-      min-width: 900px;
-    "
+    v-if="noWebApps"
+    class="column"
+    style="margin-top: 14%;"
   >
-
-    <!-- Web Apps -->
-    <div
-      class="row section-title"
-      style="margin-top: -18px"
-    >
-      <span
-        @click="showWebApps = !showWebApps"
-        class="show-hide"
-        style="opacity: 0.7; cursor: pointer; margin-left: 10px"
-      >
-        &nbsp;<!-- {{ showWebApps ? "[-]" : "[show]" }} -->
-      </span>
+    <div style="font-size: 30px; margin-bottom: 70px;">
+      {{ $t("launcher.getStarted") }}
     </div>
-    <div v-if="showWebApps" style="margin-bottom: 50px; width: 100%">
-      <div
-        v-if="noWebApps"
-        style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
-      >
-        {{ $t("main.noApps") }}
-        {{
-          selectedHolochainVersion === "All Versions"
-            ? "."
-            : " in this Holochain Version."
-        }}
-      </div>
 
-      <div
-        v-else
-        class="app-grid-container"
+    <div class="row">
+
+      <HCButton
+        style="height: 65px; min-width: 200px; border-radius: 12px;"
+        @click="$emit('select-view', { type: 'appStore' })"
+        @keypress.enter="$emit('select-view', { type: 'appStore' })"
       >
-        <div
-          v-for="app in sortedApps"
-          :key="app.webAppInfo.installed_app_info.installed_app_id"
-        >
-          <InstalledAppCard
-            v-if="app.webAppInfo.web_uis.default.type !== 'Headless'"
-            :app="app"
-            @openApp="$emit('openApp', $event)"
-            @uninstallApp="$emit('uninstall-app', $event)"
-            @disableApp="$emit('disable-app', $event)"
-            @enableApp="$emit('enable-app', $event)"
-            @startApp="$emit('startApp', $event)"
-          />
+        <div class="row" style="align-items: center; justify-content: center; font-size: 25px; font-weight: normal;">
+          <img src="/img/home_icon.svg" style="filter: invert(100%) sepia(0%) saturate(1%) hue-rotate(73deg) brightness(104%) contrast(101%);" />
+          <span style="margin-left: 10px;;">{{$t("appStore.appStore")}}</span>
         </div>
-      </div>
+      </HCButton>
+
+      <HCButton
+        style="height: 65px; min-width: 200px; border-radius: 12px; margin-left: 20px;"
+        @click="installFromFs()"
+      >
+        <div class="row center-content">
+          <mwc-icon style="font-size: 33px;;">folder</mwc-icon>
+          <span style="margin-left: 10px; font-size: 25px; font-weight: normal;">
+            {{ $t("launcher.filesystem") }}
+          </span>
+        </div>
+      </HCButton>
+
     </div>
   </div>
+
+  <div
+    v-else
+    class="app-grid-container"
+    style="margin-top: 60px;"
+  >
+    <div
+      v-for="app in sortedApps"
+      :key="app.webAppInfo.installed_app_info.installed_app_id"
+      style="margin: 5px 12px;"
+    >
+      <InstalledAppCard
+        v-if="app.webAppInfo.web_uis.default.type !== 'Headless'"
+        :app="app"
+        @openApp="$emit('openApp', $event)"
+      />
+    </div>
+  </div>
+
 </template>
 
 <script lang="ts">
@@ -83,6 +80,7 @@ import HCSelectCard from "./subcomponents/HCSelectCard.vue";
 import StackedChart from "./subcomponents/StackedChart.vue";
 import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
 import HCLoading from "./subcomponents/HCLoading.vue";
+import HCButton from "./subcomponents/HCButton.vue";
 import prettyBytes from "pretty-bytes";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 import { AppInfo, AppWebsocket } from "@holochain/client";
@@ -99,6 +97,7 @@ export default defineComponent({
     HCGenericDialog,
     HCLoading,
     HCSnackbar,
+    HCButton,
   },
   props: {
     installedApps: {
@@ -111,10 +110,6 @@ export default defineComponent({
     appstoreAppInfo: AppInfo | undefined;
     sortOptions: [string, string][];
     sortOption: string | undefined;
-    selectedHolochainVersion: string;
-    showHeadlessApps: boolean;
-    showWebApps: boolean;
-    selectedApp: HolochainAppInfoExtended | undefined;
     loadingText: string;
     errorText: string;
   } {
@@ -127,15 +122,11 @@ export default defineComponent({
         // ["Holochain Version", "Holochain Version"],
       ],
       sortOption: undefined,
-      selectedHolochainVersion: "All Versions",
-      showHeadlessApps: true,
-      showWebApps: true,
-      selectedApp: undefined,
       loadingText: "",
       errorText: "Unknown error occured",
     };
   },
-  emits: ["openApp", "uninstall-app", "enable-app", "disable-app", "startApp"],
+  emits: ["openApp", "select-view"],
   async mounted() {
     const holochainId = this.$store.getters["holochainIdForDevhub"];
     // connect to AppWebsocket
@@ -165,12 +156,6 @@ export default defineComponent({
       sortedAppList = sortedAppList.filter(
         (app) => app.webAppInfo.installed_app_info.installed_app_id !== APPSTORE_APP_ID && app.webAppInfo.installed_app_info.installed_app_id !== DEVHUB_APP_ID
       );
-
-      if (this.selectedHolochainVersion !== "All Versions") {
-        sortedAppList = sortedAppList.filter(
-          (app) => app.holochainVersion === this.selectedHolochainVersion
-        );
-      }
 
       if (this.sortOption === "name") {
         sortedAppList = sortedAppList.sort((appA, appB) =>
@@ -207,6 +192,10 @@ export default defineComponent({
     isAppHeadless(app: HolochainAppInfo) {
       return app.webAppInfo.web_uis.default.type === "Headless";
     },
+    installFromFs() {
+      window.localStorage.setItem("installFromFs", "true");
+      this.$emit('select-view', { type: 'appStore' });
+    },
   },
 });
 </script>
@@ -228,10 +217,12 @@ export default defineComponent({
 }
 
 .app-grid-container {
+  min-width: 70vw;
+  max-width: 80%;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   /* This is better for small screens, once min() is better supported */
-  /* grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); */
+  grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
   gap: 1rem;
 }
 </style>

@@ -43,10 +43,10 @@
     </div>
 
     <div class="row" style="flex: 1; overflow-y: auto;">
-      <div v-if="view.type === 'launcher'" class="flex-scrollable-parent">
+      <div v-if="view.type === 'launcher'" class="flex-scrollable-parent" style="display: flex; flex: 1;">
         <div class="flex-scrollable-container">
           <div class="flex-scrollable-y">
-            <Launcher @show-message="showMessage($event)"></Launcher>
+            <Launcher @show-message="showMessage($event)" @select-view="selectView($event)"></Launcher>
           </div>
         </div>
       </div>
@@ -208,6 +208,9 @@ export default defineComponent({
       this.snackbarText = message;
       (this.$refs as any).snackbar.show();
     },
+    selectView(view: View) {
+      this.view = view;
+    }
   },
 });
 </script>
