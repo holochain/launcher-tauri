@@ -69,6 +69,14 @@
     </div>
   </div>
 
+  <div class="bottom-bar row">
+    <img
+        src="/img/Square284x284Logo.png"
+        style="height: 30px; z-index: -1px;"
+      />
+    <span class="beta-indicator">Beta 0.2</span>
+  </div>
+
   <HCSnackbar leading :labelText="snackbarText" ref="snackbar"></HCSnackbar>
 
 </template>
@@ -216,6 +224,20 @@ export default defineComponent({
 </script>
 
 <style scoped>
+  .beta-indicator {
+    margin-left: 5px;
+    font-size: 20px;
+    opacity: 0.3;
+  }
+  .bottom-bar {
+    align-items: center;
+    height: 30px;
+    position: fixed;
+    bottom: 5px;
+    left: 5px;
+    width: 100%;
+    z-index: 0;
+  }
   .top-bar {
     align-items: center;
     height: 64px;
