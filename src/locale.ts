@@ -224,7 +224,7 @@ const messages = {
       noClonedCells: "Diese App hat keine Cloned Cells.",
       noDisabledClonedCells: "Diese App hat keine deaktivierten Cloned Cells.",
       noHolochainVersions: "Es sind keine Holochain Versionen installiert.",
-      noApps: "There are no apps installed",
+      noApps: "Es sind keine Apps installiert.",
       outgoing: "ausgehend",
       refresh: "Aktualisieren",
       reportIssue: "Problem Melden",
