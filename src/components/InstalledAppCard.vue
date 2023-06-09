@@ -43,32 +43,6 @@
       </div>
       <!-- ------------- -->
 
-      <!-- GUI update available Icon -->
-      <div
-        v-if="
-          app.guiUpdateAvailable
-        "
-        style="display: flex"
-      >
-        <sl-tooltip class="tooltip" hoist placement="top" content="New UI available">
-          <!-- <img
-            tabindex="0"
-            style="margin-right: 29px; width: 24px; cursor: pointer"
-            src="/img/Open_App.svg"
-            @click="$emit('openApp', app)"
-            v-on:keyup.enter="$emit('openApp', app)"
-          /> -->
-          <div
-            @click="$emit('updateGui', app)"
-            @keypress.enter="$emit('updateGui', app)"
-            tabindex="0"
-            class="update-button"
-          >
-            Update
-          </div>
-        </sl-tooltip>
-      </div>
-      <!-- -------------------- -->
 
       <!-- App status indicator -->
       <sl-tooltip
@@ -150,7 +124,7 @@ export default defineComponent({
       showDisabledClonedCells: false,
     };
   },
-  emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp", "updateGui"],
+  emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp"],
   computed: {
     provisionedCells(): [string, CellInfo][] {
       const provisionedCells = flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
@@ -337,21 +311,6 @@ export default defineComponent({
   border-radius: 5px;
   /* border: 2px solid #482edf; */
   padding: 1px 7px;
-}
-
-.update-button {
-  font-weight: bold;
-  color: black;
-  cursor: pointer;
-  border: 2px solid black;
-  border-radius: 4px;
-  padding: 0 5px;
-  margin-right: 29px;
-  opacity: 0.85;
-}
-
-.update-button:hover {
-  opacity: 0.6;
 }
 
 .installed-app-name {

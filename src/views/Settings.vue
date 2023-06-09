@@ -1,5 +1,33 @@
 <template>
 
+  <HCGenericDialog
+    @confirm="updateGui"
+    ref="updateGuiDialog"
+    :primaryButtonLabel="$t('buttons.install')"
+    :closeOnSideClick="true"
+  >
+    <div class="column" style="padding: 0 30px; align-items: flex-start; max-width: 500px;">
+      <div style="width: 100%; text-align: center; font-weight: 600; font-size: 27px; margin-bottom: 25px">
+        {{ $t("dialogs.guiUpdate.title") }}
+      </div>
+      <div style="margin-bottom: 15px;">
+        {{ $t("dialogs.guiUpdate.mainText") }}:
+      </div>
+      <div>
+        <span style="font-weight: bold; margin-right: 15px;">{{ $t("dialogs.guiUpdate.version") }}:</span>{{ selectedGuiUpdate ? selectedGuiUpdate.version : "loading..." }}
+      </div>
+      <div style="font-weight: bold;">
+        {{ $t("dialogs.guiUpdate.changelog") }}:
+      </div>
+      <div style="background: rgb(217,217,217); border-radius: 8px; padding: 10px; width: 480px; min-height: 100px; max-height: 200px; overflow-y: auto; margin-top: 5px; white-space: pre-wrap;">
+        {{ selectedGuiUpdate ? selectedGuiUpdate.changelog : "loading..." }}
+      </div>
+      <div style="margin-top: 20px;">
+        {{ $t("dialogs.guiUpdate.question") }}
+      </div>
+    </div>
+  </HCGenericDialog>
+
   <HCLoading ref="downloading" :text="loadingText"></HCLoading>
 
   <div
@@ -925,8 +953,7 @@ export default defineComponent({
         );
       } catch (e) {
         console.error("Error fetching the UI: ", e);
-        this.errorText = `Error fetching the UI: ${e}`;
-        (this.$refs.snackbar as typeof HCSnackbar).show();
+        this.showMessage(`Error fetching the UI: ${e}`);
         (this.$refs.downloading as typeof HCLoading).close();
         return;
       }
