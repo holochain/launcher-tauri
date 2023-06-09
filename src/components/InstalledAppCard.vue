@@ -1,22 +1,13 @@
 <template>
   <div>
-    <div
-      style="
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 120px;
-        height: 120px;
-        box-shadow: 0 0px 5px #9b9b9b;
-        border-radius: 22px;
-      "
-      tabindex="0"
-      @click="$emit('openApp', app)"
-      v-on:keyup.enter="$emit('openApp', app)"
-    >
       <!-- App Logo -->
-      <div class="appIcon" style="position: relative">
+      <div
+        class="icon-container"
+        style="position: relative"
+        tabindex="0"
+        @click="$emit('openApp', app)"
+        v-on:keyup.enter="$emit('openApp', app)"
+      >
         <img
           v-if="app.webAppInfo.icon_src"
           class="appIcon"
@@ -36,7 +27,7 @@
 
 
       <!-- App status indicator -->
-      <sl-tooltip
+      <!-- <sl-tooltip
         style="--show-delay: 500"
         hoist
         placement="top"
@@ -52,11 +43,9 @@
           style="margin-right: 29px"
           tabindex="0"
         ></div>
-      </sl-tooltip>
+      </sl-tooltip> -->
       <!-- ----------------- -->
 
-      <!-- EO Installed App Id ---------------- -->
-    </div>
           <!-- Installed App Id -->
     <div class="installed-app-name">
       {{ app.webAppInfo.installed_app_info.installed_app_id }}
@@ -155,6 +144,18 @@ export default defineComponent({
   border-radius: 22px;
   object-fit: cover;
   cursor: pointer;
+}
+
+.icon-container {
+  box-shadow: 0 0px 5px #9b9b9b;
+  border-radius: 22px;
+}
+.icon-container:hover {
+  box-shadow: 0 0px 12px #676767;
+}
+
+.icon-container:focus {
+  box-shadow: 0 0px 12px #676767;
 }
 
 
