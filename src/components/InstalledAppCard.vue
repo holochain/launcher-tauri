@@ -7,6 +7,7 @@
         tabindex="0"
         @click="$emit('openApp', app)"
         v-on:keyup.enter="$emit('openApp', app)"
+        :title="app.webAppInfo.installed_app_info.installed_app_id"
       >
         <img
           v-if="app.webAppInfo.icon_src"
@@ -147,6 +148,7 @@ export default defineComponent({
 }
 
 .icon-container {
+  width: 120px;
   box-shadow: 0 0px 5px #9b9b9b;
   border-radius: 22px;
 }
