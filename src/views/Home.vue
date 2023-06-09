@@ -4,6 +4,8 @@
       <span
         :class="{ tab: true, selectedTab: view.type === 'launcher' }"
         @click="view.type = 'launcher'"
+        @keypress.enter="view.type = 'launcher'"
+        tabindex="0"
       >
         <img src="/img/launch_icon.svg" />
         <span>{{$t("main.launcher")}}</span>
@@ -11,19 +13,27 @@
       <span
         :class="{ tab: true, selectedTab: view.type === 'appStore' }"
         @click="view.type = 'appStore'"
+        @keypress.enter="view.type = 'appStore'"
+        tabindex="0"
       >
         <img src="/img/home_icon.svg" />
         <span>{{$t("appStore.appStore")}}</span>
       </span>
       <span style="display: flex; flex: 1"></span>
-      <div class="row center-content" style="padding: 0 15px;">
+      <div class="row center-content" style="padding: 0 15px; height: 100%;"
+        tabindex="0"
+        @click="reportIssue()"
+        @keypress.enter="reportIssue()"
+      >
         <img src="/img/bug_icon.png" style="cursor: pointer; width: 20px; margin-top: 3px;"
           :title="`Report Bug on GitHub (${reportIssueUrl})`"
-          @click="reportIssue()" />
+        />
       </div>
       <span
         :class="{ tab: true, selectedTab: view.type === 'settings' }"
+        tabindex="0"
         @click="view.type = 'settings'"
+        @keypress.enter="view.type = 'settings'"
         :title="`${$t('main.settings')}${updatesAvailable ? $t('main.updatesAvailable') : ''}`"
         style="position: relative;"
       >
@@ -121,8 +131,9 @@ export default defineComponent({
 
     const installedApps: Array<HolochainAppInfo> = this.$store.getters[`allApps`];
     console.log("installedApps: ", installedApps);
-    // Check for UI updates
 
+
+    // Check for UI updates
     const holochainId = this.$store.getters["holochainIdForDevhub"];
     // connect to AppWebsocket
     const port = this.$store.getters["appInterfacePort"](holochainId);
@@ -223,6 +234,10 @@ export default defineComponent({
   }
 
   .tab:not(.selectedTab):hover {
+    background: linear-gradient(228.21deg, #bc2fd834 0%, #2f86d840 94.99%);
+  }
+
+  .tab:not(.selectedTab):focus {
     background: linear-gradient(228.21deg, #bc2fd834 0%, #2f86d840 94.99%);
   }
 
