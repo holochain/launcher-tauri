@@ -8,15 +8,15 @@ version = "0.1.0"
 [dependencies]
 # NEW_VERSION pick right client version
 
-holochain = { version = "0.1.5", features = ["sqlite-encrypted"] }
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "holochain-0.1.5" }
+holochain = { version = "0.1.5-beta-rc.1", features = ["sqlite-encrypted"] }
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "holochain-0.1.5-beta-rc.1" }
 
 
 # NEW_VERSION add latest crates here
 
-holochain_conductor_api_0_1_5 = { package = "holochain_conductor_api", version = "0.1.5" }
-holochain_p2p_0_1_5 = { package = "holochain_p2p", version = "0.1.5" }
-holochain_types_0_1_5 = { package = "holochain_types", version = "0.1.5" }
+holochain_conductor_api_0_1_5 = { package = "holochain_conductor_api", version = "0.1.5-beta-rc.1" }
+holochain_p2p_0_1_5 = { package = "holochain_p2p", version = "0.1.5-beta-rc.1" }
+holochain_types_0_1_5 = { package = "holochain_types", version = "0.1.5-beta-rc.1" }
 
 mr_bundle = "0.1.1-beta-rc.0"
 
