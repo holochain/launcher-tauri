@@ -3017,7 +3017,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-launcher"
-version = "0.9.999"
+version = "0.9.881"
 dependencies = [
  "async-trait",
  "chrono",
