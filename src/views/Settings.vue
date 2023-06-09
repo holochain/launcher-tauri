@@ -420,7 +420,7 @@ import HCLoading from "../components/subcomponents/HCLoading.vue";
 import prettyBytes from "pretty-bytes";
 import { getHappReleasesByEntryHashes, fetchGui, appstoreCells, fetchGuiReleaseEntry } from "../appstore/appstore-interface";
 import { AppInfo, AppWebsocket, decodeHashFromBase64, encodeHashToBase64, EntryHash, InstalledAppId, DnaHashB64 } from "@holochain/client";
-import { GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
+import { Entity, FilePackage, GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
 import { locatorToLocatorB64 } from "../utils";
 
@@ -875,10 +875,12 @@ export default defineComponent({
         const guiReleaseResponse = await fetchGuiReleaseEntry(this.appWebsocket as AppWebsocket, this.appstoreAppInfo, app.guiUpdateAvailable!);
 
         this.selectedGuiUpdate = guiReleaseResponse.content;
+        this.selectedGuiUpdateLocator = app.guiUpdateAvailable;
         console.log("Got GUI Release: ", guiReleaseResponse.content);
       } else {
         alert!("Error: AppWebsocket or Appstore AppInfo undefined.")
         this.selectedGuiUpdate = undefined;
+        this.selectedGuiUpdateLocator = undefined;
       }
     },
     storageFractions(holochainVersion: string) {
@@ -945,12 +947,15 @@ export default defineComponent({
       let bytes = undefined;
 
       try {
-        bytes = await fetchGui(
+        const response: Entity<FilePackage> = await fetchGui(
           this.appWebsocket! as AppWebsocket,
           this.appstoreAppInfo!,
           this.selectedGuiUpdateLocator!.dna_hash,
           this.selectedGuiUpdate!.web_asset_id,
         );
+
+        bytes = response.content.bytes;
+
       } catch (e) {
         console.error("Error fetching the UI: ", e);
         this.showMessage(`Error fetching the UI: ${e}`);
@@ -978,21 +983,18 @@ export default defineComponent({
           this.selectedGuiUpdateLocator = undefined;
 
           // to remove the update button:
-          await this.$store.dispatch(ActionTypes.fetchStateInfo);
-          window.setTimeout(() => this.checkForUiUpdates(), 500);
+          await this.refreshAppStates();
+          this.checkForUiUpdates();
+
         } catch (e) {
           console.error("Error updating the UI: ", e);
-          this.errorText = `Error updating the UI: ${e}`;
-
-          (this.$refs as any).snackbar.show();
+          this.showMessage(`Error fetching the UI: ${e}`);
           (this.$refs.downloading as typeof HCLoading).close();
           this.loadingText = "";
         }
       } else {
         console.error("Error updating the UI: Undefined bytes");
-        this.errorText = `Error updating the UI: Undefined bytes`;
-
-        (this.$refs as any).snackbar.show();
+        this.showMessage(`Error updating the UI: Undefined bytes`);
         (this.$refs.downloading as typeof HCLoading).close();
         this.loadingText = "";
       }
