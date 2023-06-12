@@ -114,6 +114,7 @@ const messages = {
       save: "Save",
       start: "Start",
       uninstall: "Uninstall",
+      uninstalling: "uninstalling...",
       update: "Update",
       yes: "Yes",
     },
@@ -175,11 +176,16 @@ const messages = {
         languageSettings: "Language Settings",
       },
       confirmUninstallApp: "Are you sure you want to uninstall this App? This will irrevocably delete all data stored in it.",
+      confirmUninstallDevHub: {
+        text: "Uninstalling the DevHub means that you permanently lose editor access to any apps that you have published with this instance of the DevHub (i.e. with the associated public key). This means that you won't be able to publish any further releases or updates to those apps - even if you later reinstall the DevHub.",
+        confirmation: "I read the warning and confirm that I want to uninstall the DevHub."
+      },
       confirmUninstallCell: "Are you sure you want to delete this cell? This will irrevocably delete all data stored in it.",
       networkStats: {
         networkStats: "Network Statistics",
         changeHolochainVersion: "Choose Holochain Version",
       },
+      warning: "Warning",
     },
   },
 
@@ -286,6 +292,7 @@ const messages = {
       save: "Speichern",
       start: "Starten",
       uninstall: "Deinstallieren",
+      uninstalling: "deinstallieren...",
       update: "Update",
       quit: "Beenden",
       yes: "Ja",
@@ -348,11 +355,16 @@ const messages = {
         languageSettings: "Sprach-Einstellungen",
       },
       confirmUninstallApp: "Bist du sicher, dass du diese App deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
+      confirmUninstallDevHub: {
+        text: "Wenn du den DevHub deinstallierst verlierst du unwiderruflich die Bearbeitungsrechte für jegliche Apps die du mit dieser DevHub-Instanz (sprich mit dem dazugehörigen Public Key) publiziert hast. Dies bedeutet, dass du keine weiteren Releases oder Updates für diese Apps mehr publizieren kannst - auch dann, wenn du den DevHub wieder neu installierst.",
+        confirmation: "Ich habe die Warning gelesen und bestätige, dass ich den DevHub deinstallieren möchte."
+      },
       confirmUninstallCell: "Bist du sicher, dass du diese Cell deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
       networkStats: {
         networkStats: "Netzwerkstatistik",
         changeHolochainVersion: "Holochain Version",
       },
+      warning: "Achtung",
     },
   },
 };
