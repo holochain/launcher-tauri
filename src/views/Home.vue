@@ -54,7 +54,7 @@
       <div v-else-if="view.type === 'appStore'" class="flex-scrollable-parent">
         <div class="flex-scrollable-container">
           <div class="flex-scrollable-y">
-            <AppStore @show-message="showMessage($event)"></AppStore>
+            <AppStore @show-message="showMessage($event)" @select-view="selectView($event)"></AppStore>
           </div>
         </div>
       </div>

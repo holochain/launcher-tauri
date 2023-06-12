@@ -93,7 +93,7 @@
       holochainSelection = true;
       installClosed();
       showMessage(`Installed App ${$event}`);
-      $emit('go-back');
+      $emit('select-view', { type: 'launcher' });;
     "
     @closing-dialog="installClosed()"
     @error="(e) => showMessage(e)"
@@ -110,7 +110,7 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket, NetworkInfo, CellInfo, EntryHashB64, encodeHashToBase64, AgentPubKey, AnyDhtHash } from "@holochain/client";
+import { AppWebsocket, NetworkInfo, CellInfo, encodeHashToBase64 } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 import { toSrc, getCellId } from "../utils";
@@ -129,9 +129,9 @@ import SelectReleaseDialog from "../components/SelectReleaseDialog.vue";
 
 import { HolochainId, ReleaseData, ReleaseInfo } from "../types";
 import prettyBytes from "pretty-bytes";
-import { AppEntry, HostAvailability } from "../appstore/types";
+import { AppEntry } from "../appstore/types";
 import { getAllApps } from "../appstore/appstore-interface";
-import { APPSTORE_APP_ID, DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../constants";
+import { APPSTORE_APP_ID } from "../constants";
 
 
 
