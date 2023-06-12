@@ -209,6 +209,11 @@ export default defineComponent({
       2000
     );
 
+    // If the "Filesystem" button is pressed in the "launcher" view with no apps installed, the
+    // "installFromFs" item is set to "true" in localStorage and then the view is switched to
+    // "appStore" view (i.e. to this component here).
+    // In that case, the select from filesystem logic shall immediately be called after mounting of the component
+    // and the localStorage item be removed again.
     if (window.localStorage.getItem("installFromFs")) {
       window.localStorage.removeItem("installFromFs");
       this.selectFromFileSystem();

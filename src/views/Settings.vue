@@ -629,7 +629,6 @@ export default defineComponent({
       const port = this.$store.getters["appInterfacePort"](holochainId);
       const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       this.appWebsocket = appWebsocket;
-      // TODO add correct installed app id here.
       const appstoreAppInfo = await appWebsocket.appInfo({
         installed_app_id: APPSTORE_APP_ID,
       });

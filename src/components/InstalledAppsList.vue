@@ -21,7 +21,7 @@
     <div class="row">
 
       <HCButton
-        style="height: 65px; min-width: 200px; border-radius: 12px;"
+        class="button-large"
         @click="$emit('select-view', { type: 'appStore' })"
         @keypress.enter="$emit('select-view', { type: 'appStore' })"
       >
@@ -32,7 +32,8 @@
       </HCButton>
 
       <HCButton
-        style="height: 65px; min-width: 200px; border-radius: 12px; margin-left: 20px;"
+        class="button-large"
+        style="margin-left: 20px;"
         @click="installFromFs()"
       >
         <div class="row center-content">
@@ -133,7 +134,6 @@ export default defineComponent({
     const port = this.$store.getters["appInterfacePort"](holochainId);
     const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
     this.appWebsocket = appWebsocket;
-    // TODO add correct installed app id here.
     const appstoreAppInfo = await appWebsocket.appInfo({
         installed_app_id: APPSTORE_APP_ID,
     });
@@ -224,5 +224,11 @@ export default defineComponent({
   /* This is better for small screens, once min() is better supported */
   grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
   gap: 1rem;
+}
+
+.button-large {
+  height: 65px;
+  min-width: 200px;
+  border-radius: 12px;
 }
 </style>
