@@ -482,9 +482,9 @@ export default defineComponent({
     },
     requestUninstall() {
       if (this.app.webAppInfo.installed_app_info.installed_app_id === DEVHUB_APP_ID) {
-      (this.$refs["uninstall-devhub-dialog"] as typeof HCGenericDialog).open();
+        (this.$refs["uninstall-devhub-dialog"] as typeof HCGenericDialog).open();
       } else {
-      (this.$refs["uninstall-app-dialog"] as typeof HCGenericDialog).open();
+        (this.$refs["uninstall-app-dialog"] as typeof HCGenericDialog).open();
       }
     },
     async enableApp(app: HolochainAppInfo) {
