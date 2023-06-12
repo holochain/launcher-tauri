@@ -86,13 +86,6 @@
         !$store.getters['oldFiles'] && !$store.getters[`databaseFileTypeError`]
       "
     ></Home>
-    <div class="bottom-bar">
-      <img
-          src="/img/Square284x284Logo.png"
-          style="height: 30px; margin-left: 11px; z-index: -1px;"
-        />
-      <span class="beta-indicator">Beta 0.3</span>
-    </div>
 
     <About></About>
     <Config></Config>
@@ -206,26 +199,6 @@ body,
 
 #nav a.router-link-exact-active {
   color: #42b983;
-}
-
-.bottom-bar {
-  height: 30px;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  z-index: 0;
-  vertical-align: middle;
-}
-
-.bottom-bar img {
-  vertical-align: middle;
-}
-
-.beta-indicator {
-  margin-left: 10px;
-  font-size: 20px;
-  opacity: 0.3;
-  vertical-align: middle;
 }
 
 .column {

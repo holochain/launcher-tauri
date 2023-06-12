@@ -17,7 +17,7 @@
         flex-direction: row;
         align-items: center;
         width: 100%;
-        height: 120px;
+        height: 110px;
       "
     >
     <!-- App Logo with Holo Identicon -->
@@ -82,7 +82,7 @@
         v-if="
           app.guiUpdateAvailable
         "
-        style="display: flex"
+        style="display: flex; position: relative;"
       >
         <sl-tooltip class="tooltip" hoist placement="top" content="New UI available">
           <!-- <img
@@ -100,6 +100,7 @@
           >
             Update
           </div>
+          <div style="background: rgb(255, 217, 0); border-radius: 50%; height: 15px; width: 15px; position: absolute; bottom: 20px; right: 22px;"></div>
         </sl-tooltip>
       </div>
       <!-- -------------------- -->
@@ -533,7 +534,11 @@ export default defineComponent({
   align-items: center;
   background: #ffffff;
   width: 100%;
-  border-bottom: 1px dotted gray;
+  border-radius: 15px;
+  background-color: white;
+  padding: 0 15px;
+  box-shadow: 0 0px 5px #9b9b9b;
+  margin-bottom: 12px;
 }
 
 .btn {
