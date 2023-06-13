@@ -448,7 +448,7 @@ export default defineComponent({
     appWebsocket: AppWebsocket | undefined;
     appstoreAppInfo: AppInfo | undefined;
     appstoreHolochainAppInfo: HolochainAppInfo | undefined;
-    devHubAppInfo: HolochainAppInfo | undefined;
+    devHubAppInfo: HolochainAppInfo | null;
     devModeEnabled: boolean;
     errorText: string;
     extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> | undefined;
@@ -475,7 +475,7 @@ export default defineComponent({
       appstoreAppInfo: undefined,
       appstoreHolochainAppInfo: undefined,
       appWebsocket: undefined,
-      devHubAppInfo: undefined,
+      devHubAppInfo: null,
       devModeEnabled: false,
       howToPublishUrl:
         "https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-devhub",
@@ -604,6 +604,8 @@ export default defineComponent({
     async refreshAppStates() {
 
       await this.$store.dispatch(ActionTypes.fetchStateInfo);
+
+      this.devHubAppInfo = null
 
       await Promise.all(
         this.installedApps.map(async (app) => {
