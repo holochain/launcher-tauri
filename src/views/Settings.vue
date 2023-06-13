@@ -42,12 +42,12 @@
 
       <!-- Holochain version info -->
       <div
-        class="row section-title"
+        class="row section"
       >
         <span
-          style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
-          :title="$t('main.holochainVersionsHelper')"
-          >{{ $t("main.holochainVersions") }}</span
+          class="section-title"
+          :title="$t('settings.holochainVersionsHelper')"
+          >{{ $t("settings.holochainVersions") }}</span
         >
         <span style="flex: 1"></span>
         <span
@@ -70,7 +70,7 @@
           v-if="noHolochainVersions"
           style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
         >
-          {{ $t("main.noHolochainVersions") }}
+          {{ $t("settings.noHolochainVersions") }}
         </div>
         <div v-else>
           <div
@@ -122,52 +122,66 @@
         Language
       </div> -->
 
-
-      <!-- Dev Mode section -->
-
+      <!-- Advanced Settings Section -->
       <div
-        class="row section-title"
+        class="row section"
+        :class="{ borderBottomed: showAdvancedSettings }"
       >
+        <span class="section-title">
+          {{ $t("settings.advancedSettings") }}
+        </span>
         <span
-          style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
-          >{{ $t("main.developerMode") }}</span
+          @click="showAdvancedSettings = !showAdvancedSettings"
+          class="show-hide"
+          style="opacity: 0.7; cursor: pointer; margin-left: 10px"
         >
+          {{ showAdvancedSettings ? "[-]" : "[show]" }}
+        </span>
       </div>
 
+      <div v-if="showAdvancedSettings" style="margin-bottom: 15px;">
 
-      <div class="row section-container" style="display: flex; flex-direction: column;">
-        <div class="row">
-          <div style="flex: 1;">
-            <span>{{ $t("main.activateDevMode") }}</span>
+        <!-- Dev Mode -->
+        <div class="row section-container" style="display: flex; flex-direction: column;">
+          <div class="row">
+            <div style="flex: 1;">
+              <span style="font-size: 18px">{{ $t("main.activateDevMode") }}</span>
+            </div>
+            <!-- Disable/enable switch -->
+            <sl-tooltip
+              class="tooltip"
+              hoist
+              placement="top"
+              :content="devModeOn ? 'Disable Dev Mode' : 'Enable Dev Mode'"
+            >
+              <ToggleSwitch
+                style="margin-right: 29px"
+                :sliderOn="!!devHubAppInfo && isAppRunning(devHubAppInfo?.webAppInfo.installed_app_info)"
+                @click.stop.prevent="toggleDevMode()"
+                @keydown.enter="toggleDevMode()"
+              />
+            </sl-tooltip>
           </div>
-          <!-- Disable/enable switch -->
-          <sl-tooltip
-            class="tooltip"
-            hoist
-            placement="top"
-            :content="devModeOn ? 'Disable Dev Mode' : 'Enable Dev Mode'"
-          >
-            <ToggleSwitch
-              style="margin-right: 29px"
-              :sliderOn="!!devHubAppInfo && isAppRunning(devHubAppInfo?.webAppInfo.installed_app_info)"
-              @click.stop.prevent="toggleDevMode()"
-              @keydown.enter="toggleDevMode()"
-            />
-          </sl-tooltip>
+
+          <div class="row">
+            <HCButton
+              outlined
+              :disabled="!devModeOn"
+              @click="openPublishAppDialog"
+              style="height: 36px; border-radius: 8px; padding: 0 20px; margin-top: 10px;"
+              >{{ $t("settings.publishAnApp") }}
+            </HCButton>
+          </div>
         </div>
 
-        <div class="row" style="margin-top: 10px;">
-          <HCButton
-            outlined
-            :disabled="!devModeOn"
-            @click="openPublishAppDialog"
-            style="height: 36px; border-radius: 8px; padding: 0 20px; margin-top: 10px;"
-            >{{ $t("settings.publishAnApp") }}
-          </HCButton>
+        <div class="row section-container">
+          <div class="column" style="flex: 1;">
+            <div style="font-size: 18px">{{ $t("settings.launcherConfiguration") }}</div>
+            <span style="font-size: 14px">{{ $t("settings.launcherConfigurationDescription") }}</span>
+          </div>
+          <HCButton style="margin: 4px 6px;" @click="$emit('open-config')">Configure Launcher</HCButton>
         </div>
       </div>
-
-
 
 
       <!-- Installed apps list -->
@@ -182,7 +196,7 @@
             width: 100%;
             justify-content: flex-end;
             align-items: center;
-            margin-bottom: -5px;
+            margin-bottom: -20px;
           "
         >
           <HCSelectCard
@@ -192,7 +206,7 @@
               box-shadow: 0 0px 3px -1px #9b9b9b;
               --hc-label-background: #e8e8eb;
             "
-            :placeholder="$t('main.holochainVersions')"
+            :placeholder="$t('settings.holochainVersions')"
             :items="holochainVersionOptions"
             @item-selected="selectedHolochainVersion = $event"
           ></HCSelectCard>
@@ -225,12 +239,12 @@
         <!-- Web Apps -->
 
         <div
-          class="row section-title"
+          class="row section"
           :class="{ borderBottomed: showWebApps }"
           style="margin-top: -25px"
         >
           <span
-            style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
+            class="section-title"
             :title="$t('settings.appSettingsHelper')"
             >{{ $t("settings.appSettings") }}</span
           >
@@ -284,11 +298,11 @@
 
         <div
           v-if="!noHeadlessApps"
-          class="row section-title"
+          class="row section"
           :class="{ borderBottomed: showHeadlessApps }"
         >
           <span
-            style="margin-left: 10px; font-size: 23px; color: rgba(0, 0, 0, 0.6)"
+            class="section-title"
             :title="$t('settings.headlessAppsHelper')"
             >{{ $t("settings.headlessApps") }}</span
           >
@@ -463,6 +477,7 @@ export default defineComponent({
     selectedGuiUpdateHash: EntryHash | undefined;
     selectedGuiUpdateLocator: ResourceLocator | undefined;
     selectedHolochainVersion: string;
+    showAdvancedSettings: boolean;
     showDevModeDevsOnlyWarning: boolean; // TODO: unused right now
     showHeadlessApps: boolean;
     showWebApps: boolean;
@@ -490,6 +505,7 @@ export default defineComponent({
       ],
       sortOption: undefined,
       selectedHolochainVersion: "All Versions",
+      showAdvancedSettings: false,
       showHeadlessApps: true,
       showWebApps: true,
       storageInfos: {},
@@ -504,7 +520,7 @@ export default defineComponent({
       errorText: "Unknown error occured",
     };
   },
-  emits: ["openApp", "uninstall-app", "enable-app", "disable-app", "startApp", "open-app-store", "show-message"],
+  emits: ["open-config", "show-message"],
   async mounted() {
     await this.refreshAppStates();
   },
@@ -1013,10 +1029,16 @@ h2 {
   margin: 0;
 }
 
+.section {
+  align-items: center;
+}
+
 .section-title {
-  margin: 10px 0;
+  margin: 10px 0 10px 10px;
   padding-bottom: 3px;
   align-items: center;
+  font-size: 23px;
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .section-container {
