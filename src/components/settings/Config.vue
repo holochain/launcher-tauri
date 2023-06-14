@@ -131,6 +131,11 @@ export default defineComponent({
     });
   },
   methods: {
+    async open() {
+      const dialog = this.$refs.dialog as typeof HCGenericDialog;
+      this.restoreDefaults();
+      dialog.open();
+    },
     async saveConfig() {
       if (this.customBinary) {
         (this.newConfig as any).custom_binary_path = (

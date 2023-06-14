@@ -57,11 +57,11 @@ pub async fn fetch_and_save_app(
   }
 
   let appstore_pub_key = AgentPubKey::from(AgentPubKeyB64::from_b64_str(appstore_pub_key.as_str())
-    .map_err(|e| String::from("Failed to convert appstorePubKey from Base64 to Vec<u8>"))?);
+    .map_err(|e| format!("Failed to convert appstorePubKey from Base64 to Vec<u8>: {}", e))?);
   let happ_release_entry_hash = EntryHash::from(EntryHashB64::from_b64_str(happ_release_hash.as_str())
-    .map_err(|e| String::from("Failed to convert happReleaseHash from Base64 to Vec<u8>"))?);
+    .map_err(|e| format!("Failed to convert happReleaseHash from Base64 to Vec<u8>: {}", e))?);
   let gui_release_entry_hash = EntryHash::from(EntryHashB64::from_b64_str(gui_release_hash.as_str())
-    .map_err(|e| String::from("Failed to convert guiReleaseHash from Base64 to Vec<u8>"))?);
+    .map_err(|e| format!("Failed to convert guiReleaseHash from Base64 to Vec<u8>: {}", e))?);
 
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
@@ -250,10 +250,10 @@ pub async fn fetch_gui(
   }
 
   let agent_pub_key = AgentPubKey::from(AgentPubKeyB64::from_b64_str(appstore_pub_key.as_str())
-    .map_err(|e| String::from("Failed to convert appstorePubKey from Base64 to Vec<u8>"))?);
+    .map_err(|e| format!("Failed to convert appstorePubKey from Base64 to Vec<u8>: {}", e))?);
 
   let gui_release_entry_hash = EntryHash::from(EntryHashB64::from_b64_str(gui_release_hash.as_str())
-    .map_err(|e| String::from("Failed to convert guiReleaseHash from Base64 to Vec<u8>"))?);
+    .map_err(|e| format!("Failed to convert guiReleaseHash from Base64 to Vec<u8>: {}", e))?);
 
 
   let mut ws = AppWebsocket::connect(format!("ws://localhost:{}", app_port))
