@@ -31,12 +31,15 @@ const messages = {
       startingUp: "Starting up",
     },
     main: {
+      activateDevMode: "Enable Developer Mode (for App Developers)",
       activePeerSynchronization: "Active Peer Synchronization",
       allVersions: "All Versions",
       copied: "Copied",
       copyDnaHash: "Copy Dna Hash",
       copyNetworkSeed: "Copy Network Seed",
       cloneName: "Name",
+      developerMode: "Developer Mode",
+      devModeExplainer: "If you are an app developer and want to publish apps, activate the developer mode.",
       hide: "Hide",
       hideNetworkSeed: "Hide Network Seed",
       holochainVersions: "Holochain Versions",
@@ -60,6 +63,7 @@ const messages = {
       sortBy: "sort by",
       show: "Show",
       showNetworkSeed: "Show Network Seed",
+      updatesAvailable: "(Updates Available)",
       visiblePeers: "Visible Peers",
       yourPublicKey: "Your Public Key",
     },
@@ -75,6 +79,10 @@ const messages = {
         "There are no apps available yet in the App Library or Synchronization with Peers is not complete.",
       receivingData: "Receiving new data",
       synchronizationNotCompleteError: "App Library Synchronization not Complete. Please try again later."
+    },
+    launcher: {
+      filesystem: "Filesystem",
+      getStarted: "To get started, install your first app:",
     },
     settings: {
       appSettings: "App Settings",
@@ -106,16 +114,11 @@ const messages = {
       save: "Save",
       start: "Start",
       uninstall: "Uninstall",
+      uninstalling: "uninstalling...",
       update: "Update",
       yes: "Yes",
     },
     dialogs: {
-      config: {
-        restoreDefaults: "Reset to Default Values",
-        useMdns: "Use MDNS.",
-        useMdnsNote: "This will disable bootstrap & proxy configurations.",
-        saveAndRestart:"Save and Restart",
-      },
       restart:
         "Do you want to clean up all holochain processes and restart the Holochain Launcher?",
       setupPassword: {
@@ -173,11 +176,16 @@ const messages = {
         languageSettings: "Language Settings",
       },
       confirmUninstallApp: "Are you sure you want to uninstall this App? This will irrevocably delete all data stored in it.",
+      confirmUninstallDevHub: {
+        text: "Uninstalling the DevHub means that you permanently lose editor access to any apps that you have published with this instance of the DevHub (i.e. with the associated public key). This means that you won't be able to publish any further releases or updates to those apps - even if you later reinstall the DevHub.",
+        confirmation: "I read the warning and confirm that I want to uninstall the DevHub."
+      },
       confirmUninstallCell: "Are you sure you want to delete this cell? This will irrevocably delete all data stored in it.",
       networkStats: {
         networkStats: "Network Statistics",
         changeHolochainVersion: "Choose Holochain Version",
       },
+      warning: "Warning",
     },
   },
 
@@ -202,12 +210,15 @@ const messages = {
       settingUp: "Einrichten",
     },
     main: {
+      activateDevMode: "Entwickler-Modus aktivieren (für App-Entwickler)",
       activePeerSynchronization: "Aktive Peer Synchronisationen",
       allVersions: "Alle Versionen",
       copied: "Kopiert",
       copyDnaHash: "Dna Hash kopieren",
       copyNetworkSeed: "Network Seed kopieren",
       cloneName: "Name",
+      developerMode: "Entwickler Modus",
+      devModeExplainer: "Wenn du ein App-Entwickler bist und Apps publizieren möchtest, kannst du den Entwickler-Modus aktivieren.",
       hide: "Verbergen",
       hideNetworkSeed: "Network Seed verbergen",
       holochainVersions: "Holochain Versionen",
@@ -223,13 +234,15 @@ const messages = {
       noClonedCells: "Diese App hat keine Cloned Cells.",
       noDisabledClonedCells: "Diese App hat keine deaktivierten Cloned Cells.",
       noHolochainVersions: "Es sind keine Holochain Versionen installiert.",
-      noApps: "There are no apps installed",
+      noApps: "Es sind keine Apps installiert.",
       outgoing: "ausgehend",
       refresh: "Aktualisieren",
       reportIssue: "Problem Melden",
+      settings: "Einstellungen",
       show: "Zeigen",
       showNetworkSeed: "Network Seed anzeigen",
       sortBy: "sortiere nach",
+      updatesAvailable: "(Updates verfügbar)",
       visiblePeers: "Sichtbare Peers",
       yourPublicKey: "Dein Public Key",
     },
@@ -245,6 +258,10 @@ const messages = {
         "Es sind noch keine Apps im App Store verfügbar oder die Synchronisierung mit Peers ist noch unvollständig.",
       receivingData: "Neue Daten werden empfangen",
       synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut."
+    },
+    launcher: {
+      filesystem: "Aus Datei",
+      getStarted: "Leg los und installiere deine erste App:",
     },
     settings: {
       appSettings: "App Settings",
@@ -275,17 +292,12 @@ const messages = {
       save: "Speichern",
       start: "Starten",
       uninstall: "Deinstallieren",
+      uninstalling: "deinstallieren...",
       update: "Update",
       quit: "Beenden",
       yes: "Ja",
     },
     dialogs: {
-      config: {
-        restoreDefaults: "Zurücksetzen zu Standardwerten",
-        useMdns: "Benutze MDNS.",
-        useMdnsNote: "Dies deaktiviert die Bootstrap & Proxy Konfigurationen.",
-        saveAndRestart:"Speichern und Neustart",
-      },
       restart:
         "Möchtest du alle Holochain Prozesse beenden und den Holochain Launcher neu starten?",
       setupPassword: {
@@ -343,11 +355,16 @@ const messages = {
         languageSettings: "Sprach-Einstellungen",
       },
       confirmUninstallApp: "Bist du sicher, dass du diese App deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
+      confirmUninstallDevHub: {
+        text: "Wenn du den DevHub deinstallierst verlierst du unwiderruflich die Bearbeitungsrechte für jegliche Apps die du mit dieser DevHub-Instanz (sprich mit dem dazugehörigen Public Key) publiziert hast. Dies bedeutet, dass du keine weiteren Releases oder Updates für diese Apps mehr publizieren kannst - auch dann, wenn du den DevHub wieder neu installierst.",
+        confirmation: "Ich habe die Warning gelesen und bestätige, dass ich den DevHub deinstallieren möchte."
+      },
       confirmUninstallCell: "Bist du sicher, dass du diese Cell deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
       networkStats: {
         networkStats: "Netzwerkstatistik",
         changeHolochainVersion: "Holochain Version",
       },
+      warning: "Achtung",
     },
   },
 };

@@ -468,9 +468,7 @@ export default defineComponent({
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
-        this.showMessage(`Installed ${this.appId}`);
-
-        this.$emit("app-installed", this.appId);
+        this.$emit("app-installed", appId);
 
         this.installing = false;
 

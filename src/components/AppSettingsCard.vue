@@ -3,9 +3,33 @@
     @confirm="uninstallApp(app)"
     closeOnSideClick
     ref="uninstall-app-dialog"
-    :primaryButtonLabel="$t('buttons.uninstall')"
+    :primaryButtonLabel="uninstalling ? $t('buttons.uninstalling') : $t('buttons.uninstall')"
+    :primaryButtonDisabled="uninstalling"
     ><div style="text-align: center">
       {{ $t('dialogs.confirmUninstallApp') }}
+    </div>
+  </HCGenericDialog>
+
+
+  <HCGenericDialog
+    @confirm="uninstallApp(app);"
+    @closing="confirmUninstallDevHub = false"
+    closeOnSideClick
+    ref="uninstall-devhub-dialog"
+    :primaryButtonLabel="uninstalling ? $t('buttons.uninstalling') : $t('buttons.uninstall')"
+    :primaryButtonDisabled="!confirmUninstallDevHub || uninstalling"
+  >
+    <div style="text-align: center; padding: 0 20px;">
+      <h1 style="margin-top: -10px;">{{ $t('dialogs.warning') }}</h1>
+      <div style="text-align: left; margin-top: 40px;">{{ $t('dialogs.confirmUninstallDevHub.text') }}</div>
+      <div class="row" style="margin-top: 40px; margin-left: 10px;">
+        <ToggleSwitch
+          :sliderOn="confirmUninstallDevHub"
+          @click="confirmUninstallDevHub = !confirmUninstallDevHub"
+          @keydown.enter="confirmUninstallDevHub = !confirmUninstallDevHub"
+        ></ToggleSwitch>
+        <div style="text-align: left; margin-left: 20px;">{{ $t('dialogs.confirmUninstallDevHub.confirmation') }}</div>
+      </div>
     </div>
   </HCGenericDialog>
 
@@ -17,7 +41,7 @@
         flex-direction: row;
         align-items: center;
         width: 100%;
-        height: 120px;
+        height: 110px;
       "
     >
     <!-- App Logo with Holo Identicon -->
@@ -82,7 +106,7 @@
         v-if="
           app.guiUpdateAvailable
         "
-        style="display: flex"
+        style="display: flex; position: relative;"
       >
         <sl-tooltip class="tooltip" hoist placement="top" content="New UI available">
           <!-- <img
@@ -100,6 +124,7 @@
           >
             Update
           </div>
+          <div style="background: rgb(255, 217, 0); border-radius: 50%; height: 15px; width: 15px; position: absolute; bottom: 20px; right: 22px;"></div>
         </sl-tooltip>
       </div>
       <!-- -------------------- -->
@@ -378,7 +403,7 @@ import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
 import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
 import DisabledCloneCard from "./subcomponents/DisabledCloneCard.vue";
-import { APPSTORE_APP_ID } from "../constants";
+import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
 
 export default defineComponent({
   name: "AppSettingsCard",
@@ -401,22 +426,24 @@ export default defineComponent({
     },
   },
   data(): {
+    confirmUninstallDevHub: boolean;
     showMore: boolean;
-    showUninstallDialog: boolean;
     showPubKeyTooltip: boolean;
     gossipInfo: Record<string, NetworkInfo>;
     showProvisionedCells: boolean;
     showClonedCells: boolean;
     showDisabledClonedCells: boolean;
+    uninstalling: boolean;
   } {
     return {
+      confirmUninstallDevHub: false,
       showMore: false,
-      showUninstallDialog: false,
       showPubKeyTooltip: false,
       gossipInfo: {},
       showProvisionedCells: true,
       showClonedCells: false,
       showDisabledClonedCells: false,
+      uninstalling: false,
     };
   },
   emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp", "updateGui"],
@@ -455,8 +482,11 @@ export default defineComponent({
       return app.webAppInfo.web_uis.default.type === "Headless";
     },
     requestUninstall() {
-      (this.$refs["uninstall-app-dialog"] as typeof HCGenericDialog).open();
-      this.showUninstallDialog = true;
+      if (this.app.webAppInfo.installed_app_info.installed_app_id === DEVHUB_APP_ID) {
+        (this.$refs["uninstall-devhub-dialog"] as typeof HCGenericDialog).open();
+      } else {
+        (this.$refs["uninstall-app-dialog"] as typeof HCGenericDialog).open();
+      }
     },
     async enableApp(app: HolochainAppInfo) {
       this.$emit("enableApp", app);
@@ -468,8 +498,8 @@ export default defineComponent({
       this.$emit("startApp", app);
     },
     async uninstallApp(app: HolochainAppInfo) {
-      this.showUninstallDialog = false;
       this.$emit("uninstallApp", app);
+      this.uninstalling = true;
     },
     getAppStatus(app: HolochainAppInfo) {
       if (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) {
@@ -533,7 +563,11 @@ export default defineComponent({
   align-items: center;
   background: #ffffff;
   width: 100%;
-  border-bottom: 1px dotted gray;
+  border-radius: 15px;
+  background-color: white;
+  padding: 0 15px;
+  box-shadow: 0 0px 5px #9b9b9b;
+  margin-bottom: 12px;
 }
 
 .btn {

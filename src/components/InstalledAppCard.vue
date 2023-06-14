@@ -1,39 +1,22 @@
 <template>
-  <HCGenericDialog
-    @confirm="uninstallApp(app)"
-    closeOnSideClick
-    ref="uninstall-app-dialog"
-    :primaryButtonLabel="$t('buttons.uninstall')"
-    ><div style="text-align: center">
-      {{ $t('dialogs.confirmUninstallApp') }}
-    </div>
-  </HCGenericDialog>
-
-  <div class="container">
-    <div
-      style="
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        height: 120px;
-      "
-
-      @click="$emit('openApp', app)"
-      v-on:keyup.enter="$emit('openApp', app)"
-    >
+  <div>
       <!-- App Logo -->
-      <div style="position: relative">
+      <div
+        class="icon-container"
+        style="position: relative"
+        tabindex="0"
+        @click="$emit('openApp', app)"
+        v-on:keyup.enter="$emit('openApp', app)"
+        :title="app.webAppInfo.installed_app_info.installed_app_id"
+      >
         <img
           v-if="app.webAppInfo.icon_src"
-          :class="{ appIcon: !showMore, appIconMore: showMore }"
+          class="appIcon"
           :src="`${app.webAppInfo.icon_src}`"
         />
         <div
           v-else
-          :class="{ appIcon: !showMore, appIconMore: showMore }"
-          class="column center-content"
+          class="appIcon column center-content"
           style="background-color: #372ba5"
         >
           <div style="color: white; font-size: 45px; font-weight: 600">
@@ -43,35 +26,9 @@
       </div>
       <!-- ------------- -->
 
-      <!-- GUI update available Icon -->
-      <div
-        v-if="
-          app.guiUpdateAvailable
-        "
-        style="display: flex"
-      >
-        <sl-tooltip class="tooltip" hoist placement="top" content="New UI available">
-          <!-- <img
-            tabindex="0"
-            style="margin-right: 29px; width: 24px; cursor: pointer"
-            src="/img/Open_App.svg"
-            @click="$emit('openApp', app)"
-            v-on:keyup.enter="$emit('openApp', app)"
-          /> -->
-          <div
-            @click="$emit('updateGui', app)"
-            @keypress.enter="$emit('updateGui', app)"
-            tabindex="0"
-            class="update-button"
-          >
-            Update
-          </div>
-        </sl-tooltip>
-      </div>
-      <!-- -------------------- -->
 
       <!-- App status indicator -->
-      <sl-tooltip
+      <!-- <sl-tooltip
         style="--show-delay: 500"
         hoist
         placement="top"
@@ -87,14 +44,12 @@
           style="margin-right: 29px"
           tabindex="0"
         ></div>
-      </sl-tooltip>
+      </sl-tooltip> -->
       <!-- ----------------- -->
 
-      <!-- Installed App Id -->
-      <div class="installed-app-name">
-        {{ app.webAppInfo.installed_app_info.installed_app_id }}
-      </div>
-      <!-- EO Installed App Id ---------------- -->
+          <!-- Installed App Id -->
+    <div class="installed-app-name">
+      {{ app.webAppInfo.installed_app_info.installed_app_id }}
     </div>
   </div>
 </template>
@@ -102,9 +57,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { HolochainAppInfo, HolochainAppInfoExtended } from "../types";
-import { isAppRunning, isAppDisabled, isAppPaused, getReason, flattenCells, getCellId } from "../utils";
-import { writeText } from "@tauri-apps/api/clipboard";
-import { CellInfo, CellType, ClonedCell, encodeHashToBase64, NetworkInfo } from "@holochain/client";
+import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
@@ -114,7 +67,6 @@ import HoloIdenticon from "../components/subcomponents/HoloIdenticon.vue";
 import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
 import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
 import DisabledCloneCard from "./subcomponents/DisabledCloneCard.vue";
-import { APPSTORE_APP_ID } from "../constants";
 
 
 export default defineComponent({
@@ -132,76 +84,18 @@ export default defineComponent({
     },
   },
   data(): {
-    showMore: boolean;
-    showUninstallDialog: boolean;
     showPubKeyTooltip: boolean;
-    gossipInfo: Record<string, NetworkInfo>;
-    showProvisionedCells: boolean;
-    showClonedCells: boolean;
-    showDisabledClonedCells: boolean;
   } {
     return {
-      showMore: false,
-      showUninstallDialog: false,
       showPubKeyTooltip: false,
-      gossipInfo: {},
-      showProvisionedCells: true,
-      showClonedCells: false,
-      showDisabledClonedCells: false,
     };
   },
-  emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp", "updateGui"],
-  computed: {
-    provisionedCells(): [string, CellInfo][] {
-      const provisionedCells = flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
-        .filter(([_roleName, cellInfo]) => "provisioned" in cellInfo)
-        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
-      return provisionedCells
-    },
-    enabledClonedCells(): [string, CellInfo][] {
-      return flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
-        .filter(([_roleName, cellInfo]) => "cloned" in cellInfo)
-        .filter(([_roleName, cellInfo]) => (cellInfo as { [CellType.Cloned]: ClonedCell }).cloned.enabled)
-        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
-    },
-    disabledClonedCells(): [string, CellInfo][] {
-      return flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
-        .filter(([_roleName, cellInfo]) => "cloned" in cellInfo)
-        .filter(([_roleName, cellInfo]) => !(cellInfo as { [CellType.Cloned]: ClonedCell }).cloned.enabled)
-        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
-    },
-    isSliderOn() {
-      return (isAppRunning(this.app.webAppInfo.installed_app_info) || isAppPaused(this.app.webAppInfo.installed_app_info));
-    },
-  },
+  emits: ["openApp"],
   methods: {
-    encodeHashToBase64,
     getReason,
     isAppRunning,
     isAppDisabled,
     isAppPaused,
-    writeText,
-    getCellId,
-    isAppHeadless(app: HolochainAppInfo) {
-      return app.webAppInfo.web_uis.default.type === "Headless";
-    },
-    requestUninstall() {
-      (this.$refs["uninstall-app-dialog"] as typeof HCGenericDialog).open();
-      this.showUninstallDialog = true;
-    },
-    async enableApp(app: HolochainAppInfo) {
-      this.$emit("enableApp", app);
-    },
-    async disableApp(app: HolochainAppInfo) {
-      this.$emit("disableApp", app);
-    },
-    async startApp(app: HolochainAppInfo) {
-      this.$emit("startApp", app);
-    },
-    async uninstallApp(app: HolochainAppInfo) {
-      this.showUninstallDialog = false;
-      this.$emit("uninstallApp", app);
-    },
     getAppStatus(app: HolochainAppInfo) {
       if (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) {
         return "Running";
@@ -216,41 +110,6 @@ export default defineComponent({
       }
       return "Unknown State";
     },
-    isAppUninstallable(installedAppId: string) {
-      return installedAppId !== APPSTORE_APP_ID;
-    },
-    async handleSlider(app: HolochainAppInfo) {
-      if (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) {
-        await this.disableApp(app);
-      } else if (isAppDisabled(app.webAppInfo.installed_app_info)) {
-        await this.enableApp(app);
-      } else if (isAppPaused(app.webAppInfo.installed_app_info)) {
-        // Currently this won't be called as paused and running are conflated both into running
-        // because app status is not getting updated: https://github.com/holochain/holochain/issues/1580#issuecomment-1377471698
-        await this.startApp(app);
-      } else {
-        throw new Error("Unknown App state.");
-      }
-    },
-    copyPubKey() {
-      const pubKey =
-        this.getPubKey();
-      this.writeText(encodeHashToBase64(new Uint8Array(pubKey)));
-      this.showPubKeyTooltip = true;
-      setTimeout(() => {
-        this.showPubKeyTooltip = false;
-      }, 1200);
-    },
-    getPubKey() {
-      const cell = Object.values(this.app.webAppInfo.installed_app_info.cell_info)[0]
-        .find((c) => "provisioned" in c);
-
-      if (!cell || !("provisioned" in cell)) {
-        throw new Error("no provisioned cell found");
-      }
-
-      return cell.provisioned.cell_id[1];
-    },
   },
 });
 </script>
@@ -262,12 +121,8 @@ export default defineComponent({
   flex: 1;
   flex-direction: column;
   align-items: center;
-  background: #ffffff;
-  border-radius: 22px;
-  width: 120px;
   margin: 8px;
   /* box-shadow: 0 0 2px rgb(131, 128, 176); */
-  box-shadow: 0 0px 5px #9b9b9b;
 }
 
 .btn {
@@ -292,28 +147,19 @@ export default defineComponent({
   cursor: pointer;
 }
 
-.appIconMore {
-  display: flex;
+.icon-container {
   width: 120px;
-  height: 120px;
-  padding: 0;
-  border-radius: 22px 0 22px 0;
-  object-fit: cover;
+  box-shadow: 0 0px 5px #9b9b9b;
+  border-radius: 22px;
+}
+.icon-container:hover {
+  box-shadow: 0 0px 12px #676767;
 }
 
-.holoIdenticon {
-  border-radius: 12px;
+.icon-container:focus {
+  box-shadow: 0 0px 12px #676767;
 }
 
-.holoIdenticonMore {
-  border-radius: 12px 0 22px 0;
-}
-
-.app-status {
-  height: 10px;
-  width: 10px;
-  border-radius: 50%;
-}
 
 .running {
   background-color: rgb(0, 185, 0);
@@ -337,21 +183,6 @@ export default defineComponent({
   border-radius: 5px;
   /* border: 2px solid #482edf; */
   padding: 1px 7px;
-}
-
-.update-button {
-  font-weight: bold;
-  color: black;
-  cursor: pointer;
-  border: 2px solid black;
-  border-radius: 4px;
-  padding: 0 5px;
-  margin-right: 29px;
-  opacity: 0.85;
-}
-
-.update-button:hover {
-  opacity: 0.6;
 }
 
 .installed-app-name {

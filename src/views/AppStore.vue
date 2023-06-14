@@ -93,7 +93,7 @@
       holochainSelection = true;
       installClosed();
       showMessage(`Installed App ${$event}`);
-      $emit('go-back');
+      $emit('select-view', { type: 'launcher' });;
     "
     @closing-dialog="installClosed()"
     @error="(e) => showMessage(e)"
@@ -110,7 +110,7 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket, NetworkInfo, CellInfo, EntryHashB64, encodeHashToBase64, AgentPubKey, AnyDhtHash } from "@holochain/client";
+import { AppWebsocket, NetworkInfo, CellInfo, encodeHashToBase64 } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 import { toSrc, getCellId } from "../utils";
@@ -129,9 +129,9 @@ import SelectReleaseDialog from "../components/SelectReleaseDialog.vue";
 
 import { HolochainId, ReleaseData, ReleaseInfo } from "../types";
 import prettyBytes from "pretty-bytes";
-import { AppEntry, HostAvailability } from "../appstore/types";
+import { AppEntry } from "../appstore/types";
 import { getAllApps } from "../appstore/appstore-interface";
-import { APPSTORE_APP_ID, DEVHUB_HAPP_LIBRARY_DNA_HASH } from "../constants";
+import { APPSTORE_APP_ID } from "../constants";
 
 
 
@@ -208,6 +208,16 @@ export default defineComponent({
       async () => await this.getQueuedBytes(),
       2000
     );
+
+    // If the "Filesystem" button is pressed in the "launcher" view with no apps installed, the
+    // "installFromFs" item is set to "true" in localStorage and then the view is switched to
+    // "appStore" view (i.e. to this component here).
+    // In that case, the select from filesystem logic shall immediately be called after mounting of the component
+    // and the localStorage item be removed again.
+    if (window.localStorage.getItem("installFromFs")) {
+      window.localStorage.removeItem("installFromFs");
+      this.selectFromFileSystem();
+    }
   },
   methods: {
     toSrc,
@@ -410,62 +420,6 @@ export default defineComponent({
 
       return queuedBytes;
     },
-    // async getNetworkState() {
-    //   if (!this.appWebsocket) {
-    //     await this.connectAppWebsocket();
-    //   }
-
-    //   const networkInfo: NetworkInfo[] = await this.appWebsocket!.networkInfo({
-    //     dnas: this.provisionedCells!.filter(([roleName, cellInfo]) => !!cellInfo)
-    //       .map(([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array),
-    //   });
-
-    //   networkInfo.forEach((info, idx) => {
-    //     const expectedIncoming =
-    //       info.fetch_pool_info.op_bytes_to_fetch;
-
-    //     // In case expected incoming bytes are undefined, keep the chached values, otherwise update
-    //     // expectedIncoming
-    //   if (expectedIncoming || expectedIncoming === 0) {
-    //       // if the expected incoming bytes are larger then the max cached value or there
-    //       // is no cached max value, replace it
-    //       const currentMax = this.cachedMaxExpected[idx];
-    //       if ((!currentMax && currentMax !== 0) || expectedIncoming > currentMax) {
-    //         this.cachedMaxExpected[idx] = expectedIncoming;
-    //         this.maxExceeded[idx] = true;
-    //         setTimeout(() => (this.maxExceeded[idx] = false), 500);
-    //       }
-
-    //       if (expectedIncoming != this.networkStates[idx]) {
-    //         this.idleStates[idx] = false;
-    //         this.latestNetworkUpdates[idx] = Date.now();
-    //       }
-    //       // make this call after setting max cached value to ensure it is always <= to it
-    //       this.networkStates[idx] = expectedIncoming;
-    //     }
-
-    //     // if expected incoming remains the same for > 10 seconds, set to idle. Except expectedIncoming
-    //     // is below 16MB, in this case transmission may already be finished.
-    //     if (new Date().getTime() - this.latestNetworkUpdates[idx] > 10000) {
-    //       if (this.networkStates[idx] || this.networkStates[idx] === 0) {
-    //         if (this.networkStates[idx]! > 16000000) {
-    //           this.idleStates[idx] = false
-    //         }
-    //       } else {
-    //         this.idleStates[idx] = true;
-    //       }
-    //     }
-
-
-    //     // if latest non-zero update to gossip progress is older than 80 seconds, set expected incoming
-    //     // and max cached expected incoming to undefined again
-    //     if (new Date().getTime() - this.latestNetworkUpdates[idx] > 80000) {
-    //       this.networkStates[idx] = undefined;
-    //       this.cachedMaxExpected[idx] = undefined;
-    //     }
-    //   });
-
-    // },
     showMessage(message: string) {
       this.$emit("show-message", message);
     },
