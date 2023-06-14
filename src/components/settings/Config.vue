@@ -26,21 +26,8 @@
         </HCSelect>
       </div>
 
-      <HCTextField
-        ref="bootstrapServerField"
-        placeholder="https://bootstrap.holo.host"
-        style="margin: 5px; width: 380px;"
-        label="Bootstrap Server URL"
-      ></HCTextField>
 
-      <HCTextField
-        ref="proxyServerField"
-        placeholder="kitsune-proxy://f3gH2VMkJ4qvZJOXx0ccL_Zo5n-s_CnBjSzAsEHHDCA/kitsune-quic/h/137.184.142.208/p/5788/--"
-        style="margin: 5px; margin-top: 20px; width: 380px;"
-        label="Proxy Server URL"
-      ></HCTextField>
-
-      <div class="row" style="margin: 5px; margin-top: 20px; width: 380px;">
+      <div class="row" style="margin: 20px 5px; width: 380px;">
         <ToggleSwitch
           ref="sliderMdns"
           :sliderOn="mdns"
@@ -49,7 +36,24 @@
         <span style="margin-left: 10px">{{ $t('dialogs.config.useMdns') }} <i>{{ $t('dialogs.config.useMdnsNote') }}</i></span>
       </div>
 
-      <div class="row" style="margin: 5px; margin-top: 20px; width: 380px;">
+      <HCTextField
+        v-show="!mdns"
+        ref="bootstrapServerField"
+        placeholder="https://bootstrap.holo.host"
+        style="margin: 5px; width: 380px;"
+        label="Bootstrap Server URL"
+      ></HCTextField>
+
+      <HCTextField
+        v-show="!mdns"
+        ref="proxyServerField"
+        placeholder="kitsune-proxy://f3gH2VMkJ4qvZJOXx0ccL_Zo5n-s_CnBjSzAsEHHDCA/kitsune-quic/h/137.184.142.208/p/5788/--"
+        style="margin: 5px; margin-top: 20px; width: 380px;"
+        label="Proxy Server URL"
+      ></HCTextField>
+
+
+      <div class="row" style="margin: 5px; margin-top: 40px; margin-bottom: 10px; width: 380px;">
         <ToggleSwitch
           ref="slider"
           :sliderOn="customBinary"
