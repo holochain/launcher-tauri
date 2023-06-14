@@ -28,6 +28,8 @@
     </div>
   </HCGenericDialog>
 
+  <Config ref="configDialog"/>
+
   <HCLoading ref="downloading" :text="loadingText"></HCLoading>
 
   <div
@@ -179,7 +181,7 @@
             <div style="font-size: 18px">{{ $t("settings.launcherConfiguration") }}</div>
             <span style="font-size: 14px">{{ $t("settings.launcherConfigurationDescription") }}</span>
           </div>
-          <HCButton style="margin: 4px 6px;" @click="$emit('open-config')">Configure Launcher</HCButton>
+          <HCButton style="margin: 4px 6px;" @click="($refs.configDialog as typeof Config).open()">Configure Launcher</HCButton>
         </div>
       </div>
 
@@ -408,39 +410,39 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ActionTypes } from "../store/actions";
-import { HolochainAppInfo, HolochainAppInfoExtended, StorageInfo, ResourceLocator } from "../types";
-import "@material/mwc-icon";
-import { invoke } from "@tauri-apps/api/tauri";
-import HCButton from "../components/subcomponents/HCButton.vue";
-import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
-import HCDialog from "../components/subcomponents/HCDialog.vue";
-import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
-import LoadingDots from "../components/subcomponents/LoadingDots.vue";
-import { i18n } from "../locale";
+import { AppInfo, AppWebsocket, decodeHashFromBase64, encodeHashToBase64, EntryHash, InstalledAppId, DnaHashB64 } from "@holochain/client";
 import { uniq } from "lodash-es";
+import prettyBytes from "pretty-bytes";
+import { invoke } from "@tauri-apps/api/tauri";
+import { defineComponent, PropType } from "vue";
 
 import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
 
-import { isAppDisabled, isAppPaused, isAppRunning } from "../utils";
-import AppSettingsCard from "../components/AppSettingsCard.vue";
-import HCSelectCard from "../components/subcomponents/HCSelectCard.vue";
-import StackedChart from "../components/subcomponents/StackedChart.vue";
-import HCGenericDialog from "../components/subcomponents/HCGenericDialog.vue";
-import HCLoading from "../components/subcomponents/HCLoading.vue";
-import prettyBytes from "pretty-bytes";
 import { getHappReleasesByEntryHashes, fetchGui, appstoreCells, fetchGuiReleaseEntry } from "../appstore/appstore-interface";
-import { AppInfo, AppWebsocket, decodeHashFromBase64, encodeHashToBase64, EntryHash, InstalledAppId, DnaHashB64 } from "@holochain/client";
 import { Entity, FilePackage, GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
-import { locatorToLocatorB64 } from "../utils";
+import AppSettingsCard from "../components/AppSettingsCard.vue";
+import Config from "../components/settings/Config.vue";
+import HCButton from "../components/subcomponents/HCButton.vue";
+import HCDialog from "../components/subcomponents/HCDialog.vue";
+import HCGenericDialog from "../components/subcomponents/HCGenericDialog.vue";
+import HCLoading from "../components/subcomponents/HCLoading.vue";
+import HCSelectCard from "../components/subcomponents/HCSelectCard.vue";
+import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
+import LoadingDots from "../components/subcomponents/LoadingDots.vue";
+import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
+import StackedChart from "../components/subcomponents/StackedChart.vue";
+import { i18n } from "../locale";
+import { ActionTypes } from "../store/actions";
+import { HolochainAppInfo, HolochainAppInfoExtended, StorageInfo, ResourceLocator } from "../types";
+import { isAppDisabled, isAppPaused, isAppRunning, locatorToLocatorB64 } from "../utils";
 
 export default defineComponent({
   name: "Settings",
   components: {
+    Config,
     HCButton,
     HCSnackbar,
     HCDialog,
@@ -520,7 +522,7 @@ export default defineComponent({
       errorText: "Unknown error occured",
     };
   },
-  emits: ["open-config", "show-message"],
+  emits: ["show-message"],
   async mounted() {
     await this.refreshAppStates();
   },
