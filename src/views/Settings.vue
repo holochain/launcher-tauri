@@ -181,7 +181,7 @@
             <div style="font-size: 18px">{{ $t("settings.launcherConfiguration") }}</div>
             <span style="font-size: 14px">{{ $t("settings.launcherConfigurationDescription") }}</span>
           </div>
-          <HCButton style="margin: 4px 6px;" @click="($refs.configDialog as typeof Config).open()">Configure Launcher</HCButton>
+          <HCButton style="margin: 4px 6px;" @click="openConfig()">Configure Launcher</HCButton>
         </div>
       </div>
 
@@ -604,6 +604,9 @@ export default defineComponent({
     prettyBytes,
     isLoading() {
       return this.$store.state.launcherStateInfo === "loading";
+    },
+    openConfig() {
+      (this.$refs.configDialog as typeof Config).open()
     },
     openPublishAppDialog() {
       (this.$refs["publishAppDialog"] as typeof HCDialog).open();

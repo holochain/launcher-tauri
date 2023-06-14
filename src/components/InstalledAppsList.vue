@@ -58,7 +58,6 @@
       style="margin: 5px 12px;"
     >
       <InstalledAppCard
-        v-if="app.webAppInfo.web_uis.default.type !== 'Headless'"
         :app="app"
         @openApp="$emit('openApp', $event)"
       />
@@ -154,7 +153,9 @@ export default defineComponent({
 
       // Filter out App Store and DevHub
       sortedAppList = sortedAppList.filter(
-        (app) => app.webAppInfo.installed_app_info.installed_app_id !== APPSTORE_APP_ID && app.webAppInfo.installed_app_info.installed_app_id !== DEVHUB_APP_ID
+        (app) => app.webAppInfo.installed_app_info.installed_app_id !== APPSTORE_APP_ID
+        && app.webAppInfo.installed_app_info.installed_app_id !== DEVHUB_APP_ID
+        && app.webAppInfo.web_uis.default.type !== "Headless"
       );
 
       if (this.sortOption === "name") {
