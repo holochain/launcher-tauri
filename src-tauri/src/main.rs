@@ -33,7 +33,7 @@ mod system_tray;
 
 use crate::commands::choose_version::get_supported_versions;
 use crate::commands::open_app::report_issue_cmd;
-use crate::commands::save_app::{save_app, fetch_and_save_app};
+use crate::commands::save_app::{save_app, fetch_and_save_app, fetch_gui};
 // use crate::commands::start_app::start_app;
 use crate::commands::restart::restart;
 use crate::commands::quit::quit;
@@ -86,6 +86,7 @@ fn main() {
       enable_app,
       execute_factory_reset,
       fetch_and_save_app,
+      fetch_gui,
       get_app_info,
       get_icon_src,
       get_state_info,

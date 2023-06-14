@@ -420,8 +420,8 @@ import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
 
-import { getHappReleasesByEntryHashes, fetchGui, appstoreCells, fetchGuiReleaseEntry } from "../appstore/appstore-interface";
-import { Entity, FilePackage, GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
+import { getHappReleasesByEntryHashes, fetchGui, appstoreCells, fetchGuiReleaseEntry, tryWithHosts } from "../appstore/appstore-interface";
+import { GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
 import AppSettingsCard from "../components/AppSettingsCard.vue";
 import Config from "../components/settings/Config.vue";
@@ -464,7 +464,7 @@ export default defineComponent({
     appWebsocket: AppWebsocket | undefined;
     appstoreAppInfo: AppInfo | undefined;
     appstoreHolochainAppInfo: HolochainAppInfo | undefined;
-    devHubAppInfo: HolochainAppInfo | undefined;
+    devHubAppInfo: HolochainAppInfo | null;
     devModeEnabled: boolean;
     errorText: string;
     extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> | undefined;
@@ -476,7 +476,6 @@ export default defineComponent({
     reportIssueUrl: string;
     selectedApp: HolochainAppInfoExtended | undefined;
     selectedGuiUpdate: GUIReleaseEntry | undefined;
-    selectedGuiUpdateHash: EntryHash | undefined;
     selectedGuiUpdateLocator: ResourceLocator | undefined;
     selectedHolochainVersion: string;
     showAdvancedSettings: boolean;
@@ -492,7 +491,7 @@ export default defineComponent({
       appstoreAppInfo: undefined,
       appstoreHolochainAppInfo: undefined,
       appWebsocket: undefined,
-      devHubAppInfo: undefined,
+      devHubAppInfo: null,
       devModeEnabled: false,
       howToPublishUrl:
         "https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-devhub",
@@ -516,7 +515,6 @@ export default defineComponent({
       extendedAppInfos: undefined,
       selectedApp: undefined,
       selectedGuiUpdate: undefined,
-      selectedGuiUpdateHash: undefined,
       selectedGuiUpdateLocator: undefined,
       loadingText: "",
       errorText: "Unknown error occured",
@@ -622,6 +620,8 @@ export default defineComponent({
     async refreshAppStates() {
 
       await this.$store.dispatch(ActionTypes.fetchStateInfo);
+
+      this.devHubAppInfo = null
 
       await Promise.all(
         this.installedApps.map(async (app) => {
@@ -961,57 +961,67 @@ export default defineComponent({
 
       this.loadingText = "fetching UI from peer host...";
 
-      let bytes = undefined;
-
       try {
-        const response: Entity<FilePackage> = await fetchGui(
-          this.appWebsocket! as AppWebsocket,
-          this.appstoreAppInfo!,
-          this.selectedGuiUpdateLocator!.dna_hash,
-          this.selectedGuiUpdate!.web_asset_id,
-        );
+        const holochainId = this.$store.getters["holochainIdForDevhub"];
+        const port = this.$store.getters["appInterfacePort"](holochainId);
 
-        bytes = response.content.bytes;
+        const appstoreAppInfo = this.appstoreAppInfo;
 
-      } catch (e) {
-        console.error("Error fetching the UI: ", e);
-        this.showMessage(`Error fetching the UI: ${e}`);
-        (this.$refs.downloading as typeof HCLoading).close();
-        return;
-      }
+        if (appstoreAppInfo) {
 
-      this.loadingText = "Installing...";
+          await tryWithHosts<void>(
+            async (host) => {
 
-      if (bytes) {
-        try {
-          await invoke("update_default_ui", {
-            holochainId: this.selectedApp!.holochainId,
-            appId: this.selectedApp!.webAppInfo.installed_app_info.installed_app_id,
-            uiZipBytes: bytes,
-            guiReleaseInfo: {
-              resource_locator: locatorToLocatorB64(this.selectedApp!.guiUpdateAvailable!),
-              version: this.selectedGuiUpdate?.version,
+              const bytes = await invoke("fetch_gui", {
+                appPort: port,
+                appstoreAppId: appstoreAppInfo!.installed_app_id,
+                host: Array.from(host),
+                devhubHappLibraryDnaHash: Array.from(this.selectedGuiUpdateLocator!.dna_hash), // DNA hash of the DevHub to which the remote call shall be made
+                appstorePubKey: encodeHashToBase64(appstoreAppInfo!.agent_pub_key),
+                guiReleaseHash: this.selectedGuiUpdate ? encodeHashToBase64(this.selectedGuiUpdate.web_asset_id) : undefined,
+              });
+
+              this.loadingText = "Installing...";
+
+              await invoke("update_default_ui", {
+                holochainId: this.selectedApp!.holochainId,
+                appId: this.selectedApp!.webAppInfo.installed_app_info.installed_app_id,
+                uiZipBytes: bytes,
+                guiReleaseInfo: {
+                  resource_locator: locatorToLocatorB64(this.selectedApp!.guiUpdateAvailable!),
+                  version: this.selectedGuiUpdate?.version,
+                },
+              });
+
+              this.loadingText = "";
+              (this.$refs.downloading as typeof HCLoading).close();
+              (this.$refs.updateGuiDialog as typeof HCGenericDialog).close();
+              this.selectedGuiUpdate = undefined;
+              this.selectedGuiUpdateLocator = undefined;
+
+              // to remove the update button:
+              await this.refreshAppStates();
+              this.checkForUiUpdates();
+
+
+
             },
-          });
-          this.loadingText = "";
-          (this.$refs.downloading as typeof HCLoading).close();
-          (this.$refs.updateGuiDialog as typeof HCGenericDialog).close();
-          this.selectedGuiUpdate = undefined;
-          this.selectedGuiUpdateLocator = undefined;
+            this.appWebsocket as AppWebsocket,
+            appstoreAppInfo!,
+            this.selectedGuiUpdateLocator!.dna_hash,
+            "happ_library",
+            "get_webasset",
+          );
 
-          // to remove the update button:
-          await this.refreshAppStates();
-          this.checkForUiUpdates();
-
-        } catch (e) {
-          console.error("Error updating the UI: ", e);
-          this.showMessage(`Error fetching the UI: ${e}`);
+        } else {
+          console.error("Error updating the UI: Undefined appstoreAppInfo");
+          this.showMessage(`Error updating the UI: Undefined appstoreAppInfo`);
           (this.$refs.downloading as typeof HCLoading).close();
           this.loadingText = "";
         }
-      } else {
-        console.error("Error updating the UI: Undefined bytes");
-        this.showMessage(`Error updating the UI: Undefined bytes`);
+      } catch (e) {
+        console.error("Error updating the UI: ", e);
+        this.showMessage(`Error fetching the UI: ${e}`);
         (this.$refs.downloading as typeof HCLoading).close();
         this.loadingText = "";
       }
