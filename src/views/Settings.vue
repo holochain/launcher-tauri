@@ -494,7 +494,7 @@ export default defineComponent({
       devHubAppInfo: null,
       devModeEnabled: false,
       howToPublishUrl:
-        "https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-devhub",
+        "https://github.com/holochain/launcher#publishing-and-updating-an-app-in-the-app-store",
       snackbarText: undefined,
       reportIssueUrl: "https://github.com/holochain/launcher/issues/new",
       showDevModeDevsOnlyWarning: false,
