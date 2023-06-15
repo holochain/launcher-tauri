@@ -32,7 +32,7 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
     window.emit("progress-update", String::from("Installing AppStore"))
       .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
-    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { None };
+    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { Some(String::from("test-network-0.990")) };
 
     manager
       .install_web_app(

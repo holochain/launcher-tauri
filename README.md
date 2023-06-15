@@ -87,14 +87,13 @@ If you get stuck at any point, don't hesitate to ask for help on Holochain's Dis
 Now that you have uploaded your app to the DevHub, you need to register it in the App Store.
 
 1. Still in "Advanced Settings", click again on "Publish an app", then on "Open App Store". This will open the admin UI of the App Store.
-2. Before being able to add an app to the App Store, you need to add a publisher if you haven't done so earlier. To do so, click on the colored profile icon in the top right corner (the icon has been automatically generated based on your public key).
-3. In your Profile section, click on the "+" icon next to "Publisher(s)", then fill out all the required fields, add an icon and click on "Save".
-4. Now you can move on to add an App under the name of this Publisher by clicking on "Add App".
-5. Add an Icon.
-6. Paste the hApp HRL of your app that you uploaded to the Dev Hub earlier. It is the address required by end-users to request your app before installing it. You can copy the HRL from your hApp's page in the *Dev Hub*. Within the Dev Hub, you find it under "My hApps" by clicking on "More Info" next to the app that you uploaded. You should see the HRL in red font with a copy icon next to it.
-7. After pasting the HRL, hit the Enter key. Most of the Details should now be auto-populated based on the information from the Dev Hub. Edit them if desired and select a Publisher (the one that you created in step 3).
-8. Click on "Save".
-9. Your app should now appear in the App Store in the Holochain Launcher. *To make sure that all the data you just uploaded to Dev Hub and App Store is being synchronized with other peers, keep the Launcher running for while* (to be safe, around 30 Minutes).
+2. Before being able to add an app to the App Store, you need to add yourself as a publisher if you haven't done so earlier. To do so, click on "Add Publisher" in the top right corner, then fill out all the required fields, add an icon and click on "Save".
+3. Now you can move on to add an App under the name of this Publisher by clicking on "Add App".
+4. Add an Icon.
+5. Paste the hApp HRL of your app that you uploaded to the Dev Hub earlier. It is the address required by end-users to request your app before installing it. You can copy the HRL from your hApp's page in the *Dev Hub*. Within the Dev Hub, you find it under "My hApps" by clicking on "More Info" next to the app that you uploaded. You should see the HRL in red font with a copy icon next to it.
+6. After pasting the HRL, hit the Enter key. Most of the Details should now be auto-populated based on the information from the Dev Hub. Edit them if desired and select a Publisher (the one that you created in step 3).
+7. Click on "Save".
+8. Your app should now appear in the App Store in the Holochain Launcher. *To make sure that all the data you just uploaded to Dev Hub and App Store is being synchronized with other peers, keep the Launcher running for while* (to be safe, around 30 Minutes).
 
 
 If you get stuck at any point, don't hesitate to ask for help on Holochain's Discord server. You should find an invite link to it on https://developer.holochain.org/.
