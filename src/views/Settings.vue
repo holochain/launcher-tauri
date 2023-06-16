@@ -520,7 +520,7 @@ export default defineComponent({
       errorText: "Unknown error occured",
     };
   },
-  emits: ["show-message"],
+  emits: ["show-message", "updated-ui"],
   async mounted() {
     await this.refreshAppStates();
   },
@@ -1006,8 +1006,6 @@ export default defineComponent({
               await this.refreshAppStates();
               this.checkForUiUpdates();
 
-
-
             },
             this.appWebsocket as AppWebsocket,
             appstoreAppInfo!,
@@ -1015,6 +1013,8 @@ export default defineComponent({
             "happ_library",
             "get_webasset",
           );
+
+          this.$emit('updated-ui');
 
         } else {
           console.error("Error updating the UI: Undefined appstoreAppInfo");
