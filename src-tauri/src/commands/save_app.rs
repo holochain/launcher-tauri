@@ -165,77 +165,6 @@ where
 }
 
 
-// #[derive(Debug, Deserialize)]
-// pub struct CustomRemoteCallInput {
-//     host: AgentPubKey,
-//     call: RemoteCallInput,
-// }
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CustomRemoteCallInput<T: Serialize + core::fmt::Debug> {
-  host: AgentPubKey,
-  call: RemoteCallDetails<String, String, T>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GetWebHappPackageInput {
-    pub name: String,
-    pub happ_release_id: EntryHash,
-    pub gui_release_id: EntryHash,
-}
-
-/// Fetching a webhapp from the DevHub via remote call through the portal_api
-async fn fetch_web_happ(
-  app_port: u16,
-  appstore_app_id: &String,
-  agent_pub_key: &AgentPubKey,
-  lair_keystore_manager: &Box<dyn LairKeystoreManager>,
-  host: AgentPubKey, // agent public key of the DevHub host to fetch the webhapp from
-  devhub_happ_library_dna_hash: DnaHash, // DNA hash of the DevHub to which the remote call shall be made
-  name: String, // name of the webhapp to use in the WebHappManifest
-  happ_release_entry_hash: EntryHash,
-  gui_release_entry_hash: EntryHash,
-) -> Result<Vec<u8>, String> {
-  let mut ws = AppWebsocket::connect(format!("ws://localhost:{}", app_port))
-      .await
-      .map_err(|e| format!("Failed to connect to app websocket: {}", e))?;
-
-  let app_info: AppInfo = ws
-      .app_info(appstore_app_id.clone())
-      .await
-      .map_err(|e| format!("Failed to get appstore AppInfo: {:?}", e))?
-      .ok_or(format!("AppInfo is None."))?;
-
-  let cells = app_info.cell_info.get("portal").ok_or(format!("No CellInfo found for portal role"))?;
-
-  let Some(CellInfo::Provisioned(portal_cell)) = cells.get(0) else {
-      return Err(format!("No provisioned cell for role portal_api found."));
-  };
-
-  let payload = GetWebHappPackageInput {
-    name,
-    happ_release_id: happ_release_entry_hash,
-    gui_release_id: gui_release_entry_hash,
-  };
-
-  let bytes: Vec<u8> = portal_remote_call(
-    &mut ws,
-    lair_keystore_manager,
-    agent_pub_key,
-    host,
-    portal_cell,
-    devhub_happ_library_dna_hash,
-    String::from("happ_library"),
-    String::from("get_webhapp_package"),
-    payload
-  ).await?;
-
-  Ok(bytes)
-}
-
-
-
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FetchWebAssetRemoteCallInput {
   host: AgentPubKey,
@@ -288,32 +217,50 @@ pub async fn fetch_gui(
       return Err(format!("No provisioned cell for role portal_api found."));
   };
 
-  let payload = GetWebAssetInput {
-    id: gui_release_entry_hash,
-  };
-
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
   let lair_keystore_manager = manager.get_lair_keystore_manager()?;
 
-  // TODO FIX because get_webasset does not exist anymore in new DevHub
-  let entity: Entity<FilePackage> = portal_remote_call(
+  let gui_release_entry_entity: Entity<GUIReleaseEntry> = portal_remote_call(
     &mut ws,
     lair_keystore_manager,
     &agent_pub_key,
-    host,
+    host.clone(),
     portal_cell,
-    devhub_happ_library_dna_hash,
+    devhub_happ_library_dna_hash.clone(),
     String::from("happ_library"),
-    String::from("get_webasset"),
-    payload
+    String::from("get_gui_release"),
+    GetEntityInput {
+      id: gui_release_entry_hash,
+    }
   ).await?;
 
+  let web_asset_file: Entity<FileEntry> = portal_remote_call(
+    &mut ws,
+    lair_keystore_manager,
+    &agent_pub_key,
+    host.clone(),
+    portal_cell,
+    devhub_happ_library_dna_hash.clone(),
+    String::from("happ_library"),
+    String::from("get_webasset_file"),
+    GetEntityInput {
+      id: gui_release_entry_entity.content.web_asset_id,
+    }
+  ).await?;
 
-  match entity.content.bytes {
-    Some(bytes) => Ok(bytes),
-    None => Err(String::from("FilePackage contained no bytes.")),
-  }
+  let ui_bytes = fetch_mere_memory(
+    &mut ws,
+    lair_keystore_manager,
+    &agent_pub_key,
+    host.clone(),
+    portal_cell,
+    "web_assets",
+    devhub_happ_library_dna_hash.clone(),
+    web_asset_file.content.mere_memory_addr
+  ).await?;
+
+  Ok(ui_bytes)
 }
 
 
@@ -454,7 +401,6 @@ async fn fetch_and_assemble_web_happ(
     web_asset_file.content.mere_memory_addr
   ).await?;
 
-  println!("Successfully fetched ui_bytes.");
 
   let happ_bundle_bytes = fetch_and_assemble_happ(
     app_websocket,
@@ -497,7 +443,7 @@ async fn fetch_and_assemble_web_happ(
 
 
 /// Fetch and assemble a happ from a devhub host
-async fn fetch_and_assemble_happ(
+pub async fn fetch_and_assemble_happ(
   app_websocket: &mut AppWebsocket,
   lair_keystore_manager: &Box<dyn LairKeystoreManager>,
   agent_pub_key: &AgentPubKey,
@@ -625,7 +571,7 @@ async fn fetch_and_assemble_happ(
 
 
 /// Fetching and combining bytes by mere_memory_address
-async fn fetch_mere_memory(
+pub async fn fetch_mere_memory(
   app_websocket: &mut AppWebsocket,
   lair_keystore_manager: &Box<dyn LairKeystoreManager>,
   agent_pub_key: &AgentPubKey,
@@ -679,9 +625,15 @@ async fn fetch_mere_memory(
   Ok(combined_memory)
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CustomRemoteCallInput<T: Serialize + core::fmt::Debug> {
+  host: AgentPubKey,
+  call: RemoteCallDetails<String, String, T>,
+}
+
 
 /// Wrapper for remote calls through the portal_api
-async fn portal_remote_call<T: Serialize + core::fmt::Debug, U: Serialize + DeserializeOwned + core::fmt::Debug>(
+pub async fn portal_remote_call<T: Serialize + core::fmt::Debug, U: Serialize + DeserializeOwned + core::fmt::Debug>(
   app_websocket: &mut AppWebsocket,
   lair_keystore_manager: &Box<dyn LairKeystoreManager>,
   agent_pub_key: &AgentPubKey,

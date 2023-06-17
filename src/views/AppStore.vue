@@ -333,6 +333,8 @@ export default defineComponent({
 
       this.loadingText = `fetching app from peer host...`;
 
+      console.log("@saveApp: devhubDnaHash", encodeHashToBase64(releaseInfo.devhubDnaHash));
+
       try {
         await tryWithHosts<void>(
           async (host) => {
