@@ -451,7 +451,7 @@ async fn fetch_and_assemble_web_happ(
     portal_cell,
     "web_assets",
     devhub_happ_library_dna_hash.clone(),
-    web_asset_file.address
+    web_asset_file.content.mere_memory_addr
   ).await?;
 
   println!("Successfully fetched ui_bytes.");
@@ -504,15 +504,18 @@ async fn fetch_and_assemble_happ(
   host: AgentPubKey,
   portal_cell: &ProvisionedCell,
   devhub_happ_library_dna_hash: DnaHash,
-  happ_release_entry: HappReleaseEntry,
+  mut happ_release_entry: HappReleaseEntry,
 ) -> Result<Vec<u8>, String>{
 
   // 1. Get all .dna files
   let mut dna_resources : BTreeMap<String, Vec<u8>> = BTreeMap::new();
 
-  for dna_ref in happ_release_entry.dnas {
+  for (i, dna_ref) in happ_release_entry.dnas.iter().enumerate() {
 
     let dna_path = format!("./{}.dna", dna_ref.role_name );
+
+    println!("Assembling data for dna with role_name: {}", dna_ref.role_name);
+    println!("DNA path: {}", dna_path);
 
     let dna_version : Entity<DnaVersionEntry> = portal_remote_call(
       app_websocket,
@@ -521,8 +524,8 @@ async fn fetch_and_assemble_happ(
       host.clone(),
       portal_cell,
       devhub_happ_library_dna_hash.clone(),
-      String::from("dna_library"),
-      String::from("get_dna_package"),
+      String::from("happ_library"),
+      String::from("get_dna_version"),
       GetEntityInput {
         id: dna_ref.version.to_owned()
       },
@@ -600,8 +603,12 @@ async fn fetch_and_assemble_happ(
     let dna_pack_bytes = encode_bundle( dna_bundle )
       .map_err(|e| format!("Failed to encode bundle for dna {}: {}", dna_ref.role_name, e))?;
 
-    dna_resources.insert(dna_path, dna_pack_bytes);
+    dna_resources.insert(dna_path.clone(), dna_pack_bytes);
+    happ_release_entry.manifest.roles[i].dna.bundled = dna_path;
   }
+
+  println!("happ manifest: {:?}", happ_release_entry.manifest);
+  println!("dna_resources keys: {:?}", dna_resources.keys());
 
   let happ_bundle = HappBundle {
     manifest: happ_release_entry.manifest,
@@ -641,8 +648,6 @@ async fn fetch_mere_memory(
     format!("{}_get_memory", dna_name),
     memory_address,
   ).await?;
-
-  println!("Got memory_entry: {:?}", memory_entry);
 
   let mut memory_blocks: Vec<MemoryBlockEntry> = Vec::new();
   // 2. Assemble all MemoryEntryBlock's
