@@ -11,6 +11,7 @@ use holochain_client::{AppInfo, AppWebsocket, AgentPubKey};
 use hdk::prelude::{
   EntryHash, ExternIO, FunctionName, Serialize, Timestamp, ZomeCallUnsigned, ZomeName, Deserialize
 };
+use mere_memory_types::{MemoryEntry, MemoryBlockEntry};
 // use mere_memory_types::MemoryEntry;
 use serde::de::DeserializeOwned;
 
@@ -236,64 +237,27 @@ pub async fn fetch_gui(
       return Err(format!("No provisioned cell for role portal_api found."));
   };
 
-  let (nonce, expires_at) = fresh_nonce(Timestamp::now())
-      .map_err(|e| format!("Failed to create fresh Nonce: {:?}", e))?;
-
-
   let payload = GetWebAssetInput {
     id: gui_release_entry_hash,
-  };
-
-  let input = FetchWebAssetRemoteCallInput {
-    host,
-    call: RemoteCallDetails {
-      dna: devhub_happ_library_dna_hash,
-      zome: String::from("happ_library"),
-      function: String::from("get_webasset"),
-      payload,
-    }
-  };
-
-  let zome_call_unsigned = ZomeCallUnsigned {
-      provenance: agent_pub_key.clone(),
-      cell_id: portal_cell.cell_id.clone(),
-      zome_name: ZomeName::from("portal_api"),
-      fn_name: FunctionName::from("custom_remote_call"),
-      payload: ExternIO::encode(input)?,
-      cap_secret: None,
-      expires_at,
-      nonce,
   };
 
   let mut mutex = (*state).lock().await;
   let manager = mutex.get_running()?;
   let lair_keystore_manager = manager.get_lair_keystore_manager()?;
 
-  let signed_zome_call = lair_keystore_manager
-      .sign_zome_call(zome_call_unsigned)
-      .await
-      .map_err(|e| format!("Failed to sign zome call: {}", e))?;
+  // TODO FIX because get_webasset does not exist anymore in new DevHub
+  let entity: Entity<FilePackage> = portal_remote_call(
+    &mut ws,
+    lair_keystore_manager,
+    &agent_pub_key,
+    host,
+    portal_cell,
+    devhub_happ_library_dna_hash,
+    String::from("happ_library"),
+    String::from("get_webasset"),
+    payload
+  ).await?;
 
-  let result = ws
-      .call_zome(signed_zome_call)
-      .await
-      .map_err(|e| format!("Zome call failed: {:?}", e))?;
-
-
-  let response: DevHubResponse<DevHubResponse<Entity<FilePackage>>> = result.decode()
-    .map_err(|e| format!("Error decoding the webhapp package: {}", e))?;
-
-  let inner_response = match response {
-    DevHubResponse::Success(pack) => pack.payload,
-    DevHubResponse::Failure(error) => {
-      println!("Errorpayload: {:?}", error.payload);
-      return Err(format!("Received ErrorPayload: {:?}", error.payload));
-    },
-  };
-
-  let entity = inner_response
-      .as_result()
-      .map_err(|e| format!("Failed to get content from DevHubResponse: {}", e))?;
 
   match entity.content.bytes {
     Some(bytes) => Ok(bytes),
@@ -304,7 +268,64 @@ pub async fn fetch_gui(
 
 
 
-/// Fetching a webhapp from the DevHub via remote call through the portal_api
+
+/// Fetching and combining bytes by mere_memory_address
+async fn fetch_mere_memory(
+  app_websocket: &mut AppWebsocket,
+  lair_keystore_manager: &Box<dyn LairKeystoreManager>,
+  agent_pub_key: &AgentPubKey,
+  host: AgentPubKey,
+  portal_cell: &ProvisionedCell,
+  dna_name: &str,
+  devhub_happ_library_dna_hash: DnaHash,
+  memory_address: EntryHash,
+) -> Result<Vec<u8>, String> {
+
+  // 1. get MemoryEntry
+  let memory_entry: MemoryEntry = portal_remote_call(
+    app_websocket,
+    lair_keystore_manager,
+    agent_pub_key,
+    host.clone(),
+    portal_cell,
+    devhub_happ_library_dna_hash.clone(),
+    String::from("happ_library"),
+    format!("{}_get_memory", dna_name),
+    memory_address,
+  ).await?;
+
+  let mut memory_blocks: Vec<MemoryBlockEntry> = Vec::new();
+  // 2. Assemble all MemoryEntryBlock's
+  for block_address in memory_entry.block_addresses {
+    let memory_block_entry: MemoryBlockEntry = portal_remote_call(
+        app_websocket,
+        lair_keystore_manager,
+        agent_pub_key,
+        host.clone(),
+        portal_cell,
+        devhub_happ_library_dna_hash.clone(),
+        String::from("happ_library"),
+        format!("{}_get_memory_block", dna_name),
+        block_address,
+      ).await?;
+
+    memory_blocks.push(memory_block_entry);
+  }
+
+  // 3. Sort and combine them
+  memory_blocks.sort_by(|a, b| a.sequence.position.cmp(&b.sequence.position));
+
+  let combined_memory = memory_blocks
+    .into_iter()
+    .map(|m| m.bytes)
+    .flatten()
+    .collect::<Vec<u8>>();
+
+  Ok(combined_memory)
+}
+
+
+/// Wrapper for remote calls through the portal_api
 async fn portal_remote_call<T: Serialize + core::fmt::Debug, U: Serialize + DeserializeOwned + core::fmt::Debug>(
   app_websocket: &mut AppWebsocket,
   lair_keystore_manager: &Box<dyn LairKeystoreManager>,
