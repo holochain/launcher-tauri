@@ -2,6 +2,7 @@ use std::{env::temp_dir, fs, path::PathBuf, time::SystemTime};
 
 
 use devhub_types::{DevHubResponse, Entity, web_asset_entry_types::FilePackage};
+use holochain::conductor::api::ProvisionedCell;
 use holochain_types::{prelude::{DnaHash, AgentPubKeyB64, EntryHashB64}, web_app::WebAppBundle};
 use lair_keystore_manager::LairKeystoreManager;
 use holochain_manager::versions::holochain_conductor_api_latest::CellInfo;
@@ -10,6 +11,8 @@ use holochain_client::{AppInfo, AppWebsocket, AgentPubKey};
 use hdk::prelude::{
   EntryHash, ExternIO, FunctionName, Serialize, Timestamp, ZomeCallUnsigned, ZomeName, Deserialize
 };
+// use mere_memory_types::MemoryEntry;
+use serde::de::DeserializeOwned;
 
 use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile};
 
@@ -117,9 +120,9 @@ where
 // }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct FetchWebHappRemoteCallInput {
+pub struct CustomRemoteCallInput<T: Serialize + core::fmt::Debug> {
   host: AgentPubKey,
-  call: RemoteCallDetails<String, String, GetWebHappPackageInput>,
+  call: RemoteCallDetails<String, String, T>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -157,62 +160,23 @@ async fn fetch_web_happ(
       return Err(format!("No provisioned cell for role portal_api found."));
   };
 
-  let (nonce, expires_at) = fresh_nonce(Timestamp::now())
-      .map_err(|e| format!("Failed to create fresh Nonce: {:?}", e))?;
-
   let payload = GetWebHappPackageInput {
     name,
     happ_release_id: happ_release_entry_hash,
     gui_release_id: gui_release_entry_hash,
   };
 
-  let input = FetchWebHappRemoteCallInput {
+  let bytes: Vec<u8> = portal_remote_call(
+    &mut ws,
+    lair_keystore_manager,
+    agent_pub_key,
     host,
-    call: RemoteCallDetails {
-      dna: devhub_happ_library_dna_hash,
-      zome: String::from("happ_library"),
-      function: String::from("get_webhapp_package"),
-      payload,
-    }
-  };
-
-  let zome_call_unsigned = ZomeCallUnsigned {
-      provenance: agent_pub_key.clone(),
-      cell_id: portal_cell.cell_id.clone(),
-      zome_name: ZomeName::from("portal_api"),
-      fn_name: FunctionName::from("custom_remote_call"),
-      payload: ExternIO::encode(input)?,
-      cap_secret: None,
-      expires_at,
-      nonce,
-  };
-
-
-  let signed_zome_call = lair_keystore_manager
-      .sign_zome_call(zome_call_unsigned)
-      .await
-      .map_err(|e| format!("Failed to sign zome call: {}", e))?;
-
-  let result = ws
-      .call_zome(signed_zome_call)
-      .await
-      .map_err(|e| format!("Zome call failed: {:?}", e))?;
-
-
-  let response: DevHubResponse<DevHubResponse<Vec<u8>>> = result.decode()
-    .map_err(|e| format!("Error decoding the webhapp package: {}", e))?;
-
-  let inner_response = match response {
-    DevHubResponse::Success(pack) => pack.payload,
-    DevHubResponse::Failure(error) => {
-      println!("Errorpayload: {:?}", error.payload);
-      return Err(format!("Received ErrorPayload: {:?}", error.payload));
-    },
-  };
-
-  let bytes = inner_response
-      .as_result()
-      .map_err(|e| format!("Failed to get content from DevHubResponse: {}", e))?;
+    portal_cell,
+    devhub_happ_library_dna_hash,
+    String::from("happ_library"),
+    String::from("get_webhapp_package"),
+    payload
+  ).await?;
 
   Ok(bytes)
 }
@@ -336,3 +300,75 @@ pub async fn fetch_gui(
     None => Err(String::from("FilePackage contained no bytes.")),
   }
 }
+
+
+
+
+/// Fetching a webhapp from the DevHub via remote call through the portal_api
+async fn portal_remote_call<T: Serialize + core::fmt::Debug, U: Serialize + DeserializeOwned + core::fmt::Debug>(
+  app_websocket: &mut AppWebsocket,
+  lair_keystore_manager: &Box<dyn LairKeystoreManager>,
+  agent_pub_key: &AgentPubKey,
+  host: AgentPubKey,
+  portal_cell: &ProvisionedCell,
+  dna: DnaHash,
+  zome: String,
+  function: String,
+  payload: T,
+) -> Result<U, String> {
+
+  let (nonce, expires_at) = fresh_nonce(Timestamp::now())
+      .map_err(|e| format!("Failed to create fresh Nonce: {:?}", e))?;
+
+  let input = CustomRemoteCallInput {
+    host,
+    call: RemoteCallDetails {
+      dna,
+      zome,
+      function,
+      payload,
+    }
+  };
+
+  let zome_call_unsigned = ZomeCallUnsigned {
+      provenance: agent_pub_key.clone(),
+      cell_id: portal_cell.cell_id.clone(),
+      zome_name: ZomeName::from("portal_api"),
+      fn_name: FunctionName::from("custom_remote_call"),
+      payload: ExternIO::encode(input)?,
+      cap_secret: None,
+      expires_at,
+      nonce,
+  };
+
+
+  let signed_zome_call = lair_keystore_manager
+      .sign_zome_call(zome_call_unsigned)
+      .await
+      .map_err(|e| format!("Failed to sign zome call: {}", e))?;
+
+  let result = app_websocket
+      .call_zome(signed_zome_call)
+      .await
+      .map_err(|e| format!("Zome call failed: {:?}", e))?;
+
+
+  let response: DevHubResponse<DevHubResponse<U>> = result.decode()
+    .map_err(|e| format!("Error decoding the webhapp package: {}", e))?;
+
+  let inner_response = match response {
+    DevHubResponse::Success(pack) => pack.payload,
+    DevHubResponse::Failure(error) => {
+      println!("Errorpayload: {:?}", error.payload);
+      return Err(format!("Received ErrorPayload: {:?}", error.payload));
+    },
+  };
+
+  let bytes = inner_response
+      .as_result()
+      .map_err(|e| format!("Failed to get content from DevHubResponse: {}", e))?;
+
+  Ok(bytes)
+}
+
+

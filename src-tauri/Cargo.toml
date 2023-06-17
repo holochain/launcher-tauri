@@ -36,13 +36,13 @@ mr_bundle = "0.1.1-beta-rc.0"
 
 devhub_types = { git = "https://github.com/holochain/devhub-dnas", branch = "holochain-v0.1.x-support" }
 
-
 async-trait = "0.1.52"
 chrono = {version = "0.4", features = ["serde"] }
 dirs-next = "2.0.0"
 futures = "0.3"
 log = "0.4.14"
 log4rs = "1.0.0"
+mere_memory_types = "0.85.0"
 open = "2.0.1"
 opener = "0.5.0"
 portpicker = "0.1.1"
