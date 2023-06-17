@@ -58,6 +58,7 @@
       margin-left: -140px;
     "
     @click="selectFromFileSystem()"
+    @keypress.enter="selectFromFileSystem()"
   >
     <div class="row center-content">
       <mwc-icon>folder</mwc-icon>
@@ -343,7 +344,6 @@ export default defineComponent({
               devhubHappLibraryDnaHash: Array.from(releaseInfo.devhubDnaHash), // DNA hash of the DevHub to which the remote call shall be made
               appstorePubKey: encodeHashToBase64(appStoreInfo.agent_pub_key),
               happReleaseHash: encodeHashToBase64(happReleaseHash),
-              guiReleaseHash: guiReleaseHash ? encodeHashToBase64(guiReleaseHash) : undefined,
             });
 
             (this.$refs.downloading as typeof HCLoading).close();
