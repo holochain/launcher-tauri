@@ -1,22 +1,27 @@
 <template>
-  <div>
+  <div
+    :class="getAppStatus(app) === ('Disabled' || 'Offline/Paused') ? 'disabled' : undefined"
+    >
       <!-- App Logo -->
       <div
         class="icon-container"
+        :class="getAppStatus(app) === ('Disabled' || 'Offline/Paused') ? 'container-disabled': undefined"
         style="position: relative"
         tabindex="0"
-        @click="$emit('openApp', app)"
-        v-on:keyup.enter="$emit('openApp', app)"
-        :title="app.webAppInfo.installed_app_info.installed_app_id"
+        @click="handleClick()"
+        v-on:keyup.enter="handleClick()"
+        :title="`${getAppStatus(app) === 'Disabled' ? 'This app is diabled - Go to Settings to enable this app' : ''}${getAppStatus(app) === 'Offline/Paused' ? ' (OFFLINE/PAUSED)' : ''}`"
       >
         <img
           v-if="app.webAppInfo.icon_src"
           class="appIcon"
+          :class="getAppStatus(app) === 'Running' ? 'pointer': 'cursor-default'"
           :src="`${app.webAppInfo.icon_src}`"
         />
         <div
           v-else
           class="appIcon column center-content"
+          :class="getAppStatus(app) === 'Running' ? 'pointer': 'cursor-default'"
           style="background-color: #372ba5"
         >
           <div style="color: white; font-size: 45px; font-weight: 600">
@@ -27,29 +32,12 @@
       <!-- ------------- -->
 
 
-      <!-- App status indicator -->
-      <!-- <sl-tooltip
-        style="--show-delay: 500"
-        hoist
-        placement="top"
-        :content="getAppStatus(app)"
-      >
-        <div
-          :class="{
-            running: isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info),
-            stopped: isAppDisabled(app.webAppInfo.installed_app_info),
-            paused: false,
-          }"
-          class="app-status"
-          style="margin-right: 29px"
-          tabindex="0"
-        ></div>
-      </sl-tooltip> -->
-      <!-- ----------------- -->
-
-          <!-- Installed App Id -->
-    <div class="installed-app-name">
-      {{ app.webAppInfo.installed_app_info.installed_app_id }}
+    <!-- Installed App Id -->
+    <div
+      class="installed-app-name"
+      :title="`${app.webAppInfo.installed_app_info.installed_app_id}${getAppStatus(app) === 'Disabled' ? ' (DISABLED)' : ''}${getAppStatus(app) === 'Offline/Paused' ? ' (OFFLINE/PAUSED)' : ''}`"
+    >
+      {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0,20) }}{{ app.webAppInfo.installed_app_info.installed_app_id.length > 20 ? '...' : '' }}
     </div>
   </div>
 </template>
@@ -110,6 +98,11 @@ export default defineComponent({
       }
       return "Unknown State";
     },
+    handleClick() {
+      if (!isAppDisabled(this.app.webAppInfo.installed_app_info)) {
+        this.$emit('openApp', this.app)
+      }
+    }
   },
 });
 </script>
@@ -144,7 +137,14 @@ export default defineComponent({
   padding: 0;
   border-radius: 22px;
   object-fit: cover;
+}
+
+.pointer {
   cursor: pointer;
+}
+
+.cursor-default {
+  cursor: default;
 }
 
 .icon-container {
@@ -152,14 +152,17 @@ export default defineComponent({
   box-shadow: 0 0px 5px #9b9b9b;
   border-radius: 22px;
 }
-.icon-container:hover {
+.icon-container:not(.container-disabled):hover {
   box-shadow: 0 0px 12px #676767;
 }
 
-.icon-container:focus {
+.icon-container:not(.container-disabled):focus {
   box-shadow: 0 0px 12px #676767;
 }
 
+.disabled {
+  opacity: 0.3;
+}
 
 .running {
   background-color: rgb(0, 185, 0);

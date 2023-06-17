@@ -108,20 +108,12 @@ export default defineComponent({
   data(): {
     appWebsocket: AppWebsocket | undefined;
     appstoreAppInfo: AppInfo | undefined;
-    sortOptions: [string, string][];
-    sortOption: string | undefined;
     loadingText: string;
     errorText: string;
   } {
     return {
       appWebsocket: undefined,
       appstoreAppInfo: undefined,
-      sortOptions: [
-        [i18n.global.t('main.name'), "name"],
-        [i18n.global.t('main.nameDescending'), "name descending"],
-        // ["Holochain Version", "Holochain Version"],
-      ],
-      sortOption: undefined,
       loadingText: "",
       errorText: "Unknown error occured",
     };
@@ -158,26 +150,14 @@ export default defineComponent({
         && app.webAppInfo.web_uis.default.type !== "Headless"
       );
 
-      if (this.sortOption === "name") {
-        sortedAppList = sortedAppList.sort((appA, appB) =>
-          appA.webAppInfo.installed_app_info.installed_app_id.localeCompare(
-            appB.webAppInfo.installed_app_info.installed_app_id
-          )
-        );
-      } else if (this.sortOption === "name descending") {
-        sortedAppList = sortedAppList.sort((appA, appB) =>
-          appB.webAppInfo.installed_app_info.installed_app_id.localeCompare(
-            appA.webAppInfo.installed_app_info.installed_app_id
-          )
-        );
-      } else {
-        // default is alphabetical by app id
-        sortedAppList = sortedAppList.sort((appA, appB) =>
-          appA.webAppInfo.installed_app_info.installed_app_id.localeCompare(
-            appB.webAppInfo.installed_app_info.installed_app_id
-          )
-        );
-      }
+      // sort alphabetically, then disabled last
+      sortedAppList = sortedAppList.sort((appA, appB) =>
+        appA.webAppInfo.installed_app_info.installed_app_id.localeCompare(
+          appB.webAppInfo.installed_app_info.installed_app_id
+        )
+      ).sort((appA, appB) => {
+        return isAppRunning(appA.webAppInfo.installed_app_info) === isAppRunning(appB.webAppInfo.installed_app_info) ? 0 : isAppRunning(appA.webAppInfo.installed_app_info) ? -1 : 1
+      });
 
       return sortedAppList;
     },

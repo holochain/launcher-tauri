@@ -22,10 +22,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { HolochainAppInfo } from "../types";
 import "@material/mwc-icon";
 import { invoke } from "@tauri-apps/api/tauri";
+import { defineComponent } from "vue";
+
+import { HolochainAppInfo } from "../types";
 import InstalledAppsList from "../components/InstalledAppsList.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
