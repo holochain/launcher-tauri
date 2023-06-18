@@ -74,7 +74,7 @@
         src="/img/Square284x284Logo.png"
         style="height: 30px; z-index: -1px;"
       />
-    <span class="beta-indicator">Beta 0.2</span>
+    <span class="beta-indicator">Beta 0.1</span>
   </div>
 
   <HCSnackbar leading :labelText="snackbarText" ref="snackbar"></HCSnackbar>

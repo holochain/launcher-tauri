@@ -14,6 +14,7 @@
     <InstalledAppsList
       :installedApps="$store.getters[`allApps`]"
       @openApp="openApp($event)"
+      @select-view="$emit('select-view', $event)"
     />
   </div>
 
