@@ -62,7 +62,7 @@
       <div v-else style="flex: 1; display: flex">
         <div class="flex-scrollable-container">
           <div class="flex-scrollable-y">
-            <Settings :installedApps="$store.getters[`allApps`]" @show-message="showMessage($event)"></Settings>
+            <Settings :installedApps="$store.getters[`allApps`]" @show-message="showMessage($event)" @updated-ui="checkForUiUpdates"></Settings>
           </div>
         </div>
       </div>
@@ -136,75 +136,74 @@ export default defineComponent({
   },
   async created() {
     await this.$store.dispatch(ActionTypes.fetchStateInfo);
-
-    const installedApps: Array<HolochainAppInfo> = this.$store.getters[`allApps`];
-    console.log("installedApps: ", installedApps);
-
-
-    // Check for UI updates
-    const holochainId = this.$store.getters["holochainIdForDevhub"];
-    // connect to AppWebsocket
-    const port = this.$store.getters["appInterfacePort"](holochainId);
-    const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
-    const appstoreAppInfo = await appWebsocket.appInfo({
-      installed_app_id: APPSTORE_APP_ID,
-    });
-
-    const updatableApps = installedApps.filter((app) => app.webAppInfo.happ_release_info?.resource_locator);
-
-    // sort all happ release ResourceLocators by DnaHash of the DevHub they originate from
-    const updatableAppsByLocatorDna: Record<DnaHashB64, HolochainAppInfo[]> = {};
-
-    updatableApps.forEach((app) => {
-      const dnaHash = app.webAppInfo.happ_release_info!.resource_locator!.dna_hash;
-      const apps = updatableAppsByLocatorDna[dnaHash];
-
-      if (apps) {
-        updatableAppsByLocatorDna[dnaHash] = [...apps, app]
-      } else {
-        updatableAppsByLocatorDna[dnaHash] = [app!]
-      }
-    });
-
-    console.log("updatableAppsByLocatorDna: ", updatableAppsByLocatorDna);
-
-    this.updatesAvailable = false;
-
-    await Promise.allSettled(Object.values(updatableAppsByLocatorDna).map(async (apps) => {
-      const entryHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator!.resource_hash));
-      const devHubDnaHash = decodeHashFromBase64(apps[0].webAppInfo.happ_release_info!.resource_locator!.dna_hash);
-
-      try {
-        console.log("@Home.vue @created: entryHashes: ", entryHashes.map((eh) => encodeHashToBase64(eh)));
-        const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByEntryHashes((appWebsocket as AppWebsocket), appstoreAppInfo, devHubDnaHash, entryHashes);
-
-        apps.forEach((app, idx) => {
-          if (happReleases[idx]) {
-            console.log("official_gui: ", happReleases[idx]!.official_gui ? encodeHashToBase64(happReleases[idx]!.official_gui!) : undefined)
-          }
-
-          // if it's installed as a webapp and the happ release has an official GUI, check whether it's a new GUI
-          if (app.webAppInfo.web_uis.default.type === "WebApp" && happReleases[idx]?.official_gui) {
-            const guiReleaseInfo = app.webAppInfo.web_uis.default.gui_release_info;
-            const guiReleaseHash = app.webAppInfo.web_uis.default.gui_release_info?.resource_locator!.resource_hash;
-            console.log("guiReleaseHash: ", guiReleaseHash);
-            if (guiReleaseInfo && guiReleaseHash) {
-              if(guiReleaseHash != encodeHashToBase64(happReleases[idx]!.official_gui!)) {
-                this.updatesAvailable = true;
-              }
-            }
-          }
-        })
-
-      } catch (e) {
-        console.error(`Failed to get happ releases from DevHub host of network with DNA hash ${encodeHashToBase64(devHubDnaHash)}: ${JSON.stringify(e)}`);
-      }
-
-    }))
+    await this.checkForUiUpdates();
   },
   methods: {
-    isLoading() {
-      return this.$store.state.launcherStateInfo === "loading";
+    async checkForUiUpdates() {
+
+      const installedApps: Array<HolochainAppInfo> = this.$store.getters[`allApps`];
+      console.log("installedApps: ", installedApps);
+
+      // Check for UI updates
+      const holochainId = this.$store.getters["holochainIdForDevhub"];
+      // connect to AppWebsocket
+      const port = this.$store.getters["appInterfacePort"](holochainId);
+      const appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      const appstoreAppInfo = await appWebsocket.appInfo({
+        installed_app_id: APPSTORE_APP_ID,
+      });
+
+      const updatableApps = installedApps.filter((app) => app.webAppInfo.happ_release_info?.resource_locator);
+
+      // sort all happ release ResourceLocators by DnaHash of the DevHub they originate from
+      const updatableAppsByLocatorDna: Record<DnaHashB64, HolochainAppInfo[]> = {};
+
+      updatableApps.forEach((app) => {
+        const dnaHash = app.webAppInfo.happ_release_info!.resource_locator!.dna_hash;
+        const apps = updatableAppsByLocatorDna[dnaHash];
+
+        if (apps) {
+          updatableAppsByLocatorDna[dnaHash] = [...apps, app]
+        } else {
+          updatableAppsByLocatorDna[dnaHash] = [app!]
+        }
+      });
+
+      let updatesAvailable = false;
+
+      await Promise.allSettled(Object.values(updatableAppsByLocatorDna).map(async (apps) => {
+        const entryHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator!.resource_hash));
+        const devHubDnaHash = decodeHashFromBase64(apps[0].webAppInfo.happ_release_info!.resource_locator!.dna_hash);
+
+        try {
+          console.log("@Home.vue @created: entryHashes: ", entryHashes.map((eh) => encodeHashToBase64(eh)));
+          const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByEntryHashes((appWebsocket as AppWebsocket), appstoreAppInfo, devHubDnaHash, entryHashes);
+
+          apps.forEach((app, idx) => {
+            if (happReleases[idx]) {
+              console.log("official_gui: ", happReleases[idx]!.official_gui ? encodeHashToBase64(happReleases[idx]!.official_gui!) : undefined)
+            }
+
+            // if it's installed as a webapp and the happ release has an official GUI, check whether it's a new GUI
+            if (app.webAppInfo.web_uis.default.type === "WebApp" && happReleases[idx]?.official_gui) {
+              const guiReleaseInfo = app.webAppInfo.web_uis.default.gui_release_info;
+              const guiReleaseHash = app.webAppInfo.web_uis.default.gui_release_info?.resource_locator!.resource_hash;
+              console.log("guiReleaseHash: ", guiReleaseHash);
+              if (guiReleaseInfo && guiReleaseHash) {
+                if(guiReleaseHash != encodeHashToBase64(happReleases[idx]!.official_gui!)) {
+                  updatesAvailable = true;
+                }
+              }
+            }
+          })
+
+        } catch (e) {
+          console.error(`Failed to get happ releases from DevHub host of network with DNA hash ${encodeHashToBase64(devHubDnaHash)}: ${JSON.stringify(e)}`);
+        }
+
+      }));
+
+      this.updatesAvailable = updatesAvailable;
     },
     async reportIssue() {
       await invoke("open_url_cmd", {
