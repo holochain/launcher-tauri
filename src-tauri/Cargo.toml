@@ -46,6 +46,7 @@ mere_memory_types = "0.85.0"
 open = "2.0.1"
 opener = "0.5.0"
 portpicker = "0.1.1"
+rayon = "1.7.0"
 rmpv = { version = "1.0.0", features = ["with-serde"] }
 serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"

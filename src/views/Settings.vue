@@ -959,7 +959,7 @@ export default defineComponent({
       this.loadingText = "Connecting with DevHub";
       (this.$refs.downloading as typeof HCLoading).open();
 
-      this.loadingText = "fetching UI from peer host...";
+      this.loadingText = "fetching UI from peer host and installing...";
 
       try {
         const holochainId = this.$store.getters["holochainIdForDevhub"];
@@ -969,24 +969,19 @@ export default defineComponent({
 
         if (appstoreAppInfo) {
 
+          console.log("@updateGui: ", encodeHashToBase64(this.selectedGuiUpdateLocator!.dna_hash));
+
           await tryWithHosts<void>(
             async (host) => {
 
-              const bytes = await invoke("fetch_gui", {
+              await invoke("fetch_and_update_default_gui", {
                 appPort: port,
                 appstoreAppId: appstoreAppInfo!.installed_app_id,
                 host: Array.from(host),
                 devhubHappLibraryDnaHash: Array.from(this.selectedGuiUpdateLocator!.dna_hash), // DNA hash of the DevHub to which the remote call shall be made
                 appstorePubKey: encodeHashToBase64(appstoreAppInfo!.agent_pub_key),
-                guiReleaseHash: this.selectedGuiUpdate ? encodeHashToBase64(this.selectedGuiUpdate.web_asset_id) : undefined,
-              });
-
-              this.loadingText = "Installing...";
-
-              await invoke("update_default_ui", {
                 holochainId: this.selectedApp!.holochainId,
                 appId: this.selectedApp!.webAppInfo.installed_app_info.installed_app_id,
-                uiZipBytes: bytes,
                 guiReleaseInfo: {
                   resource_locator: locatorToLocatorB64(this.selectedApp!.guiUpdateAvailable!),
                   version: this.selectedGuiUpdate?.version,
@@ -1002,15 +997,12 @@ export default defineComponent({
               // to remove the update button:
               await this.refreshAppStates();
               this.checkForUiUpdates();
-
-
-
             },
             this.appWebsocket as AppWebsocket,
             appstoreAppInfo!,
             this.selectedGuiUpdateLocator!.dna_hash,
             "happ_library",
-            "get_webasset",
+            "get_webasset_file",
           );
 
         } else {

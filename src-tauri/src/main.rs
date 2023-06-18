@@ -53,7 +53,7 @@ use crate::commands::{
   uninstall_app::uninstall_app,
   sign_zome_call::sign_zome_call,
   storage::get_storage_info,
-  update_default_ui::update_default_ui,
+  update_default_ui::{fetch_and_update_default_gui, update_default_ui},
 };
 use crate::launcher::manager::LauncherManager;
 use crate::launcher::state::LauncherState;
@@ -86,6 +86,7 @@ fn main() {
       enable_app,
       execute_factory_reset,
       fetch_and_save_app,
+      fetch_and_update_default_gui,
       fetch_gui,
       get_app_info,
       get_default_bootstrap,

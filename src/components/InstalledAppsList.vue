@@ -35,6 +35,7 @@
         class="button-large"
         style="margin-left: 20px;"
         @click="installFromFs()"
+        @keypress.enter="installFromFs()"
       >
         <div class="row center-content">
           <mwc-icon style="font-size: 33px;;">folder</mwc-icon>
