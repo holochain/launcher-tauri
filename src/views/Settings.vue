@@ -159,7 +159,7 @@
             >
               <ToggleSwitch
                 style="margin-right: 29px"
-                :sliderOn="!!devHubAppInfo && isAppRunning(devHubAppInfo?.webAppInfo.installed_app_info)"
+                :sliderOn="devHubAppInfo ? isAppRunning(devHubAppInfo.webAppInfo.installed_app_info) : false"
                 @click.stop.prevent="toggleDevMode()"
                 @keydown.enter="toggleDevMode()"
               />
@@ -527,7 +527,7 @@ export default defineComponent({
   },
   computed: {
     devModeOn() {
-      return !!this.devHubAppInfo && (isAppRunning(this.devHubAppInfo.webAppInfo.installed_app_info) || isAppPaused(this.devHubAppInfo.webAppInfo.installed_app_info))
+      return this.devHubAppInfo ? (isAppRunning(this.devHubAppInfo.webAppInfo.installed_app_info) || isAppPaused(this.devHubAppInfo.webAppInfo.installed_app_info)) : false
     },
     sortedApps() {
       // if extended happ releases are not yet fetched from the DevHub to include potential
@@ -634,7 +634,8 @@ export default defineComponent({
         this.installedApps.map(async (app) => {
           // Check if DevHub is installed and if so store info about it locally
           if (app.webAppInfo.installed_app_info.installed_app_id === DEVHUB_APP_ID) {
-            this.devHubAppInfo = app
+            this.devHubAppInfo = app;
+            this.showAdvancedSettings = true;
           }
 
           // Store app store for later use
