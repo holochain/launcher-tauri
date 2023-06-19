@@ -61,9 +61,8 @@ pub async fn install_app(
         )
         .await?;
     }
-    Err(e) => {
-      println!("FAILED TO DECODE WEBAPPBUNDLE: {}", e);
-      let app_bundle = AppBundle::decode(&bytes).or(Err("Failed to read Web hApp bundle file"))?;
+    Err(_e) => {
+      let app_bundle = AppBundle::decode(&bytes).or(Err("Failed to decode Web hApp or hApp bundle file"))?;
       manager
         .get_or_launch_holochain(
           holochain_id,
