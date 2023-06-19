@@ -8,8 +8,8 @@ use holochain_web_app_manager::{WebAppManager, ReleaseInfo};
 // Versions of Appstore and Devhub (commit hash of Github release of the UI or shasum of the .webhapp file).
 // Those are used to install new Appstore/DevHub UI's if necessary
 // NEW_VERSION Change appstore and devhub versions here if required
-const APPSTORE_VERSION: &str = "2f48b5753c12b8bc02b490035e2bdafc74f0fe07";
-const DEVHUB_VERSION: &str = "0ddd115221be91f06964a58a9848e605e70340df";
+const APPSTORE_VERSION: &str = "5265a828ae96915786a3f9b22a37aa64a0e1d7a3"; // shasum
+const DEVHUB_VERSION: &str = "c81126389eff0ad6b28357df28633bb34b8f6a94"; // shasum
 
 const APPSTORE_APP_ID: &str = "AppStore";
 const DEVHUB_APP_ID: &str = "DevHub";
