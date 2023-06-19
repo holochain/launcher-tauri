@@ -56,6 +56,7 @@ If you used the scaffolding tool to create your hApp, packaging it for the launc
 5. Package your Web-hApp with `hc web-app pack`, and publish it so that other users can download and install it or simply share it with your friends.
 
 
+
 ### Publishing and Updating an App in the App Store
 
 In order for your app to appear in the App Store within the Holochain Launcher, you need to follow a two-step process:
@@ -138,6 +139,7 @@ The Holochain Launcher stores data in different places on the file system, depen
   - Linux: `$XDG_DATA_HOME/holochain-launcher-0.1/profiles/${profile}/logs` or `$HOME/.local/share/holochain-launcher-0.1/profiles/${profile}/logs`
 
 To reset the launcher, you can execute a factory reset in the `Holochain Admin` window via `Settings` > `Factory Reset`.
+
 
 ## Developer Setup
 
