@@ -132,7 +132,7 @@
       <!-- Open App Icon Button -->
       <div
         v-if="
-          (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) && !isAppHeadless(app)
+          (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) && !isAppHeadless(app) && !hideOpenButton
         "
         style="display: flex"
       >
@@ -424,6 +424,9 @@ export default defineComponent({
       type: Object as PropType<HolochainAppInfoExtended>,
       required: true,
     },
+    hideOpenButton: {
+      type: Boolean,
+    }
   },
   data(): {
     confirmUninstallDevHub: boolean;

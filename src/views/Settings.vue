@@ -288,6 +288,7 @@
             <AppSettingsCard
               v-if="app.webAppInfo.web_uis.default.type !== 'Headless'"
               :app="app"
+              :hideOpenButton="openHidden(app)"
               @openApp="openApp($event)"
               @uninstallApp="uninstallApp($event)"
               @disableApp="disableApp($event)"
@@ -420,7 +421,7 @@ import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
 
-import { getHappReleasesByEntryHashes, fetchGui, appstoreCells, fetchGuiReleaseEntry, tryWithHosts } from "../appstore/appstore-interface";
+import { getHappReleasesByEntryHashes, appstoreCells, fetchGuiReleaseEntry, tryWithHosts } from "../appstore/appstore-interface";
 import { GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
 import AppSettingsCard from "../components/AppSettingsCard.vue";
@@ -610,6 +611,9 @@ export default defineComponent({
     },
     openConfig() {
       (this.$refs.configDialog as typeof Config).open()
+    },
+    openHidden(app: HolochainAppInfoExtended) {
+      return (app.webAppInfo.installed_app_info.installed_app_id === APPSTORE_APP_ID) && !this.devModeOn
     },
     closePublishAppDialog() {
       (this.$refs["publishAppDialog"] as typeof HCDialog).close();
