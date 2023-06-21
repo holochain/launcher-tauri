@@ -30,7 +30,7 @@ impl Default for LauncherConfig {
       profile: String::from("default"),
       bootstrap_server_url: Some(bootstrap_service().to_string()),
       proxy_server_url: Some(proxy_url().to_string()),
-      mdns: false,
+      mdns: true,
     }
   }
 }
@@ -46,7 +46,7 @@ impl LauncherConfig {
       profile: profile,
       bootstrap_server_url: Some(bootstrap_service().to_string()),
       proxy_server_url: Some(proxy_url().to_string()),
-      mdns: false,
+      mdns: true,
     }
   }
 
