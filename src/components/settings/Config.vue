@@ -137,7 +137,7 @@ export default defineComponent({
   methods: {
     async open() {
       const dialog = this.$refs.dialog as typeof HCGenericDialog;
-      this.restoreDefaults();
+      this.restoreCurrent();
       dialog.open();
     },
     async saveConfig() {
@@ -172,7 +172,7 @@ export default defineComponent({
     /**
      * Restoring to the values as they are currently stored in the launcher-config.yaml
      */
-    restoreCurrent() {
+     restoreCurrent() {
       const currentConfig = (this.$store.state.launcherStateInfo as any).config;
 
       this.newConfig = currentConfig;
