@@ -6,7 +6,7 @@ use holochain_conductor_api_0_1_5::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_1_5::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams, NetworkType};
+use holochain_p2p_0_1_5::kitsune_p2p::{KitsuneP2pConfig, ProxyConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
 
 use super::{version_manager::VersionManager, HdkVersion, HdiVersion, common::{bootstrap_service, proxy_url}};
 
@@ -55,9 +55,6 @@ impl VersionManager for HolochainV0_1_5 {
         }
       },
     });
-
-    // for Dweb, make mdns default
-    network_config.network_type = NetworkType::QuicMdns;
 
     let config = ConductorConfig {
       environment_path: conductor_environment_path.into(),
