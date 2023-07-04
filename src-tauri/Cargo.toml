@@ -7,7 +7,7 @@ edition = "2021"
 license = ""
 name = "holochain-launcher"
 repository = ""
-version = "0.10.970"
+version = "0.10.971"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -18,7 +18,7 @@ tauri-build = { version = "1.4.0", features = [] }
 [dependencies]
 
 # NEW_VERSION update holochain client version if requireds
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "holochain-0.3.0-beta-dev.4" }
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "holochain-0.3.0-beta-dev.7" }
 
 holochain_manager = { path = "../crates/holochain_manager" }
 holochain_launcher_utils = { path = "../crates/holochain_launcher_utils" }
@@ -26,11 +26,11 @@ holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
 lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 
 # NEW_VERSION update holochain dependencies
-holochain_types = "0.3.0-beta-dev.3"
-holochain_state = "0.3.0-beta-dev.3"
-hdk = "0.3.0-beta-dev.4"
+holochain_types = "0.3.0-beta-dev.6"
+holochain_state = "0.3.0-beta-dev.6"
+hdk = "0.3.0-beta-dev.6"
 
-holochain = { version = "0.3.0-beta-dev.4", features = ["sqlite-encrypted"] }
+holochain = { version = "0.3.0-beta-dev.7", features = ["sqlite-encrypted"] }
 
 mr_bundle = "0.2.0"
 

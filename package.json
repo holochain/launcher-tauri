@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.10.970",
+  "version": "0.10.971",
   "private": true,
   "scripts": {
     "dev": "vite",
