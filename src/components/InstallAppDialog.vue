@@ -1,5 +1,5 @@
 <template>
-  <HCDialog ref="dialog" @closing="$emit('closing-dialog')" :prohibit-escape="showNetworkSeedInfo">
+  <HCDialog ref="dialog" @closing="$emit('closing-dialog')" :prohibit-escape="showNetworkSeedInfo" @keypress.enter="installApp">
     <div
       v-if="isLoadingFile"
       class="column"
