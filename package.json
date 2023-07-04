@@ -26,7 +26,7 @@
     "@material/mwc-textfield": "^0.25.1",
     "@shoelace-style/shoelace": "^2.0.0-beta.86",
     "@msgpack/msgpack": "^2.7.1",
-    "@tauri-apps/api": "^1.2.0",
+    "@tauri-apps/api": "^1.4.0",
     "@webcomponents/scoped-custom-element-registry": "^0.0.5",
     "array-flat-polyfill": "^1.0.1",
     "blob-polyfill": "^5.0.20210201",
@@ -40,7 +40,7 @@
     "pretty-bytes": "^6.0.0"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "1.2.2",
+    "@tauri-apps/cli": "1.4.0",
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.7.10",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
@@ -58,8 +58,5 @@
     "typescript": "^4.6.4",
     "vite": "^4.3.5",
     "vue-tsc": "^1.0.11"
-  },
-  "resolutions": {
-    "@tauri-apps/cli": "1.0.0-rc.7"
   }
 }
