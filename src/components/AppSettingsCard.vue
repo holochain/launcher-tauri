@@ -208,6 +208,27 @@
         > -->
       </div>
 
+      <div class="row" style="margin-top: -10px;">
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >{{ $t('main.happVersion') }}:</span
+        >
+        <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
+          app.webAppInfo.happ_release_info?.version ? app.webAppInfo.happ_release_info.version : $t('main.unknown')
+        }}</span>
+      </div>
+
+      <div class="row" style="margin-top: -15px;">
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >{{ $t('main.uiVersion') }}:</span
+        >
+        <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
+          ((app.webAppInfo.web_uis.default?.type === "WebApp")
+            && app.webAppInfo.web_uis.default?.gui_release_info?.version)
+            ? app.webAppInfo.web_uis.default.gui_release_info.version
+            : $t('main.unknown')
+        }}</span>
+      </div>
+
       <!-- Public Key -->
       <div class="row" style="align-items: center;">
         <!-- assumes same agent pub key for all cells (just taking the first one) -->
