@@ -36,6 +36,7 @@ import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 export default defineComponent({
   name: "Launcher",
   components: { InstalledAppsList, HCButton, HCSnackbar, HCDialog, ToggleSwitch, LoadingDots },
+  emits: ['show-message', 'select-view'],
   data(): {
     snackbarText: string | undefined;
   } {

@@ -8,6 +8,7 @@
       :title="$t('appStore.selectAppFromFileSystem')"
       @click="selectFromFileSystem()"
       @keypress.enter="selectFromFileSystem()"
+      tabindex="0"
     >
       <img src="img/folder_open.svg" style="height: 195px;">
 
@@ -27,6 +28,7 @@
       :title="$t('appStore.selectAppFromFileSystem')"
       @click="selectFromFileSystem()"
       @keypress.enter="selectFromFileSystem()"
+      tabindex="0"
     >
       <img src="img/folder_open.svg" style="height: 195px;">
 
@@ -43,6 +45,7 @@
       :title="$t('appStore.selectAppFromFileSystem')"
       @click="selectFromFileSystem()"
       @keypress.enter="selectFromFileSystem()"
+      tabindex="0"
     >
       <img src="img/folder_open.svg" style="height: 195px;">
 
@@ -58,7 +61,7 @@
   </div>
 
   <!-- AppStore synchronization spinner -->
-  <div v-show="showLoadingSpinner" class="progress-indicator">
+  <!-- <div v-show="showLoadingSpinner" class="progress-indicator">
     <div style="padding: 0 15px;">
       <div
         style="margin-bottom: 5px; font-weight: 600; font-size: 18px;"
@@ -66,12 +69,12 @@
       >
         {{ $t('appStore.receivingData') }}...
       </div>
-      <div style="text-align: right; margin-bottom: 10px;" :title="$t('appStore.amountOfData')">
+      <div style="text-align: right; margin-bottom: 10px;">
         <b>{{ prettyBytesLocal(queuedBytes) }}</b> {{ $t('appStore.inQueue') }}
       </div>
     </div>
     <span :class="queuedBytes ? 'loader' : 'inactive-loader'" style="position: absolute; bottom: 0;"></span>
-  </div>
+  </div> -->
 
 
   <!-- refresh button -->
@@ -87,8 +90,8 @@
       font-size: 18px;
       margin-left: -140px;
     "
-    @click="fetchApps()"
-    @keypress.enter="fetchApps()"
+    @click="fetchApps(false)"
+    @keypress.enter="fetchApps(false)"
   >
     <div class="row center-content">
       <mwc-icon>refresh</mwc-icon>
@@ -179,6 +182,7 @@ export default defineComponent({
     LoadingDots,
     SelectReleaseDialog,
   },
+  emits: ["show-message", "select-view"],
   data(): {
     appWebsocket: AppWebsocket | undefined;
     loadingText: string;
@@ -239,15 +243,18 @@ export default defineComponent({
     }
 
     try {
-      await this.fetchApps();
+      await this.fetchApps(false);
     } catch (e) {
       console.error(`Failed to fetch apps in mounted() hook: ${e}`);
     }
 
-    await this.getQueuedBytes();
+    // await this.getQueuedBytes();
     this.pollInterval = window.setInterval(
-      async () => await this.getQueuedBytes(),
-      2000
+      async () => {
+        // await this.getQueuedBytes();
+        await this.fetchApps(true);
+      },
+      3000
     );
   },
   methods: {
@@ -261,9 +268,9 @@ export default defineComponent({
       this.appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       // console.log("connected to AppWebsocket.");
     },
-    async fetchApps() {
+    async fetchApps(silent: boolean) {
 
-      this.loading = true;
+      this.loading = silent ? false : true;
 
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();

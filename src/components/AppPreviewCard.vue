@@ -1,5 +1,11 @@
 <template>
-  <div class="column card" @click="$emit('installApp', { imgSrc })" title="Click to see details and install">
+  <div
+    class="column card"
+    @click="$emit('installApp', { imgSrc })"
+    @keypress.enter="$emit('installApp', { imgSrc })"
+    title="Click to see details and install"
+    tabindex="0"
+  >
 
     <div class="column" style="flex: 1">
       <div class="row" style="align-items: center">
