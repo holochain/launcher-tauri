@@ -135,10 +135,4 @@ export default defineComponent({
   box-shadow: 0 0px 5px #9b9b9b;
 }
 
-/* .install-btn {
-
-} */
-.install-btn:hover {
-  background-color: #674df9;
-}
 </style>

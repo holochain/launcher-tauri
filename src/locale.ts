@@ -74,7 +74,7 @@ const messages = {
       fullSynchronizationRequired: "Full synchronization with peers required to reliably download all apps.",
       inQueue: "in queue",
       noOngoingPeerSynchronization: "no ongoing peer synchronization",
-      selectAppFromFileSystem: "Select app from Filesystem",
+      selectAppFromFileSystem: "Select app from filesystem",
       noAppsInStore:
         "There are no apps available yet in the App Library or Synchronization with Peers is not complete.",
       receivingData: "Receiving new data",

@@ -21,6 +21,15 @@
 
   <div v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px); margin-bottom: 200px; align-content: flex-start;">
     <div
+      class="install-fs-card column"
+      style="margin-right: 16px; margin-bottom: 16px; align-items: center; justify-content: center; color: #3f436c;"
+      :title="$t('appStore.selectAppFromFileSystem')"
+      @click="selectFromFileSystem()"
+      @keypress.enter="selectFromFileSystem()"
+    >
+      <mwc-icon style=" font-size: 195px;">folder</mwc-icon>
+    </div>
+    <div
       v-for="(app, i) of installableApps"
       :key="i"
       class="column"
@@ -46,24 +55,27 @@
     <span :class="queuedBytes ? 'loader' : 'inactive-loader'" style="position: absolute; bottom: 0;"></span>
   </div>
 
-  <!-- Select from filesystem button -->
-   <HCButton
+
+  <!-- refresh button -->
+
+  <HCButton
     style="
-      height: 40px;
-      border-radius: 8px;
+      height: 60px;
+      border-radius: 20px;
       padding: 0 20px;
       position:fixed;
       bottom: 20px;
-      left: 50%;
+      right: 20px;
+      font-size: 18px;
       margin-left: -140px;
     "
-    @click="selectFromFileSystem()"
-    @keypress.enter="selectFromFileSystem()"
+    @click="fetchApps()"
+    @keypress.enter="fetchApps()"
   >
     <div class="row center-content">
-      <mwc-icon>folder</mwc-icon>
-      <span style="margin-left: 5px">{{
-        $t("appStore.selectAppFromFileSystem")
+      <mwc-icon>refresh</mwc-icon>
+      <span style="margin-left: 8px">{{
+        $t("main.refresh")
       }}</span>
     </div>
   </HCButton>
@@ -457,6 +469,21 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
+.install-fs-card {
+  width: 370px;
+  height: 220px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 0px 5px #9b9b9b;
+  cursor: pointer;
+}
+
+.install-fs-card:hover {
+  background: #f4f4fc;
+  box-shadow: 0 0px 5px #9b9b9b;
+}
+
 .top-bar {
   align-items: center;
   height: 64px;
@@ -467,7 +494,7 @@ export default defineComponent({
 .progress-indicator {
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  left: 20px;
   padding: 10px 0 0 0;
   background-color: white;
   box-shadow: 0 0px 5px #9b9b9b;
