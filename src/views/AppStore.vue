@@ -1,22 +1,39 @@
 <template>
   <HCLoading ref="downloading" :text="loadingText" />
 
-  <div v-if="loading" class="column center-content" style="flex: 1; min-height: calc(100vh - 64px);">
-    <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
+  <div v-if="loading" style="flex: 1; min-height: calc(100vh - 64px); margin: 16px;">
+    <div
+      class="install-fs-card column"
+      style="margin-right: 16px; margin-bottom: 16px; align-items: center; justify-content: center; color: #3f436c;"
+      :title="$t('appStore.selectAppFromFileSystem')"
+      @click="selectFromFileSystem()"
+      @keypress.enter="selectFromFileSystem()"
+    >
+      <img src="img/folder_open.svg" style="height: 195px;">
+
+    </div>
+    <div class="column center-content" style="margin-top: 130px;">
+      <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
+    </div>
   </div>
 
   <div
     v-else-if="installableApps.length === 0"
-    class="column center-content"
-    style="flex: 1; min-height: calc(100vh - 64px);"
+    style="flex: 1; min-height: calc(100vh - 64px); margin: 16px;"
   >
-    <span>{{ $t("appStore.noAppsInStore") }}</span>
-    <HCButton
-      outlined
-      @click="fetchApps()"
-      class="refresh-button"
-      >{{ $t("main.refresh") }}
-    </HCButton>
+    <div
+      class="install-fs-card column"
+      style="margin-right: 16px; margin-bottom: 16px; align-items: center; justify-content: center; color: #3f436c;"
+      :title="$t('appStore.selectAppFromFileSystem')"
+      @click="selectFromFileSystem()"
+      @keypress.enter="selectFromFileSystem()"
+    >
+      <img src="img/folder_open.svg" style="height: 195px;">
+
+    </div>
+    <div class="column center-content" style="margin-top: 130px;">
+      <span style="max-width: 600px; text-align: center;">{{ $t("appStore.noAppsInStore") }}</span>
+    </div>
   </div>
 
   <div v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px); margin-bottom: 200px; align-content: flex-start;">
