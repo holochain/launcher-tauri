@@ -27,7 +27,8 @@
       @click="selectFromFileSystem()"
       @keypress.enter="selectFromFileSystem()"
     >
-      <mwc-icon style=" font-size: 195px;">folder</mwc-icon>
+      <img src="img/folder_open.svg" style="height: 195px;">
+
     </div>
     <div
       v-for="(app, i) of installableApps"
@@ -473,14 +474,14 @@ export default defineComponent({
 .install-fs-card {
   width: 370px;
   height: 220px;
-  background: white;
+  background: linear-gradient(228.21deg, #BB2FD8 0%, #2F87D8 94.99%);
   border-radius: 15px;
   box-shadow: 0 0px 5px #9b9b9b;
   cursor: pointer;
 }
 
 .install-fs-card:hover {
-  background: #f4f4fc;
+  background: #624be1;
   box-shadow: 0 0px 5px #9b9b9b;
 }
 
