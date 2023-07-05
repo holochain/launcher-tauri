@@ -55,7 +55,7 @@ impl Into<String> for HdiVersion {
 pub enum HolochainVersion {
   #[serde(rename = "Custom Binary")]
   CustomBinary,
-  #[serde(rename = "0.3.0-beta-dev.7")]
+  #[serde(rename = "0.3.0-beta-dev.8")]
   V0_3_0,
   // Note that the foldername of the conductor database is currently only defined by the
   // minor version, i.e. 0.2
