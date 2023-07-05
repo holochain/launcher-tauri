@@ -34,7 +34,7 @@ holochain = { version = "0.3.0-beta-dev.8", features = ["sqlite-encrypted"] }
 
 mr_bundle = "0.2.0"
 
-devhub_types = { git = "https://github.com/matthme/devhub-dnas", branch = "0.3.0-beta-dev.4" }
+devhub_types = { git = "https://github.com/matthme/devhub-dnas", branch = "0.3.0-beta-dev.8" }
 
 
 async-trait = "0.1.52"
