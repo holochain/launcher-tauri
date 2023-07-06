@@ -190,7 +190,7 @@ const messages = {
       confirmUninstallApp: "Are you sure you want to uninstall this App? This will irrevocably delete all data stored in it.",
       confirmUninstallDevHub: {
         text: "Uninstalling the DevHub means that you permanently lose editor access to any apps that you have published with this instance of the DevHub (i.e. with the associated public key). This means that you won't be able to publish any further releases or updates to those apps - even if you later reinstall the DevHub.",
-        confirmation: "I read the warning and confirm that I want to uninstall the DevHub."
+        confirmation: "I have read the warning and confirm that I want to uninstall the DevHub."
       },
       confirmUninstallCell: "Are you sure you want to delete this cell? This will irrevocably delete all data stored in it.",
       networkStats: {

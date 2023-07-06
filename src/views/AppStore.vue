@@ -10,7 +10,7 @@
       @keypress.enter="selectFromFileSystem()"
       tabindex="0"
     >
-      <img src="img/folder_open.svg" style="height: 195px;">
+      <img src="/img/folder_open.svg" style="height: 195px;">
 
     </div>
     <div class="column center-content" style="margin-top: 130px;">
@@ -30,7 +30,7 @@
       @keypress.enter="selectFromFileSystem()"
       tabindex="0"
     >
-      <img src="img/folder_open.svg" style="height: 195px;">
+      <img src="/img/folder_open.svg" style="height: 195px;">
 
     </div>
     <div class="column center-content" style="margin-top: 130px;">
@@ -47,7 +47,7 @@
       @keypress.enter="selectFromFileSystem()"
       tabindex="0"
     >
-      <img src="img/folder_open.svg" style="height: 195px;">
+      <img src="/img/folder_open.svg" style="height: 195px;">
 
     </div>
     <div
