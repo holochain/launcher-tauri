@@ -23,7 +23,7 @@
   </div>
 
   <div v-if="loading" style="flex: 1; min-height: calc(100vh - 64px); margin: 16px;">
-    <div class="column center-content" style="margin-top: 130px;">
+    <div class="column center-content" style="margin-top: 300px;">
       <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
     </div>
   </div>
@@ -32,7 +32,7 @@
     v-else-if="installableApps.length === 0"
     style="flex: 1; min-height: calc(100vh - 64px); margin: 16px;"
   >
-    <div class="column center-content" style="margin-top: 130px;">
+    <div class="column center-content" style="margin-top: 300px;">
       <span style="max-width: 600px; text-align: center;">{{ $t("appStore.noAppsInStore") }}</span>
     </div>
   </div>
@@ -553,7 +553,7 @@ export default defineComponent({
 
 <style>
 mark {
-    background: #84f1ff;
-    color: black;
+  background: linear-gradient(228.21deg, #bc2fd870 0%, #2f86d872 94.99%);
+  color: black;
 }
 </style>
