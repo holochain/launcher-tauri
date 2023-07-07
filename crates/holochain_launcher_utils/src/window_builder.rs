@@ -77,6 +77,41 @@ pub fn happ_window_builder<'a>(
   });
   "#;
 
+  let zoom_on_scroll = r#"
+    // Adding event listeners to adjust zoom level on Ctrl + scroll
+    function increaseZoomLevel(amount) {
+      const percentageString = document.body.style.zoom;
+      let num = percentageString === "" ? 100 : parseInt(percentageString.slice(0, percentageString.length-1));
+      let newVal = num + Math.round(amount) < 500 ? num + Math.round(amount) : 500;
+      document.body.style.zoom = `${newVal}%`
+    }
+
+    function decreaseZoomLevel(amount) {
+      const percentageString = document.body.style.zoom;
+      let num = percentageString === "" ? 100 : parseInt(percentageString.slice(0, percentageString.length-1));
+      let newVal = num - Math.round(amount) > 30 ? num - Math.round(amount) : 30;
+      document.body.style.zoom = `${newVal}%`
+    }
+
+    window.onkeydown = (ev) => {
+      if (ev.key === "Control") {
+        window.onwheel = (ev) => {
+          if (ev.deltaY > 0) {
+            decreaseZoomLevel(10);
+          } else if (ev.deltaY < 0) {
+            increaseZoomLevel(10);
+          }
+        }
+      }
+    };
+
+    window.onkeyup = (ev) => {
+      if (ev.key === "Control") {
+        window.onwheel = null;
+      }
+    }
+  "#;
+
   let message_404 = r#"
   <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
     <h1>404 Not Found.</h1>
@@ -178,6 +213,7 @@ pub fn happ_window_builder<'a>(
     .data_directory(local_storage_path)
     .initialization_script(launcher_env_command.as_str())
     .initialization_script(anchor_event_listener)
+    .initialization_script(zoom_on_scroll)
     .title(window_title)
 
 }
