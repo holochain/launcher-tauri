@@ -1,18 +1,28 @@
 <template>
   <HCLoading ref="downloading" :text="loadingText" />
 
-  <div v-if="loading" style="flex: 1; min-height: calc(100vh - 64px); margin: 16px;">
-    <div
-      class="install-fs-card column"
-      style="margin-right: 16px; margin-bottom: 16px; align-items: center; justify-content: center; color: #3f436c;"
-      :title="$t('appStore.selectAppFromFileSystem')"
+  <div class="row search-bar">
+     <mwc-icon style="font-size: 38px; margin-left: 16px;">search</mwc-icon>
+    <HCTextField
+      ref="search-field"
+      style="height: 45px; margin-left: 5px;"
+      placeholder="Search..."
+      @input="highlightSearchString"
+     ></HCTextField>
+     <span style="display: flex; flex: 1;"></span>
+    <HCButton
+      style="border-radius: 10px; height: 40px; margin-right: 7px;"
       @click="selectFromFileSystem()"
       @keypress.enter="selectFromFileSystem()"
-      tabindex="0"
     >
-      <img src="/img/folder_open.svg" style="height: 195px;">
+      <div class="row" style="margin: -12px;">
+        <mwc-icon>folder</mwc-icon>
+        <span style="margin-left: 10px;">{{ $t('appStore.selectAppFromFileSystem') }}</span>
+      </div>
+    </HCButton>
+  </div>
 
-    </div>
+  <div v-if="loading" style="flex: 1; min-height: calc(100vh - 64px); margin: 16px;">
     <div class="column center-content" style="margin-top: 130px;">
       <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
     </div>
@@ -22,39 +32,25 @@
     v-else-if="installableApps.length === 0"
     style="flex: 1; min-height: calc(100vh - 64px); margin: 16px;"
   >
-    <div
-      class="install-fs-card column"
-      style="margin-right: 16px; margin-bottom: 16px; align-items: center; justify-content: center; color: #3f436c;"
-      :title="$t('appStore.selectAppFromFileSystem')"
-      @click="selectFromFileSystem()"
-      @keypress.enter="selectFromFileSystem()"
-      tabindex="0"
-    >
-      <img src="/img/folder_open.svg" style="height: 195px;">
-
-    </div>
     <div class="column center-content" style="margin-top: 130px;">
       <span style="max-width: 600px; text-align: center;">{{ $t("appStore.noAppsInStore") }}</span>
     </div>
   </div>
 
-  <div v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px); margin-bottom: 200px; align-content: flex-start;">
-    <div
-      class="install-fs-card column"
-      style="margin-right: 16px; margin-bottom: 16px; align-items: center; justify-content: center; color: #3f436c;"
-      :title="$t('appStore.selectAppFromFileSystem')"
-      @click="selectFromFileSystem()"
-      @keypress.enter="selectFromFileSystem()"
-      tabindex="0"
-    >
-      <img src="/img/folder_open.svg" style="height: 195px;">
-
+  <div
+    v-else-if="filteredApps.length === 0"
+  >
+    <div class="column center-content" style="margin-top: 300px; font-size: 20px;">
+      <span style="max-width: 600px; text-align: center;">{{ $t("appStore.noAppsForSearch") }}</span>
     </div>
+  </div>
+
+  <div ref="apps-list" v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px); margin-bottom: 200px; margin-top: 80px; align-content: flex-start;">
     <div
-      v-for="(app, i) of installableApps"
+      v-for="(app, i) of filteredApps"
       :key="i"
       class="column"
-      style="margin-right: 16px; margin-bottom: 16px"
+      style="margin-right: 16px; margin-bottom: 16px;"
     >
       <AppPreviewCard :app="app" :appWebsocket="appWebsocket" @installApp="requestInstall(app, $event.imgSrc)" />
     </div>
@@ -81,8 +77,8 @@
 
   <HCButton
     style="
-      height: 60px;
-      border-radius: 20px;
+      height: 50px;
+      border-radius: 18px;
       padding: 0 20px;
       position:fixed;
       bottom: 20px;
@@ -148,6 +144,7 @@ import { AppWebsocket, NetworkInfo, CellInfo, encodeHashToBase64 } from "@holoch
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 import { toSrc, getCellId } from "../utils";
+import Mark from "mark.js";
 
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
@@ -156,6 +153,7 @@ import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 import { tryWithHosts } from "../appstore/appstore-interface";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
+import HCTextField from "../components/subcomponents/HCTextField.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
 import HCDialog from "../components/subcomponents/HCDialog.vue";
@@ -177,6 +175,7 @@ export default defineComponent({
     AppPreviewCard,
     HCLoading,
     HCSnackbar,
+    HCTextField,
     HCProgressBar,
     HCDialog,
     LoadingDots,
@@ -256,6 +255,18 @@ export default defineComponent({
       },
       3000
     );
+  },
+  computed: {
+    filteredApps(): Array<AppEntry> {
+      if (this.installableApps.length === 0) {
+        return [];
+      }
+      const searchString = (this.$refs["search-field"] as typeof HCTextField).value;
+      if (searchString && searchString !== "") {
+        return this.installableApps.filter((app) => app.title.includes(searchString) || app.subtitle.includes(searchString));
+      }
+      return this.installableApps;
+    },
   },
   methods: {
     toSrc,
@@ -489,30 +500,28 @@ export default defineComponent({
         return diff;
       }
     },
+    highlightSearchString() {
+      const searchString = (this.$refs["search-field"] as typeof HCTextField).value;
+      console.log("saerchstring: ", searchString);
+      const appsListElement = this.$refs["apps-list"] as HTMLElement | undefined;
+      if (appsListElement) {
+        var instance = new Mark(appsListElement);
+        instance.unmark();
+        instance.mark(searchString, { className: "mark" });
+      }
+    }
   },
 });
 </script>
 
 <style scoped>
 
-.install-fs-card {
-  width: 370px;
-  height: 220px;
-  background: linear-gradient(228.21deg, #BB2FD8 0%, #2F87D8 94.99%);
-  border-radius: 15px;
-  box-shadow: 0 0px 5px #9b9b9b;
-  cursor: pointer;
-}
-
-.install-fs-card:hover {
-  background: #624be1;
-  box-shadow: 0 0px 5px #9b9b9b;
-}
-
-.top-bar {
+.search-bar {
+  position: fixed;
+  width: 100%;
+  height: 60px;
   align-items: center;
-  height: 64px;
-  background: white;
+  background-color: #e8e8eb;
   box-shadow: 0 0px 5px #9b9b9b;
 }
 
@@ -540,4 +549,11 @@ export default defineComponent({
   opacity: 1;
 }
 
+</style>
+
+<style>
+mark {
+    background: #84f1ff;
+    color: black;
+}
 </style>

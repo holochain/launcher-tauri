@@ -77,6 +77,7 @@ const messages = {
       selectAppFromFileSystem: "Select app from filesystem",
       noAppsInStore:
         "There are no apps available yet in the App Library or Synchronization with Peers is not complete.",
+      noAppsForSearch: "No apps found for search input...",
       receivingData: "Receiving new data",
       synchronizationNotCompleteError: "App Library Synchronization not Complete. Please try again later."
     },
@@ -268,6 +269,7 @@ const messages = {
       selectAppFromFileSystem: "Installiere App von Datei",
       noAppsInStore:
         "Es sind noch keine Apps im App Store verfügbar oder die Synchronisierung mit Peers ist noch unvollständig.",
+      noAppsForSearch: "Keine Apps gefunden für die gewählte Such-Eingabe...",
       receivingData: "Neue Daten werden empfangen",
       synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut."
     },

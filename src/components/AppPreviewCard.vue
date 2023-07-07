@@ -67,7 +67,7 @@
           overflow-y: auto;
         "
       >
-        {{ app.subtitle }}
+        <span>{{ app.subtitle }}</span>
       </div>
     </div>
 
@@ -76,14 +76,12 @@
 
 <script lang="ts">
 import { HolochainVersion } from "../types";
-import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent, PropType } from "vue";
 
 import HCButton from "./subcomponents/HCButton.vue";
 import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import { AppEntry } from "../appstore/types";
 import { collectBytes } from "../appstore/appstore-interface";
-import { AppWebsocket } from "@holochain/client";
 import { APPSTORE_APP_ID } from "../constants";
 import { toSrc } from "../utils";
 

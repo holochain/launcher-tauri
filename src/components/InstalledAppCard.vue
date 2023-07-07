@@ -10,7 +10,7 @@
         tabindex="0"
         @click="handleClick()"
         v-on:keyup.enter="handleClick()"
-        :title="`${getAppStatus(app) === 'Disabled' ? 'This app is disabled - Go to Settings to enable this app' : ''}${getAppStatus(app) === 'Offline/Paused' ? ' (OFFLINE/PAUSED)' : ''}`"
+        :title="`${getAppStatus(app) === 'Disabled' ? 'This app is disabled - Go to Settings to enable this app' : app.webAppInfo.installed_app_info.installed_app_id}${getAppStatus(app) === 'Offline/Paused' ? ' (OFFLINE/PAUSED)' : ''}`"
       >
         <img
           v-if="app.webAppInfo.icon_src"
@@ -37,7 +37,8 @@
       class="installed-app-name"
       :title="`${app.webAppInfo.installed_app_info.installed_app_id}${getAppStatus(app) === 'Disabled' ? ' (DISABLED)' : ''}${getAppStatus(app) === 'Offline/Paused' ? ' (OFFLINE/PAUSED)' : ''}`"
     >
-      {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0,20) }}{{ app.webAppInfo.installed_app_info.installed_app_id.length > 20 ? '...' : '' }}
+      {{ app.webAppInfo.installed_app_info.installed_app_id }}
+      <!-- {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0,20) }}{{ app.webAppInfo.installed_app_info.installed_app_id.length > 20 ? '...' : '' }} -->
     </div>
   </div>
 </template>
@@ -194,6 +195,11 @@ export default defineComponent({
   text-align: center;
   font-size: 18px;
   font-weight: 700;
-  word-break: break-all;
+  word-break: normal;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>
