@@ -141,6 +141,29 @@ fn main() {
         None => String::from("default")
       };
 
+      // Only allow single-instance of the Launcher (https://github.com/holochain/launcher/issues/153), except
+      // a special profile is specified via the CLI
+      if profile == String::from("default") {
+        app.handle().plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+          println!("{}, {argv:?}, {cwd}", app.package_info().name);
+
+          let admin_window = app.get_window("admin");
+          // println!("admin window? {:?}", admin_window);
+          if let Some(window) = admin_window {
+            window.show().unwrap();
+            window.unminimize().unwrap();
+            window.set_focus().unwrap();
+          } else {
+            let r = WindowBuilder::new(app, "admin", tauri::WindowUrl::App("index.html".into()))
+              .inner_size(1200.0, 880.0)
+              .title("Holochain Admin")
+              .build();
+
+            log::info!("Creating admin window {:?}", r);
+          }
+        }))?;
+      }
+
       println!("Selected profile: {:?}", profile);
 
       let local_storage_path = profile_tauri_dir(profile.clone())?;
