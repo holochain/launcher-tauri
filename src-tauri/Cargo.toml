@@ -36,6 +36,7 @@ mr_bundle = "0.1.1-beta-rc.0"
 
 devhub_types = { git = "https://github.com/holochain/devhub-dnas", branch = "holochain-v0.1.x-support" }
 
+async-recursion = "1.0.4"
 async-trait = "0.1.52"
 chrono = {version = "0.4", features = ["serde"] }
 dirs-next = "2.0.0"

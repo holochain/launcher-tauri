@@ -325,6 +325,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-recursion"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e97ce7de6cf12de5d7226c73f5ba9811622f4db3a5b91b55c53e987e5f91cba"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.15",
+]
+
+[[package]]
 name = "async-std"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2810,7 +2821,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b8868e8bfa5501c8a98c98e1a96c06f9b94c6295456c4dca1bfd96f744732b8"
 dependencies = [
  "anyhow",
- "async-recursion",
+ "async-recursion 0.3.2",
  "async-trait",
  "base64 0.13.1",
  "byteorder",
@@ -2889,6 +2900,7 @@ dependencies = [
 name = "holochain-launcher"
 version = "0.10.2"
 dependencies = [
+ "async-recursion 1.0.4",
  "async-trait",
  "chrono",
  "devhub_types",
@@ -3296,7 +3308,7 @@ version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39da384cbf8ca1da473eb7ed5365e643e0018497cf68c7393da9254d46fa43c3"
 dependencies = [
- "async-recursion",
+ "async-recursion 0.3.2",
  "base64 0.13.1",
  "byteorder",
  "cfg-if 0.1.10",
