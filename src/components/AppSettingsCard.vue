@@ -132,8 +132,7 @@
       <!-- Open App Icon Button -->
       <div
         v-if="
-          (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) && !isAppHeadless(app)
-        "
+          (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) && !isAppHeadless(app) && !hideOpenButton"
         style="display: flex"
       >
         <sl-tooltip class="tooltip" hoist placement="top" content="Open App">
@@ -206,6 +205,27 @@
           @click="refresh"
           style="width: 20px; height: 20px; margin-right: 30px; cursor: pointer;"
         > -->
+      </div>
+
+      <div class="row" style="margin-top: -10px;">
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >{{ $t('main.happVersion') }}:</span
+        >
+        <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
+          app.webAppInfo.happ_release_info?.version ? app.webAppInfo.happ_release_info.version : $t('main.unknown')
+        }}</span>
+      </div>
+
+      <div class="row" style="margin-top: -15px;">
+        <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
+          >{{ $t('main.uiVersion') }}:</span
+        >
+        <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
+          ((app.webAppInfo.web_uis.default?.type === "WebApp")
+            && app.webAppInfo.web_uis.default?.gui_release_info?.version)
+            ? app.webAppInfo.web_uis.default.gui_release_info.version
+            : $t('main.unknown')
+        }}</span>
       </div>
 
       <!-- Public Key -->
@@ -423,6 +443,9 @@ export default defineComponent({
     app: {
       type: Object as PropType<HolochainAppInfoExtended>,
       required: true,
+    },
+    hideOpenButton: {
+      type: Boolean,
     },
   },
   data(): {

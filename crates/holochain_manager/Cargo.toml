@@ -15,8 +15,8 @@ holochain_client = { git = "https://github.com/holochain/holochain-client-rust",
 # NEW_VERSION add latest crates here
 
 holochain_conductor_api_0_3_0 = { package = "holochain_conductor_api", version = "0.3.0-beta-dev.8" }
-holochain_p2p_0_3_0 = { package = "holochain_p2p", version = "0.3.0-beta-dev.6" }
-holochain_types_0_3_0 = { package = "holochain_types", version = "0.3.0-beta-dev.6" }
+holochain_p2p_0_3_0 = { package = "holochain_p2p", version = "0.3.0-beta-dev.7" }
+holochain_types_0_3_0 = { package = "holochain_types", version = "0.3.0-beta-dev.7" }
 
 mr_bundle = "0.2.0"
 

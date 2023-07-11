@@ -1,6 +1,11 @@
 <template>
-  <div class="column card" @click="$emit('installApp', { imgSrc })" title="Click to see details and install">
-
+  <div
+    class="column card"
+    @click="$emit('installApp', { imgSrc })"
+    @keypress.enter="$emit('installApp', { imgSrc })"
+    title="Click to see details and install"
+    tabindex="0"
+  >
     <div class="column" style="flex: 1">
       <div class="row" style="align-items: center">
         <!-- if icon provided -->
@@ -61,7 +66,7 @@
           overflow-y: auto;
         "
       >
-        {{ app.subtitle }}
+        <span>{{ app.subtitle }}</span>
       </div>
     </div>
 
@@ -70,14 +75,12 @@
 
 <script lang="ts">
 import { HolochainVersion } from "../types";
-import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent, PropType } from "vue";
 
 import HCButton from "./subcomponents/HCButton.vue";
 import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import { AppEntry } from "../appstore/types";
 import { collectBytes } from "../appstore/appstore-interface";
-import { AppWebsocket } from "@holochain/client";
 import { APPSTORE_APP_ID } from "../constants";
 import { toSrc } from "../utils";
 
@@ -133,12 +136,5 @@ export default defineComponent({
 .card:hover {
   background: #f4f4fc;
   box-shadow: 0 0px 5px #9b9b9b;
-}
-
-/* .install-btn {
-
-} */
-.install-btn:hover {
-  background-color: #674df9;
 }
 </style>

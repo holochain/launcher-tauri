@@ -39,7 +39,7 @@ use crate::commands::restart::restart;
 use crate::commands::quit::quit;
 use crate::commands::{
   choose_version::choose_version_for_hdk,
-  config::write_config,
+  config::{write_config, get_default_bootstrap, get_default_signaling},
   enable_app::{disable_app, enable_app, delete_clone},
   factory_reset::execute_factory_reset,
   get_app_info::get_app_info,
@@ -53,7 +53,7 @@ use crate::commands::{
   uninstall_app::uninstall_app,
   sign_zome_call::sign_zome_call,
   storage::get_storage_info,
-  update_default_ui::update_default_ui,
+  update_default_ui::{fetch_and_update_default_gui, update_default_ui},
 };
 use crate::launcher::manager::LauncherManager;
 use crate::launcher::state::LauncherState;
@@ -86,8 +86,11 @@ fn main() {
       enable_app,
       execute_factory_reset,
       fetch_and_save_app,
+      fetch_and_update_default_gui,
       fetch_gui,
       get_app_info,
+      get_default_bootstrap,
+      get_default_signaling,
       get_icon_src,
       get_state_info,
       get_storage_info,
@@ -137,6 +140,29 @@ fn main() {
         },
         None => String::from("default")
       };
+
+      // Only allow single-instance of the Launcher (https://github.com/holochain/launcher/issues/153), except
+      // a special profile is specified via the CLI
+      if profile == String::from("default") {
+        app.handle().plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+          println!("{}, {argv:?}, {cwd}", app.package_info().name);
+
+          let admin_window = app.get_window("admin");
+          // println!("admin window? {:?}", admin_window);
+          if let Some(window) = admin_window {
+            window.show().unwrap();
+            window.unminimize().unwrap();
+            window.set_focus().unwrap();
+          } else {
+            let r = WindowBuilder::new(app, "admin", tauri::WindowUrl::App("index.html".into()))
+              .inner_size(1200.0, 880.0)
+              .title("Holochain Admin")
+              .build();
+
+            log::info!("Creating admin window {:?}", r);
+          }
+        }))?;
+      }
 
       println!("Selected profile: {:?}", profile);
 

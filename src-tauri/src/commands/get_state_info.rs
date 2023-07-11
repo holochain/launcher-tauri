@@ -1,3 +1,4 @@
+use async_recursion::async_recursion;
 use std::collections::HashMap;
 
 use holochain_manager::versions::{HolochainVersion, version_manager::VersionManager};
@@ -60,7 +61,7 @@ async fn inner_get_state_info(
         match manager.get_web_happ_manager(HolochainId::HolochainVersion(holochain_version.clone()))
         {
           Ok(holochain_manager) => {
-            let running_state = get_holochain_state(holochain_manager).await;
+            let running_state = get_holochain_state(holochain_manager, 2).await;
             holochain_manager_states.insert(holochain_version.clone(), running_state);
           }
           Err(err) => {
@@ -71,7 +72,7 @@ async fn inner_get_state_info(
       }
 
       let custom_binary = match &mut manager.custom_binary_manager {
-        Some(RunningState::Running(m)) => Some(get_holochain_state(m).await),
+        Some(RunningState::Running(m)) => Some(get_holochain_state(m, 2).await),
         Some(RunningState::Error(err)) => Some(RunningState::Error(format!(
           "There was an error launching the custom Holochain binary: {:?}",
           err
@@ -90,7 +91,8 @@ async fn inner_get_state_info(
   }
 }
 
-async fn get_holochain_state(web_app_manager: &mut WebAppManager) -> HolochainState {
+#[async_recursion]
+async fn get_holochain_state(web_app_manager: &mut WebAppManager, retries: usize) -> HolochainState {
   match web_app_manager.list_apps().await {
     Ok(installed_apps) => RunningState::Running(HolochainInfo {
       installed_apps,
@@ -99,6 +101,11 @@ async fn get_holochain_state(web_app_manager: &mut WebAppManager) -> HolochainSt
       hdi_version: web_app_manager.holochain_manager.version.manager().hdi_version(),
       hdk_version: web_app_manager.holochain_manager.version.manager().hdk_version(),
     }),
-    Err(err) => RunningState::Error(format!("Could not fetch installed apps: {}", err)),
+    Err(err) => {
+      match retries {
+        0 => RunningState::Error(format!("Could not fetch installed apps: {}", err)),
+        _ => get_holochain_state(web_app_manager, retries - 1).await,
+      }
+    }
   }
 }

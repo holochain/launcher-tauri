@@ -2,8 +2,8 @@
   <HCGenericDialog
     ref="dialog"
     @confirm="saveConfig()"
-    @closing="restoreDefaults()"
-    primaryButtonLabel="Save and Restart"
+    @closing="restoreCurrent()"
+    :primaryButtonLabel="$t('dialogs.config.saveAndRestart')"
     closeOnSideClick
   >
     <div
@@ -58,6 +58,14 @@
         :default="customBinaryPath"
       ></HCTextField>
     </div>
+
+    <HCButton
+      outlined
+      style="min-width: 270px; height: 30px; margin-bottom: -15px; margin-top: 10px;"
+      @click="restoreDefaults()"
+    >{{ $t('dialogs.config.restoreDefaults') }}
+    </HCButton>
+
   </HCGenericDialog>
 </template>
 
@@ -66,6 +74,7 @@ import { defineComponent } from "vue";
 import { getCurrent } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/tauri";
 
+import HCButton from "../subcomponents/HCButton.vue";
 import HCGenericDialog from "../subcomponents/HCGenericDialog.vue";
 import HCSelect from "../subcomponents/HCSelect.vue";
 import HCTextField from "../subcomponents/HCTextField.vue";
@@ -73,7 +82,7 @@ import ToggleSwitch from "../subcomponents/ToggleSwitch.vue";
 
 export default defineComponent({
   name: "Config",
-  components: { HCGenericDialog, HCSelect, HCTextField, ToggleSwitch },
+  components: { HCButton, HCGenericDialog, HCSelect, HCTextField, ToggleSwitch },
   data(): {
     levels: [string, string][];
     newConfig: any;
@@ -104,7 +113,7 @@ export default defineComponent({
       const dialog = this.$refs.dialog as typeof HCGenericDialog;
       await getCurrent().listen("open-config", async () => {
         //await this.$store.dispatch(ActionTypes.fetchStateInfo);
-        this.restoreDefaults();
+        this.restoreCurrent();
 
         dialog.open();
       });
@@ -113,7 +122,7 @@ export default defineComponent({
   methods: {
     async open() {
       const dialog = this.$refs.dialog as typeof HCGenericDialog;
-      this.restoreDefaults();
+      this.restoreCurrent();
       dialog.open();
     },
     async saveConfig() {
@@ -140,7 +149,10 @@ export default defineComponent({
     handleSlider() {
       this.customBinary = !this.customBinary;
     },
-    restoreDefaults() {
+    /**
+     * Restoring to the values as they are currently stored in the launcher-config.yaml
+     */
+    restoreCurrent() {
       const currentConfig = (this.$store.state.launcherStateInfo as any).config;
 
       this.newConfig = currentConfig;
@@ -179,6 +191,25 @@ export default defineComponent({
         (this.$refs.bootstrapServerField as typeof HCTextField).setValue(currentBootstrapUrl);
         this.bootstrapUrl = currentBootstrapUrl;
       }
+    },
+    /**
+     * Restoring to the values to "factory reset" defaults
+     */
+    async restoreDefaults() {
+      this.currentLogLevel = this.levels[1];
+      (this.$refs.selectLogLevel as typeof HCSelect).select(
+        this.currentLogLevel
+      );
+
+      const bootstrapUrl: string = await invoke("get_default_bootstrap", {});
+      this.bootstrapUrl = bootstrapUrl;
+      (this.$refs.bootstrapServerField as typeof HCTextField).setValue(bootstrapUrl);
+
+      const signalingUrl: string = await invoke("get_default_signaling", {});
+      this.signalingUrl = signalingUrl;
+      (this.$refs.signalingServerField as typeof HCTextField).setValue(signalingUrl);
+
+      this.customBinary = false;
     },
   },
 });

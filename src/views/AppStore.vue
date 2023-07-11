@@ -1,37 +1,64 @@
 <template>
   <HCLoading ref="downloading" :text="loadingText" />
 
-  <div v-if="loading" class="column center-content" style="flex: 1; min-height: calc(100vh - 64px);">
-    <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
+  <div class="row search-bar">
+     <mwc-icon style="font-size: 38px; margin-left: 16px;">search</mwc-icon>
+    <HCTextField
+      ref="search-field"
+      style="height: 45px; margin-left: 5px;"
+      placeholder="Search..."
+      @input="highlightSearchString"
+     ></HCTextField>
+     <span style="display: flex; flex: 1;"></span>
+    <HCButton
+      style="border-radius: 10px; height: 40px; margin-right: 7px;"
+      @click="selectFromFileSystem()"
+      @keypress.enter="selectFromFileSystem()"
+    >
+      <div class="row" style="margin: -12px;">
+        <mwc-icon>folder</mwc-icon>
+        <span style="margin-left: 10px;">{{ $t('appStore.selectAppFromFileSystem') }}</span>
+      </div>
+    </HCButton>
+  </div>
+
+  <div v-if="loading" style="flex: 1; min-height: calc(100vh - 124px); margin: 16px;">
+    <div class="column center-content" style="margin-top: 360px;">
+      <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
+    </div>
   </div>
 
   <div
     v-else-if="installableApps.length === 0"
     class="column center-content"
-    style="flex: 1; min-height: calc(100vh - 64px);"
+    style="flex: 1; min-height: calc(100vh - 124px); margin: 16px;"
   >
-    <span>{{ $t("appStore.noAppsInStore") }}</span>
-    <HCButton
-      outlined
-      @click="fetchApps()"
-      class="refresh-button"
-      >{{ $t("main.refresh") }}
-    </HCButton>
+    <div class="column center-content">
+      <span style="max-width: 600px; text-align: center;">{{ $t("appStore.noAppsInStore") }}</span>
+    </div>
   </div>
 
-  <div v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px); margin-bottom: 200px; align-content: flex-start;">
+  <div
+    v-else-if="filteredApps.length === 0"
+  >
+    <div class="column center-content" style="margin-top: 300px; font-size: 20px;">
+      <span style="max-width: 600px; text-align: center;">{{ $t("appStore.noAppsForSearch") }}</span>
+    </div>
+  </div>
+
+  <div ref="apps-list" v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px); margin-bottom: 200px; margin-top: 80px;">
     <div
-      v-for="(app, i) of installableApps"
+    v-for="(app, i) of filteredApps"
       :key="i"
       class="column"
-      style="margin-right: 16px; margin-bottom: 16px"
+      style="margin-right: 16px; margin-bottom: 16px;"
     >
       <AppPreviewCard :app="app" :appWebsocket="appWebsocket" @installApp="requestInstall(app, $event.imgSrc)" />
     </div>
   </div>
 
   <!-- AppStore synchronization spinner -->
-  <div v-show="showLoadingSpinner" class="progress-indicator">
+  <!-- <div v-show="showLoadingSpinner" class="progress-indicator">
     <div style="padding: 0 15px;">
       <div
         style="margin-bottom: 5px; font-weight: 600; font-size: 18px;"
@@ -44,25 +71,27 @@
       </div>
     </div>
     <span :class="queuedBytes ? 'loader' : 'inactive-loader'" style="position: absolute; bottom: 0;"></span>
-  </div>
+  </div> -->
 
-  <!-- Select from filesystem button -->
+  <!-- refresh button -->
    <HCButton
     style="
-      height: 40px;
-      border-radius: 8px;
+      height: 50px;
+      border-radius: 18px;
       padding: 0 20px;
       position:fixed;
       bottom: 20px;
-      left: 50%;
+      right: 20px;
+      font-size: 18px;
       margin-left: -140px;
     "
-    @click="selectFromFileSystem()"
+    @click="fetchApps(false)"
+    @keypress.enter="fetchApps(false)"
   >
     <div class="row center-content">
-      <mwc-icon>folder</mwc-icon>
-      <span style="margin-left: 5px">{{
-        $t("appStore.selectAppFromFileSystem")
+      <mwc-icon>refresh</mwc-icon>
+      <span style="margin-left: 8px">{{
+        $t("main.refresh")
       }}</span>
     </div>
   </HCButton>
@@ -113,6 +142,8 @@ import "@material/mwc-icon-button";
 import { AppWebsocket, NetworkInfo, CellInfo, encodeHashToBase64 } from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
+import Mark from "mark.js";
+
 import { toSrc, getCellId } from "../utils";
 
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
@@ -122,6 +153,7 @@ import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 import { tryWithHosts } from "../appstore/appstore-interface";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
+import HCTextField from "../components/subcomponents/HCTextField.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
 import HCDialog from "../components/subcomponents/HCDialog.vue";
@@ -140,6 +172,7 @@ export default defineComponent({
   components: {
     InstallAppDialog,
     HCButton,
+    HCTextField,
     AppPreviewCard,
     HCLoading,
     HCSnackbar,
@@ -148,6 +181,7 @@ export default defineComponent({
     LoadingDots,
     SelectReleaseDialog,
   },
+  emits: ["show-message", "select-view"],
   data(): {
     appWebsocket: AppWebsocket | undefined;
     loadingText: string;
@@ -197,18 +231,6 @@ export default defineComponent({
     window.clearInterval(this.pollInterval!);
   },
   async mounted() {
-    try {
-      await this.fetchApps();
-    } catch (e) {
-      console.error(`Failed to fetch apps in mounted() hook: ${e}`);
-    }
-
-    await this.getQueuedBytes();
-    this.pollInterval = window.setInterval(
-      async () => await this.getQueuedBytes(),
-      2000
-    );
-
     // If the "Filesystem" button is pressed in the "launcher" view with no apps installed, the
     // "installFromFs" item is set to "true" in localStorage and then the view is switched to
     // "appStore" view (i.e. to this component here).
@@ -218,6 +240,35 @@ export default defineComponent({
       window.localStorage.removeItem("installFromFs");
       this.selectFromFileSystem();
     }
+
+    try {
+      await this.fetchApps(false);
+    } catch (e) {
+      console.error(`Failed to fetch apps in mounted() hook: ${e}`);
+    }
+
+    // await this.getQueuedBytes();
+    this.pollInterval = window.setInterval(
+      async () => {
+        // await this.getQueuedBytes();
+        await this.fetchApps(true);
+      },
+      3000
+    );
+
+
+  },
+  computed: {
+    filteredApps(): Array<AppEntry> {
+      if (this.installableApps.length === 0) {
+        return [];
+      }
+      const searchString = (this.$refs["search-field"] as typeof HCTextField).value;
+      if (searchString && searchString !== "") {
+        return this.installableApps.filter((app) => app.title.includes(searchString) || app.subtitle.includes(searchString));
+      }
+      return this.installableApps;
+    },
   },
   methods: {
     toSrc,
@@ -230,9 +281,9 @@ export default defineComponent({
       this.appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
       // console.log("connected to AppWebsocket.");
     },
-    async fetchApps() {
+    async fetchApps(silent: boolean) {
 
-      this.loading = true;
+      this.loading = silent ? false : true;
 
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
@@ -343,7 +394,6 @@ export default defineComponent({
               devhubHappLibraryDnaHash: Array.from(releaseInfo.devhubDnaHash), // DNA hash of the DevHub to which the remote call shall be made
               appstorePubKey: encodeHashToBase64(appStoreInfo.agent_pub_key),
               happReleaseHash: encodeHashToBase64(happReleaseHash),
-              guiReleaseHash: guiReleaseHash ? encodeHashToBase64(guiReleaseHash) : undefined,
             });
 
             (this.$refs.downloading as typeof HCLoading).close();
@@ -450,22 +500,34 @@ export default defineComponent({
         return diff;
       }
     },
+    highlightSearchString() {
+      const searchString = (this.$refs["search-field"] as typeof HCTextField).value;
+      console.log("saerchstring: ", searchString);
+      const appsListElement = this.$refs["apps-list"] as HTMLElement | undefined;
+      if (appsListElement) {
+        var instance = new Mark(appsListElement);
+        instance.unmark();
+        instance.mark(searchString, { className: "mark" });
+      }
+    }
   },
 });
 </script>
 
 <style scoped>
-.top-bar {
+.search-bar {
+  position: fixed;
+  width: 100%;
+  height: 60px;
   align-items: center;
-  height: 64px;
-  background: white;
+  background-color: #e8e8eb;
   box-shadow: 0 0px 5px #9b9b9b;
 }
 
 .progress-indicator {
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  left: 20px;
   padding: 10px 0 0 0;
   background-color: white;
   box-shadow: 0 0px 5px #9b9b9b;
@@ -486,4 +548,13 @@ export default defineComponent({
   opacity: 1;
 }
 
+</style>
+
+
+<style>
+/* non-scoped styles */
+mark {
+  background: linear-gradient(228.21deg, #bc2fd870 0%, #2f86d872 94.99%);
+  color: black;
+}
 </style>

@@ -24,6 +24,45 @@ window.onerror = function (message, source, lineno, colno, error) {
 };
 
 
+
+// Adding event listeners to adjust zoom level on Ctrl + scroll
+function increaseZoomLevel(amount: number) {
+  const percentageString: string = (document.body.style as any).zoom;
+  let num = percentageString === "" ? 100 : parseInt(percentageString.slice(0, percentageString.length-1));
+  let newVal = num + Math.round(amount) < 500 ? num + Math.round(amount) : 500;
+  (document.body.style as any).zoom = `${newVal}%`
+}
+
+function decreaseZoomLevel(amount: number) {
+  const percentageString: string = (document.body.style as any).zoom;
+  let num = percentageString === "" ? 100 : parseInt(percentageString.slice(0, percentageString.length-1));
+  let newVal = num - Math.round(amount) > 30 ? num - Math.round(amount) : 30;
+  (document.body.style as any).zoom = `${newVal}%`
+}
+
+window.onkeydown = (ev) => {
+  if (ev.key === "Control") {
+    window.onwheel = (ev) => {
+      if (ev.deltaY > 0) {
+        // scrolling DOWN
+        decreaseZoomLevel(10);
+      } else if (ev.deltaY < 0) {
+        // scrolling UP
+        increaseZoomLevel(10);
+        // (document.body.style as any).zoom = "120%";
+      }
+    }
+  }
+};
+
+window.onkeyup = (ev) => {
+  if (ev.key === "Control") {
+    window.onwheel = null;
+  }
+}
+
+
+
 // logic for setting locale
 const customLocale = window.localStorage.getItem("customLocale");
 

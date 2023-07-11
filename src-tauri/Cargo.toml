@@ -7,7 +7,7 @@ edition = "2021"
 license = ""
 name = "holochain-launcher"
 repository = ""
-version = "0.10.971"
+version = "0.10.972"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -34,15 +34,17 @@ holochain = { version = "0.3.0-beta-dev.8", features = ["sqlite-encrypted"] }
 
 mr_bundle = "0.2.0"
 
-devhub_types = { git = "https://github.com/matthme/devhub-dnas", branch = "0.3.0-beta-dev.8" }
+devhub_types = { git = "https://github.com/holochain/devhub-dnas", branch = "develop" }
 
 
+async-recursion = "1.0.4"
 async-trait = "0.1.52"
 chrono = {version = "0.4", features = ["serde"] }
 dirs-next = "2.0.0"
 futures = "0.3"
 log = "0.4.14"
 log4rs = "1.0.0"
+mere_memory_types = "0.85.0"
 open = "2.0.1"
 opener = "0.5.0"
 portpicker = "0.1.1"
@@ -51,6 +53,7 @@ serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
 tauri = {version = "1.4.0", features = ["cli", "clipboard-write-text", "devtools", "dialog-all", "native-tls-vendored", "reqwest-native-tls-vendored", "shell-open", "system-tray", "updater"] }
+tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 thiserror = "1.0.30"
 url2 = "0.0.6"
 mime_guess = "2.0.4"

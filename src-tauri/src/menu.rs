@@ -5,7 +5,7 @@ use crate::file_system::Profile;
 pub fn build_menu() -> Menu {
   let factory_reset = CustomMenuItem::new("factory_reset".to_string(), "Factory Reset");
   let open_logs = CustomMenuItem::new("open_logs".to_string(), "Open Logs");
-  let config = CustomMenuItem::new("config".to_string(), "Configuration");
+  // let config = CustomMenuItem::new("config".to_string(), "Configuration");
   let language_settings = CustomMenuItem::new("language_settings".to_string(), "Language");
   let network_stats = CustomMenuItem::new("network_stats".to_string(), "Network Statistics");
   let restart = CustomMenuItem::new("restart".to_string(), "Restart");
@@ -26,7 +26,7 @@ pub fn build_menu() -> Menu {
     Menu::new()
       .add_item(language_settings.clone())
       .add_item(network_stats.clone())
-      .add_item(config.clone())
+      // .add_item(config.clone())
       .add_item(factory_reset.clone())
   );
 
@@ -48,7 +48,7 @@ pub fn build_menu() -> Menu {
       Menu::new()
         .add_item(language_settings.clone())
         .add_item(network_stats.clone())
-        .add_item(config)
+        // .add_item(config)
         .add_item(factory_reset)
     );
 
@@ -67,7 +67,7 @@ pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
   let profile = app_handle.state::<Profile>();
   match event_id {
     "factory_reset" => window.emit("request-factory-reset", ()).unwrap(),
-    "config" => window.emit("open-config", ()).unwrap(),
+    // "config" => window.emit("open-config", ()).unwrap(),
     "language_settings" => window.emit("open-language-settings", ()).unwrap(),
     "network_stats" => window.emit("open-network-stats", ()).unwrap(),
     "about" => window.emit("about", ()).unwrap(),

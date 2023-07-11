@@ -40,6 +40,7 @@ const messages = {
       cloneName: "Name",
       developerMode: "Developer Mode",
       devModeExplainer: "If you are an app developer and want to publish apps, activate the developer mode.",
+      happVersion: "happ Version",
       hide: "Hide",
       hideNetworkSeed: "Hide Network Seed",
       holochainVersion: "Holochain Version",
@@ -60,6 +61,8 @@ const messages = {
       sortBy: "sort by",
       show: "Show",
       showNetworkSeed: "Show Network Seed",
+      uiVersion: "UI Version",
+      unknown: "unknown",
       updatesAvailable: "(Updates Available)",
       visiblePeers: "Visible Peers",
       yourPublicKey: "Your Public Key",
@@ -71,9 +74,10 @@ const messages = {
       fullSynchronizationRequired: "Full synchronization with peers required to reliably download all apps.",
       inQueue: "in queue",
       noOngoingPeerSynchronization: "no ongoing peer synchronization",
-      selectAppFromFileSystem: "Select app from Filesystem",
+      selectAppFromFileSystem: "Select app from filesystem",
       noAppsInStore:
         "There are no apps available yet in the App Library or Synchronization with Peers is not complete.",
+      noAppsForSearch: "No apps found for search input...",
       receivingData: "Receiving new data",
       synchronizationNotCompleteError: "App Library Synchronization not Complete. Please try again later."
     },
@@ -90,7 +94,7 @@ const messages = {
       holochainVersions: "Holochain Versions",
       holochainVersionsHelper: "Installed Holochain Versions",
       launcherConfiguration: "Launcher Configuration",
-      launcherConfigurationDescription: "Adjust log level, bootstrap server, proxy server, or use a custom holochain binary",
+      launcherConfigurationDescription: "Adjust log level, bootstrap server, signaling server, or use a custom holochain binary",
       noHeadlessApps: "There are no headless apps installed",
       noHolochainVersions: "There are no Holochain versions installed.",
       noWebApps: "There are no web apps installed",
@@ -122,6 +126,10 @@ const messages = {
       yes: "Yes",
     },
     dialogs: {
+      config: {
+        restoreDefaults: "Reset to Default Values",
+        saveAndRestart:"Save and Restart",
+      },
       restart:
         "Do you want to clean up all holochain processes and restart the Holochain Launcher?",
       setupPassword: {
@@ -181,7 +189,7 @@ const messages = {
       confirmUninstallApp: "Are you sure you want to uninstall this App? This will irrevocably delete all data stored in it.",
       confirmUninstallDevHub: {
         text: "Uninstalling the DevHub means that you permanently lose editor access to any apps that you have published with this instance of the DevHub (i.e. with the associated public key). This means that you won't be able to publish any further releases or updates to those apps - even if you later reinstall the DevHub.",
-        confirmation: "I read the warning and confirm that I want to uninstall the DevHub."
+        confirmation: "I have read the warning and confirm that I want to uninstall the DevHub."
       },
       confirmUninstallCell: "Are you sure you want to delete this cell? This will irrevocably delete all data stored in it.",
       networkStats: {
@@ -222,6 +230,7 @@ const messages = {
       cloneName: "Name",
       developerMode: "Entwickler Modus",
       devModeExplainer: "Wenn du ein App-Entwickler bist und Apps publizieren möchtest, kannst du den Entwickler-Modus aktivieren.",
+      happVersion: "happ Version",
       hide: "Verbergen",
       hideNetworkSeed: "Network Seed verbergen",
       holochainVersion: "Holochain Version",
@@ -242,6 +251,8 @@ const messages = {
       show: "Zeigen",
       showNetworkSeed: "Network Seed anzeigen",
       sortBy: "sortiere nach",
+      uiVersion: "UI Version",
+      unknown: "unbekannt",
       updatesAvailable: "(Updates verfügbar)",
       visiblePeers: "Sichtbare Peers",
       yourPublicKey: "Dein Public Key",
@@ -256,6 +267,7 @@ const messages = {
       selectAppFromFileSystem: "Installiere App von Datei",
       noAppsInStore:
         "Es sind noch keine Apps im App Store verfügbar oder die Synchronisierung mit Peers ist noch unvollständig.",
+      noAppsForSearch: "Keine Apps gefunden für die gewählte Such-Eingabe...",
       receivingData: "Neue Daten werden empfangen",
       synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut."
     },
@@ -304,6 +316,10 @@ const messages = {
       yes: "Ja",
     },
     dialogs: {
+      config: {
+        restoreDefaults: "Zurücksetzen zu Standardwerten",
+        saveAndRestart:"Speichern und Neustart",
+      },
       restart:
         "Möchtest du alle Holochain Prozesse beenden und den Holochain Launcher neu starten?",
       setupPassword: {

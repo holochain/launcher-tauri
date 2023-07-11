@@ -35,14 +35,14 @@ use crate::{
 /// internally.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ResourceLocator {
-    dna_hash: DnaHash,
-    resource_hash: AnyDhtHash,
+    pub dna_hash: DnaHash,
+    pub resource_hash: AnyDhtHash,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ResourceLocatorB64 {
-    dna_hash: DnaHashB64,
-    resource_hash: AnyDhtHashB64,
+    pub dna_hash: DnaHashB64,
+    pub resource_hash: AnyDhtHashB64,
 }
 
 impl Into<ResourceLocator> for ResourceLocatorB64 {

@@ -17,7 +17,7 @@ pub struct LauncherConfig {
   pub bootstrap_server_url: BootstrapServerUrl,
 
   pub running_versions: HashSet<HolochainVersion>,
-  profile: Profile,
+  pub profile: Profile,
 }
 
 impl Default for LauncherConfig {

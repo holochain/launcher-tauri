@@ -8,8 +8,8 @@ use holochain_web_app_manager::{WebAppManager, ReleaseInfo};
 // Versions of Appstore and Devhub (commit hash of Github release).
 // Those are used to install new Appstore/DevHub UI's if necessary
 // NEW_VERSION Change appstore and devhub versions here if required
-const APPSTORE_VERSION: &str = "97f08097bfbe08d2760c30a4379c75ee98d96799"; // shasum
-const DEVHUB_VERSION: &str = "6ec0ae911cb467ba5a7019bacfbfda82c74ed1d1"; // shasum
+const APPSTORE_VERSION: &str = "834c3d3cc15d24fb6d598d64f76a69d844cb6e61"; // shasum
+const DEVHUB_VERSION: &str = "4f09a03478c89c668b9f94dfeab22234f1e70623"; // shasum
 
 const APPSTORE_APP_ID: &str = "AppStore";
 const DEVHUB_APP_ID: &str = "DevHub";
@@ -32,7 +32,7 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
     window.emit("progress-update", String::from("Installing AppStore"))
       .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
-    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev2")) } else { Some(String::from("test-network-0.994")) };
+    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev2")) } else { Some(String::from("test-network-0.10.972")) };
 
     manager
       .install_web_app(
@@ -124,8 +124,6 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
 
     }
   }
-
-
 
   Ok(())
 }
