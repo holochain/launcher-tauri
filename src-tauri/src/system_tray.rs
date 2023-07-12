@@ -10,7 +10,7 @@ use tauri::{
   WindowUrl, Wry,
 };
 
-use crate::launcher::{state::LauncherState, manager::HolochainId};
+use crate::{launcher::{state::LauncherState, manager::HolochainId}, build_admin_window, file_system::{profile_tauri_dir, Profile}};
 
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   match event_id.as_str() {
@@ -29,12 +29,9 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
         window.show().unwrap();
         window.set_focus().unwrap();
       } else {
-        let r = WindowBuilder::new(app, "admin", WindowUrl::App("index.html".into()))
-          .inner_size(1200.0, 880.0)
-          .title("Holochain Admin")
-          .build();
-
-        log::info!("Creating admin window {:?}", r);
+        let profile = app.state::<Profile>().inner().to_owned();
+        let local_storage_path = profile_tauri_dir(profile).unwrap();
+        let _r = build_admin_window(&app.app_handle(), local_storage_path).unwrap();
       }
     }
     menu_item_id => {
