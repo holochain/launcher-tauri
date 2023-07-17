@@ -5019,7 +5019,7 @@ checksum = "21805a2d7f92656c9d088e565ef4a9962c92673239a621d19c36825b003c9936"
 dependencies = [
  "hdi",
  "serde",
- "sha2 0.10.7",
+ "sha2 0.9.9",
 ]
 
 [[package]]
@@ -8351,9 +8351,10 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-single-instance"
 version = "0.0.0"
-source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v1#2a8e16814937d291fa362bf1520011cefdc5b681"
+source = "git+https://github.com/matthme/plugins-workspace?branch=single-instance-semver#8440daaedd472e34b6d778eb00bc44d98e0a2867"
 dependencies = [
  "log",
+ "semver 1.0.17",
  "serde",
  "serde_json",
  "tauri",
