@@ -2,10 +2,7 @@ use std::{fs, io, path::PathBuf};
 
 use tauri::{api::process::kill_children, Manager};
 
-use crate::{
-  file_system::{profile_config_dir, profile_holochain_data_dir, profile_lair_dir, Profile, profile_logs_dir, profile_tauri_dir, holochain_version_data_dir},
-  launcher::{state::LauncherState}
-};
+use crate::file_system::{profile_config_dir, profile_holochain_data_dir, profile_lair_dir, Profile, profile_logs_dir, profile_tauri_dir, holochain_version_data_dir};
 
 use holochain_manager::versions::HolochainVersion;
 use strum::IntoEnumIterator;
@@ -13,7 +10,6 @@ use strum::IntoEnumIterator;
 #[tauri::command]
 pub async fn execute_factory_reset(
   window: tauri::Window,
-  state: tauri::State<'_, LauncherState>,
   profile: tauri::State<'_, Profile>,
   app_handle: tauri::AppHandle,
   delete_logs: bool,
