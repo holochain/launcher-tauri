@@ -7,8 +7,10 @@ use futures::lock::Mutex;
 use hdk::prelude::AgentPubKey;
 use launcher::error::LauncherError;
 use running_state::RunningState;
+use tauri::Window;
 use std::collections::HashMap;
 use std::path::Path;
+use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::AppHandle;
 use serde_json::value::Value;
@@ -144,9 +146,7 @@ fn main() {
       // Only allow single-instance of the Launcher (https://github.com/holochain/launcher/issues/153), except
       // a special profile is specified via the CLI
       if profile == String::from("default") {
-        app.handle().plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
-          println!("{}, {argv:?}, {cwd}", app.package_info().name);
-
+        app.handle().plugin(tauri_plugin_single_instance::init(move |app, argv, cwd| {
           let admin_window = app.get_window("admin");
           // println!("admin window? {:?}", admin_window);
           if let Some(window) = admin_window {
@@ -154,11 +154,8 @@ fn main() {
             window.unminimize().unwrap();
             window.set_focus().unwrap();
           } else {
-            let r = WindowBuilder::new(app, "admin", tauri::WindowUrl::App("index.html".into()))
-              .inner_size(1200.0, 880.0)
-              .title("Holochain Admin")
-              .build();
-
+            let local_storage_path = profile_tauri_dir(String::from("default")).unwrap();
+            let r = build_admin_window(&app.app_handle(), local_storage_path).unwrap();
             log::info!("Creating admin window {:?}", r);
           }
         }))?;
@@ -219,6 +216,22 @@ fn main() {
     }
     Err(err) => log::error!("Error building the app: {:?}", err),
   }
+}
+
+pub fn build_admin_window(app_handle: &AppHandle, local_storage_path: PathBuf) -> Result<Window, tauri::Error> {
+  WindowBuilder::new(
+    app_handle,
+    "admin",
+    tauri::WindowUrl::App("index.html".into())
+  )
+    .inner_size(1200.0, 880.0)
+    .data_directory(local_storage_path)
+    .resizable(true)
+    .fullscreen(false)
+    .title("Holochain Launcher")
+    .center()
+    .initialization_script("window.__HC_LAUNCHER_ENV__ = {}")
+    .build()
 }
 
 async fn launch_manager(app_handle: Arc<AppHandle>, profile: Profile) -> RunningState<LauncherManager, LauncherError> {

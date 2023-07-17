@@ -5,12 +5,9 @@ use holochain_manager::versions::{
   holochain_conductor_api_latest::AppInfoStatus, HolochainVersion,
 };
 use holochain_web_app_manager::installed_web_app_info::{InstalledWebAppInfo, WebUiInfo};
-use tauri::{
-  window::WindowBuilder, AppHandle, CustomMenuItem, Manager, SystemTrayMenu, SystemTrayMenuItem,
-  WindowUrl, Wry,
-};
+use tauri::{AppHandle, CustomMenuItem, Manager, SystemTrayMenu, SystemTrayMenuItem,Wry};
 
-use crate::launcher::{state::LauncherState, manager::HolochainId};
+use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::{profile_tauri_dir, Profile}, build_admin_window};
 
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
   match event_id.as_str() {
@@ -29,14 +26,11 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
         window.show().unwrap();
         window.set_focus().unwrap();
       } else {
-        let r = WindowBuilder::new(app, "admin", WindowUrl::App("index.html".into()))
-          .inner_size(1200.0, 880.0)
-          .title("Holochain Admin")
-          .build();
-
-        log::info!("Creating admin window {:?}", r);
+        let profile = app.state::<Profile>().inner().to_owned();
+        let local_storage_path = profile_tauri_dir(profile).unwrap();
+        let _r = build_admin_window(&app.app_handle(), local_storage_path).unwrap();
       }
-    }
+    },
     menu_item_id => {
       let (version, app_id) =
         expand_holochain_and_app_id(String::from(menu_item_id)).expect("Bad menu item?");
@@ -90,6 +84,12 @@ pub fn update_system_tray(
 ) -> () {
   let mut menu = SystemTrayMenu::new();
 
+  for item in builtin_system_tray() {
+    menu = menu.add_item(item);
+  }
+
+  menu = menu.add_native_item(SystemTrayMenuItem::Separator);
+
   for (version, installed_apps) in &all_installed_apps.by_version {
     for app in installed_apps {
       if let AppInfoStatus::Running = app.installed_app_info.status {
@@ -106,7 +106,6 @@ pub fn update_system_tray(
         }
       }
     }
-    menu = menu.add_native_item(SystemTrayMenuItem::Separator);
   }
 
   if let Some(custom_binary_apps) = &all_installed_apps.custom_binary {
@@ -124,9 +123,6 @@ pub fn update_system_tray(
     }
   }
 
-  for item in builtin_system_tray() {
-    menu = menu.add_item(item);
-  }
   if let Err(err) = app_handle.tray_handle().set_menu(menu) {
     log::error!("Error setting the system tray: {:?}", err);
   }

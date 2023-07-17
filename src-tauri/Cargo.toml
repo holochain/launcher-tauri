@@ -53,6 +53,7 @@ serde = {version = "1", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
 tauri = {version = "1.4.0", features = ["cli", "clipboard-write-text", "devtools", "dialog-all", "native-tls-vendored", "reqwest-native-tls-vendored", "shell-open", "system-tray", "updater"] }
+tauri-plugin-single-instance = { git = "https://github.com/matthme/plugins-workspace", branch = "single-instance-semver" }
 thiserror = "1.0.30"
 url2 = "0.0.6"
 mime_guess = "2.0.4"
