@@ -7,6 +7,9 @@ use crate::{
   launcher::{state::LauncherState}
 };
 
+use holochain_manager::versions::HolochainVersion;
+use strum::IntoEnumIterator;
+
 #[tauri::command]
 pub async fn execute_factory_reset(
   window: tauri::Window,
@@ -77,10 +80,9 @@ pub async fn execute_factory_reset(
     })?;
 
   } else {
-    let mut mutex = (*state).lock().await;
-    let launcher_manager = mutex.get_running()?;
-    for (version, _state) in &launcher_manager.holochain_managers {
-      let holochain_version_data_dir = holochain_version_data_dir(version, profile.clone())
+
+    for version in HolochainVersion::iter() {
+      let holochain_version_data_dir = holochain_version_data_dir(&version, profile.clone())
         .map_err(|e| {
           log::error!("Failed to get data directory of holochain version {:?} during factory reset: {:?}", version, e);
           format!("Failed to get data directory of holochain version {:?} during factory reset: {:?}", version, e)

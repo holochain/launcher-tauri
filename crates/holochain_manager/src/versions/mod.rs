@@ -1,6 +1,7 @@
 use enum_dispatch::enum_dispatch;
 use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};
 use std::path::PathBuf;
+use strum_macros::EnumIter;
 use url2::Url2;
 
 // NEW_VERSION: Upgrade these two crates so that they refer to the latest version of them
@@ -51,7 +52,7 @@ impl Into<String> for HdiVersion {
 }
 
 // NEW_VERSION: Add the new Holochain version to this enum
-#[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
+#[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str, EnumIter)]
 pub enum HolochainVersion {
   #[serde(rename = "Custom Binary")]
   CustomBinary,
