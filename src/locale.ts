@@ -159,7 +159,7 @@ const messages = {
         part1:
           "Unfortunately, the Holochain Launcher does not support a password recovery mechanism at this stage.",
         part2:
-          "Your only option is to do a factory reset (Settings > Factory Reset) to delete your current profile alongside with all your holochain apps and restart from scratch.",
+        "Your only option is to do a factory reset (Settings > Factory Reset) to delete your current profile alongside with all your holochain apps and restart from scratch. You will need to select the option \"Delete data of ALL Holochain versions, reset password and delete private keys\".",
       },
       factoryReset: {
         title: "Factory Reset",
@@ -174,7 +174,7 @@ const messages = {
         optionalDeletions: "Optional:",
         deleteLair: "Delete Private Keys",
         deleteLogs: "Delete Logs",
-        deleteAllHolochainVersions: "(not recommended) Delete data of ALL Holochain versions. This includes Holochain versions that are or were used by other versions of the Holochain Launcher."
+        deleteAllHolochainVersions: "(not recommended) Delete data of ALL Holochain versions, reset password and delete private keys. This can include deletion of Holochain versions that are or were used by other versions of the Holochain Launcher."
       },
       guiUpdate: {
         title: "UI Update",
@@ -351,7 +351,7 @@ const messages = {
         part1:
           "Leider unterstützt Holochain Launcher momentan noch keinen Passwort Wiederherstellungs-Mechanismus.",
         part2:
-          "Die einzige Option ist, den Holochain Launcher komplett zurückzusetzen (Settings > Factory Reset) um dein Profil und all deine Holochain Apps zu löschen und von vorne zu beginnen.",
+        "Die einzige Option ist, den Holochain Launcher komplett zurückzusetzen (Settings > Factory Reset) um dein Profil und all deine Holochain Apps zu löschen und von vorne zu beginnen. Du musst dabei die Option \"Daten ALLER Holochain Versionen löschen, Passwort zurücksetzen und Private Keys löschen\" wählen.",
       },
       factoryReset: {
         title: "Zurücksetzen",
@@ -366,7 +366,7 @@ const messages = {
         optionalDeletions: "Optional:",
         deleteLair: "Private Schlüssel löschen",
         deleteLogs: "Log Dateien löschen",
-        deleteAllHolochainVersions: "(Nicht empfohlen) Daten ALLER Holochain Versionen löschen. Dies beinhaltet Holochain Versionen, die von anderen Versionen des Holochain Launcher verwendet werden oder wurden."
+        deleteAllHolochainVersions: "(Nicht empfohlen) Daten ALLER Holochain Versionen löschen, Passwort zurücksetzen und Private Keys löschen. Dies kann das Löschen von Holochain Versionen beinhalten, die von anderen Versionen des Holochain Launcher verwendet werden oder wurden."
       },
       guiUpdate: {
         title: "UI Update",

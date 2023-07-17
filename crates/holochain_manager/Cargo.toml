@@ -30,6 +30,8 @@ portpicker = "0.1.1"
 serde = {version = "1", features = ["derive"]}
 serde-enum-str = "0.2"
 serde_yaml = "0.8"
+strum = "0.25.0"
+strum_macros = "0.25.1"
 tauri = {version = "1.4.0", features = ["native-tls-vendored", "reqwest-native-tls-vendored"]}
 thiserror = "1.0.30"
 url2 = "0.0.6"

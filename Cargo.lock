@@ -2009,7 +2009,7 @@ dependencies = [
  "rand 0.8.5",
  "rand_core 0.6.4",
  "serde",
- "strum",
+ "strum 0.18.0",
  "strum_macros 0.18.0",
 ]
 
@@ -2920,7 +2920,7 @@ dependencies = [
  "shrinkwraprs",
  "sodoken",
  "structopt",
- "strum",
+ "strum 0.18.0",
  "subtle-encoding",
  "task-motel",
  "tempfile",
@@ -2971,6 +2971,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml 0.8.26",
+ "strum 0.25.0",
  "tauri",
  "tauri-build",
  "tauri-plugin-single-instance",
@@ -3209,6 +3210,8 @@ dependencies = [
  "serde",
  "serde-enum-str",
  "serde_yaml 0.8.26",
+ "strum 0.25.0",
+ "strum_macros 0.25.1",
  "tauri",
  "thiserror",
  "url2",
@@ -3435,7 +3438,7 @@ dependencies = [
  "serde_with 1.14.0",
  "serde_yaml 0.9.21",
  "shrinkwraprs",
- "strum",
+ "strum 0.18.0",
  "strum_macros 0.18.0",
  "tempfile",
  "thiserror",
@@ -3469,7 +3472,7 @@ checksum = "176e6f1545fe86c407b95b22f309d29d4cbfe7643e302b7ebc388a6324452106"
 dependencies = [
  "holochain_types",
  "holochain_util",
- "strum",
+ "strum 0.18.0",
  "strum_macros 0.18.0",
  "toml 0.5.11",
  "walkdir",
@@ -3620,7 +3623,7 @@ dependencies = [
  "serde_bytes",
  "serde_yaml 0.9.21",
  "shrinkwraprs",
- "strum",
+ "strum 0.18.0",
  "subtle",
  "subtle-encoding",
  "thiserror",
@@ -7712,6 +7715,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "57bd81eb48f4c437cadc685403cad539345bf703d78e63707418431cecd4522b"
 
 [[package]]
+name = "strum"
+version = "0.25.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "290d54ea6f91c969195bdbcd7442c8c2a2ba87da8bf60a7ee86a235d4bc1e125"
+
+[[package]]
 name = "strum_macros"
 version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7734,6 +7743,19 @@ dependencies = [
  "quote",
  "rustversion",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "strum_macros"
+version = "0.25.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6069ca09d878a33f883cc06aaa9718ede171841d3832450354410b718b097232"
+dependencies = [
+ "heck 0.4.1",
+ "proc-macro2",
+ "quote",
+ "rustversion",
+ "syn 2.0.15",
 ]
 
 [[package]]
