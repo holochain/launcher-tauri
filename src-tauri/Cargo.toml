@@ -7,7 +7,7 @@ edition = "2021"
 license = ""
 name = "holochain-launcher"
 repository = ""
-version = "0.10.972"
+version = "0.10.973"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

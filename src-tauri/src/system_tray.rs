@@ -5,10 +5,7 @@ use holochain_manager::versions::{
   holochain_conductor_api_latest::AppInfoStatus, HolochainVersion,
 };
 use holochain_web_app_manager::installed_web_app_info::{InstalledWebAppInfo, WebUiInfo};
-use tauri::{
-  window::WindowBuilder, AppHandle, CustomMenuItem, Manager, SystemTrayMenu, SystemTrayMenuItem,
-  WindowUrl, Wry,
-};
+use tauri::{ AppHandle, CustomMenuItem, Manager, SystemTrayMenu, SystemTrayMenuItem, Wry };
 
 use crate::{launcher::{state::LauncherState, manager::HolochainId}, build_admin_window, file_system::{profile_tauri_dir, Profile}};
 
