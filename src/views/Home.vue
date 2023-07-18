@@ -74,7 +74,7 @@
         src="/img/Square284x284Logo.png"
         style="height: 30px; z-index: -1px;"
       />
-    <span class="beta-indicator">Beta 0.1</span>
+    <span class="beta-indicator" title="Uses Holochain Beta 0.1">Beta 0.1</span>
   </div>
 
   <HCSnackbar leading :labelText="snackbarText" ref="snackbar"></HCSnackbar>
