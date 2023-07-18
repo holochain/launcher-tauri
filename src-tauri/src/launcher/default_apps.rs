@@ -34,6 +34,11 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
 
     let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev2")) } else { Some(String::from("test-network-0.10.972")) };
 
+    let gui_release_info = ReleaseInfo {
+      resource_locator: None,
+      version: Some(APPSTORE_VERSION.to_string()),
+    };
+
     manager
       .install_web_app(
         APPSTORE_APP_ID.to_string(),
@@ -42,7 +47,7 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
         HashMap::new(),
         None,
         None,
-        None,
+        Some(gui_release_info),
       )
       .await?;
   } else { // If the AppStore is already installed, check UI version
