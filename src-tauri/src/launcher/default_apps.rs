@@ -9,10 +9,10 @@ use holochain_web_app_manager::{WebAppManager, ReleaseInfo};
 // Those are used to install new Appstore/DevHub UI's if necessary
 // NEW_VERSION Change appstore and devhub versions here if required
 const APPSTORE_VERSION: &str = "834c3d3cc15d24fb6d598d64f76a69d844cb6e61"; // shasum
-const DEVHUB_VERSION: &str = "4f09a03478c89c668b9f94dfeab22234f1e70623"; // shasum
+pub const DEVHUB_VERSION: &str = "4f09a03478c89c668b9f94dfeab22234f1e70623"; // shasum
 
 const APPSTORE_APP_ID: &str = "AppStore";
-const DEVHUB_APP_ID: &str = "DevHub";
+pub const DEVHUB_APP_ID: &str = "DevHub";
 
 
 
@@ -34,6 +34,11 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
 
     let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev2")) } else { Some(String::from("test-network-0.10.972")) };
 
+    let happ_release_info = ReleaseInfo {
+      resource_locator: None,
+      version: Some(APPSTORE_VERSION.to_string()),
+    };
+
     let gui_release_info = ReleaseInfo {
       resource_locator: None,
       version: Some(APPSTORE_VERSION.to_string()),
@@ -46,7 +51,7 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
         network_seed,
         HashMap::new(),
         None,
-        None,
+        Some(happ_release_info),
         Some(gui_release_info),
       )
       .await?;

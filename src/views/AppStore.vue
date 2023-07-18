@@ -22,8 +22,8 @@
     </HCButton>
   </div>
 
-  <div v-if="loading" style="flex: 1; min-height: calc(100vh - 124px); margin: 16px;">
-    <div class="column center-content" style="margin-top: 360px;">
+  <div v-if="loading" class="column" style="flex: 1; min-height: calc(100vh - 124px); margin-top: 60px;">
+    <div class="column center-content" style="display: flex; flex: 1;">
       <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
     </div>
   </div>
@@ -46,7 +46,7 @@
     </div>
   </div>
 
-  <div ref="apps-list" v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px); margin-bottom: 200px; margin-top: 80px;">
+  <div ref="apps-list" v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 124px); margin-bottom: 80px; margin-top: 80px;">
     <div
     v-for="(app, i) of installableApps"
       :key="i"
