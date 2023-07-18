@@ -47,12 +47,12 @@
 
   <div ref="apps-list" v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 64px); margin-bottom: 200px; margin-top: 80px; align-content: flex-start;">
     <div
-      v-for="(app, i) of filteredApps"
+      v-for="(app, i) of installableApps"
       :key="i"
       class="column"
       style="margin-right: 16px; margin-bottom: 16px;"
     >
-      <AppPreviewCard :app="app" :appWebsocket="appWebsocket" @installApp="requestInstall(app, $event.imgSrc)" />
+      <AppPreviewCard v-show="filteredApps.includes(app)" :app="app" :appWebsocket="appWebsocket" @installApp="requestInstall(app, $event.imgSrc)" />
     </div>
   </div>
 
@@ -263,7 +263,7 @@ export default defineComponent({
       }
       const searchString = (this.$refs["search-field"] as typeof HCTextField).value;
       if (searchString && searchString !== "") {
-        return this.installableApps.filter((app) => app.title.includes(searchString) || app.subtitle.includes(searchString));
+        return this.installableApps.filter((app) => app.title.toLowerCase().includes(searchString.toLowerCase()) || app.subtitle.toLowerCase().includes(searchString.toLowerCase()));
       }
       return this.installableApps;
     },
@@ -502,12 +502,11 @@ export default defineComponent({
     },
     highlightSearchString() {
       const searchString = (this.$refs["search-field"] as typeof HCTextField).value;
-      console.log("saerchstring: ", searchString);
       const appsListElement = this.$refs["apps-list"] as HTMLElement | undefined;
       if (appsListElement) {
         var instance = new Mark(appsListElement);
         instance.unmark();
-        instance.mark(searchString, { className: "mark" });
+        instance.mark(searchString, { className: "mark", caseSensitive: false });
       }
     }
   },
