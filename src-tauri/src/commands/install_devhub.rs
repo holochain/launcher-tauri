@@ -2,8 +2,9 @@ use std::collections::HashMap;
 
 use holochain_manager::versions::HolochainVersion;
 use holochain_types::web_app::WebAppBundle;
+use holochain_web_app_manager::ReleaseInfo;
 
-use crate::launcher::{state::LauncherState, manager::HolochainId};
+use crate::launcher::{state::LauncherState, manager::HolochainId, default_apps::{DEVHUB_APP_ID, DEVHUB_VERSION}};
 
 
 /// Installs the DevHub if it is not already installed.
@@ -30,22 +31,32 @@ pub async fn install_devhub(
   if apps.iter()
     .map(|info| info.installed_app_info.installed_app_id.clone())
     .collect::<Vec<String>>()
-    .contains(&devhub_app_id) == false {
+    .contains(&DEVHUB_APP_ID.to_string()) == false {
 
     let devhub_bundle = WebAppBundle::decode(include_bytes!("../../../DevHub.webhapp"))
       .or(Err("Malformed webhapp bundle file"))?;
 
     let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { None };
 
+    let happ_release_info = ReleaseInfo {
+      resource_locator: None,
+      version: Some(DEVHUB_VERSION.to_string()),
+    };
+
+    let gui_release_info = ReleaseInfo {
+      resource_locator: None,
+      version: Some(DEVHUB_VERSION.to_string()),
+    };
+
     webapp_manager
       .install_web_app(
-        devhub_app_id,
+        DEVHUB_APP_ID.to_string(),
         devhub_bundle,
         network_seed,
         HashMap::new(),
         None,
-        None,
-        None,
+        Some(happ_release_info),
+        Some(gui_release_info),
       )
       .await?;
 
