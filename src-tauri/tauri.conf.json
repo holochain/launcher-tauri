@@ -1,7 +1,7 @@
 {
   "package": {
     "productName": "Holochain Launcher Beta 3",
-    "version": "0.10.973"
+    "version": "0.10.974"
   },
   "build": {
     "distDir": "../dist",
@@ -26,7 +26,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "holochain-launcher-0.3",
+      "identifier": "holochain-launcher-0.2",
       "publisher": "Holochain Foundation",
       "icon": [
         "icons/32x32.png",
