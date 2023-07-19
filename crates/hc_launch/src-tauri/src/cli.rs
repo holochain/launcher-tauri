@@ -2,11 +2,11 @@
 
 // use holochain_types::prelude::InstalledAppId;
 // use std::path::Path;
-use holochain_cli_sandbox::calls::{attach_app_interface, AddAppWs, InstallApp, Call, AdminRequestCli};
-use holochain_cli_sandbox::run::run_async;
-use holochain_cli_sandbox::CmdRunner;
+use holochain_cli_sandbox::calls::{InstallApp, Call, AdminRequestCli};
+use holochain_cli_sandbox::cli::{generate, run_n};
 use holochain_launcher_utils::window_builder::UISource;
 use holochain_types::prelude::InstalledAppId;
+use holochain_trace::Output;
 use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 use tokio::process::Child;
@@ -407,7 +407,7 @@ async fn spawn_sandboxes(
   create: Create,
   app_id: InstalledAppId,
 ) -> anyhow::Result<Vec<(Child, Option<Child>)>> {
-  let sandbox_paths = generate(holochain_path, Some(happ_path), create, app_id).await?;
+  let sandbox_paths = generate(holochain_path, Some(happ_path), create, app_id, Output::Log).await?;
 
   let port = portpicker::pick_unused_port().expect("Cannot find any unused port");
   let force_admin_ports: Vec<u16> = vec![];
@@ -419,6 +419,7 @@ async fn spawn_sandboxes(
     sandbox_paths,
     vec![port],
     force_admin_ports,
+    Output::Log,
   )
   .await;
 

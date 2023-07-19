@@ -3114,6 +3114,7 @@ dependencies = [
  "holochain_client",
  "holochain_conductor_api",
  "holochain_launcher_utils",
+ "holochain_trace",
  "holochain_types",
  "holochain_util",
  "holochain_zome_types",
