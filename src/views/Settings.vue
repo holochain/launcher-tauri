@@ -158,7 +158,7 @@
             >
               <ToggleSwitch
                 style="margin-right: 29px"
-                :sliderOn="!!devHubAppInfo && isAppRunning(devHubAppInfo?.webAppInfo.installed_app_info)"
+                :sliderOn="devHubAppInfo ? isAppRunning(devHubAppInfo.webAppInfo.installed_app_info) : false"
                 @click.stop.prevent="toggleDevMode()"
                 @keydown.enter="toggleDevMode()"
               />
