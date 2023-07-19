@@ -428,77 +428,77 @@ async fn spawn_sandboxes(
   result
 }
 
-// copied from hc sandbox because it's private (https://github.com/holochain/holochain/blob/540c2497f778cc004c1e7114662733fe197790cc/crates/hc_sandbox/src/cli.rs#L219)
-async fn generate(
-  holochain_path: &Path,
-  happ: Option<PathBuf>,
-  create: Create,
-  app_id: InstalledAppId,
-) -> anyhow::Result<Vec<PathBuf>> {
-  let happ = holochain_cli_sandbox::bundles::parse_happ(happ)?;
-  let paths =
-    holochain_cli_sandbox::sandbox::default_n(holochain_path, create, happ, app_id).await?;
-  holochain_cli_sandbox::save::save(std::env::current_dir()?, paths.clone())?;
-  Ok(paths)
-}
+// // copied from hc sandbox because it's private (https://github.com/holochain/holochain/blob/540c2497f778cc004c1e7114662733fe197790cc/crates/hc_sandbox/src/cli.rs#L219)
+// async fn generate(
+//   holochain_path: &Path,
+//   happ: Option<PathBuf>,
+//   create: Create,
+//   app_id: InstalledAppId,
+// ) -> anyhow::Result<Vec<PathBuf>> {
+//   let happ = holochain_cli_sandbox::bundles::parse_happ(happ)?;
+//   let paths =
+//     holochain_cli_sandbox::sandbox::default_n(holochain_path, create, happ, app_id).await?;
+//   holochain_cli_sandbox::save::save(std::env::current_dir()?, paths.clone())?;
+//   Ok(paths)
+// }
 
-// copied over from hc_sanbox because it's not public (https://github.com/holochain/holochain/blob/03f315be92991f374cba341d210340f7e1141578/crates/hc_sandbox/src/cli.rs#L190)
-async fn run_n(
-  holochain_path: &Path,
-  paths: Vec<PathBuf>,
-  app_ports: Vec<u16>,
-  force_admin_ports: Vec<u16>,
-) -> anyhow::Result<Vec<(Child, Option<Child>)>> {
-  let run_holochain = |holochain_path: PathBuf, path: PathBuf, ports, force_admin_port| async move {
-    run(&holochain_path, path, ports, force_admin_port).await
-  };
-  let mut force_admin_ports = force_admin_ports.into_iter();
-  let mut app_ports = app_ports.into_iter();
+// // copied over from hc_sanbox because it's not public (https://github.com/holochain/holochain/blob/03f315be92991f374cba341d210340f7e1141578/crates/hc_sandbox/src/cli.rs#L190)
+// async fn run_n(
+//   holochain_path: &Path,
+//   paths: Vec<PathBuf>,
+//   app_ports: Vec<u16>,
+//   force_admin_ports: Vec<u16>,
+// ) -> anyhow::Result<Vec<(Child, Option<Child>)>> {
+//   let run_holochain = |holochain_path: PathBuf, path: PathBuf, ports, force_admin_port| async move {
+//     run(&holochain_path, path, ports, force_admin_port).await
+//   };
+//   let mut force_admin_ports = force_admin_ports.into_iter();
+//   let mut app_ports = app_ports.into_iter();
 
-  let jhs = paths
-    .into_iter()
-    .zip(std::iter::repeat_with(|| force_admin_ports.next()))
-    .zip(std::iter::repeat_with(|| app_ports.next()))
-    .map(|((path, force_admin_port), app_port)| {
-      run_holochain(
-        holochain_path.to_path_buf(),
-        path,
-        app_port.map(|p| vec![p]).unwrap_or_default(),
-        force_admin_port,
-      )
-    });
-  let childs = futures::future::try_join_all(jhs).await?;
+//   let jhs = paths
+//     .into_iter()
+//     .zip(std::iter::repeat_with(|| force_admin_ports.next()))
+//     .zip(std::iter::repeat_with(|| app_ports.next()))
+//     .map(|((path, force_admin_port), app_port)| {
+//       run_holochain(
+//         holochain_path.to_path_buf(),
+//         path,
+//         app_port.map(|p| vec![p]).unwrap_or_default(),
+//         force_admin_port,
+//       )
+//     });
+//   let childs = futures::future::try_join_all(jhs).await?;
 
-  Ok(childs)
-}
+//   Ok(childs)
+// }
 
-// Copied over from hc_sandbox (https://github.com/holochain/holochain/blob/540c2497f778cc004c1e7114662733fe197790cc/crates/hc_sandbox/src/run.rs#L32)
-// to make it possible to listen to when conductors are ready
-pub async fn run(
-  holochain_path: &Path,
-  sandbox_path: PathBuf,
-  app_ports: Vec<u16>,
-  force_admin_port: Option<u16>,
-) -> anyhow::Result<(Child, Option<Child>)> {
-  let (port, holochain, lair) =
-    run_async(holochain_path, sandbox_path.clone(), force_admin_port).await?;
-  println!("Running conductor on admin port {} {:?}", port, app_ports);
-  for app_port in app_ports {
-    let mut cmd = CmdRunner::try_new(port).await?;
-    let port = attach_app_interface(
-      &mut cmd,
-      AddAppWs {
-        port: Some(app_port),
-      },
-    )
-    .await?;
-    println!("App port attached at {}", port);
-  }
-  holochain_cli_sandbox::save::lock_live(std::env::current_dir()?, &sandbox_path, port).await?;
-  println!("Connected successfully to a running holochain");
-  let _e = format!("Failed to run holochain at {}", sandbox_path.display());
-  Ok((holochain, lair))
-}
+// // Copied over from hc_sandbox (https://github.com/holochain/holochain/blob/540c2497f778cc004c1e7114662733fe197790cc/crates/hc_sandbox/src/run.rs#L32)
+// // to make it possible to listen to when conductors are ready
+// pub async fn run(
+//   holochain_path: &Path,
+//   sandbox_path: PathBuf,
+//   app_ports: Vec<u16>,
+//   force_admin_port: Option<u16>,
+// ) -> anyhow::Result<(Child, Option<Child>)> {
+//   let (port, holochain, lair) =
+//     run_async(holochain_path, sandbox_path.clone(), force_admin_port).await?;
+//   println!("Running conductor on admin port {} {:?}", port, app_ports);
+//   for app_port in app_ports {
+//     let mut cmd = CmdRunner::try_new(port).await?;
+//     let port = attach_app_interface(
+//       &mut cmd,
+//       AddAppWs {
+//         port: Some(app_port),
+//       },
+//     )
+//     .await?;
+//     println!("App port attached at {}", port);
+//   }
+//   holochain_cli_sandbox::save::lock_live(std::env::current_dir()?, &sandbox_path, port).await?;
+//   println!("Connected successfully to a running holochain");
+//   let _e = format!("Failed to run holochain at {}", sandbox_path.display());
+//   Ok((holochain, lair))
+// }
 
 
 /// Reads the contents of the .hc_live_{n} files in the given path where n is 0 to n_expected
