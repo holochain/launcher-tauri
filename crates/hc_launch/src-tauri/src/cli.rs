@@ -2,31 +2,33 @@
 
 // use holochain_types::prelude::InstalledAppId;
 // use std::path::Path;
-use holochain_cli_sandbox::calls::{InstallApp, Call, AdminRequestCli};
-use holochain_cli_sandbox::cli::{generate, run_n};
+use clap::Parser;
+use holochain_cli_sandbox::CmdRunner;
+use holochain_cli_sandbox::calls::{InstallApp, Call, AdminRequestCli, attach_app_interface, AddAppWs};
+use holochain_cli_sandbox::cli::generate;
+use holochain_cli_sandbox::run::run_async;
 use holochain_launcher_utils::window_builder::UISource;
 use holochain_types::prelude::InstalledAppId;
 use holochain_trace::Output;
-use std::path::{Path, PathBuf};
-use structopt::StructOpt;
 use tokio::process::Child;
+use std::path::{PathBuf, Path};
 
 use crate::launch_tauri::launch_tauri;
 use crate::prepare_webapp;
 use holochain_cli_sandbox::cmds::{Create, Existing, NetworkCmd, NetworkType};
 
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 /// Helper for launching holochain apps in a Holochain Launcher environment for testing and development purposes.
 ///
 pub struct HcLaunch {
   /// Instead of the normal "interactive" passphrase mode,
   /// collect the passphrase by reading stdin to the end.
-  #[structopt(long)]
+  #[arg(long)]
   piped: bool,
 
   /// Set the path to the holochain binary.
-  #[structopt(long, env = "HC_HOLOCHAIN_PATH", default_value = "holochain")]
+  #[arg(long, env = "HC_HOLOCHAIN_PATH", default_value = "holochain")]
   holochain_path: PathBuf,
 
   /// Path to .webhapp or .happ file to launch. If a .happ file is passed, either
@@ -38,22 +40,22 @@ pub struct HcLaunch {
   /// Install and run the app into already running conductors.
   /// The number of sandboxes cannot be specified if this flag is used
   /// since the app will just be installed into all existing conductors.
-  #[structopt(long)]
+  #[arg(long)]
   reuse_conductors: bool,
 
   /// Install the app with a specific network seed.
   /// This option can currently only be used with the `--reuse-conductors` flag.
-  #[structopt(long)]
+  #[arg(long)]
   network_seed: Option<String>,
 
   /// Install the app with a specific app id. By default the app id is derived
   /// from the name of the .webhapp/.happ file that you pass but this option allows
   /// you to set it explicitly.
-  #[structopt(long)]
+  #[arg(long)]
   app_id: Option<String>,
 
 
-  #[structopt(long)]
+  #[arg(long)]
   /// Port pointing to a localhost server that serves your assets.
   /// NOTE: This is only meant for development purposes! Apps can behave differently when
   /// served from a localhost server than when actually running in the Holochain Launcher.
@@ -61,20 +63,20 @@ pub struct HcLaunch {
   /// the packaged .webhapp to test the actual behavior of your hApp in the Holochain Launcher.
   ui_port: Option<u16>,
 
-  #[structopt(long)]
+  #[arg(long)]
   /// path to the UI. Required if a .happ file is passed.
   ui_path: Option<PathBuf>,
 
   /// Watch for file changes in the UI folder. Requires --ui-path to be specified.
-  #[structopt(long, short)]
+  #[arg(long, short)]
   watch: bool,
 
   /// (flattened)
-  #[structopt(flatten)]
+  #[command(flatten)]
   create: Create,
 
   /// Explicitly allow to use the official production signaling server
-  #[structopt(long)]
+  #[arg(long)]
   force_production: bool,
 }
 
@@ -135,7 +137,7 @@ impl HcLaunch {
 ERROR
 
 You are attempting to use the official production signaling server of holochain.
-It is recommended to instead use the `hc signal-srv` command of the holochain CLI to spawn a local signaling server for testing.
+It is recommended to instead use the `hc run-local-services` command of the holochain CLI to spawn a local bootstrap and signaling server for testing.
 If you are sure that you want to use the production signaling server with hc launch, use the --force-production flag.
 
 "#);
@@ -144,6 +146,24 @@ If you are sure that you want to use the production signaling server with hc lau
           }
         },
         _ => ()
+      }
+
+      match n.bootstrap {
+        Some(url) => {
+          if (url.to_string() == "https://bootstrap.holo.host") || (url.to_string() == "http://bootstrap.holo.host") && self.force_production == false {
+            eprintln!(r#"
+ERROR
+
+You are attempting to use the official production bootstrap server of holochain.
+It is recommended to instead use the `hc run-local-services` command of the holochain CLI to spawn a local bootstrap and signaling server for testing.
+If you are sure that you want to use the production bootstrap server with hc launch, use the --force-production flag.
+
+"#);
+
+            panic!("Attempted to use production bootstrap server without explicitly allowing it.");
+          }
+        },
+        _ => (),
       }
     }
 
@@ -222,7 +242,7 @@ If you are sure that you want to use the production signaling server with hc lau
                     call: AdminRequestCli::InstallApp(install_app),
                   };
 
-                  holochain_cli_sandbox::calls::call(&self.holochain_path, call).await?;
+                  holochain_cli_sandbox::calls::call(&self.holochain_path, call, Output::Log).await?;
 
                 } else {
                   // clean existing sandboxes
@@ -242,14 +262,6 @@ If you are sure that you want to use the production signaling server with hc lau
                     holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
                     println!("Released ports.");
                     temp_dir.close().unwrap();
-                    // killing child processes
-                    for (mut holochain_process, lair_process) in child_processes {
-                      holochain_process.start_kill().unwrap();
-                      if let Some(mut p) = lair_process {
-                        p.start_kill().unwrap();
-                      }
-                    }
-                    println!("Killed holochain processes, press Ctrl+C to quit.");
                     std::process::exit(0);
                   });
                 }
@@ -330,7 +342,7 @@ If you are sure that you want to use the production signaling server with hc lau
                         call: AdminRequestCli::InstallApp(install_app),
                       };
 
-                      holochain_cli_sandbox::calls::call(&self.holochain_path, call).await?;
+                      holochain_cli_sandbox::calls::call(&self.holochain_path, call, Output::Log).await?;
 
                     } else {
                       // clean existing sandboxes
@@ -338,7 +350,7 @@ If you are sure that you want to use the production signaling server with hc lau
 
                       // spawn sandboxes
                       println!("[hc launch] Spawning sandbox conductors.");
-                      let child_processes = spawn_sandboxes(
+                      spawn_sandboxes(
                         &self.holochain_path,
                         p,
                         self.create,
@@ -350,15 +362,6 @@ If you are sure that you want to use the production signaling server with hc lau
                         tokio::signal::ctrl_c().await.unwrap();
                         holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
                         println!("Released ports.");
-
-                        // killing child processes
-                        for (mut holochain_process, lair_process) in child_processes {
-                          holochain_process.start_kill().unwrap();
-                          if let Some(mut p) = lair_process {
-                            p.start_kill().unwrap();
-                          }
-                        }
-                        println!("Killed holochain processes, press Ctrl+C to quit.");
                         std::process::exit(0);
                       });
 
@@ -414,12 +417,12 @@ async fn spawn_sandboxes(
 
   let holochain_path_clone = holochain_path.clone();
   let force_admin_ports = force_admin_ports.clone();
+
   let result = run_n(
     &holochain_path_clone,
     sandbox_paths,
     vec![port],
     force_admin_ports,
-    Output::Log,
   )
   .await;
 
@@ -443,63 +446,63 @@ async fn spawn_sandboxes(
 //   Ok(paths)
 // }
 
-// // copied over from hc_sanbox because it's not public (https://github.com/holochain/holochain/blob/03f315be92991f374cba341d210340f7e1141578/crates/hc_sandbox/src/cli.rs#L190)
-// async fn run_n(
-//   holochain_path: &Path,
-//   paths: Vec<PathBuf>,
-//   app_ports: Vec<u16>,
-//   force_admin_ports: Vec<u16>,
-// ) -> anyhow::Result<Vec<(Child, Option<Child>)>> {
-//   let run_holochain = |holochain_path: PathBuf, path: PathBuf, ports, force_admin_port| async move {
-//     run(&holochain_path, path, ports, force_admin_port).await
-//   };
-//   let mut force_admin_ports = force_admin_ports.into_iter();
-//   let mut app_ports = app_ports.into_iter();
+// copied over from hc_sanbox because it's not public (https://github.com/holochain/holochain/blob/03f315be92991f374cba341d210340f7e1141578/crates/hc_sandbox/src/cli.rs#L190)
+async fn run_n(
+  holochain_path: &Path,
+  paths: Vec<PathBuf>,
+  app_ports: Vec<u16>,
+  force_admin_ports: Vec<u16>,
+) -> anyhow::Result<Vec<(Child, Option<Child>)>> {
+  let run_holochain = |holochain_path: PathBuf, path: PathBuf, ports, force_admin_port| async move {
+    run(&holochain_path, path, ports, force_admin_port).await
+  };
+  let mut force_admin_ports = force_admin_ports.into_iter();
+  let mut app_ports = app_ports.into_iter();
 
-//   let jhs = paths
-//     .into_iter()
-//     .zip(std::iter::repeat_with(|| force_admin_ports.next()))
-//     .zip(std::iter::repeat_with(|| app_ports.next()))
-//     .map(|((path, force_admin_port), app_port)| {
-//       run_holochain(
-//         holochain_path.to_path_buf(),
-//         path,
-//         app_port.map(|p| vec![p]).unwrap_or_default(),
-//         force_admin_port,
-//       )
-//     });
-//   let childs = futures::future::try_join_all(jhs).await?;
+  let jhs = paths
+    .into_iter()
+    .zip(std::iter::repeat_with(|| force_admin_ports.next()))
+    .zip(std::iter::repeat_with(|| app_ports.next()))
+    .map(|((path, force_admin_port), app_port)| {
+      run_holochain(
+        holochain_path.to_path_buf(),
+        path,
+        app_port.map(|p| vec![p]).unwrap_or_default(),
+        force_admin_port,
+      )
+    });
+  let childs = futures::future::try_join_all(jhs).await?;
 
-//   Ok(childs)
-// }
+  Ok(childs)
+}
 
 // // Copied over from hc_sandbox (https://github.com/holochain/holochain/blob/540c2497f778cc004c1e7114662733fe197790cc/crates/hc_sandbox/src/run.rs#L32)
 // // to make it possible to listen to when conductors are ready
-// pub async fn run(
-//   holochain_path: &Path,
-//   sandbox_path: PathBuf,
-//   app_ports: Vec<u16>,
-//   force_admin_port: Option<u16>,
-// ) -> anyhow::Result<(Child, Option<Child>)> {
-//   let (port, holochain, lair) =
-//     run_async(holochain_path, sandbox_path.clone(), force_admin_port).await?;
-//   println!("Running conductor on admin port {} {:?}", port, app_ports);
-//   for app_port in app_ports {
-//     let mut cmd = CmdRunner::try_new(port).await?;
-//     let port = attach_app_interface(
-//       &mut cmd,
-//       AddAppWs {
-//         port: Some(app_port),
-//       },
-//     )
-//     .await?;
-//     println!("App port attached at {}", port);
-//   }
-//   holochain_cli_sandbox::save::lock_live(std::env::current_dir()?, &sandbox_path, port).await?;
-//   println!("Connected successfully to a running holochain");
-//   let _e = format!("Failed to run holochain at {}", sandbox_path.display());
-//   Ok((holochain, lair))
-// }
+pub async fn run(
+  holochain_path: &Path,
+  sandbox_path: PathBuf,
+  app_ports: Vec<u16>,
+  force_admin_port: Option<u16>,
+) -> anyhow::Result<(Child, Option<Child>)> {
+  let (port, holochain, lair) =
+    run_async(holochain_path, sandbox_path.clone(), force_admin_port, Output::Log).await?;
+  println!("Running conductor on admin port {} {:?}", port, app_ports);
+  for app_port in app_ports {
+    let mut cmd = CmdRunner::try_new(port).await?;
+    let port = attach_app_interface(
+      &mut cmd,
+      AddAppWs {
+        port: Some(app_port),
+      },
+    )
+    .await?;
+    println!("App port attached at {}", port);
+  }
+  holochain_cli_sandbox::save::lock_live(std::env::current_dir()?, &sandbox_path, port).await?;
+  println!("Connected successfully to a running holochain");
+  let _e = format!("Failed to run holochain at {}", sandbox_path.display());
+  Ok((holochain, lair))
+}
 
 
 /// Reads the contents of the .hc_live_{n} files in the given path where n is 0 to n_expected

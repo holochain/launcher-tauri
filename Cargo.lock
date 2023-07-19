@@ -3108,6 +3108,7 @@ name = "holochain_cli_launch"
 version = "0.0.13"
 dependencies = [
  "anyhow",
+ "clap 4.3.10",
  "futures",
  "holochain",
  "holochain_cli_sandbox",
@@ -3125,7 +3126,6 @@ dependencies = [
  "observability",
  "portpicker",
  "serde",
- "structopt",
  "tauri",
  "tauri-build",
  "tauri-plugin-localhost",
@@ -8375,7 +8375,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-single-instance"
 version = "0.0.0"
-source = "git+https://github.com/matthme/plugins-workspace?branch=single-instance-semver#8440daaedd472e34b6d778eb00bc44d98e0a2867"
+source = "git+https://github.com/matthme/plugins-workspace?branch=single-instance-semver#65037e7dcf8e354ff9445084fab738ad3fd695bb"
 dependencies = [
  "log",
  "semver 1.0.17",
