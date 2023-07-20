@@ -1631,7 +1631,7 @@ checksum = "3c877555693c14d2f84191cfd3ad8582790fc52b5e2274b40b59cf5f5cea25c7"
 [[package]]
 name = "devhub_types"
 version = "0.2.1-beta-rc.0"
-source = "git+https://github.com/matthme/devhub-dnas?branch=holochain-0.2.1-beta-rc.0#21cb312aad920dffe262a2f1bb21a0f8bbf44c98"
+source = "git+https://github.com/holochain/devhub-dnas?rev=44f61801dadf6d63444f6a46f26113305c699ad7#44f61801dadf6d63444f6a46f26113305c699ad7"
 dependencies = [
  "essence_payloads",
  "flate2",
@@ -2784,8 +2784,9 @@ dependencies = [
 
 [[package]]
 name = "hc_crud_ceps"
-version = "0.79.0"
-source = "git+https://github.com/matthme/rust-hc-crud-ceps?branch=holochain-0.2.1-beta-rc.0#d147fddcf4d29a5922f89cd618a212d904399e31"
+version = "0.80.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e8464413d7affb6425c71e27677d428cdd573019d6136693d2a7d71d684911f"
 dependencies = [
  "hdk",
  "holo_hash",
@@ -3033,7 +3034,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-launcher"
-version = "0.10.974"
+version = "0.10.975"
 dependencies = [
  "async-recursion 1.0.4",
  "async-trait",
@@ -5018,8 +5019,9 @@ dependencies = [
 
 [[package]]
 name = "mere_memory_types"
-version = "0.86.0"
-source = "git+https://github.com/matthme/hc-zome-mere-memory?branch=holochain-0.2.1-beta-rc.0#4328e3f1bf1240adeabb7c24dbb7fd3709613aa1"
+version = "0.87.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7c2db054460c8d213654315ba67b4d5b4215903bbabcef75bf1b12de81dc266"
 dependencies = [
  "getrandom 0.2.7",
  "hdi",

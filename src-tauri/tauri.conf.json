@@ -1,7 +1,7 @@
 {
   "package": {
     "productName": "Holochain Launcher Beta 2",
-    "version": "0.10.974"
+    "version": "0.10.975"
   },
   "build": {
     "distDir": "../dist",

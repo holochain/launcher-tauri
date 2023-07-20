@@ -7,7 +7,7 @@ edition = "2021"
 license = ""
 name = "holochain-launcher"
 repository = ""
-version = "0.10.974"
+version = "0.10.975"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -34,7 +34,7 @@ holochain = { version = "0.2.1-beta-rc.0", features = ["sqlite-encrypted"] }
 
 mr_bundle = "0.2.1-beta-rc.0"
 
-devhub_types = { git = "https://github.com/matthme/devhub-dnas", branch = "holochain-0.2.1-beta-rc.0" }
+devhub_types = { git = "https://github.com/holochain/devhub-dnas", rev = "44f61801dadf6d63444f6a46f26113305c699ad7"}
 
 
 async-recursion = "1.0.4"
@@ -44,7 +44,7 @@ dirs-next = "2.0.0"
 futures = "0.3"
 log = "0.4.14"
 log4rs = "1.0.0"
-mere_memory_types = { git = "https://github.com/matthme/hc-zome-mere-memory", branch = "holochain-0.2.1-beta-rc.0" }
+mere_memory_types = "0.87.0"
 open = "2.0.1"
 opener = "0.5.0"
 portpicker = "0.1.1"
