@@ -84,6 +84,12 @@ pub fn update_system_tray(
 ) -> () {
   let mut menu = SystemTrayMenu::new();
 
+  for item in builtin_system_tray() {
+    menu = menu.add_item(item);
+  }
+
+  menu = menu.add_native_item(SystemTrayMenuItem::Separator);
+
   for (version, installed_apps) in &all_installed_apps.by_version {
     for app in installed_apps {
       if let AppInfoStatus::Running = app.installed_app_info.status {
@@ -100,7 +106,6 @@ pub fn update_system_tray(
         }
       }
     }
-    menu = menu.add_native_item(SystemTrayMenuItem::Separator);
   }
 
   if let Some(custom_binary_apps) = &all_installed_apps.custom_binary {
@@ -118,9 +123,6 @@ pub fn update_system_tray(
     }
   }
 
-  for item in builtin_system_tray() {
-    menu = menu.add_item(item);
-  }
   if let Err(err) = app_handle.tray_handle().set_menu(menu) {
     log::error!("Error setting the system tray: {:?}", err);
   }
