@@ -34,7 +34,13 @@
     style="flex: 1; min-height: calc(100vh - 124px); margin: 16px;"
   >
     <div class="column center-content">
-      <span style="max-width: 600px; text-align: center;">{{ $t("appStore.noAppsInStore") }}</span>
+      <div class="radar halo" style="width: 200px; height: 200px;">
+        <div class="__dot"></div>
+        <div class="__dot"></div>
+        <div class="__dot"></div>
+      </div>
+      <span style="max-width: 600px; text-align: center; margin-top: 25px; font-size: 20px;">{{ $t('appStore.searchingForPeers') }}...</span>
+      <span style="max-width: 600px; text-align: center; margin-top: 15px; opacity: 0.8;">{{ $t('appStore.searchingForPeersDetail') }}</span>
     </div>
   </div>
 
@@ -547,6 +553,79 @@ export default defineComponent({
 .refresh-button:hover {
   opacity: 1;
 }
+
+.halo {
+  background-image: url(/img/Square310x310Logo.png);
+  background-size: 105%;
+  background-position: center center;
+  /* filter: grayscale(1); */
+}
+
+.radar {
+  position: relative;
+  width: 60vmin;
+  height: 60vmin;
+  border-radius: 50%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.radar::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: conic-gradient(transparent 94%, #05edc600 94%, #05edc6); /* scanner  color*/
+    border-radius: 50%;
+    animation: spin 2.5s linear infinite;
+  }
+
+
+.radar .__dot {
+    position: absolute;
+    width: 8%;
+    height: 8%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: blink 2.5s ease-out infinite;
+}
+
+.radar .__dot:first-of-type {
+      top: 24%;
+      left: 76%;
+      animation-delay: 0.3s;
+}
+
+    .radar .__dot:nth-of-type(2) {
+      top: 83%;
+      left: 55%;
+      animation-delay: 1.15s;
+    }
+
+    .radar .__dot:last-of-type {
+      top: 36%;
+      left: 36%;
+      animation-delay: 2.2s;
+    }
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes blink {
+  2%,
+  20% {
+    /* background-color: #2096c9; */
+    background-color: #303dab;
+    box-shadow: 0 0 0.3vmin #151e68;
+  }
+
+  90% {
+    background-color: transparent;
+  }
+}
+
 
 </style>
 
