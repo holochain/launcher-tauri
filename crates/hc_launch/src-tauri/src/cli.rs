@@ -75,7 +75,9 @@ pub struct HcLaunch {
   #[command(flatten)]
   create: Create,
 
-  /// Explicitly allow to use the official production signaling server
+  /// Explicitly allow to use the official production signaling and/or bootstrap server(s)
+  /// NOTE: It is strongly recommended to use local signaling and bootstrap servers during development.
+  /// Bootstrap and signaling server for development can be started via `hc run-local-services`.
   #[arg(long)]
   force_production: bool,
 }
@@ -548,3 +550,4 @@ pub fn get_running_ports(path: PathBuf, n_expected: usize) -> Vec<u16> {
   running_ports
 
 }
+
