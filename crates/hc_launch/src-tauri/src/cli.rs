@@ -264,6 +264,14 @@ If you are sure that you want to use the production bootstrap server with hc lau
                     holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
                     println!("Released ports.");
                     temp_dir.close().unwrap();
+                    // killing child processes
+                    for (mut holochain_process, lair_process) in child_processes {
+                      holochain_process.start_kill().unwrap();
+                      if let Some(mut p) = lair_process {
+                        p.start_kill().unwrap();
+                      }
+                    }
+                    println!("Killed holochain processes, press Ctrl+C to quit.");
                     std::process::exit(0);
                   });
                 }
@@ -352,7 +360,7 @@ If you are sure that you want to use the production bootstrap server with hc lau
 
                       // spawn sandboxes
                       println!("[hc launch] Spawning sandbox conductors.");
-                      spawn_sandboxes(
+                      let child_processes = spawn_sandboxes(
                         &self.holochain_path,
                         p,
                         self.create,
@@ -364,6 +372,14 @@ If you are sure that you want to use the production bootstrap server with hc lau
                         tokio::signal::ctrl_c().await.unwrap();
                         holochain_cli_sandbox::save::release_ports(std::env::current_dir().unwrap()).await.unwrap();
                         println!("Released ports.");
+                        // killing child processes
+                        for (mut holochain_process, lair_process) in child_processes {
+                          holochain_process.start_kill().unwrap();
+                          if let Some(mut p) = lair_process {
+                            p.start_kill().unwrap();
+                          }
+                        }
+                        println!("Killed holochain processes, press Ctrl+C to quit.");
                         std::process::exit(0);
                       });
 
@@ -433,20 +449,6 @@ async fn spawn_sandboxes(
   }
   result
 }
-
-// // copied from hc sandbox because it's private (https://github.com/holochain/holochain/blob/540c2497f778cc004c1e7114662733fe197790cc/crates/hc_sandbox/src/cli.rs#L219)
-// async fn generate(
-//   holochain_path: &Path,
-//   happ: Option<PathBuf>,
-//   create: Create,
-//   app_id: InstalledAppId,
-// ) -> anyhow::Result<Vec<PathBuf>> {
-//   let happ = holochain_cli_sandbox::bundles::parse_happ(happ)?;
-//   let paths =
-//     holochain_cli_sandbox::sandbox::default_n(holochain_path, create, happ, app_id).await?;
-//   holochain_cli_sandbox::save::save(std::env::current_dir()?, paths.clone())?;
-//   Ok(paths)
-// }
 
 // copied over from hc_sanbox because it's not public (https://github.com/holochain/holochain/blob/03f315be92991f374cba341d210340f7e1141578/crates/hc_sandbox/src/cli.rs#L190)
 async fn run_n(
