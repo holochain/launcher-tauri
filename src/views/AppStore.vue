@@ -113,7 +113,7 @@
     @cancel="() => {
       selectedApp = undefined;
     }"
-    @release-selected="saveApp($event)"
+    @release-selected="saveApp($event.releaseData, $event.appEntry)"
   >
   </SelectReleaseDialog>
 
@@ -156,7 +156,7 @@ import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
-import { tryWithHosts } from "../appstore/appstore-interface";
+import { tryWithHosts, collectBytes } from "../appstore/appstore-interface";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import HCTextField from "../components/subcomponents/HCTextField.vue";
@@ -358,7 +358,7 @@ export default defineComponent({
         (this.$refs.selectAppReleasesDialog as typeof SelectReleaseDialog).open();
       });
     },
-    async saveApp(releaseInfo: ReleaseData) {
+    async saveApp(releaseInfo: ReleaseData, appEntry: AppEntry) {
       // // if downloading, always take holochain version of DevHub
       this.holochainSelection = false;
       this.loadingText = "searching available peer host";
@@ -368,6 +368,22 @@ export default defineComponent({
       const appStoreInfo = await this.appWebsocket!.appInfo({
         installed_app_id: APPSTORE_APP_ID,
       });
+
+      // fetching icon from appstore if not already fetched earlier
+      let errorFetchingIcon = false;
+      if (!this.selectedIconSrc) {
+        try {
+          if (!this.appWebsocket) {
+            await this.connectAppWebsocket();
+          }
+          this.loadingText = `Loading app icon from App Store...`;
+          const collectedBytes = await collectBytes(this.appWebsocket as any, appStoreInfo, appEntry.icon);
+          this.selectedIconSrc = toSrc(collectedBytes, appEntry.metadata.icon_mime_type);
+        } catch (e) {
+          console.error("Error fetching app icon from App Store: ", e);
+          errorFetchingIcon = true;
+        }
+      }
 
       const happReleaseHash = releaseInfo.happRelease.id;
       const guiReleaseHash = releaseInfo.happRelease.content.official_gui;
@@ -387,7 +403,7 @@ export default defineComponent({
         version: releaseInfo.guiRelease?.content.version
       } : undefined;
 
-      this.loadingText = `fetching app from peer host...`;
+      this.loadingText = `${errorFetchingIcon ? "Failed to fetch icon from App Store. F" : "f"}etching app from peer host${errorFetchingIcon ? " without icon " : ""}...`;
 
       try {
         await tryWithHosts<void>(
