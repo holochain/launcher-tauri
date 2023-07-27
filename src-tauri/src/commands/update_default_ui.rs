@@ -1,6 +1,6 @@
 use crate::{launcher::{state::LauncherState, manager::HolochainId}, file_system::Profile, commands::save_app::{portal_remote_call, fetch_mere_memory}};
 use devhub_types::{happ_entry_types::GUIReleaseEntry, Entity, GetEntityInput, FileEntry};
-use hdk::prelude::{AnyDhtHash, EntryHash};
+use hdk::prelude::{AnyDhtHash, ActionHash};
 use holochain::conductor::api::CellInfo;
 use holochain_client::{AgentPubKey, AppWebsocket, AppInfo};
 use holochain_types::prelude::{DnaHash, AgentPubKeyB64};
@@ -41,7 +41,7 @@ pub async fn fetch_and_update_default_gui(
     None => return Err(String::from("resource_hash of gui_release_info is None but must be Some in 'fetch_and_update_default_gui'.")),
   };
 
-  let gui_release_entry_hash = AnyDhtHash::from(gui_release_hash);
+  let gui_release_action_hash = AnyDhtHash::from(gui_release_hash);
 
   let mut ws = AppWebsocket::connect(format!("ws://localhost:{}", app_port))
       .await
@@ -73,8 +73,8 @@ pub async fn fetch_and_update_default_gui(
     String::from("happ_library"),
     String::from("get_gui_release"),
     GetEntityInput {
-      id: EntryHash::try_from(gui_release_entry_hash)
-        .map_err(|err| format!("Failed to convert AnDhtHash to EntryHash: {:?}", err))?,
+      id: ActionHash::try_from(gui_release_action_hash)
+        .map_err(|err| format!("Failed to convert AnDhtHash to ActionHash: {:?}", err))?,
     }
   ).await?;
 

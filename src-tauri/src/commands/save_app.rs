@@ -2,12 +2,12 @@ use std::{env::temp_dir, fs, path::PathBuf, time::SystemTime, collections::BTree
 
 use devhub_types::{DevHubResponse, Entity, HappReleaseEntry, happ_entry_types::HappManifest, DnaVersionEntry, GetEntityInput, encode_bundle, happ_entry_types::GUIReleaseEntry, FileEntry};
 use holochain::conductor::api::ProvisionedCell;
-use holochain_types::prelude::{DnaHash, AgentPubKeyB64, EntryHashB64};
+use holochain_types::prelude::{DnaHash, AgentPubKeyB64, ActionHashB64};
 use lair_keystore_manager::LairKeystoreManager;
 use holochain_manager::versions::holochain_conductor_api_latest::CellInfo;
 use holochain_state::nonce::fresh_nonce;
 use holochain_client::{AppInfo, AppWebsocket, AgentPubKey};
-use hdk::prelude::{EntryHash, ExternIO, FunctionName, Serialize, Timestamp, ZomeCallUnsigned, ZomeName, Deserialize, HumanTimestamp};
+use hdk::prelude::{EntryHash, ExternIO, FunctionName, Serialize, Timestamp, ZomeCallUnsigned, ZomeName, Deserialize, HumanTimestamp, ActionHash, Action};
 use mere_memory_types::{MemoryEntry, MemoryBlockEntry};
 // use mere_memory_types::MemoryEntry;
 use serde::de::DeserializeOwned;
@@ -49,7 +49,7 @@ pub async fn fetch_and_save_app(
   host: AgentPubKey,
   devhub_happ_library_dna_hash: DnaHash, // DNA hash of the DevHub to which the remote call shall be made
   appstore_pub_key: String,
-  happ_release_hash: String,
+  happ_release_hash: String, // ActionHash of the HappReleaseEntry Record
 ) -> Result<PathBuf, String> {
 
   if window.label() != "admin" {
@@ -58,7 +58,7 @@ pub async fn fetch_and_save_app(
 
   let appstore_pub_key = AgentPubKey::from(AgentPubKeyB64::from_b64_str(appstore_pub_key.as_str())
     .map_err(|e| format!("Failed to convert appstorePubKey from Base64 to Vec<u8>: {}", e))?);
-  let happ_release_entry_hash = EntryHash::from(EntryHashB64::from_b64_str(happ_release_hash.as_str())
+  let happ_release_action_hash = ActionHash::from(ActionHashB64::from_b64_str(happ_release_hash.as_str())
     .map_err(|e| format!("Failed to convert happReleaseHash from Base64 to Vec<u8>: {}", e))?);
 
   let mut mutex = (*state).lock().await;
@@ -96,7 +96,7 @@ pub async fn fetch_and_save_app(
     String::from("happ_library"),
     String::from("get_happ_release"),
     GetEntityInput {
-      id: happ_release_entry_hash
+      id: happ_release_action_hash
     }
   ).await?;
 
@@ -165,17 +165,6 @@ where
 //     call: RemoteCallInput,
 // }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct FetchWebAssetRemoteCallInput {
-  host: AgentPubKey,
-  call: RemoteCallDetails<String, String, GetWebAssetInput>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GetWebAssetInput {
-  pub id: EntryHash,
-}
-
 /// Fetching UI assets from the DevHub via remote call through the portal_api
 #[tauri::command]
 pub async fn fetch_gui(
@@ -186,7 +175,7 @@ pub async fn fetch_gui(
   appstore_pub_key: String,
   host: AgentPubKey, // agent public key of the DevHub host to fetch the webhapp from
   devhub_happ_library_dna_hash: DnaHash, // DNA hash of the DevHub to which the remote call shall be made
-  gui_release_hash: String,
+  gui_release_hash: String, // ActionHash of the GUIReleaseEntry Record
 ) -> Result<Vec<u8>, String> {
 
   if window.label() != "admin" {
@@ -195,7 +184,7 @@ pub async fn fetch_gui(
 
   let agent_pub_key = AgentPubKey::from(AgentPubKeyB64::from_b64_str(appstore_pub_key.as_str())
     .map_err(|e| format!("Failed to convert appstorePubKey from Base64 to Vec<u8>: {}", e))?);
-  let gui_release_entry_hash = EntryHash::from(EntryHashB64::from_b64_str(gui_release_hash.as_str())
+  let gui_release_action_hash = ActionHash::from(ActionHashB64::from_b64_str(gui_release_hash.as_str())
     .map_err(|e| format!("Failed to convert guiReleaseHash from Base64 to Vec<u8>: {}", e))?);
 
   let mut ws = AppWebsocket::connect(format!("ws://localhost:{}", app_port))
@@ -228,7 +217,7 @@ pub async fn fetch_gui(
     String::from("happ_library"),
     String::from("get_gui_release"),
     GetEntityInput {
-      id: gui_release_entry_hash,
+      id: gui_release_action_hash,
     }
   ).await?;
 

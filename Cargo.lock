@@ -1630,18 +1630,18 @@ checksum = "3c877555693c14d2f84191cfd3ad8582790fc52b5e2274b40b59cf5f5cea25c7"
 
 [[package]]
 name = "devhub_types"
-version = "0.2.1-beta-rc.0"
-source = "git+https://github.com/holochain/devhub-dnas?rev=44f61801dadf6d63444f6a46f26113305c699ad7#44f61801dadf6d63444f6a46f26113305c699ad7"
+version = "0.0.0"
+source = "git+https://github.com/holochain/devhub-dnas?rev=8ad6faaaa965dfdaccbf25a6947086680acf0fa7#8ad6faaaa965dfdaccbf25a6947086680acf0fa7"
 dependencies = [
  "essence_payloads",
  "flate2",
- "hc_crud_ceps",
+ "hc_crud_caps",
  "hdk",
  "hex",
  "rmp-serde 0.15.5",
  "serde",
  "serde_yaml 0.8.26",
- "sha2 0.10.7",
+ "sha2 0.9.9",
  "thiserror",
 ]
 
@@ -2783,10 +2783,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "hc_crud_ceps"
-version = "0.80.0"
+name = "hc_crud_caps"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e8464413d7affb6425c71e27677d428cdd573019d6136693d2a7d71d684911f"
+checksum = "65d2beba013ec933d507dec64e210ab52b793692d88aa251c8424f7aa76ff2ea"
 dependencies = [
  "hdk",
  "holo_hash",
@@ -3034,7 +3034,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-launcher"
-version = "0.10.976"
+version = "0.10.977"
 dependencies = [
  "async-recursion 1.0.4",
  "async-trait",

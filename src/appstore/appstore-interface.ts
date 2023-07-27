@@ -1,4 +1,4 @@
-import { AgentPubKey, AppInfo, AppWebsocket, DnaHash, encodeHashToBase64, EntryHash } from "@holochain/client";
+import { ActionHash, AgentPubKey, AppInfo, AppWebsocket, DnaHash, encodeHashToBase64, EntryHash } from "@holochain/client";
 import { getCellId } from "../utils";
 import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry, GUIReleaseEntry, FilePackage, HostAvailability, PublisherEntry } from "./types";
 import { ResourceLocator } from "../types";
@@ -96,19 +96,18 @@ export async function getPublisher(
 /**
  * Gets the happ releases corresponding to the passed entry hashes
  *
- * IMPORTANT: EntryHashes all need to be part of the same DHT
+ * IMPORTANT: ActionHashes all need to be part of the same DHT
  *
- * @param happReleaseEntryHash
  */
-export async function getHappReleasesByEntryHashes(
+export async function getHappReleasesByActionHashes(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   devhubDna: DnaHash,
-  happReleaseEntryHashes: Array<EntryHash | undefined>
+  happReleaseActionHashes: Array<ActionHash | undefined>
 ): Promise<Array<HappReleaseEntry | undefined>> {
 
-  console.log("@getHappReleasesByEntryHashes: getting happ releases by entry hashes");
-  console.log("@getHappReleasesByEntryHashes: devhubDna: ", encodeHashToBase64(devhubDna));
+  console.log("@getHappReleasesByActionHashes: getting happ releases by entry hashes");
+  console.log("@getHappReleasesByActionHashes: devhubDna: ", encodeHashToBase64(devhubDna));
   // Find an online host
   const host: AgentPubKey = await getAvailableHostForZomeFunction(
     appWebsocket,
@@ -118,20 +117,20 @@ export async function getHappReleasesByEntryHashes(
     "get_happ_releases",
   );
 
-  console.log("@getHappReleasesByEntryHashes: found host: ", host);
+  console.log("@getHappReleasesByActionHashes: found host: ", host);
 
 
-  // make zome calls for each EntryHash to this one host
-  const happReleases = await Promise.all(happReleaseEntryHashes.map( async (entryHash) => {
-    if (entryHash) {
-      return getHappReleaseFromHost(appWebsocket, appStoreApp, devhubDna, host, entryHash);
+  // make zome calls for each ActionHash to this one host
+  const happReleases = await Promise.all(happReleaseActionHashes.map( async (actionHash) => {
+    if (actionHash) {
+      return getHappReleaseFromHost(appWebsocket, appStoreApp, devhubDna, host, actionHash);
     } else {
       return undefined;
     }
   }));
 
 
-  console.log("@getHappReleasesByEntryHashes: Found happReleases: ", happReleases);
+  console.log("@getHappReleasesByActionHashes: Found happReleases: ", happReleases);
 
   return happReleases.map((response) => {
     if (response) {
@@ -148,18 +147,18 @@ export async function getHappReleasesByEntryHashes(
  * @param appWebsocket
  * @param appStoreApp
  * @param host
- * @param entryHash
+ * @param actionHash
  */
 async function getHappEntryFromHost (
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   devhubDna: DnaHash,
   host: AgentPubKey,
-  entryHash: EntryHash, // EntryHash of the HappEntry
+  actionHash: ActionHash, // ActionHash of the HappEntry
 ): Promise<Entity<HappReleaseEntry>> {
 
   const payload = {
-    id: entryHash,
+    id: actionHash,
   };
 
   return remoteCallToDevHubHost<Entity<HappReleaseEntry>>(
@@ -179,18 +178,18 @@ async function getHappEntryFromHost (
  * @param appWebsocket
  * @param appStoreApp
  * @param host
- * @param entryHash
+ * @param actionHash
  */
 async function getHappReleaseFromHost (
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   devhubDna: DnaHash,
   host: AgentPubKey,
-  entryHash: EntryHash, // EntryHash of the HappReleaseEntry
+  actionHash: ActionHash, // ActionHash of the HappReleaseEntry
 ): Promise<Entity<HappReleaseEntry>> {
 
   const payload = {
-    id: entryHash,
+    id: actionHash,
   };
 
   return remoteCallToDevHubHost<Entity<HappReleaseEntry>>(
@@ -280,7 +279,6 @@ export async function getHappReleasesFromHost (
  *
  * @param appWebsocket
  * @param appStoreApp
- * @param guiReleaseEntryHash
  */
 export async function fetchGuiReleaseEntry(
   appWebsocket: AppWebsocket,
@@ -306,12 +304,6 @@ export async function fetchGuiReleaseEntry(
 /**
  * Fetching the webhapp bytes from a DevHub host.
  *
- * @param appWebsocket
- * @param appStoreApp
- * @param name
- * @param happReleaseEntryHash
- * @param guiReleaseEntryHash
- * @returns
  */
 export async function fetchWebHapp(
   appWebsocket: AppWebsocket,
@@ -357,7 +349,7 @@ export async function fetchGui(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   devhubDna: DnaHash,
-  guiReleaseHash: EntryHash,
+  guiReleaseHash: ActionHash,
 ): Promise<Entity<FilePackage>> {
 
   const host: AgentPubKey = await getAvailableHostForZomeFunction(

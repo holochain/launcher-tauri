@@ -1,9 +1,7 @@
 import {
-  AgentPubKey,
   AnyDhtHash,
   AppRoleManifest,
   AppInfo,
-  EntryHash,
   DnaHash,
   DnaHashB64,
   AnyDhtHashB64,

@@ -75,8 +75,8 @@ export interface LocationTriplet {
 
 export interface WebHappConfig {
   dna: DnaHash,
-  happ: EntryHash,
-  gui: EntryHash | undefined,
+  happ: ActionHash,
+  gui: ActionHash | undefined,
 }
 
 
@@ -94,15 +94,15 @@ export interface RemoteCallInput {
 
 export interface GetWebHappPackageInput {
   name: string,
-  happ_release_id: EntryHash,
-  gui_release_id: EntryHash,
+  happ_release_id: ActionHash,
+  gui_release_id: ActionHash,
 }
 
 
 export interface HappReleaseEntry {
   version: string,
   description: string,
-  for_happ: EntryHash,
+  for_happ: ActionHash,
   ordering: number,
   published_at: number,
   last_updated: number,
@@ -113,22 +113,22 @@ export interface HappReleaseEntry {
   metadata: Record<string, any>, // BTreeMap<String, serde_yaml::Value> in Rust
 
   // Optional fields
-  official_gui: EntryHash | undefined,
+  official_gui: ActionHash | undefined,
 }
 
 export interface DnaReference {
   role_name: string,
-  dna : EntryHash, // Dna ID
-  version : EntryHash, // Version ID
+  dna : ActionHash, // Dna ID
+  version : ActionHash, // Version ID
   wasm_hash : string,
 }
 
 export interface GUIReleaseEntry {
   version: string,
   changelog: string,
-  for_gui: EntryHash,
-  for_happ_releases: Array<EntryHash>,
-  web_asset_id: EntryHash,
+  for_gui: ActionHash,
+  for_happ_releases: Array<ActionHash>,
+  web_asset_id: ActionHash,
   published_at: number,
   last_updated: number,
   metadata: Record<string, any>,

@@ -515,7 +515,7 @@ impl WebAppManager {
 
   /// Stores the hash of a happ release of the given hApp to the filesystem in a yaml file
   /// called .happrelease
-  /// EntryHash must be passed as a base64 string
+  /// ActionHash must be passed as a base64 string
   pub fn store_happ_release_info(&self, info: ReleaseInfo, app_id: &String) -> Result<(), String> {
 
     let app_data_dir = app_data_dir(&self.environment_path, app_id);
@@ -544,7 +544,7 @@ impl WebAppManager {
   }
 
   /// Stores the hash of a gui release of the given hApp to the filesystem
-  /// EntryHash must be passed as a base64 string
+  /// ActionHash must be passed as a base64 string
   pub fn store_gui_release_info(&self, info: ReleaseInfo, app_id: &String, ui_name: &String) -> Result<(), String> {
 
     let app_gui_dir = app_ui_dir(&self.environment_path, app_id, ui_name);

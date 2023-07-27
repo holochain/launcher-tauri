@@ -8,9 +8,9 @@ import {
 import { GUIReleaseEntry, HappEntry, HappReleaseEntry } from "./types";
 import { getCellId } from "../utils";
 
-// corresponds to https://docs.rs/hc_crud_ceps/0.55.0/hc_crud/struct.Entity.html
+// corresponds to https://docs.rs/hc_crud_caps/0.9.0/hc_crud/struct.Entity.html
 export interface Entity<T> {
-  id: EntryHash;
+  id: ActionHash;
   action: ActionHash;
   address: EntryHash;
   ctype: EntityType;
@@ -27,12 +27,12 @@ export interface GUIReleaseResponsePayload {
   action: ActionHash;
   address: EntryHash; // The address of the current entry
   content: GUIReleaseEntry;
-  id: EntryHash; // The address of the original created entry
+  id: ActionHash; // The address of the original created entry
   type: any;
 }
 
 export interface ContentAddress<C> {
-  id: EntryHash;
+  id: ActionHash;
   address: EntryHash;
   content: C;
 }
@@ -159,8 +159,8 @@ export async function fetchWebHapp(
   appWebsocket: AppWebsocket,
   devhubHapp: AppInfo,
   name: string,
-  happReleaseEntryHash: EntryHash,
-  guiReleaseEntryHash: EntryHash,
+  happReleaseActionHash: ActionHash,
+  guiReleaseActionHash: ActionHash,
   retryCount = 3
 ): Promise<Uint8Array> {
   const cells = devhubCells(devhubHapp);
@@ -172,8 +172,8 @@ export async function fetchWebHapp(
     zome_name: "happ_library",
     payload: {
       name,
-      happ_release_id: happReleaseEntryHash,
-      gui_release_id: guiReleaseEntryHash,
+      happ_release_id: happReleaseActionHash,
+      gui_release_id: guiReleaseActionHash,
     },
     provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
   });
@@ -187,8 +187,8 @@ export async function fetchWebHapp(
         appWebsocket,
         devhubHapp,
         name,
-        happReleaseEntryHash,
-        guiReleaseEntryHash,
+        happReleaseActionHash,
+        guiReleaseActionHash,
         retryCount - 1
       );
     }
@@ -216,24 +216,24 @@ export function devhubCells(devhubHapp: AppInfo) {
 /**
  * Gets the happ releases corresponding to the passed entry hashes
  *
- * @param happReleaseEntryHash
+ * @param happReleaseActionHash
  */
-export async function getHappReleasesByEntryHashes(
+export async function getHappReleasesByActionHashes(
   appWebsocket: AppWebsocket,
   devhubHapp: AppInfo,
-  happReleaseEntryHashes: Array<EntryHash | undefined>
+  happReleaseActionHashes: Array<ActionHash | undefined>
 ) {
 
   const cells = devhubCells(devhubHapp);
-  const happReleases = await Promise.all(happReleaseEntryHashes.map( async (entryHash) => {
-    if (entryHash) {
+  const happReleases = await Promise.all(happReleaseActionHashes.map( async (actionHash) => {
+    if (actionHash) {
       return appWebsocket.callZome({
         cap_secret: null,
         cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
         fn_name: "get_happ_release",
         zome_name: "happ_library",
         payload: {
-          id: entryHash,
+          id: actionHash,
         },
         provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
       })
@@ -256,14 +256,14 @@ export async function getHappReleasesByEntryHashes(
  * Fetches a GUI from the DevHub
  * @param appWebsocket
  * @param devhubHapp
- * @param webAssetEntryHash
+ * @param webAssetActionHash
  * @param retryCount
  * @returns
  */
 export async function fetchGui(
   appWebsocket: AppWebsocket,
   devhubHapp: AppInfo,
-  webAssetEntryHash: EntryHash,
+  webAssetActionHash: ActionHash,
   retryCount = 3
 ): Promise<Uint8Array> {
   const cells = devhubCells(devhubHapp);
@@ -274,7 +274,7 @@ export async function fetchGui(
     fn_name: "get_webasset",
     zome_name: "happ_library",
     payload: {
-      id: webAssetEntryHash,
+      id: webAssetActionHash,
     },
     provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
   });
@@ -287,7 +287,7 @@ export async function fetchGui(
       return fetchGui(
         appWebsocket,
         devhubHapp,
-        webAssetEntryHash,
+        webAssetActionHash,
         retryCount - 1
       );
     }

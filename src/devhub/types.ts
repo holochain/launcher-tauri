@@ -1,10 +1,10 @@
-import { AgentPubKey, EntryHash } from "@holochain/client";
+import { ActionHash, AgentPubKey, EntryHash } from "@holochain/client";
 
 export interface DeprecationNotice {
   message: string;
 
   // optional
-  recommended_alternatives: Array<EntryHash> | undefined;
+  recommended_alternatives: Array<ActionHash> | undefined;
 }
 
 export interface HappEntry {
@@ -29,8 +29,8 @@ export interface HappEntry {
 //
 export interface DnaReference {
     role_name: string,
-    dna : EntryHash, // Dna ID
-    version : EntryHash, // Version ID
+    dna : ActionHash, // Dna ID
+    version : ActionHash, // Version ID
     wasm_hash : string,
 }
 
@@ -40,7 +40,7 @@ export interface DnaReference {
 export interface HappReleaseEntry {
     name: string,
     description: string,
-    for_happ: EntryHash,
+    for_happ: ActionHash,
     ordering: number,
     published_at: number,
     last_updated: number,
@@ -51,7 +51,7 @@ export interface HappReleaseEntry {
     metadata: Record<string, any>, // BTreeMap<String, serde_yaml::Value> in Rust
 
     // Optional fields
-    official_gui: EntryHash | undefined,
+    official_gui: ActionHash | undefined,
 }
 
 
@@ -74,9 +74,9 @@ export interface GUIEntry {
 export interface GUIReleaseEntry {
     version: string,
     changelog: string,
-    for_gui: EntryHash,
-    for_happ_releases: Array<EntryHash>,
-    web_asset_id: EntryHash,
+    for_gui: ActionHash,
+    for_happ_releases: Array<ActionHash>,
+    web_asset_id: ActionHash,
     published_at: number,
     last_updated: number,
     metadata: Record<string, any>,
@@ -89,8 +89,8 @@ export interface GUIReleaseEntry {
 
 export interface DnaReference {
   role_name: string,
-  dna : EntryHash, // Dna ID
-  version : EntryHash, // Version ID
+  dna : ActionHash, // Dna ID
+  version : ActionHash, // Version ID
   wasm_hash : string,
 }
 

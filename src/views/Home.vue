@@ -95,7 +95,7 @@ import "@material/mwc-fab";
 import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
 import { HolochainAppInfo } from "../types";
 import { AppWebsocket, decodeHashFromBase64, DnaHashB64, encodeHashToBase64 } from "@holochain/client";
-import { getHappReleasesByEntryHashes } from "../appstore/appstore-interface";
+import { getHappReleasesByActionHashes } from "../appstore/appstore-interface";
 import { HappReleaseEntry } from "../appstore/types";
 
 type View =
@@ -179,12 +179,12 @@ export default defineComponent({
       console.log("updatableAppsByLocatorDna: ", updatableAppsByLocatorDna);
 
       await Promise.allSettled(Object.values(updatableAppsByLocatorDna).map(async (apps) => {
-        const entryHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator!.resource_hash));
+        const actionHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator!.resource_hash));
         const devHubDnaHash = decodeHashFromBase64(apps[0].webAppInfo.happ_release_info!.resource_locator!.dna_hash);
 
         try {
-          console.log("@Home.vue @created: entryHashes: ", entryHashes.map((eh) => encodeHashToBase64(eh)));
-          const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByEntryHashes((appWebsocket as AppWebsocket), appstoreAppInfo, devHubDnaHash, entryHashes);
+          console.log("@Home.vue @created: actionHashes: ", actionHashes.map((eh) => encodeHashToBase64(eh)));
+          const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByActionHashes((appWebsocket as AppWebsocket), appstoreAppInfo, devHubDnaHash, actionHashes);
 
           apps.forEach((app, idx) => {
             if (happReleases[idx]) {

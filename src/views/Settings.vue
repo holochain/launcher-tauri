@@ -411,7 +411,7 @@
 </template>
 
 <script lang="ts">
-import { AppInfo, AppWebsocket, decodeHashFromBase64, encodeHashToBase64, EntryHash, InstalledAppId, DnaHashB64 } from "@holochain/client";
+import { AppInfo, AppWebsocket, decodeHashFromBase64, encodeHashToBase64, InstalledAppId, DnaHashB64 } from "@holochain/client";
 import { uniq } from "lodash-es";
 import prettyBytes from "pretty-bytes";
 import { invoke } from "@tauri-apps/api/tauri";
@@ -421,7 +421,7 @@ import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
 
-import { getHappReleasesByEntryHashes, fetchGui, appstoreCells, fetchGuiReleaseEntry, tryWithHosts } from "../appstore/appstore-interface";
+import { getHappReleasesByActionHashes, appstoreCells, fetchGuiReleaseEntry, tryWithHosts } from "../appstore/appstore-interface";
 import { GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
 import AppSettingsCard from "../components/AppSettingsCard.vue";
@@ -843,12 +843,12 @@ export default defineComponent({
       });
 
       await Promise.allSettled(Object.values(updatableAppsByLocatorDna).map(async (apps) => {
-        const entryHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator!.resource_hash));
+        const actionHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator!.resource_hash));
         const devHubDnaHash = decodeHashFromBase64(apps[0].webAppInfo.happ_release_info!.resource_locator!.dna_hash);
 
         try {
-          console.log("@checkForUiPudates: entryHashes: ", entryHashes.map((eh) => encodeHashToBase64(eh)));
-          const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByEntryHashes((this.appWebsocket! as AppWebsocket), this.appstoreAppInfo!, devHubDnaHash, entryHashes);
+          console.log("@checkForUiPudates: actionHashes: ", actionHashes.map((eh) => encodeHashToBase64(eh)));
+          const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByActionHashes((this.appWebsocket! as AppWebsocket), this.appstoreAppInfo!, devHubDnaHash, actionHashes);
 
           apps.forEach((app, idx) => {
             if (happReleases[idx]) {
