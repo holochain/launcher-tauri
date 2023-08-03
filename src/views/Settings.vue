@@ -360,15 +360,6 @@
         Are you sure you want to continue?
       </div>
 
-      <div class="row" style="margin-top: 30px; margin-bottom: 10px; margin-left: 50px; width: 100%;">
-        <ToggleSwitch
-          :sliderOn="ignoreDevModeWarning"
-          @click="() => ignoreDevModeWarning = !ignoreDevModeWarning"
-          @keydown.enter="() => ignoreDevModeWarning = !ignoreDevModeWarning"
-        />
-        <span style="margin-left: 10px;">Don't show this message again.</span>
-      </div>
-
       <div class="row" style="margin-top: 20px;">
         <HCButton style="height: 30px; margin: 4px 6px;" outlined @click="closeDevModeWarning">Cancel</HCButton>
         <HCButton style="margin: 4px 6px;" @click="handleInstallDevHub">Install DevHub</HCButton>
@@ -470,7 +461,6 @@ export default defineComponent({
     errorText: string;
     extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> | undefined;
     howToPublishUrl: string;
-    ignoreDevModeWarning: boolean;
     loadingText: string;
     refreshing: boolean;
     refreshTimeout: number | null;
@@ -499,7 +489,6 @@ export default defineComponent({
       snackbarText: undefined,
       reportIssueUrl: "https://github.com/holochain/launcher/issues/new",
       showDevModeDevsOnlyWarning: false,
-      ignoreDevModeWarning: false,
       sortOptions: [
         [i18n.global.t('main.name'), "name"],
         [i18n.global.t('main.nameDescending'), "name descending"],
@@ -619,9 +608,6 @@ export default defineComponent({
       (this.$refs["publishAppDialog"] as typeof HCDialog).close();
     },
     closeDevModeWarning() {
-      if (this.ignoreDevModeWarning) {
-        window.localStorage.setItem("ignoreDevModeDevsOnlyWarning", "true");
-      }
       (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).close();
     },
     async refreshAppStates() {
@@ -680,9 +666,6 @@ export default defineComponent({
       await this.checkForUiUpdates();
     },
     async handleInstallDevHub() {
-      if (this.ignoreDevModeWarning) {
-        window.localStorage.setItem("ignoreDevModeDevsOnlyWarning", "true");
-      }
       (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).close();
       this.loadingText = "Installing DevHub...";
       (this.$refs.downloading as typeof HCLoading).open();
