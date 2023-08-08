@@ -9,7 +9,7 @@ use holochain_web_app_manager::{WebAppManager, ReleaseInfo};
 // Those are used to install new Appstore/DevHub UI's if necessary
 // NEW_VERSION Change appstore and devhub versions here if required
 const APPSTORE_VERSION: &str = "834c3d3cc15d24fb6d598d64f76a69d844cb6e61"; // shasum
-pub const DEVHUB_VERSION: &str = "4f09a03478c89c668b9f94dfeab22234f1e70623"; // shasum
+pub const DEVHUB_VERSION: &str = "7455e3fab4a77fcd841d55b60c5bbd182b603ba6"; // shasum
 
 const APPSTORE_APP_ID: &str = "AppStore";
 pub const DEVHUB_APP_ID: &str = "DevHub";
