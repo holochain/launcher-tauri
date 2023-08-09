@@ -3044,7 +3044,7 @@ dependencies = [
  "futures",
  "hdk",
  "holochain",
- "holochain_client",
+ "holochain_client 0.4.0",
  "holochain_launcher_utils",
  "holochain_manager",
  "holochain_state",
@@ -3113,7 +3113,7 @@ dependencies = [
  "futures",
  "holochain",
  "holochain_cli_sandbox",
- "holochain_client",
+ "holochain_client 0.4.1",
  "holochain_conductor_api",
  "holochain_launcher_utils",
  "holochain_trace",
@@ -3172,6 +3172,25 @@ dependencies = [
 name = "holochain_client"
 version = "0.4.0"
 source = "git+https://github.com/holochain/holochain-client-rust?branch=holochain-0.2.1#2c1c5b28d8fe876d94e71a4899e2ebd41440e8dc"
+dependencies = [
+ "again",
+ "anyhow",
+ "ed25519-dalek",
+ "holo_hash",
+ "holochain_conductor_api",
+ "holochain_serialized_bytes 0.0.52",
+ "holochain_types",
+ "holochain_websocket",
+ "holochain_zome_types",
+ "serde",
+ "url 2.4.0",
+]
+
+[[package]]
+name = "holochain_client"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97f51dc982527dca0459316b69ef94c0a1a9f72d8673bb18cc7fef760111bfac"
 dependencies = [
  "again",
  "anyhow",
@@ -3260,7 +3279,7 @@ dependencies = [
 name = "holochain_launcher_utils"
 version = "0.0.5"
 dependencies = [
- "holochain_client",
+ "holochain_client 0.4.0",
  "holochain_conductor_api",
  "holochain_types",
  "holochain_zome_types",
@@ -3280,7 +3299,7 @@ dependencies = [
  "async-trait",
  "enum_dispatch",
  "holochain",
- "holochain_client",
+ "holochain_client 0.4.0",
  "holochain_conductor_api",
  "holochain_p2p",
  "holochain_types",
