@@ -55,7 +55,7 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.4 --git https://github.com/holochain/lair --rev 43be404da0fd9d57bf4429c44def405bd6490f61 lair_keystore
+          cargo install --git https://github.com/holochain/lair --rev 43be404da0fd9d57bf4429c44def405bd6490f61 --locked lair_keystore
           LAIR_PATH=$(which lair-keystore)
           cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.4-x86_64-apple-darwin
 
