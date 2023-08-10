@@ -2,6 +2,7 @@ use tauri::{ WindowUrl, window::WindowBuilder };
 use std::fs::read;
 use std::path::PathBuf;
 
+pub const INIT_SCRIPT: &str = include_str!("./scripts/polyfill.min.js");
 
 pub enum UISource {
   Path(PathBuf),
@@ -210,6 +211,7 @@ pub fn happ_window_builder<'a>(
     .data_directory(local_storage_path)
     .initialization_script(launcher_env_command.as_str())
     .initialization_script(anchor_event_listener)
+    .initialization_script(INIT_SCRIPT)
     .initialization_script(zoom_on_scroll)
     .title(window_title)
 
