@@ -94,9 +94,9 @@ impl HolochainManager {
     };
 
     let app_interface_port = {
-      let app_interfaces = ws.list_app_interfaces().await.or(Err(
-        LaunchHolochainError::CouldNotConnectToConductor("Could not list app interfaces".into()),
-      ))?;
+      let app_interfaces = ws.list_app_interfaces().await.map_err(|e|
+        LaunchHolochainError::CouldNotConnectToConductor(format!("Could not list app interfaces: {:?}", e)),
+      )?;
 
       if app_interfaces.len() > 0 {
         app_interfaces[0]
