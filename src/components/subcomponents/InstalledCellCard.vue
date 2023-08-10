@@ -184,7 +184,7 @@ export default defineComponent({
   },
   async created() {
     const port = this.$store.getters["appInterfacePort"](this.holochainId);
-    this.appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+    this.appWebsocket = await AppWebsocket.connect(new URL(`ws://localhost:${port}`), 40000);
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
     await this.getNetworkInfo();
@@ -205,7 +205,7 @@ export default defineComponent({
     writeText,
     async connectAppWebsocket() {
       const port = this.$store.getters["appInterfacePort"](this.holochainId);
-      this. appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      this. appWebsocket = await AppWebsocket.connect(new URL(`ws://localhost:${port}`), 40000);
       // console.log("Connected to AppWebsocket.");
     },
     async getNetworkInfo() {

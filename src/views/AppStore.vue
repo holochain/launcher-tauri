@@ -284,7 +284,7 @@ export default defineComponent({
       this.holochainId = holochainId;
       // connect to AppWebsocket
       const port = this.$store.getters["appInterfacePort"](holochainId);
-      this.appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      this.appWebsocket = await AppWebsocket.connect(new URL(`ws://localhost:${port}`), 40000);
       // console.log("connected to AppWebsocket.");
     },
     async fetchApps(silent: boolean) {
