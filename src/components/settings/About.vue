@@ -1,10 +1,9 @@
 <template>
   <HCDialogHeaded heading="About" ref="dialog" closeOnSideClick>
     <div class="row center" style="width: 512px" v-if="!holochainVersions">
-      <mwc-circular-progress
-        indeterminate
+      <HCCircularProgress
         style="margin-top: 80px; margin-bottom: 60px"
-      ></mwc-circular-progress>
+      ></HCCircularProgress>
     </div>
     <div
       class="column"
@@ -45,10 +44,12 @@ import { HolochainVersion } from "../../types";
 import { invoke } from "@tauri-apps/api/tauri";
 import { getVersion } from "@tauri-apps/api/app";
 import HCDialogHeaded from "../subcomponents/HCDialogHeaded.vue";
+import HCCircularProgress from "../subcomponents/HCCircularProgress.vue";
 
 export default defineComponent({
   name: "About",
   components: {
+    HCCircularProgress,
     HCDialogHeaded,
   },
   data(): {

@@ -158,10 +158,9 @@
         </div>
 
         <div v-else class="column" style="align-items: center; width: 100%;">
-          <mwc-circular-progress
-            indeterminate
+          <HCCircularProgress
             style="margin-top: 30px; margin-bottom: 20px"
-          ></mwc-circular-progress>
+          ></HCCircularProgress>
         </div>
 
       </div>
@@ -190,6 +189,7 @@ import { defineComponent, PropType } from "vue";
 import HCButton from "./subcomponents/HCButton.vue";
 import HCDialog from "./subcomponents/HCDialog.vue";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
+import HCCircularProgress from "./subcomponents/HCCircularProgress.vue";
 
 import { ResourceLocator, ReleaseData } from "../types";
 import { AppEntry, Entity, GUIReleaseEntry, HappReleaseEntry, HostAvailability, PublisherEntry } from "../appstore/types";
@@ -208,6 +208,7 @@ export default defineComponent({
   name: "SelectReleaseDialog",
   emits: ["error", "closing-dialog", "release-selected", "cancel"],
   components: {
+    HCCircularProgress,
     HCDialog,
     HCButton,
     HCSnackbar,
