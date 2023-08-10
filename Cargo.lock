@@ -1641,7 +1641,7 @@ dependencies = [
  "rmp-serde 0.15.5",
  "serde",
  "serde_yaml 0.8.26",
- "sha2 0.9.9",
+ "sha2 0.10.7",
  "thiserror",
 ]
 
@@ -3170,8 +3170,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_client"
-version = "0.4.0"
-source = "git+https://github.com/holochain/holochain-client-rust?branch=holochain-0.2.1#2c1c5b28d8fe876d94e71a4899e2ebd41440e8dc"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97f51dc982527dca0459316b69ef94c0a1a9f72d8673bb18cc7fef760111bfac"
 dependencies = [
  "again",
  "anyhow",
