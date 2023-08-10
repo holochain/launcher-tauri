@@ -15,10 +15,9 @@
       "
     >
       <!-- <img class="halo" src="/img/Holochain_Halo_no_gradient.svg" /> -->
-      <mwc-circular-progress
-        indeterminate
+      <HCCircularProgress
         style="margin-top: 40px; margin-bottom: 40px"
-      ></mwc-circular-progress>
+      ></HCCircularProgress>
       <div style="margin-bottom: 10px; text-align: center; padding: 0 30px;">{{ text }}</div>
     </div>
   </HCDialog>
@@ -27,10 +26,11 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import HCDialog from "../subcomponents/HCDialog.vue";
+import HCCircularProgress from "./HCCircularProgress.vue";
 
 export default defineComponent({
   name: "HCLoading",
-  components: { HCDialog },
+  components: { HCCircularProgress, HCDialog },
   props: {
     text: {
       type: String,
