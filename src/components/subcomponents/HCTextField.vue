@@ -60,9 +60,8 @@ export default defineComponent({
   methods: {
     setValue(value: string) {
       this.value = value;
-  }
-
-  }
+    },
+  },
 });
 </script>
 

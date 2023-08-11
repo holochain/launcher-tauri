@@ -56,7 +56,8 @@ export default defineComponent({
 }
 .lds-ring div:nth-child(1) {
   animation-delay: -0.8s;
-  border-color: var(--loading-color) var(--loading-color) transparent transparent;
+  border-color: var(--loading-color) var(--loading-color) transparent
+    transparent;
   animation: lds-ring-fast 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }
 .lds-ring div:nth-child(2) {
@@ -97,5 +98,4 @@ export default defineComponent({
     transform: rotate(360deg);
   }
 }
-
 </style>

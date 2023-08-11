@@ -40,7 +40,7 @@
           </div>
         </div>
 
-        <div class="column" style="overflow: hidden;">
+        <div class="column" style="overflow: hidden">
           <div
             style="
               font-size: 25px;
@@ -69,7 +69,6 @@
         <span>{{ app.subtitle }}</span>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -111,13 +110,17 @@ export default defineComponent({
     };
   },
   emits: ["installApp"],
-  async mounted () {
+  async mounted() {
     const iconHash = this.app.icon;
     const appStoreInfo = await this.appWebsocket!.appInfo({
       installed_app_id: APPSTORE_APP_ID,
     });
 
-    const collectedBytes = await collectBytes(this.appWebsocket, appStoreInfo, iconHash);
+    const collectedBytes = await collectBytes(
+      this.appWebsocket,
+      appStoreInfo,
+      iconHash
+    );
     this.imgSrc = toSrc(collectedBytes, this.app.metadata.icon_mime_type);
   },
 });

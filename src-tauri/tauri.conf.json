@@ -36,10 +36,7 @@
         "icons/icon.ico"
       ],
       "resources": [],
-      "externalBin": [
-        "bins/holochain-v0.2.1",
-        "bins/lair-keystore-v0.2.4"
-      ],
+      "externalBin": ["bins/holochain-v0.2.1", "bins/lair-keystore-v0.2.4"],
       "copyright": "",
       "category": "DeveloperTool",
       "shortDescription": "",

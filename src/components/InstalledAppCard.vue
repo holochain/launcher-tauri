@@ -1,41 +1,54 @@
 <template>
   <div
-    :class="getAppStatus(app) === ('Disabled' || 'Offline/Paused') ? 'disabled' : undefined"
+    :class="
+      getAppStatus(app) === ('Disabled' || 'Offline/Paused')
+        ? 'disabled'
+        : undefined
+    "
+  >
+    <!-- App Logo -->
+    <div
+      class="icon-container"
+      :class="
+        getAppStatus(app) === ('Disabled' || 'Offline/Paused')
+          ? 'container-disabled'
+          : undefined
+      "
+      style="position: relative"
+      tabindex="0"
+      @click="handleClick()"
+      @keyup.enter="handleClick()"
+      :title="`${
+        getAppStatus(app) === 'Disabled'
+          ? 'This app is disabled - Go to Settings to enable this app'
+          : app.webAppInfo.installed_app_info.installed_app_id
+      }${getAppStatus(app) === 'Offline/Paused' ? ' (OFFLINE/PAUSED)' : ''}`"
     >
-      <!-- App Logo -->
+      <img
+        v-if="app.webAppInfo.icon_src"
+        class="appIcon"
+        :class="getAppStatus(app) === 'Running' ? 'pointer' : 'cursor-default'"
+        :src="`${app.webAppInfo.icon_src}`"
+      />
       <div
-        class="icon-container"
-        :class="getAppStatus(app) === ('Disabled' || 'Offline/Paused') ? 'container-disabled': undefined"
-        style="position: relative"
-        tabindex="0"
-        @click="handleClick()"
-        v-on:keyup.enter="handleClick()"
-        :title="`${getAppStatus(app) === 'Disabled' ? 'This app is disabled - Go to Settings to enable this app' : app.webAppInfo.installed_app_info.installed_app_id}${getAppStatus(app) === 'Offline/Paused' ? ' (OFFLINE/PAUSED)' : ''}`"
-        >
-        <img
-          v-if="app.webAppInfo.icon_src"
-          class="appIcon"
-          :class="getAppStatus(app) === 'Running' ? 'pointer': 'cursor-default'"
-          :src="`${app.webAppInfo.icon_src}`"
-        />
-        <div
-          v-else
-          class="appIcon column center-content"
-          :class="getAppStatus(app) === 'Running' ? 'pointer': 'cursor-default'"
-          style="background-color: #372ba5"
-        >
-          <div style="color: white; font-size: 45px; font-weight: 600">
-            {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0, 2) }}
-          </div>
+        v-else
+        class="appIcon column center-content"
+        :class="getAppStatus(app) === 'Running' ? 'pointer' : 'cursor-default'"
+        style="background-color: #372ba5"
+      >
+        <div style="color: white; font-size: 45px; font-weight: 600">
+          {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0, 2) }}
         </div>
       </div>
-      <!-- ------------- -->
-
+    </div>
+    <!-- ------------- -->
 
     <!-- Installed App Id -->
     <div
       class="installed-app-name"
-      :title="`${app.webAppInfo.installed_app_info.installed_app_id}${getAppStatus(app) === 'Disabled' ? ' (DISABLED)' : ''}${getAppStatus(app) === 'Offline/Paused' ? ' (OFFLINE/PAUSED)' : ''}`"
+      :title="`${app.webAppInfo.installed_app_info.installed_app_id}${
+        getAppStatus(app) === 'Disabled' ? ' (DISABLED)' : ''
+      }${getAppStatus(app) === 'Offline/Paused' ? ' (OFFLINE/PAUSED)' : ''}`"
     >
       <!-- {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0,20) }}{{ app.webAppInfo.installed_app_info.installed_app_id.length > 20 ? '...' : '' }} -->
       {{ app.webAppInfo.installed_app_info.installed_app_id }}
@@ -56,7 +69,6 @@ import HoloIdenticon from "../components/subcomponents/HoloIdenticon.vue";
 import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
 import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
 import DisabledCloneCard from "./subcomponents/DisabledCloneCard.vue";
-
 
 export default defineComponent({
   name: "InstalledAppCard",
@@ -86,7 +98,10 @@ export default defineComponent({
     isAppDisabled,
     isAppPaused,
     getAppStatus(app: HolochainAppInfo) {
-      if (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) {
+      if (
+        isAppRunning(app.webAppInfo.installed_app_info) ||
+        isAppPaused(app.webAppInfo.installed_app_info)
+      ) {
         return "Running";
       }
       if (isAppDisabled(app.webAppInfo.installed_app_info)) {
@@ -101,9 +116,9 @@ export default defineComponent({
     },
     handleClick() {
       if (!isAppDisabled(this.app.webAppInfo.installed_app_info)) {
-        this.$emit('openApp', this.app)
+        this.$emit("openApp", this.app);
       }
-    }
+    },
   },
 });
 </script>

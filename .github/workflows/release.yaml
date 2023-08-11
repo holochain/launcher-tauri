@@ -28,10 +28,9 @@ jobs:
       - name: install Go stable
         uses: actions/setup-go@v4
         with:
-          go-version: 'stable'
+          go-version: "stable"
       - name: install app dependencies and info
         run: npm install && npm run tauri info
-
 
       - name: setup binaries (Windows only)
         if: matrix.platform == 'windows-2019'
@@ -48,7 +47,6 @@ jobs:
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.2.1-x86_64-pc-windows-msvc.exe
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
-
 
       - name: setup binaries (macos only)
         if: matrix.platform == 'macos-11'
@@ -70,7 +68,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev libcanberra-gtk-module libcanberra-gtk3-module build-essential curl wget libssl-dev libgtk-3-dev squashfs-tools libgtksourceview-3.0-dev libappindicator3-dev patchelf librsvg2-dev ayatana-indicator-application
-
 
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
@@ -143,7 +140,6 @@ jobs:
         env:
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_0_2 }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-
 
       - name: upload signed .msi, .msi.zip, .msi.zip.sig files to github release (Windows only)
         uses: matthme/tauri-action-ev-signing@dist

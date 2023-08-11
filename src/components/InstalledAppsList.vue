@@ -1,70 +1,65 @@
 <template>
-
   <HCLoading ref="downloading" :text="loadingText" />
 
-  <HCSnackbar
-    :labelText="errorText"
-    ref="snackbar"
-  ></HCSnackbar>
-
+  <HCSnackbar :labelText="errorText" ref="snackbar"></HCSnackbar>
 
   <!-- Web Apps -->
-  <div
-    v-if="noWebApps"
-    class="column"
-    style="margin-top: 14%;"
-  >
-    <div style="font-size: 30px; margin-bottom: 70px;">
+  <div v-if="noWebApps" class="column" style="margin-top: 14%">
+    <div style="font-size: 30px; margin-bottom: 70px">
       {{ $t("launcher.getStarted") }}
     </div>
 
     <div class="row">
-
       <HCButton
         class="button-large"
         @click="$emit('select-view', { type: 'appStore' })"
         @keypress.enter="$emit('select-view', { type: 'appStore' })"
       >
-        <div class="row" style="align-items: center; justify-content: center; font-size: 25px; font-weight: normal;">
-          <img src="/img/home_icon.svg" style="filter: invert(100%) sepia(0%) saturate(1%) hue-rotate(73deg) brightness(104%) contrast(101%);" />
-          <span style="margin-left: 10px;;">{{$t("appStore.appStore")}}</span>
+        <div
+          class="row"
+          style="
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: normal;
+          "
+        >
+          <img
+            src="/img/home_icon.svg"
+            style="
+              filter: invert(100%) sepia(0%) saturate(1%) hue-rotate(73deg)
+                brightness(104%) contrast(101%);
+            "
+          />
+          <span style="margin-left: 10px">{{ $t("appStore.appStore") }}</span>
         </div>
       </HCButton>
 
       <HCButton
         class="button-large"
-        style="margin-left: 20px;"
+        style="margin-left: 20px"
         @click="installFromFs()"
         @keypress.enter="installFromFs()"
       >
         <div class="row center-content">
-          <mwc-icon style="font-size: 33px;;">folder</mwc-icon>
-          <span style="margin-left: 10px; font-size: 25px; font-weight: normal;">
+          <mwc-icon style="font-size: 33px">folder</mwc-icon>
+          <span style="margin-left: 10px; font-size: 25px; font-weight: normal">
             {{ $t("launcher.filesystem") }}
           </span>
         </div>
       </HCButton>
-
     </div>
   </div>
 
-  <div
-    v-else
-    class="app-grid-container"
-    style="margin-top: 60px;"
-  >
+  <div v-else class="app-grid-container" style="margin-top: 60px">
     <div
       v-for="app in sortedApps"
       :key="app.webAppInfo.installed_app_info.installed_app_id"
-      style="margin: 5px 12px;"
+      style="margin: 5px 12px"
     >
-      <InstalledAppCard
-        :app="app"
-        @openApp="$emit('openApp', $event)"
-      />
+      <InstalledAppCard :app="app" @openApp="$emit('openApp', $event)" />
     </div>
   </div>
-
 </template>
 
 <script lang="ts">
@@ -87,7 +82,6 @@ import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 import { AppInfo, AppWebsocket } from "@holochain/client";
 import { i18n } from "../locale";
 import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
-
 
 export default defineComponent({
   name: "InstalledAppsList",
@@ -124,10 +118,13 @@ export default defineComponent({
     const holochainId = this.$store.getters["holochainIdForDevhub"];
     // connect to AppWebsocket
     const port = this.$store.getters["appInterfacePort"](holochainId);
-    const appWebsocket = await AppWebsocket.connect(new URL(`ws://localhost:${port}`), 40000);
+    const appWebsocket = await AppWebsocket.connect(
+      new URL(`ws://localhost:${port}`),
+      40000
+    );
     this.appWebsocket = appWebsocket;
     const appstoreAppInfo = await appWebsocket.appInfo({
-        installed_app_id: APPSTORE_APP_ID,
+      installed_app_id: APPSTORE_APP_ID,
     });
     this.appstoreAppInfo = appstoreAppInfo;
   },
@@ -135,30 +132,41 @@ export default defineComponent({
     sortedApps() {
       // if extended happ releases are not yet fetched from the DevHub to include potential
       // GUI updates, just return installedApps with guiUpdateAvailable undefined
-      let sortedAppList: Array<HolochainAppInfoExtended> = this.installedApps.map((app) => {
-        return {
-          webAppInfo: app.webAppInfo,
-          holochainId: app.holochainId,
-          holochainVersion: app.holochainVersion,
-          guiUpdateAvailable: undefined,
-        }
-      });
+      let sortedAppList: Array<HolochainAppInfoExtended> =
+        this.installedApps.map((app) => {
+          return {
+            webAppInfo: app.webAppInfo,
+            holochainId: app.holochainId,
+            holochainVersion: app.holochainVersion,
+            guiUpdateAvailable: undefined,
+          };
+        });
 
       // Filter out App Store and DevHub
       sortedAppList = sortedAppList.filter(
-        (app) => app.webAppInfo.installed_app_info.installed_app_id !== APPSTORE_APP_ID
-        && app.webAppInfo.installed_app_info.installed_app_id !== DEVHUB_APP_ID
-        && app.webAppInfo.web_uis.default.type !== "Headless"
+        (app) =>
+          app.webAppInfo.installed_app_info.installed_app_id !==
+            APPSTORE_APP_ID &&
+          app.webAppInfo.installed_app_info.installed_app_id !==
+            DEVHUB_APP_ID &&
+          app.webAppInfo.web_uis.default.type !== "Headless"
       );
 
       // sort alphabetically, then disabled last
-      sortedAppList = sortedAppList.sort((appA, appB) =>
-        appA.webAppInfo.installed_app_info.installed_app_id.localeCompare(
-          appB.webAppInfo.installed_app_info.installed_app_id
+      sortedAppList = sortedAppList
+        .sort((appA, appB) =>
+          appA.webAppInfo.installed_app_info.installed_app_id.localeCompare(
+            appB.webAppInfo.installed_app_info.installed_app_id
+          )
         )
-      ).sort((appA, appB) => {
-        return isAppRunning(appA.webAppInfo.installed_app_info) === isAppRunning(appB.webAppInfo.installed_app_info) ? 0 : isAppRunning(appA.webAppInfo.installed_app_info) ? -1 : 1
-      });
+        .sort((appA, appB) => {
+          return isAppRunning(appA.webAppInfo.installed_app_info) ===
+            isAppRunning(appB.webAppInfo.installed_app_info)
+            ? 0
+            : isAppRunning(appA.webAppInfo.installed_app_info)
+            ? -1
+            : 1;
+        });
 
       return sortedAppList;
     },
@@ -176,7 +184,7 @@ export default defineComponent({
     },
     installFromFs() {
       window.localStorage.setItem("installFromFs", "true");
-      this.$emit('select-view', { type: 'appStore' });
+      this.$emit("select-view", { type: "appStore" });
     },
   },
 });

@@ -60,7 +60,9 @@
               white-space: nowrap;
             "
             >holochain-v</span
-          > and <span
+          >
+          and
+          <span
             style="
               font-family: monospace;
               font-size: 1.1em;
@@ -145,7 +147,7 @@ export default defineComponent({
   },
   mounted() {
     // define window.__HC_LAUNCHER_ENV__ so that js-client routes zome-call signing to tauri
-    (window as any).__HC_LAUNCHER_ENV__ = {};
+    window.__HC_LAUNCHER_ENV__ = {};
     this.$nextTick(async () => {
       const restartDialog = this.$refs.restartDialog as typeof HCGenericDialog;
       await listen("request-restart", () => {
@@ -251,7 +253,9 @@ mwc-icon-button {
   font-style: normal;
   font-weight: 400;
   src: url(/fonts/icons/MaterialIcons-Regular.eot); /* For IE6-8 */
-  src: local("Material Icons"), local("MaterialIcons-Regular"),
+  src:
+    local("Material Icons"),
+    local("MaterialIcons-Regular"),
     url(/fonts/icons/MaterialIcons-Regular.ttf) format("truetype");
 }
 
@@ -261,7 +265,8 @@ mwc-icon-button {
   font-style: normal;
   font-weight: 300;
   src: url("/fonts/mulish/mulish-v5-latin-300.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-300.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-300.woff2") format("woff2"),
@@ -278,7 +283,8 @@ mwc-icon-button {
   font-style: normal;
   font-weight: 400;
   src: url("/fonts/mulish/mulish-v5-latin-regular.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-regular.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-regular.woff2")
@@ -296,7 +302,8 @@ mwc-icon-button {
   font-style: normal;
   font-weight: 500;
   src: url("/fonts/mulish/mulish-v5-latin-500.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-500.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-500.woff2") format("woff2"),
@@ -313,7 +320,8 @@ mwc-icon-button {
   font-style: normal;
   font-weight: 600;
   src: url("/fonts/mulish/mulish-v5-latin-600.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-600.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-600.woff2") format("woff2"),
@@ -330,7 +338,8 @@ mwc-icon-button {
   font-style: normal;
   font-weight: 700;
   src: url("/fonts/mulish/mulish-v5-latin-700.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-700.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-700.woff2") format("woff2"),
@@ -347,7 +356,8 @@ mwc-icon-button {
   font-style: normal;
   font-weight: 800;
   src: url("/fonts/mulish/mulish-v5-latin-800.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-800.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-800.woff2") format("woff2"),
@@ -364,7 +374,8 @@ mwc-icon-button {
   font-style: normal;
   font-weight: 900;
   src: url("/fonts/mulish/mulish-v5-latin-900.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-900.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-900.woff2") format("woff2"),
@@ -381,7 +392,8 @@ mwc-icon-button {
   font-style: italic;
   font-weight: 400;
   src: url("/fonts/mulish/mulish-v5-latin-italic.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-italic.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-italic.woff2")
@@ -399,7 +411,8 @@ mwc-icon-button {
   font-style: italic;
   font-weight: 500;
   src: url("/fonts/mulish/mulish-v5-latin-500italic.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-500italic.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-500italic.woff2")
@@ -417,7 +430,8 @@ mwc-icon-button {
   font-style: italic;
   font-weight: 600;
   src: url("/fonts/mulish/mulish-v5-latin-600italic.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-600italic.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-600italic.woff2")
@@ -435,7 +449,8 @@ mwc-icon-button {
   font-style: italic;
   font-weight: 700;
   src: url("/fonts/mulish/mulish-v5-latin-700italic.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-700italic.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-700italic.woff2")
@@ -453,7 +468,8 @@ mwc-icon-button {
   font-style: italic;
   font-weight: 800;
   src: url("/fonts/mulish/mulish-v5-latin-800italic.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-800italic.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-800italic.woff2")
@@ -471,7 +487,8 @@ mwc-icon-button {
   font-style: italic;
   font-weight: 900;
   src: url("/fonts/mulish/mulish-v5-latin-900italic.eot"); /* IE9 Compat Modes */
-  src: local(""),
+  src:
+    local(""),
     url("/fonts/mulish/mulish-v5-latin-900italic.eot?#iefix")
       format("embedded-opentype"),
     /* IE6-IE8 */ url("/fonts/mulish/mulish-v5-latin-900italic.woff2")

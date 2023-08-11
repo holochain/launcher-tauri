@@ -24,7 +24,7 @@ jobs:
       - name: install Go stable
         uses: actions/setup-go@v4
         with:
-          go-version: 'stable'
+          go-version: "stable"
       - name: install webkit2gtk (ubuntu only)
         run: |
           sudo apt-get update
@@ -63,7 +63,7 @@ jobs:
       - name: install Go stable
         uses: actions/setup-go@v4
         with:
-          go-version: 'stable'
+          go-version: "stable"
       - name: install webkit2gtk (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
         run: |
