@@ -43,7 +43,7 @@ jobs:
           Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.2.4-x86_64-pc-windows-msvc.exe
 
 
-          cargo install lair_keystore --git https://github.com/holochain/lair --rev 43be404da0fd9d57bf4429c44def405bd6490f61 --locked --features sqlite-encrypted
+          cargo install lair_keystore --git https://github.com/holochain/lair --rev 43be404da0fd9d57bf4429c44def405bd6490f61 --frozen --features sqlite-encrypted
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.2.1-x86_64-pc-windows-msvc.exe
 
