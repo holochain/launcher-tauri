@@ -123,8 +123,8 @@
           "
           @click="openChangeLanguageDialog"
         >
-          <img src="/img/language_icon_blue.svg" style="height: 22px;" />
-          <div style="margin-left: 6px;">
+          <img src="/img/language_icon_blue.svg" style="height: 22px" />
+          <div style="margin-left: 6px">
             {{ $t("setup.changeLanguage") }}
           </div>
         </div>
@@ -163,7 +163,13 @@ import { i18n } from "../../locale";
 
 export default defineComponent({
   name: "EnterPassword",
-  components: { PasswordField, HCButton, LoadingDots, HCDialog, ChangeLanguage },
+  components: {
+    PasswordField,
+    HCButton,
+    LoadingDots,
+    HCDialog,
+    ChangeLanguage,
+  },
   data(): {
     entering: boolean;
     pwInputDisabled: boolean;
@@ -184,7 +190,7 @@ export default defineComponent({
   async mounted() {
     // this.bootUpSlogan =
     //   bootUpSlogans[Math.floor(Math.random() * bootUpSlogans.length)];
-    this.bootUpSlogan = i18n.global.t('setup.startingUp') + "...";
+    this.bootUpSlogan = i18n.global.t("setup.startingUp") + "...";
 
     this.loadingState = undefined;
     await listen("progress-update", (event) => {

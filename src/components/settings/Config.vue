@@ -18,7 +18,7 @@
       <div class="row" style="margin-top: 20px; margin-bottom: 16px">
         <HCSelect
           ref="selectLogLevel"
-          style="margin: 5px; width: 380px;"
+          style="margin: 5px; width: 380px"
           label="Log Level"
           :items="levels"
           @item-selected="newConfig.log_level = $event"
@@ -29,18 +29,18 @@
       <HCTextField
         ref="bootstrapServerField"
         placeholder="https://bootstrap.holo.host"
-        style="margin: 5px; width: 380px;"
+        style="margin: 5px; width: 380px"
         label="Bootstrap Server URL"
       ></HCTextField>
 
       <HCTextField
         ref="signalingServerField"
         placeholder="wss://signal.holo.host"
-        style="margin: 5px; margin-top: 20px; width: 380px;"
+        style="margin: 5px; margin-top: 20px; width: 380px"
         label="Signaling Server URL"
       ></HCTextField>
 
-      <div class="row" style="margin: 5px; margin-top: 20px;">
+      <div class="row" style="margin: 5px; margin-top: 20px">
         <ToggleSwitch
           ref="slider"
           :sliderOn="customBinary"
@@ -61,11 +61,15 @@
 
     <HCButton
       outlined
-      style="min-width: 270px; height: 30px; margin-bottom: -15px; margin-top: 10px;"
+      style="
+        min-width: 270px;
+        height: 30px;
+        margin-bottom: -15px;
+        margin-top: 10px;
+      "
       @click="restoreDefaults()"
-    >{{ $t('dialogs.config.restoreDefaults') }}
+      >{{ $t("dialogs.config.restoreDefaults") }}
     </HCButton>
-
   </HCGenericDialog>
 </template>
 
@@ -82,7 +86,13 @@ import ToggleSwitch from "../subcomponents/ToggleSwitch.vue";
 
 export default defineComponent({
   name: "Config",
-  components: { HCButton, HCGenericDialog, HCSelect, HCTextField, ToggleSwitch },
+  components: {
+    HCButton,
+    HCGenericDialog,
+    HCSelect,
+    HCTextField,
+    ToggleSwitch,
+  },
   data(): {
     levels: [string, string][];
     newConfig: any;
@@ -135,11 +145,15 @@ export default defineComponent({
       }
 
       if (this.signalingUrl) {
-        (this.newConfig as any).signaling_server_url = (this.$refs.signalingServerField as typeof HCTextField).value;
+        (this.newConfig as any).signaling_server_url = (
+          this.$refs.signalingServerField as typeof HCTextField
+        ).value;
       }
 
       if (this.bootstrapUrl) {
-        (this.newConfig as any).bootstrap_server_url = (this.$refs.bootstrapServerField as typeof HCTextField).value;
+        (this.newConfig as any).bootstrap_server_url = (
+          this.$refs.bootstrapServerField as typeof HCTextField
+        ).value;
       }
 
       // console.log("newConfig: ", this.newConfig);
@@ -176,19 +190,21 @@ export default defineComponent({
         this.customBinaryPath = currentCustomBinaryPath;
       }
 
-      const currentSignalingUrl = (this.newConfig as any)
-        .signaling_server_url;
+      const currentSignalingUrl = (this.newConfig as any).signaling_server_url;
 
       if (currentSignalingUrl && currentSignalingUrl !== "") {
-        (this.$refs.signalingServerField as typeof HCTextField).setValue(currentSignalingUrl);
+        (this.$refs.signalingServerField as typeof HCTextField).setValue(
+          currentSignalingUrl
+        );
         this.signalingUrl = currentSignalingUrl;
       }
 
-      const currentBootstrapUrl = (this.newConfig as any)
-        .bootstrap_server_url;
+      const currentBootstrapUrl = (this.newConfig as any).bootstrap_server_url;
 
       if (currentBootstrapUrl && currentBootstrapUrl !== "") {
-        (this.$refs.bootstrapServerField as typeof HCTextField).setValue(currentBootstrapUrl);
+        (this.$refs.bootstrapServerField as typeof HCTextField).setValue(
+          currentBootstrapUrl
+        );
         this.bootstrapUrl = currentBootstrapUrl;
       }
     },
@@ -203,11 +219,15 @@ export default defineComponent({
 
       const bootstrapUrl: string = await invoke("get_default_bootstrap", {});
       this.bootstrapUrl = bootstrapUrl;
-      (this.$refs.bootstrapServerField as typeof HCTextField).setValue(bootstrapUrl);
+      (this.$refs.bootstrapServerField as typeof HCTextField).setValue(
+        bootstrapUrl
+      );
 
       const signalingUrl: string = await invoke("get_default_signaling", {});
       this.signalingUrl = signalingUrl;
-      (this.$refs.signalingServerField as typeof HCTextField).setValue(signalingUrl);
+      (this.$refs.signalingServerField as typeof HCTextField).setValue(
+        signalingUrl
+      );
 
       this.customBinary = false;
     },

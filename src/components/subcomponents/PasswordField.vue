@@ -100,7 +100,7 @@ export default defineComponent({
     clickEye() {
       (this.$refs.passwordInput as any).focus();
       this.passwordVisible = !this.passwordVisible;
-    }
+    },
   },
 });
 </script>

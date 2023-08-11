@@ -52,7 +52,7 @@ export function filterByHdkVersion(
     happReleases: app.happReleases.filter((r) =>
       hdkVersions.includes(r.content.hdk_version)
     ),
-    guiReleases: app.guiReleases
+    guiReleases: app.guiReleases,
   }));
 
   return filteredReleases.filter((app) => app.happReleases.length > 0);
@@ -66,11 +66,11 @@ export async function getAllAppsWithGui(
   const cells = devhubCells(devhubHapp);
   const allAppsOutput = await appWebsocket.callZome({
     cap_secret: null,
-    cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
+    cell_id: getCellId(cells.happs.find((c) => "provisioned" in c)!)!,
     fn_name: "get_happs_by_tags",
     zome_name: "happ_library",
     payload: ["app-store-ready"],
-    provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
+    provenance: getCellId(cells.happs.find((c) => "provisioned" in c)!)![1],
   });
   // console.log("@getAllAppsWithGui: ", allAppsOutput);
   const allApps: Array<ContentAddress<HappEntry>> = allAppsOutput.payload;
@@ -90,18 +90,19 @@ export async function getAppsReleasesWithGui(
 
   const appReleasesOutput = await appWebsocket.callZome({
     cap_secret: null,
-    cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
+    cell_id: getCellId(cells.happs.find((c) => "provisioned" in c)!)!,
     fn_name: "get_happ_releases",
     zome_name: "happ_library",
     payload: {
       for_happ: app.id,
     },
-    provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
+    provenance: getCellId(cells.happs.find((c) => "provisioned" in c)!)![1],
   });
 
   // console.log("@getAppsReleases: appReleasesOutput:", appReleasesOutput);
 
-  const allReleases: Array<Entity<HappReleaseEntry>> = appReleasesOutput.payload;
+  const allReleases: Array<Entity<HappReleaseEntry>> =
+    appReleasesOutput.payload;
 
   const releases: Array<ContentAddress<HappReleaseEntry>> = allReleases.map(
     (entity) => {
@@ -117,24 +118,23 @@ export async function getAppsReleasesWithGui(
 
   const filteredReleases = releases.filter((r) => !!r.content.official_gui);
 
-  let guiReleases: Array<GUIReleaseResponsePayload> = []
+  let guiReleases: Array<GUIReleaseResponsePayload> = [];
 
   await Promise.all(
     filteredReleases.map(async (release) => {
       const guiRelease = await appWebsocket.callZome({
         cap_secret: null,
-        cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
+        cell_id: getCellId(cells.happs.find((c) => "provisioned" in c)!)!,
         fn_name: "get_gui_release",
         zome_name: "happ_library",
         payload: {
-          id: release.content.official_gui
+          id: release.content.official_gui,
         },
-        provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
-      })
-      guiReleases.push(guiRelease.payload)
+        provenance: getCellId(cells.happs.find((c) => "provisioned" in c)!)![1],
+      });
+      guiReleases.push(guiRelease.payload);
     })
-  )
-
+  );
 
   // console.log("@getAppsReleases: filteredReleases: ", filteredReleases);
   return {
@@ -152,7 +152,6 @@ export function getLatestRelease(
   )[0];
 }
 
-
 const sleep = (ms: number) => new Promise((r) => setTimeout(() => r(null), ms));
 
 export async function fetchWebHapp(
@@ -167,7 +166,7 @@ export async function fetchWebHapp(
 
   const result = await appWebsocket.callZome({
     cap_secret: null,
-    cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
+    cell_id: getCellId(cells.happs.find((c) => "provisioned" in c)!)!,
     fn_name: "get_webhapp_package",
     zome_name: "happ_library",
     payload: {
@@ -175,7 +174,7 @@ export async function fetchWebHapp(
       happ_release_id: happReleaseActionHash,
       gui_release_id: guiReleaseActionHash,
     },
-    provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
+    provenance: getCellId(cells.happs.find((c) => "provisioned" in c)!)![1],
   });
 
   if (result.payload.error) {
@@ -211,8 +210,6 @@ export function devhubCells(devhubHapp: AppInfo) {
   };
 }
 
-
-
 /**
  * Gets the happ releases corresponding to the passed entry hashes
  *
@@ -223,24 +220,27 @@ export async function getHappReleasesByActionHashes(
   devhubHapp: AppInfo,
   happReleaseActionHashes: Array<ActionHash | undefined>
 ) {
-
   const cells = devhubCells(devhubHapp);
-  const happReleases = await Promise.all(happReleaseActionHashes.map( async (actionHash) => {
-    if (actionHash) {
-      return appWebsocket.callZome({
-        cap_secret: null,
-        cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
-        fn_name: "get_happ_release",
-        zome_name: "happ_library",
-        payload: {
-          id: actionHash,
-        },
-        provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
-      })
-    } else {
-      return undefined;
-    }
-  }));
+  const happReleases = await Promise.all(
+    happReleaseActionHashes.map(async (actionHash) => {
+      if (actionHash) {
+        return appWebsocket.callZome({
+          cap_secret: null,
+          cell_id: getCellId(cells.happs.find((c) => "provisioned" in c)!)!,
+          fn_name: "get_happ_release",
+          zome_name: "happ_library",
+          payload: {
+            id: actionHash,
+          },
+          provenance: getCellId(
+            cells.happs.find((c) => "provisioned" in c)!
+          )![1],
+        });
+      } else {
+        return undefined;
+      }
+    })
+  );
 
   return happReleases.map((response) => {
     if (response) {
@@ -250,7 +250,6 @@ export async function getHappReleasesByActionHashes(
     }
   });
 }
-
 
 /**
  * Fetches a GUI from the DevHub
@@ -270,13 +269,13 @@ export async function fetchGui(
 
   const result = await appWebsocket.callZome({
     cap_secret: null,
-    cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
+    cell_id: getCellId(cells.happs.find((c) => "provisioned" in c)!)!,
     fn_name: "get_webasset",
     zome_name: "happ_library",
     payload: {
       id: webAssetActionHash,
     },
-    provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
+    provenance: getCellId(cells.happs.find((c) => "provisioned" in c)!)![1],
   });
 
   if (result.payload.error) {

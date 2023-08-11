@@ -15,7 +15,7 @@ import { defineComponent, PropType } from "vue";
 import { isAppRunning, isAppDisabled, isAppPaused } from "../utils";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import "@shoelace-style/shoelace/dist/components/badge/badge.js";
-import { AppInfo} from "@holochain/client";
+import { AppInfo } from "@holochain/client";
 
 export default defineComponent({
   name: "InstalledAppStatus",

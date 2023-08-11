@@ -1,51 +1,93 @@
 <template>
-
   <HCGenericDialog
     @confirm="updateGui"
     ref="updateGuiDialog"
     :primaryButtonLabel="$t('buttons.install')"
     :closeOnSideClick="true"
   >
-    <div class="column" style="padding: 0 30px; align-items: flex-start; max-width: 500px;">
-      <div style="width: 100%; text-align: center; font-weight: 600; font-size: 27px; margin-bottom: 25px">
+    <div
+      class="column"
+      style="padding: 0 30px; align-items: flex-start; max-width: 500px"
+    >
+      <div
+        style="
+          width: 100%;
+          text-align: center;
+          font-weight: 600;
+          font-size: 27px;
+          margin-bottom: 25px;
+        "
+      >
         {{ $t("dialogs.guiUpdate.title") }}
       </div>
-      <div style="margin-bottom: 15px;">
+      <div style="margin-bottom: 15px">
         {{ $t("dialogs.guiUpdate.mainText") }}:
       </div>
       <div>
-        <span style="font-weight: bold; margin-right: 15px;">{{ $t("dialogs.guiUpdate.version") }}:</span>{{ selectedGuiUpdate ? selectedGuiUpdate.version : "loading..." }}
+        <span style="font-weight: bold; margin-right: 15px"
+          >{{ $t("dialogs.guiUpdate.version") }}:</span
+        >{{ selectedGuiUpdate ? selectedGuiUpdate.version : "loading..." }}
       </div>
-      <div style="font-weight: bold;">
+      <div style="font-weight: bold">
         {{ $t("dialogs.guiUpdate.changelog") }}:
       </div>
-      <div style="background: rgb(217,217,217); border-radius: 8px; padding: 10px; width: 480px; min-height: 100px; max-height: 200px; overflow-y: auto; margin-top: 5px; white-space: pre-wrap;">
+      <div
+        style="
+          background: rgb(217, 217, 217);
+          border-radius: 8px;
+          padding: 10px;
+          width: 480px;
+          min-height: 100px;
+          max-height: 200px;
+          overflow-y: auto;
+          margin-top: 5px;
+          white-space: pre-wrap;
+        "
+      >
         {{ selectedGuiUpdate ? selectedGuiUpdate.changelog : "loading..." }}
       </div>
-      <div style="margin-top: 20px;">
+      <div style="margin-top: 20px">
         {{ $t("dialogs.guiUpdate.question") }}
       </div>
     </div>
   </HCGenericDialog>
 
-  <Config ref="configDialog"/>
+  <Config ref="configDialog" />
 
   <HCLoading ref="downloading" :text="loadingText"></HCLoading>
 
   <div
     v-if="isLoading()"
-    class="column center-content" style="flex: 1; height: calc(100vh - 64px);"
+    class="column center-content"
+    style="flex: 1; height: calc(100vh - 64px)"
   >
-    <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"></LoadingDots>
+    <LoadingDots
+      style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"
+    ></LoadingDots>
   </div>
 
-  <div v-else style="display: flex; margin: 24px; margin-bottom: 50px; flex-direction: column; align-items: center;">
-    <div class='column' style="flex: 1 1 0%; margin-bottom: 80px; padding: 0px 30px; width: 70%; min-width: 900px;">
-
+  <div
+    v-else
+    style="
+      display: flex;
+      margin: 24px;
+      margin-bottom: 50px;
+      flex-direction: column;
+      align-items: center;
+    "
+  >
+    <div
+      class="column"
+      style="
+        flex: 1 1 0%;
+        margin-bottom: 80px;
+        padding: 0px 30px;
+        width: 70%;
+        min-width: 900px;
+      "
+    >
       <!-- Holochain version info -->
-      <div
-        class="row section"
-      >
+      <div class="row section">
         <span
           class="section-title"
           :title="$t('settings.holochainVersionsHelper')"
@@ -64,13 +106,14 @@
         </span>
       </div>
 
-      <div
-        class="column"
-        style="margin-bottom: 15px; width: 100%;"
-      >
+      <div class="column" style="margin-bottom: 15px; width: 100%">
         <div
           v-if="noHolochainVersions"
-          style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
+          style="
+            margin-top: 30px;
+            color: rgba(0, 0, 0, 0.6);
+            text-align: center;
+          "
         >
           {{ $t("settings.noHolochainVersions") }}
         </div>
@@ -78,12 +121,7 @@
           <div
             v-for="hcVersion in holochainVersions"
             :key="hcVersion"
-            style="
-              display: flex;
-              flex: 1;
-              flex-direction: column;
-              width: 100%;
-            "
+            style="display: flex; flex: 1; flex-direction: column; width: 100%"
           >
             <div class="row section-container hc-version" style="margin: 5px 0">
               <img
@@ -141,13 +179,17 @@
         </span>
       </div>
 
-      <div v-if="showAdvancedSettings" style="margin-bottom: 15px;">
-
+      <div v-if="showAdvancedSettings" style="margin-bottom: 15px">
         <!-- Dev Mode -->
-        <div class="row section-container" style="display: flex; flex-direction: column;">
+        <div
+          class="row section-container"
+          style="display: flex; flex-direction: column"
+        >
           <div class="row">
-            <div style="flex: 1;">
-              <span style="font-size: 18px">{{ $t("main.activateDevMode") }}</span>
+            <div style="flex: 1">
+              <span style="font-size: 18px">{{
+                $t("main.activateDevMode")
+              }}</span>
             </div>
             <!-- Disable/enable switch -->
             <sl-tooltip
@@ -158,7 +200,11 @@
             >
               <ToggleSwitch
                 style="margin-right: 29px"
-                :sliderOn="devHubAppInfo ? isAppRunning(devHubAppInfo.webAppInfo.installed_app_info) : false"
+                :sliderOn="
+                  devHubAppInfo
+                    ? isAppRunning(devHubAppInfo.webAppInfo.installed_app_info)
+                    : false
+                "
                 @click.stop.prevent="toggleDevMode()"
                 @keydown.enter="toggleDevMode()"
               />
@@ -170,28 +216,35 @@
               outlined
               :disabled="!devModeOn"
               @click="openPublishAppDialog"
-              style="height: 36px; border-radius: 8px; padding: 0 20px; margin-top: 10px;"
+              style="
+                height: 36px;
+                border-radius: 8px;
+                padding: 0 20px;
+                margin-top: 10px;
+              "
               >{{ $t("settings.publishAnApp") }}
             </HCButton>
           </div>
         </div>
 
         <div class="row section-container">
-          <div class="column" style="flex: 1;">
-            <div style="font-size: 18px">{{ $t("settings.launcherConfiguration") }}</div>
-            <span style="font-size: 14px">{{ $t("settings.launcherConfigurationDescription") }}</span>
+          <div class="column" style="flex: 1">
+            <div style="font-size: 18px">
+              {{ $t("settings.launcherConfiguration") }}
+            </div>
+            <span style="font-size: 14px">{{
+              $t("settings.launcherConfigurationDescription")
+            }}</span>
           </div>
-          <HCButton style="margin: 4px 6px;" @click="openConfig()">Configure Launcher</HCButton>
+          <HCButton style="margin: 4px 6px" @click="openConfig()"
+            >Configure Launcher</HCButton
+          >
         </div>
       </div>
 
-
       <!-- Installed apps list -->
 
-      <div
-        class="column"
-        style="flex: 1; margin-top: 20px"
-      >
+      <div class="column" style="flex: 1; margin-top: 20px">
         <div
           class="row"
           style="
@@ -259,10 +312,14 @@
           </span>
         </div>
 
-        <div v-if="showWebApps" style="margin-bottom: 50px; padding: 0 15px;">
+        <div v-if="showWebApps" style="margin-bottom: 50px; padding: 0 15px">
           <div
             v-if="noWebApps"
-            style="margin-top: 30px; color: rgba(0, 0, 0, 0.6); text-align: center"
+            style="
+              margin-top: 30px;
+              color: rgba(0, 0, 0, 0.6);
+              text-align: center;
+            "
           >
             {{ $t("settings.noWebApps") }}
             {{
@@ -318,7 +375,10 @@
           </span>
         </div>
 
-        <div v-if="showHeadlessApps && !noHeadlessApps" style="margin-bottom: 50px; padding: 0 15px;">
+        <div
+          v-if="showHeadlessApps && !noHeadlessApps"
+          style="margin-bottom: 50px; padding: 0 15px"
+        >
           <div
             v-for="app in sortedApps"
             :key="app.webAppInfo.installed_app_info.installed_app_id"
@@ -354,15 +414,26 @@
       </div>
       <div>
         Turning on Dev Mode installs the DevHub app. DevHub is the place where
-        <span style="font-weight: bold; white-space: nowrap;">app developers</span>
-        can upload and manage their apps, and is required to publish apps to the AppStore.<br><br>
-        Installing DevHub will download a lot of data, and synchronization with other DevHub nodes may take a long time.
-        Are you sure you want to continue?
+        <span style="font-weight: bold; white-space: nowrap"
+          >app developers</span
+        >
+        can upload and manage their apps, and is required to publish apps to the
+        AppStore.<br /><br />
+        Installing DevHub will download a lot of data, and synchronization with
+        other DevHub nodes may take a long time. Are you sure you want to
+        continue?
       </div>
 
-      <div class="row" style="margin-top: 20px;">
-        <HCButton style="height: 30px; margin: 4px 6px;" outlined @click="closeDevModeWarning">Cancel</HCButton>
-        <HCButton style="margin: 4px 6px;" @click="handleInstallDevHub">Install DevHub</HCButton>
+      <div class="row" style="margin-top: 20px">
+        <HCButton
+          style="height: 30px; margin: 4px 6px"
+          outlined
+          @click="closeDevModeWarning"
+          >Cancel</HCButton
+        >
+        <HCButton style="margin: 4px 6px" @click="handleInstallDevHub"
+          >Install DevHub</HCButton
+        >
       </div>
     </div>
   </HCDialog>
@@ -377,32 +448,45 @@
       </div>
 
       <div>
-        To publish your own Holochain App you will need to upload it first to the Dev Hub and then to the App Store.
-        First read the <a :href='howToPublishUrl' target="_blank">full instructions here</a>, then open the Dev Hub and App Store below.
+        To publish your own Holochain App you will need to upload it first to
+        the Dev Hub and then to the App Store. First read the
+        <a :href="howToPublishUrl" target="_blank">full instructions here</a>,
+        then open the Dev Hub and App Store below.
       </div>
 
-      <div class="row" style="margin-top: 20px;">
+      <div class="row" style="margin-top: 20px">
         <HCButton
-          style="height: 30px; margin: 4px 6px;"
+          style="height: 30px; margin: 4px 6px"
           outlined
-          @click="devHubAppInfo ? openApp(devHubAppInfo) : undefined; "
+          @click="devHubAppInfo ? openApp(devHubAppInfo) : undefined"
         >
           {{ $t("settings.openDevHub") }}
         </HCButton>
         <HCButton
-          style="margin: 4px 6px;"
-          @click="appstoreHolochainAppInfo ? openApp(appstoreHolochainAppInfo) : undefined; closePublishAppDialog();"
+          style="margin: 4px 6px"
+          @click="
+            appstoreHolochainAppInfo
+              ? openApp(appstoreHolochainAppInfo)
+              : undefined;
+            closePublishAppDialog();
+          "
         >
           {{ $t("settings.openAppStore") }}
         </HCButton>
       </div>
     </div>
   </HCDialog>
-
 </template>
 
 <script lang="ts">
-import { AppInfo, AppWebsocket, decodeHashFromBase64, encodeHashToBase64, InstalledAppId, DnaHashB64 } from "@holochain/client";
+import {
+  AppInfo,
+  AppWebsocket,
+  decodeHashFromBase64,
+  encodeHashToBase64,
+  InstalledAppId,
+  DnaHashB64,
+} from "@holochain/client";
 import { uniq } from "lodash-es";
 import prettyBytes from "pretty-bytes";
 import { invoke } from "@tauri-apps/api/tauri";
@@ -412,7 +496,12 @@ import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
 
-import { getHappReleasesByActionHashes, appstoreCells, fetchGuiReleaseEntry, tryWithHosts } from "../appstore/appstore-interface";
+import {
+  getHappReleasesByActionHashes,
+  appstoreCells,
+  fetchGuiReleaseEntry,
+  tryWithHosts,
+} from "../appstore/appstore-interface";
 import { GUIReleaseEntry, HappReleaseEntry } from "../appstore/types";
 import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
 import AppSettingsCard from "../components/AppSettingsCard.vue";
@@ -428,8 +517,18 @@ import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
 import StackedChart from "../components/subcomponents/StackedChart.vue";
 import { i18n } from "../locale";
 import { ActionTypes } from "../store/actions";
-import { HolochainAppInfo, HolochainAppInfoExtended, StorageInfo, ResourceLocator } from "../types";
-import { isAppDisabled, isAppPaused, isAppRunning, locatorToLocatorB64 } from "../utils";
+import {
+  HolochainAppInfo,
+  HolochainAppInfoExtended,
+  StorageInfo,
+  ResourceLocator,
+} from "../types";
+import {
+  isAppDisabled,
+  isAppPaused,
+  isAppRunning,
+  locatorToLocatorB64,
+} from "../utils";
 
 export default defineComponent({
   name: "Settings",
@@ -444,7 +543,7 @@ export default defineComponent({
     HCSelectCard,
     StackedChart,
     HCGenericDialog,
-    HCLoading
+    HCLoading,
   },
   props: {
     installedApps: {
@@ -459,7 +558,9 @@ export default defineComponent({
     devHubAppInfo: HolochainAppInfo | null;
     devModeEnabled: boolean;
     errorText: string;
-    extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> | undefined;
+    extendedAppInfos:
+      | Record<InstalledAppId, HolochainAppInfoExtended>
+      | undefined;
     howToPublishUrl: string;
     loadingText: string;
     refreshing: boolean;
@@ -490,8 +591,8 @@ export default defineComponent({
       reportIssueUrl: "https://github.com/holochain/launcher/issues/new",
       showDevModeDevsOnlyWarning: false,
       sortOptions: [
-        [i18n.global.t('main.name'), "name"],
-        [i18n.global.t('main.nameDescending'), "name descending"],
+        [i18n.global.t("main.name"), "name"],
+        [i18n.global.t("main.nameDescending"), "name descending"],
         // ["Holochain Version", "Holochain Version"],
       ],
       sortOption: undefined,
@@ -516,21 +617,24 @@ export default defineComponent({
   },
   computed: {
     devModeOn() {
-      return this.devHubAppInfo ? (isAppRunning(this.devHubAppInfo.webAppInfo.installed_app_info) || isAppPaused(this.devHubAppInfo.webAppInfo.installed_app_info)) : false
+      return this.devHubAppInfo
+        ? isAppRunning(this.devHubAppInfo.webAppInfo.installed_app_info) ||
+            isAppPaused(this.devHubAppInfo.webAppInfo.installed_app_info)
+        : false;
     },
     sortedApps() {
       // if extended happ releases are not yet fetched from the DevHub to include potential
       // GUI updates, just return installedApps with guiUpdateAvailable undefined
       let sortedAppList: Array<HolochainAppInfoExtended> = this.extendedAppInfos
-          ? Object.values(this.extendedAppInfos)
-          : this.installedApps.map((app) => {
-        return {
-          webAppInfo: app.webAppInfo,
-          holochainId: app.holochainId,
-          holochainVersion: app.holochainVersion,
-          guiUpdateAvailable: undefined,
-        }
-      });
+        ? Object.values(this.extendedAppInfos)
+        : this.installedApps.map((app) => {
+            return {
+              webAppInfo: app.webAppInfo,
+              holochainId: app.holochainId,
+              holochainVersion: app.holochainVersion,
+              guiUpdateAvailable: undefined,
+            };
+          });
 
       if (this.selectedHolochainVersion !== "All Versions") {
         sortedAppList = sortedAppList.filter(
@@ -579,8 +683,10 @@ export default defineComponent({
       return uniq(allApps.map((app) => app.holochainVersion));
     },
     holochainVersionOptions(): [string, string][] {
-      let allApps = this.installedApps;
-      let hcVersions: [string, string][] = [[i18n.global.t('main.allVersions'), "All Versions"]];
+      const allApps = this.installedApps;
+      const hcVersions: [string, string][] = [
+        [i18n.global.t("main.allVersions"), "All Versions"],
+      ];
       uniq(allApps.map((app) => app.holochainVersion)).forEach((hcVer) => {
         hcVersions.push([hcVer, hcVer]);
       });
@@ -596,10 +702,13 @@ export default defineComponent({
       return this.$store.state.launcherStateInfo === "loading";
     },
     openConfig() {
-      (this.$refs.configDialog as typeof Config).open()
+      (this.$refs.configDialog as typeof Config).open();
     },
     openHidden(app: HolochainAppInfoExtended) {
-      return (app.webAppInfo.installed_app_info.installed_app_id === APPSTORE_APP_ID) && !this.devModeOn
+      return (
+        app.webAppInfo.installed_app_info.installed_app_id ===
+          APPSTORE_APP_ID && !this.devModeOn
+      );
     },
     openPublishAppDialog() {
       (this.$refs["publishAppDialog"] as typeof HCDialog).open();
@@ -611,35 +720,42 @@ export default defineComponent({
       (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).close();
     },
     async refreshAppStates() {
-
       await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
-      this.devHubAppInfo = null
+      this.devHubAppInfo = null;
 
       await Promise.all(
         this.installedApps.map(async (app) => {
           // Check if DevHub is installed and if so store info about it locally
-          if (app.webAppInfo.installed_app_info.installed_app_id === DEVHUB_APP_ID) {
-            this.devHubAppInfo = app
+          if (
+            app.webAppInfo.installed_app_info.installed_app_id === DEVHUB_APP_ID
+          ) {
+            this.devHubAppInfo = app;
             this.showAdvancedSettings = true;
           }
 
           // Store app store for later use
-          if (app.webAppInfo.installed_app_info.installed_app_id === APPSTORE_APP_ID) {
-            this.appstoreHolochainAppInfo = app
+          if (
+            app.webAppInfo.installed_app_info.installed_app_id ===
+            APPSTORE_APP_ID
+          ) {
+            this.appstoreHolochainAppInfo = app;
           }
 
-          return this.storageInfos[app.holochainVersion] = await invoke(
+          return (this.storageInfos[app.holochainVersion] = await invoke(
             "get_storage_info",
             { holochainId: app.holochainId }
-          );
+          ));
         })
       );
 
       const holochainId = this.$store.getters["holochainIdForDevhub"];
       // connect to AppWebsocket
       const port = this.$store.getters["appInterfacePort"](holochainId);
-      const appWebsocket = await AppWebsocket.connect(new URL(`ws://localhost:${port}`), 40000);
+      const appWebsocket = await AppWebsocket.connect(
+        new URL(`ws://localhost:${port}`),
+        40000
+      );
       this.appWebsocket = appWebsocket;
       const appstoreAppInfo = await appWebsocket.appInfo({
         installed_app_id: APPSTORE_APP_ID,
@@ -649,7 +765,8 @@ export default defineComponent({
       await this.refreshExtendedAppInfos();
     },
     async refreshExtendedAppInfos() {
-      const extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> = {};
+      const extendedAppInfos: Record<InstalledAppId, HolochainAppInfoExtended> =
+        {};
 
       // TODO: do i need this here?
       this.installedApps.forEach((app) => {
@@ -658,7 +775,7 @@ export default defineComponent({
           holochainId: app.holochainId,
           holochainVersion: app.holochainVersion,
           guiUpdateAvailable: undefined,
-        }
+        };
       });
 
       this.extendedAppInfos = extendedAppInfos;
@@ -701,12 +818,15 @@ export default defineComponent({
         await invoke("disable_app", { appId, holochainId: app.holochainId });
         await this.refreshAppStates();
         this.showMessage(`Disabled ${appId}`);
-
       } catch (e) {
         const error = `Disable app ${appId} failed: ${JSON.stringify(e)}`;
 
         // if disabling "purportedly" fails due to being offline, ignore the error.
-        if (error.includes("failed to lookup address information: Temporary failure in name resolution")) {
+        if (
+          error.includes(
+            "failed to lookup address information: Temporary failure in name resolution"
+          )
+        ) {
           this.showMessage(`Disabled ${appId}`);
         } else {
           this.showMessage(error);
@@ -764,7 +884,6 @@ export default defineComponent({
       }
     },
     async uninstallApp(app: HolochainAppInfo) {
-
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
 
       try {
@@ -809,57 +928,95 @@ export default defineComponent({
       // check for GUI updates
       const allApps: Array<HolochainAppInfo> = this.$store.getters["allApps"];
 
-      const updatableApps = allApps.filter((app) => app.webAppInfo.happ_release_info?.resource_locator);
+      const updatableApps = allApps.filter(
+        (app) => app.webAppInfo.happ_release_info?.resource_locator
+      );
 
       // sort all happ release ResourceLocators by DnaHash of the DevHub they originate from
-      const updatableAppsByLocatorDna: Record<DnaHashB64, HolochainAppInfo[]> = {};
+      const updatableAppsByLocatorDna: Record<DnaHashB64, HolochainAppInfo[]> =
+        {};
 
       updatableApps.forEach((app) => {
-        const dnaHash = app.webAppInfo.happ_release_info!.resource_locator!.dna_hash;
+        const dnaHash =
+          app.webAppInfo.happ_release_info!.resource_locator!.dna_hash;
         const apps = updatableAppsByLocatorDna[dnaHash];
 
         if (apps) {
-          updatableAppsByLocatorDna[dnaHash] = [...apps, app]
+          updatableAppsByLocatorDna[dnaHash] = [...apps, app];
         } else {
-          updatableAppsByLocatorDna[dnaHash] = [app!]
+          updatableAppsByLocatorDna[dnaHash] = [app!];
         }
       });
 
-      await Promise.allSettled(Object.values(updatableAppsByLocatorDna).map(async (apps) => {
-        const actionHashes = apps.map((app) => decodeHashFromBase64(app.webAppInfo.happ_release_info!.resource_locator!.resource_hash));
-        const devHubDnaHash = decodeHashFromBase64(apps[0].webAppInfo.happ_release_info!.resource_locator!.dna_hash);
+      await Promise.allSettled(
+        Object.values(updatableAppsByLocatorDna).map(async (apps) => {
+          const actionHashes = apps.map((app) =>
+            decodeHashFromBase64(
+              app.webAppInfo.happ_release_info!.resource_locator!.resource_hash
+            )
+          );
+          const devHubDnaHash = decodeHashFromBase64(
+            apps[0].webAppInfo.happ_release_info!.resource_locator!.dna_hash
+          );
 
-        try {
-          console.log("@checkForUiPudates: actionHashes: ", actionHashes.map((eh) => encodeHashToBase64(eh)));
-          const happReleases: Array<HappReleaseEntry | undefined> = await getHappReleasesByActionHashes((this.appWebsocket! as AppWebsocket), this.appstoreAppInfo!, devHubDnaHash, actionHashes);
+          try {
+            console.log(
+              "@checkForUiPudates: actionHashes: ",
+              actionHashes.map((eh) => encodeHashToBase64(eh))
+            );
+            const happReleases: Array<HappReleaseEntry | undefined> =
+              await getHappReleasesByActionHashes(
+                this.appWebsocket! as AppWebsocket,
+                this.appstoreAppInfo!,
+                devHubDnaHash,
+                actionHashes
+              );
 
-          apps.forEach((app, idx) => {
-            if (happReleases[idx]) {
-              console.log("official_gui: ", happReleases[idx]!.official_gui ? encodeHashToBase64(happReleases[idx]!.official_gui!) : undefined)
-            }
+            apps.forEach((app, idx) => {
+              if (happReleases[idx]) {
+                console.log(
+                  "official_gui: ",
+                  happReleases[idx]!.official_gui
+                    ? encodeHashToBase64(happReleases[idx]!.official_gui!)
+                    : undefined
+                );
+              }
 
-            // if it's installed as a webapp and the happ release has an official GUI, check whether it's a new GUI
-            if (app.webAppInfo.web_uis.default.type === "WebApp" && happReleases[idx]?.official_gui) {
-              const guiReleaseInfo = app.webAppInfo.web_uis.default.gui_release_info;
-              const guiReleaseHash = app.webAppInfo.web_uis.default.gui_release_info?.resource_locator!.resource_hash;
-              console.log("guiReleaseHash: ", guiReleaseHash);
-              if (guiReleaseInfo && guiReleaseHash) {
-                if(guiReleaseHash != encodeHashToBase64(happReleases[idx]!.official_gui!)) {
-                  this.extendedAppInfos![app.webAppInfo.installed_app_info.installed_app_id].guiUpdateAvailable = {
-                    dna_hash: devHubDnaHash,
-                    resource_hash: happReleases[idx]!.official_gui!,
+              // if it's installed as a webapp and the happ release has an official GUI, check whether it's a new GUI
+              if (
+                app.webAppInfo.web_uis.default.type === "WebApp" &&
+                happReleases[idx]?.official_gui
+              ) {
+                const guiReleaseInfo =
+                  app.webAppInfo.web_uis.default.gui_release_info;
+                const guiReleaseHash =
+                  app.webAppInfo.web_uis.default.gui_release_info
+                    ?.resource_locator!.resource_hash;
+                console.log("guiReleaseHash: ", guiReleaseHash);
+                if (guiReleaseInfo && guiReleaseHash) {
+                  if (
+                    guiReleaseHash !=
+                    encodeHashToBase64(happReleases[idx]!.official_gui!)
+                  ) {
+                    this.extendedAppInfos![
+                      app.webAppInfo.installed_app_info.installed_app_id
+                    ].guiUpdateAvailable = {
+                      dna_hash: devHubDnaHash,
+                      resource_hash: happReleases[idx]!.official_gui!,
+                    };
                   }
                 }
               }
-            }
-          })
-
-        } catch (e) {
-          console.error(`Failed to get happ releases from DevHub host of network with DNA hash ${encodeHashToBase64(devHubDnaHash)}: ${JSON.stringify(e)}`);
-        }
-
-      }))
-
+            });
+          } catch (e) {
+            console.error(
+              `Failed to get happ releases from DevHub host of network with DNA hash ${encodeHashToBase64(
+                devHubDnaHash
+              )}: ${JSON.stringify(e)}`
+            );
+          }
+        })
+      );
     },
     async openUpdateGuiDialog(app: HolochainAppInfoExtended) {
       this.selectedApp = app;
@@ -868,7 +1025,7 @@ export default defineComponent({
       (this.$refs.updateGuiDialog as typeof HCGenericDialog).open();
 
       if (this.appWebsocket && this.appstoreAppInfo) {
-          const cells = appstoreCells(this.appstoreAppInfo);
+        const cells = appstoreCells(this.appstoreAppInfo);
         //   const guiReleaseResponse = await this.appWebsocket?.callZome({
         //   cap_secret: null,
         //   cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
@@ -880,13 +1037,17 @@ export default defineComponent({
         //   provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
         // });
 
-        const guiReleaseResponse = await fetchGuiReleaseEntry(this.appWebsocket as AppWebsocket, this.appstoreAppInfo, app.guiUpdateAvailable!);
+        const guiReleaseResponse = await fetchGuiReleaseEntry(
+          this.appWebsocket as AppWebsocket,
+          this.appstoreAppInfo,
+          app.guiUpdateAvailable!
+        );
 
         this.selectedGuiUpdate = guiReleaseResponse.content;
         this.selectedGuiUpdateLocator = app.guiUpdateAvailable;
         console.log("Got GUI Release: ", guiReleaseResponse.content);
       } else {
-        alert!("Error: AppWebsocket or Appstore AppInfo undefined.")
+        alert!("Error: AppWebsocket or Appstore AppInfo undefined.");
         this.selectedGuiUpdate = undefined;
         this.selectedGuiUpdateLocator = undefined;
       }
@@ -959,19 +1120,26 @@ export default defineComponent({
         const appstoreAppInfo = this.appstoreAppInfo;
 
         if (appstoreAppInfo) {
-
           await tryWithHosts<void>(
             async (host) => {
               await invoke("fetch_and_update_default_gui", {
                 appPort: port,
                 appstoreAppId: appstoreAppInfo!.installed_app_id,
                 host: Array.from(host),
-                devhubHappLibraryDnaHash: Array.from(this.selectedGuiUpdateLocator!.dna_hash), // DNA hash of the DevHub to which the remote call shall be made
-                appstorePubKey: encodeHashToBase64(appstoreAppInfo!.agent_pub_key),
+                devhubHappLibraryDnaHash: Array.from(
+                  this.selectedGuiUpdateLocator!.dna_hash
+                ), // DNA hash of the DevHub to which the remote call shall be made
+                appstorePubKey: encodeHashToBase64(
+                  appstoreAppInfo!.agent_pub_key
+                ),
                 holochainId: this.selectedApp!.holochainId,
-                appId: this.selectedApp!.webAppInfo.installed_app_info.installed_app_id,
+                appId:
+                  this.selectedApp!.webAppInfo.installed_app_info
+                    .installed_app_id,
                 guiReleaseInfo: {
-                  resource_locator: locatorToLocatorB64(this.selectedApp!.guiUpdateAvailable!),
+                  resource_locator: locatorToLocatorB64(
+                    this.selectedApp!.guiUpdateAvailable!
+                  ),
                   version: this.selectedGuiUpdate?.version,
                 },
               });
@@ -985,17 +1153,15 @@ export default defineComponent({
               // to remove the update button:
               await this.refreshAppStates();
               this.checkForUiUpdates();
-
             },
             this.appWebsocket as AppWebsocket,
             appstoreAppInfo!,
             this.selectedGuiUpdateLocator!.dna_hash,
             "happ_library",
-            "get_webasset_file",
+            "get_webasset_file"
           );
 
-          this.$emit('updated-ui');
-
+          this.$emit("updated-ui");
         } else {
           console.error("Error updating the UI: Undefined appstoreAppInfo");
           this.showMessage(`Error updating the UI: Undefined appstoreAppInfo`);
@@ -1050,6 +1216,4 @@ h2 {
   margin-top: 8px;
   padding: 8px 0;
 }
-
-
 </style>

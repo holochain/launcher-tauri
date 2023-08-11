@@ -18,7 +18,9 @@
       <HCCircularProgress
         style="margin-top: 40px; margin-bottom: 40px"
       ></HCCircularProgress>
-      <div style="margin-bottom: 10px; text-align: center; padding: 0 30px;">{{ text }}</div>
+      <div style="margin-bottom: 10px; text-align: center; padding: 0 30px">
+        {{ text }}
+      </div>
     </div>
   </HCDialog>
 </template>

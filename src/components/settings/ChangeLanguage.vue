@@ -25,7 +25,6 @@
         >
         </HCSelect>
       </div>
-
     </div>
   </HCGenericDialog>
 </template>
@@ -57,7 +56,7 @@ export default defineComponent({
     };
   },
   mounted() {
-    let languages: [string, string][] = [];
+    const languages: [string, string][] = [];
     i18n.global.availableLocales.forEach((locale) => {
       if (languageNames[locale]) {
         languages.push([languageNames[locale], locale]);
@@ -85,7 +84,7 @@ export default defineComponent({
     },
     open() {
       (this.$refs.dialog as typeof HCGenericDialog).open();
-    }
+    },
   },
 });
 </script>

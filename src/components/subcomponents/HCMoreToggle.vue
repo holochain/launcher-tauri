@@ -2,7 +2,7 @@
   <div
     style="width: 28px; height: 28px; cursor: pointer"
     @click="handleClick"
-    v-on:keyup.enter="handleClick"
+    @keyup.enter="handleClick"
   >
     <img
       style="width: 28px"

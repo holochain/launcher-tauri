@@ -71,6 +71,7 @@ A manager is something that given a path, instantiates and manages an external p
 High-level functions:
 
 - lair_keystore_manager: given a path to a folder, run a lair_keystore instance in that folder and maintain an active connection to it to:
+
   - Sign zome calls
 
 - holochain_manager: given a path to a config folder and a path to a data folder, run and manage a holochain instance that installs apps in that path.

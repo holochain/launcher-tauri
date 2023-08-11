@@ -4,18 +4,16 @@
     closeOnSideClick
     ref="delete-cell-dialog"
     primaryButtonLabel="Delete"
-    ><div style="text-align: center; margin: 0 10px;">
-      {{ $t('dialogs.confirmUninstallCell') }}
+    ><div style="text-align: center; margin: 0 10px">
+      {{ $t("dialogs.confirmUninstallCell") }}
     </div>
   </HCGenericDialog>
 
   <div class="column card">
     <div style="text-align: right; font-weight: 600">{{ roleName }}</div>
     <div>
-      <span style="margin-right: 47px;">Name:</span>
-      <span style="font-size: 14px;"
-        >{{ getCellName(cellInfo) }}
-      </span>
+      <span style="margin-right: 47px">Name:</span>
+      <span style="font-size: 14px">{{ getCellName(cellInfo) }} </span>
     </div>
     <div style="margin-bottom: 15px">
       <span style="margin-right: 20px">Dna Hash:</span>
@@ -23,11 +21,15 @@
         >{{ dnaHashForCell(cellInfo) }}
       </span>
     </div>
-    <div style="display: flex; flex-direction: row; align-items: center;">
-      <span style="display: flex; flex: 1;"></span>
-      <div style="display: flex; flex-direction: row; align-items: center;">
-        <img src="/img/trashcan.svg" style="height: 22px;">
-        <span @click="openDeleteDialog()" style="cursor: pointer; color: #d80d0dff; margin-left: 7px;">Delete Cell</span>
+    <div style="display: flex; flex-direction: row; align-items: center">
+      <span style="display: flex; flex: 1"></span>
+      <div style="display: flex; flex-direction: row; align-items: center">
+        <img src="/img/trashcan.svg" style="height: 22px" />
+        <span
+          @click="openDeleteDialog()"
+          style="cursor: pointer; color: #d80d0dff; margin-left: 7px"
+          >Delete Cell</span
+        >
       </div>
     </div>
   </div>
@@ -100,19 +102,23 @@ export default defineComponent({
     getCellName,
     getCellId,
     dnaHashForCell(cell: CellInfo) {
-      return encodeHashToBase64(new Uint8Array(getCellId(cell)![0]))
+      return encodeHashToBase64(new Uint8Array(getCellId(cell)![0]));
     },
     openDeleteDialog() {
       (this.$refs["delete-cell-dialog"] as typeof HCGenericDialog).open();
     },
     async deleteCell() {
-      const clonedCell = (this.cellInfo as { [CellType.Cloned]: ClonedCell }).cloned;
+      const clonedCell = (this.cellInfo as { [CellType.Cloned]: ClonedCell })
+        .cloned;
 
-      await invoke("delete_clone", { holochainId: this.holochainId, appId: this.appId, cellId: clonedCell.cell_id })
+      await invoke("delete_clone", {
+        holochainId: this.holochainId,
+        appId: this.appId,
+        cellId: clonedCell.cell_id,
+      });
 
       await this.$store.dispatch(ActionTypes.fetchStateInfo);
-
-    }
+    },
   },
 });
 </script>

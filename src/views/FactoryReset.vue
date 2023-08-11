@@ -20,7 +20,7 @@
           margin-bottom: 25px;
           margin-top: -10px;
         "
-        >
+      >
         {{ $data.heading }}
       </div>
 
@@ -33,26 +33,35 @@
       </div>
 
       <div style="margin-top: 40px; margin-left: 20px; text-align: left:">
-        <div style="font-weight: bold;">{{ $t("dialogs.factoryReset.optionalDeletions") }}</div>
-        <div class="row" style="margin-top: 5px;">
+        <div style="font-weight: bold">
+          {{ $t("dialogs.factoryReset.optionalDeletions") }}
+        </div>
+        <div class="row" style="margin-top: 5px">
           <ToggleSwitch
             :sliderOn="deleteLogs"
-            @click="() => deleteLogs = !deleteLogs"
-            @keydown.enter="() => deleteLogs = !deleteLogs"
+            @click="() => (deleteLogs = !deleteLogs)"
+            @keydown.enter="() => (deleteLogs = !deleteLogs)"
           />
-          <div style="margin-left: 10px;">{{ $t("dialogs.factoryReset.deleteLogs") }}</div>
+          <div style="margin-left: 10px">
+            {{ $t("dialogs.factoryReset.deleteLogs") }}
+          </div>
         </div>
 
-        <div class="row" style="margin-top: 5px;">
+        <div class="row" style="margin-top: 5px">
           <ToggleSwitch
             :sliderOn="deleteAllHolochainVersions"
-            @click="() => deleteAllHolochainVersions = !deleteAllHolochainVersions"
-            @keydown.enter="() => deleteAllHolochainVersions = !deleteAllHolochainVersions"
+            @click="
+              () => (deleteAllHolochainVersions = !deleteAllHolochainVersions)
+            "
+            @keydown.enter="
+              () => (deleteAllHolochainVersions = !deleteAllHolochainVersions)
+            "
           />
-          <div style="margin-left: 10px;">{{ $t("dialogs.factoryReset.deleteAllHolochainVersions") }}</div>
+          <div style="margin-left: 10px">
+            {{ $t("dialogs.factoryReset.deleteAllHolochainVersions") }}
+          </div>
         </div>
       </div>
-
     </div>
   </HCGenericDialog>
   <HCSnackbar :labelText="snackbarText" ref="snackbar"></HCSnackbar>
@@ -125,7 +134,10 @@ export default defineComponent({
     async executeFactoryReset() {
       try {
         this.executing = true;
-        await invoke("execute_factory_reset", { deleteLogs: this.deleteLogs, deleteAllHolochainVersions: this.deleteAllHolochainVersions });
+        await invoke("execute_factory_reset", {
+          deleteLogs: this.deleteLogs,
+          deleteAllHolochainVersions: this.deleteAllHolochainVersions,
+        });
         this.executing = false;
         window.location.reload();
       } catch (e) {

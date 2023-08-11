@@ -1,15 +1,36 @@
-import { ActionHash, AgentPubKey, AppInfo, AppWebsocket, DnaHash, encodeHashToBase64, EntryHash } from "@holochain/client";
+import {
+  ActionHash,
+  AgentPubKey,
+  AppInfo,
+  AppWebsocket,
+  DnaHash,
+  encodeHashToBase64,
+  EntryHash,
+} from "@holochain/client";
 import { getCellId } from "../utils";
-import { AppEntry, CustomRemoteCallInput, DevHubResponse, Entity, GetWebHappPackageInput, HappReleaseEntry, HostEntry, Response, MemoryEntry, MemoryBlockEntry, GUIReleaseEntry, FilePackage, HostAvailability, PublisherEntry } from "./types";
+import {
+  AppEntry,
+  CustomRemoteCallInput,
+  DevHubResponse,
+  Entity,
+  GetWebHappPackageInput,
+  HappReleaseEntry,
+  HostEntry,
+  Response,
+  MemoryEntry,
+  MemoryBlockEntry,
+  GUIReleaseEntry,
+  FilePackage,
+  HostAvailability,
+  PublisherEntry,
+} from "./types";
 import { ResourceLocator } from "../types";
-
-
 
 export function appstoreCells(appstoreHapp: AppInfo) {
   const appstore = appstoreHapp.cell_info["appstore"];
   const portal = appstoreHapp.cell_info["portal"];
 
-  if (!appstore || !portal ) throw new Error("Bad app info");
+  if (!appstore || !portal) throw new Error("Bad app info");
 
   return {
     appstore,
@@ -17,35 +38,34 @@ export function appstoreCells(appstoreHapp: AppInfo) {
   };
 }
 
-
 export async function getAllApps(
   appWebsocket: AppWebsocket,
-  appStoreApp: AppInfo,
+  appStoreApp: AppInfo
 ): Promise<Array<AppEntry>> {
   console.log("@getAllApps");
-  const appstoreCell = appStoreApp.cell_info["appstore"].find((c) => "provisioned" in c);
+  const appstoreCell = appStoreApp.cell_info["appstore"].find(
+    (c) => "provisioned" in c
+  );
 
   console.log("@getAllApps: appstoreCell", appstoreCell);
 
   if (!appstoreCell) {
-    throw new Error("appstore cell not found.")
+    throw new Error("appstore cell not found.");
   } else {
-    const allApps: DevHubResponse<Array<Entity<AppEntry>>> = await appWebsocket.callZome({
-      fn_name: "get_all_apps",
-      zome_name: "appstore_api",
-      cell_id: getCellId(appstoreCell)!,
-      payload: null,
-      provenance: getCellId(appstoreCell)![1],
-    })
+    const allApps: DevHubResponse<Array<Entity<AppEntry>>> =
+      await appWebsocket.callZome({
+        fn_name: "get_all_apps",
+        zome_name: "appstore_api",
+        cell_id: getCellId(appstoreCell)!,
+        payload: null,
+        provenance: getCellId(appstoreCell)![1],
+      });
 
     console.log("@getAllApps: allApps", allApps);
 
-
-    return allApps.payload.map((appEntity) => appEntity.content)
+    return allApps.payload.map((appEntity) => appEntity.content);
   }
-
 }
-
 
 /**
  * Gets a publisher entry
@@ -58,38 +78,39 @@ export async function getAllApps(
 export async function getPublisher(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
-  publisherEntryHash: EntryHash,
+  publisherEntryHash: EntryHash
 ): Promise<PublisherEntry> {
-
-  const appstoreCell = appStoreApp.cell_info["appstore"].find((c) => "provisioned" in c);
+  const appstoreCell = appStoreApp.cell_info["appstore"].find(
+    (c) => "provisioned" in c
+  );
 
   if (!appstoreCell) {
-    throw new Error("appstore cell not found.")
+    throw new Error("appstore cell not found.");
   }
 
   try {
-    const response: Response<Entity<PublisherEntry>> = await appWebsocket.callZome({
-      fn_name: "get_publisher",
-      zome_name: "appstore_api",
-      cell_id: getCellId(appstoreCell)!,
-      payload: {
-        id: publisherEntryHash,
-      },
-      provenance: getCellId(appstoreCell)![1],
-    })
+    const response: Response<Entity<PublisherEntry>> =
+      await appWebsocket.callZome({
+        fn_name: "get_publisher",
+        zome_name: "appstore_api",
+        cell_id: getCellId(appstoreCell)!,
+        payload: {
+          id: publisherEntryHash,
+        },
+        provenance: getCellId(appstoreCell)![1],
+      });
 
     if (response.type !== "success") {
-      return Promise.reject(`Failed to get publisher entry: ${response.payload}`)
+      return Promise.reject(
+        `Failed to get publisher entry: ${response.payload}`
+      );
     }
 
-    return response.payload.content
-
+    return response.payload.content;
   } catch (e) {
-    return Promise.reject(`Failed to get publisher entry: ${e}`)
+    return Promise.reject(`Failed to get publisher entry: ${e}`);
   }
-
 }
-
 
 // =========== Bridge Calls via Portal API =================
 
@@ -105,32 +126,45 @@ export async function getHappReleasesByActionHashes(
   devhubDna: DnaHash,
   happReleaseActionHashes: Array<ActionHash | undefined>
 ): Promise<Array<HappReleaseEntry | undefined>> {
-
-  console.log("@getHappReleasesByActionHashes: getting happ releases by entry hashes");
-  console.log("@getHappReleasesByActionHashes: devhubDna: ", encodeHashToBase64(devhubDna));
+  console.log(
+    "@getHappReleasesByActionHashes: getting happ releases by entry hashes"
+  );
+  console.log(
+    "@getHappReleasesByActionHashes: devhubDna: ",
+    encodeHashToBase64(devhubDna)
+  );
   // Find an online host
   const host: AgentPubKey = await getAvailableHostForZomeFunction(
     appWebsocket,
     appStoreApp,
     devhubDna,
     "happ_library",
-    "get_happ_releases",
+    "get_happ_releases"
   );
 
   console.log("@getHappReleasesByActionHashes: found host: ", host);
 
-
   // make zome calls for each ActionHash to this one host
-  const happReleases = await Promise.all(happReleaseActionHashes.map( async (actionHash) => {
-    if (actionHash) {
-      return getHappReleaseFromHost(appWebsocket, appStoreApp, devhubDna, host, actionHash);
-    } else {
-      return undefined;
-    }
-  }));
+  const happReleases = await Promise.all(
+    happReleaseActionHashes.map(async (actionHash) => {
+      if (actionHash) {
+        return getHappReleaseFromHost(
+          appWebsocket,
+          appStoreApp,
+          devhubDna,
+          host,
+          actionHash
+        );
+      } else {
+        return undefined;
+      }
+    })
+  );
 
-
-  console.log("@getHappReleasesByActionHashes: Found happReleases: ", happReleases);
+  console.log(
+    "@getHappReleasesByActionHashes: Found happReleases: ",
+    happReleases
+  );
 
   return happReleases.map((response) => {
     if (response) {
@@ -141,7 +175,6 @@ export async function getHappReleasesByActionHashes(
   });
 }
 
-
 /**
  * Get the the HappEntry of an entry hash from a specific DevHub host
  * @param appWebsocket
@@ -149,14 +182,13 @@ export async function getHappReleasesByActionHashes(
  * @param host
  * @param actionHash
  */
-async function getHappEntryFromHost (
+async function getHappEntryFromHost(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   devhubDna: DnaHash,
   host: AgentPubKey,
-  actionHash: ActionHash, // ActionHash of the HappEntry
+  actionHash: ActionHash // ActionHash of the HappEntry
 ): Promise<Entity<HappReleaseEntry>> {
-
   const payload = {
     id: actionHash,
   };
@@ -172,7 +204,6 @@ async function getHappEntryFromHost (
   );
 }
 
-
 /**
  * Get the happ released associated to a happ release entry hash from a specific DevHub host
  * @param appWebsocket
@@ -180,14 +211,13 @@ async function getHappEntryFromHost (
  * @param host
  * @param actionHash
  */
-async function getHappReleaseFromHost (
+async function getHappReleaseFromHost(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   devhubDna: DnaHash,
   host: AgentPubKey,
-  actionHash: ActionHash, // ActionHash of the HappReleaseEntry
+  actionHash: ActionHash // ActionHash of the HappReleaseEntry
 ): Promise<Entity<HappReleaseEntry>> {
-
   const payload = {
     id: actionHash,
   };
@@ -203,7 +233,6 @@ async function getHappReleaseFromHost (
   );
 }
 
-
 /**
  * Get happ releases for a happ. Searches for an online DevHub host first.
  *
@@ -218,9 +247,8 @@ async function getHappReleaseFromHost (
 export async function getHappReleases(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
-  forHapp: ResourceLocator,
+  forHapp: ResourceLocator
 ): Promise<Array<Entity<HappReleaseEntry>>> {
-
   // console.log("@getHappReleases: trying to get host.");
 
   try {
@@ -229,10 +257,14 @@ export async function getHappReleases(
       appStoreApp,
       forHapp.dna_hash,
       "happ_library",
-      "get_happ_releases",
+      "get_happ_releases"
     );
 
-    console.log("@getHappReleases: found host: ", encodeHashToBase64(host), host);
+    console.log(
+      "@getHappReleases: found host: ",
+      encodeHashToBase64(host),
+      host
+    );
 
     return getHappReleasesFromHost(appWebsocket, appStoreApp, host, forHapp);
   } catch (e) {
@@ -251,13 +283,12 @@ export async function getHappReleases(
  * @param host
  * @param forHapp
  */
-export async function getHappReleasesFromHost (
+export async function getHappReleasesFromHost(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   host: AgentPubKey,
-  forHapp: ResourceLocator,
+  forHapp: ResourceLocator
 ): Promise<Array<Entity<HappReleaseEntry>>> {
-
   const payload = {
     for_happ: forHapp.resource_hash,
   };
@@ -269,10 +300,9 @@ export async function getHappReleasesFromHost (
     host,
     "happ_library",
     "get_happ_releases",
-    payload,
+    payload
   );
 }
-
 
 /**
  * Fetching GuiRelease Entry from a DevHub host
@@ -283,9 +313,8 @@ export async function getHappReleasesFromHost (
 export async function fetchGuiReleaseEntry(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
-  guiReleaseLocator: ResourceLocator,
+  guiReleaseLocator: ResourceLocator
 ) {
-
   const payload = {
     id: guiReleaseLocator.resource_hash,
   };
@@ -296,10 +325,9 @@ export async function fetchGuiReleaseEntry(
     guiReleaseLocator.dna_hash,
     "happ_library",
     "get_gui_release",
-    payload,
+    payload
   );
 }
-
 
 /**
  * Fetching the webhapp bytes from a DevHub host.
@@ -310,20 +338,20 @@ export async function fetchWebHapp(
   appStoreApp: AppInfo,
   name: string,
   happReleaseLocator: ResourceLocator,
-  guiReleaseLocator: ResourceLocator,
+  guiReleaseLocator: ResourceLocator
 ): Promise<Uint8Array> {
-
-  const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+  const portalCell = appStoreApp.cell_info["portal"].find(
+    (c) => "provisioned" in c
+  );
   if (!portalCell) {
-    throw new Error("portal cell not found.")
+    throw new Error("portal cell not found.");
   } else {
-
     const host: AgentPubKey = await getAvailableHostForZomeFunction(
       appWebsocket,
       appStoreApp,
       happReleaseLocator.dna_hash,
       "happ_library",
-      "get_webhapp_package",
+      "get_webhapp_package"
     );
 
     const payload: GetWebHappPackageInput = {
@@ -344,20 +372,18 @@ export async function fetchWebHapp(
   }
 }
 
-
 export async function fetchGui(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   devhubDna: DnaHash,
-  guiReleaseHash: ActionHash,
+  guiReleaseHash: ActionHash
 ): Promise<Entity<FilePackage>> {
-
   const host: AgentPubKey = await getAvailableHostForZomeFunction(
     appWebsocket,
     appStoreApp,
     devhubDna,
     "happ_library",
-    "get_webasset",
+    "get_webasset"
   );
 
   const payload = {
@@ -375,10 +401,6 @@ export async function fetchGui(
   );
 }
 
-
-
-
-
 /**
  * Remote call to DevHub host
  *
@@ -394,25 +416,35 @@ export async function getAvailableHostForZomeFunction(
   appStoreApp: AppInfo,
   devhubDna: DnaHash,
   zome_name: string,
-  fn_name: string,
+  fn_name: string
 ): Promise<AgentPubKey> {
+  const portalCell = appStoreApp.cell_info["portal"].find(
+    (c) => "provisioned" in c
+  );
 
-    const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+  if (!portalCell) {
+    return Promise.reject(
+      "Failed to get hosts for zome function: portal cell not found."
+    );
+  }
 
-    if (!portalCell) {
-      return Promise.reject("Failed to get hosts for zome function: portal cell not found.");
-    }
+  try {
+    const hosts = await getHostsForZomeFunction(
+      appWebsocket,
+      appStoreApp,
+      devhubDna,
+      zome_name,
+      fn_name
+    );
 
+    // 2. ping each of them and take the first one that responds
     try {
-      const hosts = await getHostsForZomeFunction(appWebsocket, appStoreApp, devhubDna, zome_name, fn_name)
-
-      // 2. ping each of them and take the first one that responds
-      try {
-        const availableHost = await Promise.any(hosts.map(async (hostEntry) => {
+      const availableHost = await Promise.any(
+        hosts.map(async (hostEntry) => {
           const hostPubKey = hostEntry.author;
           // console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
 
-          try{
+          try {
             const result: Response<any> = await appWebsocket.callZome({
               fn_name: "ping",
               zome_name: "portal_api",
@@ -430,21 +462,22 @@ export async function getAvailableHostForZomeFunction(
           }
           // what happens in the "false" case? Can this happen?
 
-
           return hostPubKey;
-        }))
+        })
+      );
 
-        return availableHost;
-      } catch (e) {
-        return Promise.reject("No available peer host found.")
-      }
-
+      return availableHost;
     } catch (e) {
-      return Promise.reject(`Failed to get available host for zome ${zome_name} and function ${fn_name}: ${JSON.stringify(e)}`);
+      return Promise.reject("No available peer host found.");
     }
+  } catch (e) {
+    return Promise.reject(
+      `Failed to get available host for zome ${zome_name} and function ${fn_name}: ${JSON.stringify(
+        e
+      )}`
+    );
+  }
 }
-
-
 
 export async function getVisibleHostsForZomeFunction(
   appWebsocket: AppWebsocket,
@@ -452,59 +485,69 @@ export async function getVisibleHostsForZomeFunction(
   devhubDna: DnaHash,
   zome_name: string,
   fn_name: string,
-  timeoutMs: number = 4000,
+  timeoutMs: number = 4000
 ): Promise<HostAvailability> {
+  const portalCell = appStoreApp.cell_info["portal"].find(
+    (c) => "provisioned" in c
+  );
 
-    const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+  if (!portalCell) {
+    return Promise.reject(
+      "Failed to get hosts for zome function: portal cell not found."
+    );
+  }
 
-    if (!portalCell) {
-      return Promise.reject("Failed to get hosts for zome function: portal cell not found.");
-    }
+  let responded: AgentPubKey[] = [];
 
-    let responded: AgentPubKey[] = [];
+  const pingTimestamp = Date.now();
 
-    const pingTimestamp = Date.now();
+  try {
+    const hosts = await getHostsForZomeFunction(
+      appWebsocket,
+      appStoreApp,
+      devhubDna,
+      zome_name,
+      fn_name
+    );
 
-    try {
-
-      const hosts = await getHostsForZomeFunction(appWebsocket, appStoreApp, devhubDna, zome_name, fn_name)
-
-      // 2. ping each of them and take the first one that responds
-      await Promise.allSettled(hosts.map(async (hostEntry) => {
-
+    // 2. ping each of them and take the first one that responds
+    await Promise.allSettled(
+      hosts.map(async (hostEntry) => {
         try {
           // consider hosts that do not respond after 6 seconds as offline
-          const result = await appWebsocket.callZome({
-            fn_name: "ping",
-            zome_name: "portal_api",
-            cell_id: getCellId(portalCell)!,
-            payload: hostEntry.author,
-            provenance: getCellId(portalCell)![1],
-          }, timeoutMs);
+          const result = await appWebsocket.callZome(
+            {
+              fn_name: "ping",
+              zome_name: "portal_api",
+              cell_id: getCellId(portalCell)!,
+              payload: hostEntry.author,
+              provenance: getCellId(portalCell)![1],
+            },
+            timeoutMs
+          );
 
           if (result.type === "failure") {
-              return Promise.reject(`Failed to ping host: ${result.payload}`);
+            return Promise.reject(`Failed to ping host: ${result.payload}`);
           }
 
-          responded.push(hostEntry.author)
-
+          responded.push(hostEntry.author);
         } catch (e) {
           return Promise.reject(`Failed to ping host: ${e}`);
-        };
+        }
+      })
+    );
 
-      }))
-
-      return {
-        responded,
-        totalHosts: hosts.length,
-        pingTimestamp,
-      };
-
-    } catch (e) {
-      return Promise.reject(`Failed to get visible hosts for zome ${zome_name} and function ${fn_name}: ${e}`);
-    }
+    return {
+      responded,
+      totalHosts: hosts.length,
+      pingTimestamp,
+    };
+  } catch (e) {
+    return Promise.reject(
+      `Failed to get visible hosts for zome ${zome_name} and function ${fn_name}: ${e}`
+    );
+  }
 }
-
 
 /**
  * Gets all the hosts that registered to grant remote calls for the given zome function
@@ -520,35 +563,38 @@ export async function getHostsForZomeFunction(
   appStoreApp: AppInfo,
   devhubDna: DnaHash,
   zome_name: string,
-  fn_name: string,
+  fn_name: string
 ): Promise<Array<HostEntry>> {
-
   // console.log("@getHostsForZomeFunction: being called...");
   // console.log("@getHostsForZomeFunction: appStoreApp: ", appStoreApp);
 
-
-  const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+  const portalCell = appStoreApp.cell_info["portal"].find(
+    (c) => "provisioned" in c
+  );
 
   // console.log("@getHostsForZomeFunction: appstoreCell", appstoreCell);
   // console.log("@getHostsForZomeFunction: portalCell", portalCell);
 
   if (!portalCell) {
-    return Promise.reject("Failed to get hosts for zome function: portal cell not found.");
+    return Promise.reject(
+      "Failed to get hosts for zome function: portal cell not found."
+    );
   } else {
     // console.log("@getHostsForZomeFunction: searching hosts.");
 
     // 1. get all registered hosts for this zome function
-    const hosts: DevHubResponse<Array<Entity<HostEntry>>> = await appWebsocket.callZome({
-      fn_name: "get_hosts_for_zome_function",
-      zome_name: "portal_api",
-      cell_id: getCellId(portalCell)!,
-      payload: {
-        dna: devhubDna,
-        zome: zome_name,
-        function: fn_name,
-      },
-      provenance: getCellId(portalCell)![1],
-    })
+    const hosts: DevHubResponse<Array<Entity<HostEntry>>> =
+      await appWebsocket.callZome({
+        fn_name: "get_hosts_for_zome_function",
+        zome_name: "portal_api",
+        cell_id: getCellId(portalCell)!,
+        payload: {
+          dna: devhubDna,
+          zome: zome_name,
+          function: fn_name,
+        },
+        provenance: getCellId(portalCell)![1],
+      });
 
     // console.log("@getHostsForZomeFunction: found hosts: ", hosts);
     // let b64Hosts = hosts.payload.map((entity) => encodeHashToBase64(entity.content.author));
@@ -562,9 +608,6 @@ export async function getHostsForZomeFunction(
   }
 }
 
-
-
-
 /**
  * Gets bytes from the mere_memory zome
  *
@@ -575,30 +618,30 @@ export async function getHostsForZomeFunction(
 export async function collectBytes(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
-  entryHash: EntryHash,
+  entryHash: EntryHash
 ): Promise<Uint8Array> {
-
   console.log("@collectBytes");
-  const appstoreCell = appStoreApp.cell_info["appstore"].find((c) => "provisioned" in c);
+  const appstoreCell = appStoreApp.cell_info["appstore"].find(
+    (c) => "provisioned" in c
+  );
 
   console.log("@collectBytes: appstoreCell", appstoreCell);
 
   if (!appstoreCell) {
-    throw new Error("appstore cell not found.")
+    throw new Error("appstore cell not found.");
   } else {
-
     const response: Response<MemoryEntry> = await appWebsocket.callZome({
       fn_name: "get_memory",
       zome_name: "mere_memory_api",
       cell_id: getCellId(appstoreCell)!,
       payload: entryHash,
       provenance: getCellId(appstoreCell)![1],
-    })
+    });
 
     console.log("@collectBytes RECEIVED RESPONSE: ", response);
 
     if (!(response.type === "success")) {
-      return Promise.reject(`Failed to get MemoryEntry: ${response.payload}`)
+      return Promise.reject(`Failed to get MemoryEntry: ${response.payload}`);
     }
 
     let memoryEntry = response.payload;
@@ -607,44 +650,47 @@ export async function collectBytes(
     let chunks: Array<MemoryBlockEntry> = [];
     // for each block address get the bytes
     try {
-      await Promise.all(blockAddresses.map(async (entryHash) => {
-        const memoryBlockResponse: Response<MemoryBlockEntry> = await appWebsocket.callZome({
-          fn_name: "get_memory_block",
-          zome_name: "mere_memory_api",
-          cell_id: getCellId(appstoreCell)!,
-          payload: entryHash,
-          provenance: getCellId(appstoreCell)![1],
+      await Promise.all(
+        blockAddresses.map(async (entryHash) => {
+          const memoryBlockResponse: Response<MemoryBlockEntry> =
+            await appWebsocket.callZome({
+              fn_name: "get_memory_block",
+              zome_name: "mere_memory_api",
+              cell_id: getCellId(appstoreCell)!,
+              payload: entryHash,
+              provenance: getCellId(appstoreCell)![1],
+            });
+
+          if (!(memoryBlockResponse.type === "success")) {
+            return Promise.reject(
+              `Failed to get MemoryBlockEntry: ${response.payload}`
+            );
+          }
+
+          chunks.push(memoryBlockResponse.payload);
         })
-
-        if (!(memoryBlockResponse.type === "success")) {
-          return Promise.reject(`Failed to get MemoryBlockEntry: ${response.payload}`)
-        }
-
-        chunks.push(memoryBlockResponse.payload)
-
-      }))
+      );
 
       // sort chunks and plug them together to one array
       chunks.sort((a, b) => a.sequence.position - b.sequence.position);
 
       let combinedBytes: Array<number> = [];
-      chunks.forEach((chunk) => combinedBytes = [...combinedBytes, ...chunk.bytes]);
+      chunks.forEach(
+        (chunk) => (combinedBytes = [...combinedBytes, ...chunk.bytes])
+      );
 
       return Uint8Array.from(combinedBytes);
-
     } catch (e) {
-      return Promise.reject(`Failed to collect bytes from mere_memory zome: ${e}`);
+      return Promise.reject(
+        `Failed to collect bytes from mere_memory zome: ${e}`
+      );
     }
-
 
     // console.log("@getImage: image", image);
 
-
     // return allApps.payload.map((appEntity) => appEntity.content)
   }
-
 }
-
 
 /**
  * Makes a remote call to a specified DevHub host for the specified function and zome and with the
@@ -666,14 +712,14 @@ export async function remoteCallToDevHubHost<T>(
   host: AgentPubKey, // public key of the devhub host to call to
   zome_name: string,
   fn_name: string,
-  payload: any,
+  payload: any
 ): Promise<T> {
-
-  const portalCell = appStoreApp.cell_info["portal"].find((c) => "provisioned" in c);
+  const portalCell = appStoreApp.cell_info["portal"].find(
+    (c) => "provisioned" in c
+  );
   if (!portalCell) {
-    throw new Error("portal cell not found.")
+    throw new Error("portal cell not found.");
   } else {
-
     const input: CustomRemoteCallInput = {
       host,
       call: {
@@ -681,30 +727,37 @@ export async function remoteCallToDevHubHost<T>(
         zome: zome_name,
         function: fn_name,
         payload,
-      }
-    }
+      },
+    };
 
-    const response: DevHubResponse<DevHubResponse<T>> = await appWebsocket.callZome({
-      fn_name: "custom_remote_call",
-      zome_name: "portal_api",
-      cell_id: getCellId(portalCell)!,
-      payload: input,
-      provenance: getCellId(portalCell)![1],
-    });
+    const response: DevHubResponse<DevHubResponse<T>> =
+      await appWebsocket.callZome({
+        fn_name: "custom_remote_call",
+        zome_name: "portal_api",
+        cell_id: getCellId(portalCell)!,
+        payload: input,
+        provenance: getCellId(portalCell)![1],
+      });
 
     if (response.type === "success") {
       if (response.payload.type === "success") {
         return response.payload.payload;
       } else {
-        return Promise.reject(`remote call for function '${fn_name}' of zome '${zome_name}' failed: ${JSON.stringify(response.payload.payload)}`);
+        return Promise.reject(
+          `remote call for function '${fn_name}' of zome '${zome_name}' failed: ${JSON.stringify(
+            response.payload.payload
+          )}`
+        );
       }
     } else {
-      return Promise.reject(`remote call for function '${fn_name}' of zome '${zome_name}' failed: ${JSON.stringify(response.payload)}`);
+      return Promise.reject(
+        `remote call for function '${fn_name}' of zome '${zome_name}' failed: ${JSON.stringify(
+          response.payload
+        )}`
+      );
     }
   }
 }
-
-
 
 /**
  * Helper function to make a remote call to first responsive host. It is possible
@@ -724,15 +777,14 @@ export async function remoteCallToAvailableHost<T>(
   devhubDna: DnaHash,
   zome_name: string,
   fn_name: string,
-  payload: any,
+  payload: any
 ): Promise<T> {
-
   const host: AgentPubKey = await getAvailableHostForZomeFunction(
     appWebsocket,
     appStoreApp,
     devhubDna,
     zome_name,
-    fn_name,
+    fn_name
   );
 
   return remoteCallToDevHubHost<T>(
@@ -745,8 +797,6 @@ export async function remoteCallToAvailableHost<T>(
     payload
   );
 }
-
-
 
 /**
  * Helper function to make a remote call to hosts in a cascading manner, i.e. if the first
@@ -768,16 +818,15 @@ export async function remoteCallCascadeToAvailableHosts<T>(
   zome_name: string,
   fn_name: string,
   payload: any,
-  pingTimeout: number = 3000, // hosts that do not respond to the ping quicker than this are ignored
+  pingTimeout: number = 3000 // hosts that do not respond to the ping quicker than this are ignored
 ): Promise<T> {
-
   const pingResult = await getVisibleHostsForZomeFunction(
     appWebsocket,
     appStoreApp,
     devhubDna,
     zome_name,
     fn_name,
-    pingTimeout,
+    pingTimeout
   );
 
   const availableHosts = pingResult.responded;
@@ -797,20 +846,19 @@ export async function remoteCallCascadeToAvailableHosts<T>(
         host,
         zome_name,
         fn_name,
-        payload,
+        payload
       );
 
       return response;
-
     } catch (e) {
       errors.push(e);
     }
   }
 
-  return Promise.reject(`Failed to do remote call for function '${fn_name}' of zome '${zome_name}' for all available hosts.\nErrors: ${errors}`);
-
+  return Promise.reject(
+    `Failed to do remote call for function '${fn_name}' of zome '${zome_name}' for all available hosts.\nErrors: ${errors}`
+  );
 }
-
 
 export async function tryWithHosts<T>(
   fn: (host: AgentPubKey) => T,
@@ -819,16 +867,15 @@ export async function tryWithHosts<T>(
   devhubDna: DnaHash,
   zome_name: string,
   fn_name: string,
-  pingTimeout: number = 3000,
-  ): Promise<T>{
-
+  pingTimeout: number = 3000
+): Promise<T> {
   // try with first responding host
   const host: AgentPubKey = await getAvailableHostForZomeFunction(
     appWebsocket,
     appStoreApp,
     devhubDna,
     zome_name,
-    fn_name,
+    fn_name
   );
 
   try {
@@ -847,7 +894,7 @@ export async function tryWithHosts<T>(
       devhubDna,
       zome_name,
       fn_name,
-      pingTimeout,
+      pingTimeout
     );
 
     const availableHosts = pingResult.responded;
@@ -868,12 +915,10 @@ export async function tryWithHosts<T>(
       }
     }
 
-    return Promise.reject(`Callback for function '${fn_name}' of zome '${zome_name}' failed for all available hosts.\nErrors: ${JSON.stringify(errors)}`);
-
+    return Promise.reject(
+      `Callback for function '${fn_name}' of zome '${zome_name}' failed for all available hosts.\nErrors: ${JSON.stringify(
+        errors
+      )}`
+    );
   }
-
 }
-
-
-
-
