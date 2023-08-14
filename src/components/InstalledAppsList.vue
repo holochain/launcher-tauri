@@ -26,6 +26,7 @@
         >
           <img
             src="/img/home_icon.svg"
+            alt="App Store"
             style="
               filter: invert(100%) sepia(0%) saturate(1%) hue-rotate(73deg)
                 brightness(104%) contrast(101%);
@@ -72,9 +73,6 @@ import "@material/mwc-icon";
 import { HolochainAppInfo, HolochainAppInfoExtended } from "../types";
 import { isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
-import HCSelectCard from "./subcomponents/HCSelectCard.vue";
-import StackedChart from "./subcomponents/StackedChart.vue";
-import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
 import HCLoading from "./subcomponents/HCLoading.vue";
 import HCButton from "./subcomponents/HCButton.vue";
 import prettyBytes from "pretty-bytes";
@@ -87,9 +85,6 @@ export default defineComponent({
   name: "InstalledAppsList",
   components: {
     InstalledAppCard,
-    HCSelectCard,
-    StackedChart,
-    HCGenericDialog,
     HCLoading,
     HCSnackbar,
     HCButton,

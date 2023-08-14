@@ -26,18 +26,6 @@ import {
 } from "./types";
 import { ResourceLocator } from "../types";
 
-export function appstoreCells(appstoreHapp: AppInfo) {
-  const appstore = appstoreHapp.cell_info["appstore"];
-  const portal = appstoreHapp.cell_info["portal"];
-
-  if (!appstore || !portal) throw new Error("Bad app info");
-
-  return {
-    appstore,
-    portal,
-  };
-}
-
 export async function getAllApps(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo
@@ -173,35 +161,6 @@ export async function getHappReleasesByActionHashes(
       return undefined;
     }
   });
-}
-
-/**
- * Get the the HappEntry of an entry hash from a specific DevHub host
- * @param appWebsocket
- * @param appStoreApp
- * @param host
- * @param actionHash
- */
-async function getHappEntryFromHost(
-  appWebsocket: AppWebsocket,
-  appStoreApp: AppInfo,
-  devhubDna: DnaHash,
-  host: AgentPubKey,
-  actionHash: ActionHash // ActionHash of the HappEntry
-): Promise<Entity<HappReleaseEntry>> {
-  const payload = {
-    id: actionHash,
-  };
-
-  return remoteCallToDevHubHost<Entity<HappReleaseEntry>>(
-    appWebsocket,
-    appStoreApp,
-    devhubDna,
-    host,
-    "happ_library",
-    "get_happ",
-    payload
-  );
 }
 
 /**
@@ -445,7 +404,7 @@ export async function getAvailableHostForZomeFunction(
           // console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
 
           try {
-            const result: Response<any> = await appWebsocket.callZome({
+            const result = await appWebsocket.callZome({
               fn_name: "ping",
               zome_name: "portal_api",
               cell_id: getCellId(portalCell)!,
@@ -497,7 +456,7 @@ export async function getVisibleHostsForZomeFunction(
     );
   }
 
-  let responded: AgentPubKey[] = [];
+  const responded: AgentPubKey[] = [];
 
   const pingTimestamp = Date.now();
 
@@ -644,10 +603,10 @@ export async function collectBytes(
       return Promise.reject(`Failed to get MemoryEntry: ${response.payload}`);
     }
 
-    let memoryEntry = response.payload;
-    let blockAddresses = memoryEntry.block_addresses;
+    const memoryEntry = response.payload;
+    const blockAddresses = memoryEntry.block_addresses;
 
-    let chunks: Array<MemoryBlockEntry> = [];
+    const chunks: Array<MemoryBlockEntry> = [];
     // for each block address get the bytes
     try {
       await Promise.all(
@@ -712,7 +671,7 @@ export async function remoteCallToDevHubHost<T>(
   host: AgentPubKey, // public key of the devhub host to call to
   zome_name: string,
   fn_name: string,
-  payload: any
+  payload: unknown
 ): Promise<T> {
   const portalCell = appStoreApp.cell_info["portal"].find(
     (c) => "provisioned" in c
@@ -777,7 +736,7 @@ export async function remoteCallToAvailableHost<T>(
   devhubDna: DnaHash,
   zome_name: string,
   fn_name: string,
-  payload: any
+  payload: unknown
 ): Promise<T> {
   const host: AgentPubKey = await getAvailableHostForZomeFunction(
     appWebsocket,
@@ -817,7 +776,7 @@ export async function remoteCallCascadeToAvailableHosts<T>(
   devhubDna: DnaHash,
   zome_name: string,
   fn_name: string,
-  payload: any,
+  payload: unknown,
   pingTimeout: number = 3000 // hosts that do not respond to the ping quicker than this are ignored
 ): Promise<T> {
   const pingResult = await getVisibleHostsForZomeFunction(
@@ -831,9 +790,7 @@ export async function remoteCallCascadeToAvailableHosts<T>(
 
   const availableHosts = pingResult.responded;
 
-  let result: T | undefined = undefined;
-
-  let errors = [];
+  const errors = [];
 
   // for each host, try to get stuff and if it succeeded, return,
   // otherwise go to next host
@@ -883,7 +840,7 @@ export async function tryWithHosts<T>(
     const result = await fn(host);
     return result;
   } catch (e) {
-    let errors = [];
+    const errors = [];
     errors.push(e);
 
     // console.log("@tryWithHosts: Failed with first host: ", JSON.stringify(e));
@@ -900,8 +857,6 @@ export async function tryWithHosts<T>(
     const availableHosts = pingResult.responded;
 
     // console.log("@tryWithHosts: other available hosts: ", availableHosts.map((hash) => encodeHashToBase64(hash)));
-
-    let result: T | undefined = undefined;
 
     // for each host, try to get stuff and if it succeeded, return,
     // otherwise go to next host

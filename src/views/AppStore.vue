@@ -193,14 +193,14 @@ import {
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 import Mark from "mark.js";
-
 import { toSrc, getCellId } from "../utils";
-
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
-import HCProgressBar from "../components/subcomponents/HCProgressBar.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
-
-import { tryWithHosts, collectBytes } from "../appstore/appstore-interface";
+import {
+  tryWithHosts,
+  collectBytes,
+  getAllApps,
+} from "../appstore/appstore-interface";
 import InstallAppDialog from "../components/InstallAppDialog.vue";
 import HCButton from "../components/subcomponents/HCButton.vue";
 import HCTextField from "../components/subcomponents/HCTextField.vue";
@@ -431,7 +431,7 @@ export default defineComponent({
           }
           this.loadingText = `Loading app icon from App Store...`;
           const collectedBytes = await collectBytes(
-            this.appWebsocket as any,
+            this.appWebsocket,
             appStoreInfo,
             appEntry.icon
           );
@@ -545,7 +545,7 @@ export default defineComponent({
         ).map(
           ([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array
         ),
-      } as any);
+      });
       let queuedBytes = 0;
       networkInfo.forEach((info, _idx) => {
         queuedBytes += info.fetch_pool_info.op_bytes_to_fetch;

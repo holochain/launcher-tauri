@@ -116,13 +116,11 @@ import AppStore from "./AppStore.vue";
 import Launcher from "./Launcher.vue";
 import Settings from "./Settings.vue";
 import { ActionTypes } from "../store/actions";
-import HCButton from "../components/subcomponents/HCButton.vue";
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
-import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import "@material/mwc-fab";
-import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
+import { APPSTORE_APP_ID } from "../constants";
 import { HolochainAppInfo } from "../types";
 import {
   AppWebsocket,
@@ -148,10 +146,8 @@ export default defineComponent({
   name: "Home",
   components: {
     AppStore,
-    HCButton,
     HCSnackbar,
     Launcher,
-    LoadingDots,
     Settings,
   },
   data(): {
@@ -293,7 +289,7 @@ export default defineComponent({
     },
     showMessage(message: string) {
       this.snackbarText = message;
-      (this.$refs as any).snackbar.show();
+      (this.$refs["snackbar"] as typeof HCSnackbar).show();
     },
     selectView(view: View) {
       this.view = view;

@@ -347,7 +347,7 @@ export const store = createStore<LauncherAdminState>({
       const allCellInfos = flatten(
         holochainState.content.installed_apps.map((app) =>
           flattenCells(app.installed_app_info.cell_info).filter(
-            ([roleName, cellInfo]) => !("Stem" in cellInfo)
+            ([_, cellInfo]) => !("Stem" in cellInfo)
           )
         )
       );

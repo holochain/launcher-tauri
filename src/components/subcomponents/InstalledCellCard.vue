@@ -207,14 +207,11 @@ import {
 } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 
-import HCProgressBar from "./HCProgressBar.vue";
-import { HolochainId } from "../../types";
 import { getCellId, getCellName, getCellNetworkSeed } from "../../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
 
 export default defineComponent({
   name: "InstalledCellCard",
-  components: { HCProgressBar },
   props: {
     cellInfo: {
       type: Object as PropType<CellInfo>,
