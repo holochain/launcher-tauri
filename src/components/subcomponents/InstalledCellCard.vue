@@ -209,6 +209,7 @@ import prettyBytes from "pretty-bytes";
 
 import { getCellId, getCellName, getCellNetworkSeed } from "../../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
+import { mapActions } from "vuex";
 
 export default defineComponent({
   name: "InstalledCellCard",
@@ -219,10 +220,6 @@ export default defineComponent({
     },
     roleName: {
       type: String,
-      required: true,
-    },
-    holochainId: {
-      type: Object as PropType<HolochainId>,
       required: true,
     },
   },
@@ -244,11 +241,7 @@ export default defineComponent({
     };
   },
   async created() {
-    const port = this.$store.getters["appInterfacePort"](this.holochainId);
-    this.appWebsocket = await AppWebsocket.connect(
-      new URL(`ws://localhost:${port}`),
-      40000
-    );
+    await this.connectToWebsocket();
     // set up polling loop to periodically get gossip progress, global scope (window) seems to
     // be required to clear it again on beforeUnmount()
     await this.getNetworkInfo();
@@ -267,20 +260,13 @@ export default defineComponent({
     getCellId,
     getCellNetworkSeed,
     writeText,
-    async connectAppWebsocket() {
-      const port = this.$store.getters["appInterfacePort"](this.holochainId);
-      this.appWebsocket = await AppWebsocket.connect(
-        new URL(`ws://localhost:${port}`),
-        40000
-      );
-      // console.log("Connected to AppWebsocket.");
-    },
+    ...mapActions(["connectToWebsocket"]),
     async getNetworkInfo() {
       // console.log("========================================");
       // console.log("@getNetworkInfo: getting network info...")
 
       if (!this.appWebsocket) {
-        await this.connectAppWebsocket();
+        await this.connectToWebsocket();
       }
 
       // console.log("@getNetworkInfo: connected to app websocket: ", this.appWebsocket);

@@ -177,16 +177,10 @@ export default defineComponent({
     async checkForUiUpdates() {
       const installedApps: Array<HolochainAppInfo> =
         this.$store.getters[`allApps`];
-      console.log("installedApps: ", installedApps);
 
-      // Check for UI updates
-      const holochainId = this.$store.getters["holochainIdForDevhub"];
-      // connect to AppWebsocket
-      const port = this.$store.getters["appInterfacePort"](holochainId);
-      const appWebsocket = await AppWebsocket.connect(
-        new URL(`ws://localhost:${port}`),
-        40000
-      );
+      await this.$store.dispatch("connectToWebsocket");
+      const appWebsocket = this.$store.state.appWebsocket as AppWebsocket;
+
       const appstoreAppInfo = await appWebsocket.appInfo({
         installed_app_id: APPSTORE_APP_ID,
       });

@@ -206,14 +206,12 @@ import HCButton from "../components/subcomponents/HCButton.vue";
 import HCTextField from "../components/subcomponents/HCTextField.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
-import HCDialog from "../components/subcomponents/HCDialog.vue";
 import SelectReleaseDialog from "../components/SelectReleaseDialog.vue";
-
 import { HolochainId, ReleaseData, ReleaseInfo } from "../types";
 import prettyBytes from "pretty-bytes";
 import { AppEntry } from "../appstore/types";
-import { getAllApps } from "../appstore/appstore-interface";
 import { APPSTORE_APP_ID } from "../constants";
+import { mapGetters } from "vuex";
 
 export default defineComponent({
   name: "AppStore",
@@ -224,14 +222,11 @@ export default defineComponent({
     AppPreviewCard,
     HCLoading,
     HCSnackbar,
-    HCProgressBar,
-    HCDialog,
     LoadingDots,
     SelectReleaseDialog,
   },
   emits: ["show-message", "select-view"],
   data(): {
-    appWebsocket: AppWebsocket | undefined;
     loadingText: string;
     loading: boolean;
     installableApps: Array<AppEntry>;
@@ -253,7 +248,6 @@ export default defineComponent({
     showLoadingSpinner: boolean;
   } {
     return {
-      appWebsocket: undefined,
       loadingText: "",
       loading: true,
       installableApps: [],
@@ -302,6 +296,7 @@ export default defineComponent({
     }, 3000);
   },
   computed: {
+    ...mapGetters(["appWebsocket"]),
     filteredApps(): Array<AppEntry> {
       if (this.installableApps.length === 0) {
         return [];
@@ -321,25 +316,20 @@ export default defineComponent({
   methods: {
     toSrc,
     async connectAppWebsocket() {
-      // const _hdiOfDevhub = this.$store.getters["hdiOfDevhub"]; // currently not used
       const holochainId = this.$store.getters["holochainIdForDevhub"];
       this.holochainId = holochainId;
-      // connect to AppWebsocket
-      const port = this.$store.getters["appInterfacePort"](holochainId);
-      this.appWebsocket = await AppWebsocket.connect(
-        new URL(`ws://localhost:${port}`),
-        40000
-      );
-      // console.log("connected to AppWebsocket.");
+      return this.$store.dispatch("connectToWebsocket");
     },
     async fetchApps(silent: boolean) {
       this.loading = silent ? false : true;
 
-      if (!this.appWebsocket) {
+      const appWebsocket = this.appWebsocket as AppWebsocket | undefined;
+
+      if (!appWebsocket) {
         await this.connectAppWebsocket();
       }
 
-      const appStoreInfo = await this.appWebsocket!.appInfo({
+      const appStoreInfo = await appWebsocket!.appInfo({
         installed_app_id: APPSTORE_APP_ID,
       });
 

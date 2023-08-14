@@ -8,19 +8,25 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { createStore } from "vuex";
 import { flatten, uniq } from "lodash-es";
 import { flattenCells, getCellId } from "../utils";
-import { stat } from "fs";
+import { AppWebsocket } from "@holochain/client";
 
 export interface LauncherAdminState {
   launcherStateInfo: "loading" | LauncherStateInfo;
+  appWebsocket?: AppWebsocket;
 }
 
 export const store = createStore<LauncherAdminState>({
-  state() {
-    return {
-      launcherStateInfo: "loading",
-    };
+  state: {
+    launcherStateInfo: "loading",
+    appWebsocket: undefined,
   },
   getters: {
+    idConnectedToWebSocket(state) {
+      return !!state.appWebsocket;
+    },
+    appWebsocket(state) {
+      return state.appWebsocket;
+    },
     oldFiles(state) {
       if (state.launcherStateInfo === "loading") return false;
       return (
@@ -383,6 +389,9 @@ export const store = createStore<LauncherAdminState>({
     setStateInfo(state, StateInfo) {
       state.launcherStateInfo = StateInfo;
     },
+    setAppWebsocket(state, appWebsocket) {
+      state.appWebsocket = appWebsocket;
+    },
   },
   actions: {
     async fetchStateInfo({ commit }) {
@@ -390,6 +399,17 @@ export const store = createStore<LauncherAdminState>({
       const StateInfo: LauncherStateInfo = await invoke("get_state_info", {});
 
       commit("setStateInfo", StateInfo);
+    },
+    async connectToWebsocket({ commit, getters }) {
+      if (getters["idConnectedToWebSocket"]) return;
+      const holochainId = getters["holochainIdForDevhub"];
+      const port = getters["appInterfacePort"](holochainId);
+      const appWebsocket = await AppWebsocket.connect(
+        new URL(`ws://localhost:${port}`),
+        40000
+      );
+
+      commit("setAppWebsocket", appWebsocket);
     },
   },
 });

@@ -77,8 +77,7 @@ import HCLoading from "./subcomponents/HCLoading.vue";
 import HCButton from "./subcomponents/HCButton.vue";
 import prettyBytes from "pretty-bytes";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
-import { AppInfo, AppWebsocket } from "@holochain/client";
-import { i18n } from "../locale";
+import { mapActions } from "vuex";
 import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
 
 export default defineComponent({
@@ -96,32 +95,17 @@ export default defineComponent({
     },
   },
   data(): {
-    appWebsocket: AppWebsocket | undefined;
-    appstoreAppInfo: AppInfo | undefined;
     loadingText: string;
     errorText: string;
   } {
     return {
-      appWebsocket: undefined,
-      appstoreAppInfo: undefined,
       loadingText: "",
       errorText: "Unknown error occured",
     };
   },
   emits: ["openApp", "select-view"],
   async mounted() {
-    const holochainId = this.$store.getters["holochainIdForDevhub"];
-    // connect to AppWebsocket
-    const port = this.$store.getters["appInterfacePort"](holochainId);
-    const appWebsocket = await AppWebsocket.connect(
-      new URL(`ws://localhost:${port}`),
-      40000
-    );
-    this.appWebsocket = appWebsocket;
-    const appstoreAppInfo = await appWebsocket.appInfo({
-      installed_app_id: APPSTORE_APP_ID,
-    });
-    this.appstoreAppInfo = appstoreAppInfo;
+    await this.connectToWebsocket();
   },
   computed: {
     sortedApps() {
@@ -181,6 +165,7 @@ export default defineComponent({
       window.localStorage.setItem("installFromFs", "true");
       this.$emit("select-view", { type: "appStore" });
     },
+    ...mapActions(["connectToWebsocket"]),
   },
 });
 </script>
