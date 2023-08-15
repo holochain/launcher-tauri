@@ -60,9 +60,15 @@ npm install
 
 ### Compiles and hot-reloads for development
 
-````bash
+`````bash
 npm run build:ui
 npm run tauri dev
+```
+
+or just
+
+````bash
+npm run start:dev
 ```
 
 **Note:** This mode will show different behavior in some cases than running production builds.
@@ -71,7 +77,7 @@ To get the production build behavior (but thereby sacrificing hot-reloading), ru
 ```bash
 npm run build:ui
 cd src-tauri && cargo run
-````
+`````
 
 ### Compiles and minifies for production
 
