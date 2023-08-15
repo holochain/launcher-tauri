@@ -50,6 +50,7 @@ use crate::commands::{
   install_app::install_app,
   install_devhub::install_devhub,
   network_stats::dump_network_stats,
+  notification::notify,
   open_app::open_app_ui,
   password::{initialize_keystore, unlock_and_launch},
   uninstall_app::uninstall_app,
@@ -100,6 +101,7 @@ fn main() {
       initialize_keystore,
       install_app,
       install_devhub,
+      notify,
       open_app_ui,
       holochain_launcher_utils::shared_commands::open_url_cmd,
       // start_app,
@@ -221,6 +223,7 @@ pub fn build_admin_window(app_handle: &AppHandle, local_storage_path: PathBuf) -
     .title("Holochain Launcher")
     .center()
     .initialization_script("window.__HC_LAUNCHER_ENV__ = {}")
+    .initialization_script(include_str!("../../api_scripts/dist/api-scripts.js"))
     .build()
 }
 

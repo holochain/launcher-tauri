@@ -8,6 +8,8 @@ declare global {
   }
 }
 
-window.__HC_LAUNCHER_API__.notify = async (notification: string) => {
-  await invoke("notify", { notification });
+window.__HC_LAUNCHER_API__ = {
+  notify: async (notification: string) => {
+    await invoke("notify", { notification });
+  },
 };
