@@ -223,7 +223,6 @@ pub fn build_admin_window(app_handle: &AppHandle, local_storage_path: PathBuf) -
     .title("Holochain Launcher")
     .center()
     .initialization_script("window.__HC_LAUNCHER_ENV__ = {}")
-    .initialization_script(include_str!("../../api_scripts/dist/api-scripts.js"))
     .build()
 }
 

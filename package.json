@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "start:dev": "npm run build -w @holochain-launcher/api-scripts && npm run tauri dev",
-    "start:dev2": "npm run build:ui && cargo run --manifest-path ./src-tauri/Cargo.toml",
+    "start:dev2": "npm run build -w @holochain-launcher/api-scripts && npm run build:ui && cargo run --manifest-path ./src-tauri/Cargo.toml",
     "dev": "vite",
     "build:ui": "vue-tsc --noEmit && vite build",
     "build": "npm run build -w @holochain-launcher/api-scripts && npm run tauri -- build -v",
