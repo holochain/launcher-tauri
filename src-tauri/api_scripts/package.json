@@ -1,0 +1,24 @@
+{
+  "name": "@holochain-launcher/api-scripts",
+  "version": "0.0.1",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./dist/*": "./dist/*"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch --preserveWatchOutput"
+  },
+  "type": "module",
+  "dependencies": {
+    "@tauri-apps/api": "1.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.4"
+  }
+}
