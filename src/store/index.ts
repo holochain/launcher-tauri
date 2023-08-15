@@ -401,9 +401,10 @@ export const store = createStore<LauncherAdminState>({
       commit("setStateInfo", StateInfo);
     },
     async connectToWebsocket({ commit, getters }) {
-      if (getters["idConnectedToWebSocket"]) return;
       const holochainId = getters["holochainIdForDevhub"];
       const port = getters["appInterfacePort"](holochainId);
+
+      if (getters["idConnectedToWebSocket"] || !port) return;
       const appWebsocket = await AppWebsocket.connect(
         new URL(`ws://localhost:${port}`),
         40000

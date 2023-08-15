@@ -318,7 +318,7 @@ export default defineComponent({
     async connectAppWebsocket() {
       const holochainId = this.$store.getters["holochainIdForDevhub"];
       this.holochainId = holochainId;
-      return this.$store.dispatch("connectToWebsocket");
+      return await this.$store.dispatch("connectToWebsocket");
     },
     async fetchApps(silent: boolean) {
       this.loading = silent ? false : true;
@@ -326,7 +326,7 @@ export default defineComponent({
       const appWebsocket = this.appWebsocket as AppWebsocket | undefined;
 
       if (!appWebsocket) {
-        await this.connectAppWebsocket();
+        return;
       }
 
       const appStoreInfo = await appWebsocket!.appInfo({

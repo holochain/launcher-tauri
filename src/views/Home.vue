@@ -181,6 +181,10 @@ export default defineComponent({
       await this.$store.dispatch("connectToWebsocket");
       const appWebsocket = this.$store.state.appWebsocket as AppWebsocket;
 
+      if (!appWebsocket) {
+        return;
+      }
+
       const appstoreAppInfo = await appWebsocket.appInfo({
         installed_app_id: APPSTORE_APP_ID,
       });
