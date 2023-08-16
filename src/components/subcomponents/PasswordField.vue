@@ -89,16 +89,32 @@ export default defineComponent({
     };
   },
   methods: {
+    getRefAs<T extends HTMLElement>(refName: string): T | null {
+      const ref = this.$refs[refName];
+      if (ref) {
+        return ref as T;
+      }
+      return null;
+    },
     setFocus() {
       this.inFocus = true;
-      (this.$refs.passwordInput as HTMLInputElement).focus();
+      const input = this.getRefAs("passwordInput");
+      if (input) {
+        input.focus();
+      }
     },
     blur() {
-      (this.$refs.passwordInput as HTMLElement).blur();
+      const input = this.getRefAs("passwordInput");
+      if (input) {
+        input.blur();
+      }
       this.inFocus = false;
     },
     clickEye() {
-      (this.$refs.passwordInput as any).focus();
+      const input = this.getRefAs("passwordInput");
+      if (input) {
+        input.focus();
+      }
       this.passwordVisible = !this.passwordVisible;
     },
   },

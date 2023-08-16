@@ -498,7 +498,6 @@ import "@material/mwc-icon";
 
 import {
   getHappReleasesByActionHashes,
-  appstoreCells,
   fetchGuiReleaseEntry,
   tryWithHosts,
 } from "../appstore/appstore-interface";
@@ -511,7 +510,6 @@ import HCDialog from "../components/subcomponents/HCDialog.vue";
 import HCGenericDialog from "../components/subcomponents/HCGenericDialog.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
 import HCSelectCard from "../components/subcomponents/HCSelectCard.vue";
-import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
 import StackedChart from "../components/subcomponents/StackedChart.vue";
@@ -535,7 +533,6 @@ export default defineComponent({
   components: {
     Config,
     HCButton,
-    HCSnackbar,
     HCDialog,
     ToggleSwitch,
     LoadingDots,
@@ -749,14 +746,13 @@ export default defineComponent({
         })
       );
 
-      const holochainId = this.$store.getters["holochainIdForDevhub"];
-      // connect to AppWebsocket
-      const port = this.$store.getters["appInterfacePort"](holochainId);
-      const appWebsocket = await AppWebsocket.connect(
-        new URL(`ws://localhost:${port}`),
-        40000
-      );
-      this.appWebsocket = appWebsocket;
+      await this.$store.dispatch("connectToWebsocket");
+      const appWebsocket = this.$store.state.appWebsocket as AppWebsocket;
+
+      if (!appWebsocket) {
+        return;
+      }
+
       const appstoreAppInfo = await appWebsocket.appInfo({
         installed_app_id: APPSTORE_APP_ID,
       });
@@ -1025,18 +1021,6 @@ export default defineComponent({
       (this.$refs.updateGuiDialog as typeof HCGenericDialog).open();
 
       if (this.appWebsocket && this.appstoreAppInfo) {
-        const cells = appstoreCells(this.appstoreAppInfo);
-        //   const guiReleaseResponse = await this.appWebsocket?.callZome({
-        //   cap_secret: null,
-        //   cell_id: getCellId(cells.happs.find((c) => "provisioned" in c )!)!,
-        //   fn_name: "get_gui_release",
-        //   zome_name: "happ_library",
-        //   payload: {
-        //     id: app.guiUpdateAvailable,
-        //   },
-        //   provenance: getCellId(cells.happs.find((c) => "provisioned" in c )!)![1],
-        // });
-
         const guiReleaseResponse = await fetchGuiReleaseEntry(
           this.appWebsocket as AppWebsocket,
           this.appstoreAppInfo,

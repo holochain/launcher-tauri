@@ -8,19 +8,25 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { createStore } from "vuex";
 import { flatten, uniq } from "lodash-es";
 import { flattenCells, getCellId } from "../utils";
-import { stat } from "fs";
+import { AppWebsocket } from "@holochain/client";
 
 export interface LauncherAdminState {
   launcherStateInfo: "loading" | LauncherStateInfo;
+  appWebsocket?: AppWebsocket;
 }
 
 export const store = createStore<LauncherAdminState>({
-  state() {
-    return {
-      launcherStateInfo: "loading",
-    };
+  state: {
+    launcherStateInfo: "loading",
+    appWebsocket: undefined,
   },
   getters: {
+    isConnectedToWebSocket(state) {
+      return !!state.appWebsocket;
+    },
+    appWebsocket(state) {
+      return state.appWebsocket;
+    },
     oldFiles(state) {
       if (state.launcherStateInfo === "loading") return false;
       return (
@@ -347,7 +353,7 @@ export const store = createStore<LauncherAdminState>({
       const allCellInfos = flatten(
         holochainState.content.installed_apps.map((app) =>
           flattenCells(app.installed_app_info.cell_info).filter(
-            ([roleName, cellInfo]) => !("Stem" in cellInfo)
+            ([_, cellInfo]) => !("Stem" in cellInfo)
           )
         )
       );
@@ -383,6 +389,9 @@ export const store = createStore<LauncherAdminState>({
     setStateInfo(state, StateInfo) {
       state.launcherStateInfo = StateInfo;
     },
+    setAppWebsocket(state, appWebsocket) {
+      state.appWebsocket = appWebsocket;
+    },
   },
   actions: {
     async fetchStateInfo({ commit }) {
@@ -390,6 +399,18 @@ export const store = createStore<LauncherAdminState>({
       const StateInfo: LauncherStateInfo = await invoke("get_state_info", {});
 
       commit("setStateInfo", StateInfo);
+    },
+    async connectToWebsocket({ commit, getters }) {
+      const holochainId: HolochainId = getters["holochainIdForDevhub"];
+      const port: string | undefined = getters["appInterfacePort"](holochainId);
+
+      if (getters["isConnectedToWebSocket"] || !port) return;
+      const appWebsocket = await AppWebsocket.connect(
+        new URL(`ws://localhost:${port}`),
+        40000
+      );
+
+      commit("setAppWebsocket", appWebsocket);
     },
   },
 });

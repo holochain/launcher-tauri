@@ -16,7 +16,6 @@
         position: relative;
       "
     >
-      <!-- <img class="halo" src="/img/Holochain_Halo_no_gradient.svg" /> -->
       <HCCircularProgress
         style="margin-top: 40px; margin-bottom: 40px"
       ></HCCircularProgress>
@@ -34,7 +33,6 @@
         position: relative;
       "
     >
-      <!-- <img class="halo" src="/img/Holochain_Halo_no_gradient.svg" /> -->
       <HCCircularProgress
         style="margin-top: 40px; margin-bottom: 40px"
       ></HCCircularProgress>
@@ -83,6 +81,7 @@
           @mouseleave="closeNetworkSeedInfo"
           @keydown.enter="openNetworkSeedInfo"
           @keydown.esc="closeNetworkSeedInfo"
+          alt="Network seed info"
           tabindex="0"
           src="/img/info_icon.svg"
           style="
@@ -180,7 +179,11 @@
   </HCDialog>
 
   <div class="info-popup row" v-if="showNetworkSeedInfo">
-    <img src="/img/info_icon.svg" style="opacity: 0.9; width: 40px" />
+    <img
+      alt="info icon"
+      src="/img/info_icon.svg"
+      style="opacity: 0.9; width: 40px"
+    />
     <div style="margin: 0 15px">
       If you enter a network seed, you create an app instance with its own
       network and data store. If in doubt, leave this field blank to join the
@@ -497,7 +500,7 @@ export default defineComponent({
     },
     showMessage(message: string) {
       this.snackbarText = message;
-      (this.$refs as any).snackbar.show();
+      (this.$refs["snackbar"] as typeof HCSnackbar).show();
     },
   },
 });

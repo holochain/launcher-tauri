@@ -23,25 +23,34 @@ window.onerror = function (message, source, lineno, colno, error) {
   });
 };
 
-// Adding event listeners to adjust zoom level on Ctrl + scroll
-function increaseZoomLevel(amount: number) {
-  const percentageString: string = (document.body.style as any).zoom;
-  let num =
+function adjustZoomLevel(amount: number, increase: boolean) {
+  const percentageString: string = (
+    document.body.style as CSSStyleDeclaration & { zoom: string }
+  ).zoom;
+  const num =
     percentageString === ""
       ? 100
       : parseInt(percentageString.slice(0, percentageString.length - 1));
-  let newVal = num + Math.round(amount) < 500 ? num + Math.round(amount) : 500;
-  (document.body.style as any).zoom = `${newVal}%`;
+
+  let newVal = increase ? num + Math.round(amount) : num - Math.round(amount);
+
+  if (increase) {
+    newVal = newVal < 500 ? newVal : 500;
+  } else {
+    newVal = newVal > 30 ? newVal : 30;
+  }
+
+  (
+    document.body.style as CSSStyleDeclaration & { zoom: string }
+  ).zoom = `${newVal}%`;
+}
+
+function increaseZoomLevel(amount: number) {
+  adjustZoomLevel(amount, true);
 }
 
 function decreaseZoomLevel(amount: number) {
-  const percentageString: string = (document.body.style as any).zoom;
-  let num =
-    percentageString === ""
-      ? 100
-      : parseInt(percentageString.slice(0, percentageString.length - 1));
-  let newVal = num - Math.round(amount) > 30 ? num - Math.round(amount) : 30;
-  (document.body.style as any).zoom = `${newVal}%`;
+  adjustZoomLevel(amount, false);
 }
 
 window.onkeydown = (ev) => {
@@ -65,14 +74,15 @@ window.onkeyup = (ev) => {
   }
 };
 
-// logic for setting locale
+type Locale = "en" | "de";
+
 const customLocale = window.localStorage.getItem("customLocale");
 
 console.log("Fetched customLocale: ", customLocale);
 
 if (customLocale) {
-  if (i18n.global.availableLocales.includes(customLocale as any)) {
-    i18n.global.locale = customLocale as any;
+  if (i18n.global.availableLocales.includes(customLocale as Locale)) {
+    i18n.global.locale = customLocale as Locale;
   } else {
     console.warn(
       `Invalid custom locale found in localStorage: ${customLocale}. Available locales: ${i18n.global.availableLocales}`
@@ -81,8 +91,8 @@ if (customLocale) {
 } else {
   // default to the webview's locale which should correspond to the OS locale
   const defaultLocale = navigator.language;
-  if (i18n.global.availableLocales.includes(defaultLocale as any)) {
-    i18n.global.locale = defaultLocale as any;
+  if (i18n.global.availableLocales.includes(defaultLocale as Locale)) {
+    i18n.global.locale = defaultLocale as Locale;
   }
 }
 
