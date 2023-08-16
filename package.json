@@ -3,7 +3,8 @@
   "version": "0.11.0",
   "private": true,
   "scripts": {
-    "start:dev": "npm run build:ui && npm run tauri dev",
+    "dev:quasi-prod": "npm run build:ui && cd src-tauri && cargo run",
+    "dev:quasi-prod": "npm run build:ui && cd src-tauri && cargo run",
     "dev": "vite",
     "build:ui": "vue-tsc --noEmit && vite build",
     "build": "npm run tauri -- build -v",

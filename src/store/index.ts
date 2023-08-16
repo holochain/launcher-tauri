@@ -21,7 +21,7 @@ export const store = createStore<LauncherAdminState>({
     appWebsocket: undefined,
   },
   getters: {
-    idConnectedToWebSocket(state) {
+    isConnectedToWebSocket(state) {
       return !!state.appWebsocket;
     },
     appWebsocket(state) {
@@ -401,10 +401,10 @@ export const store = createStore<LauncherAdminState>({
       commit("setStateInfo", StateInfo);
     },
     async connectToWebsocket({ commit, getters }) {
-      const holochainId = getters["holochainIdForDevhub"];
-      const port = getters["appInterfacePort"](holochainId);
+      const holochainId: HolochainId = getters["holochainIdForDevhub"];
+      const port: string | undefined = getters["appInterfacePort"](holochainId);
 
-      if (getters["idConnectedToWebSocket"] || !port) return;
+      if (getters["isConnectedToWebSocket"] || !port) return;
       const appWebsocket = await AppWebsocket.connect(
         new URL(`ws://localhost:${port}`),
         40000

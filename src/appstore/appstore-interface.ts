@@ -404,7 +404,7 @@ export async function getAvailableHostForZomeFunction(
           // console.log("@getAvailableHostForZomeFunction: trying to ping host: ", encodeHashToBase64(hostPubKey));
 
           try {
-            const result = await appWebsocket.callZome({
+            const result: Response<boolean> = await appWebsocket.callZome({
               fn_name: "ping",
               zome_name: "portal_api",
               cell_id: getCellId(portalCell)!,

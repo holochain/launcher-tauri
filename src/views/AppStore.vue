@@ -316,12 +316,13 @@ export default defineComponent({
   methods: {
     toSrc,
     async connectAppWebsocket() {
-      const holochainId = this.$store.getters["holochainIdForDevhub"];
-      this.holochainId = holochainId;
-      return await this.$store.dispatch("connectToWebsocket");
+      return this.$store.dispatch("connectToWebsocket");
     },
     async fetchApps(silent: boolean) {
       this.loading = silent ? false : true;
+
+      const holochainId = this.$store.getters["holochainIdForDevhub"];
+      this.holochainId = holochainId;
 
       const appWebsocket = this.appWebsocket as AppWebsocket | undefined;
 
