@@ -72,7 +72,7 @@ npm run build:ui
 cd src-tauri && cargo run
 ```
 
-or just
+**Note:** This script runs without hot-reloading but with the ability to open apps within the Launcher
 
 ```bash
 npm run dev:quasi-prod
