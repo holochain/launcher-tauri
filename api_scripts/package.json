@@ -17,7 +17,8 @@
   },
   "type": "module",
   "dependencies": {
-    "@tauri-apps/api": "1.4.0"
+    "@tauri-apps/api": "1.4.0",
+    "@holochain-launcher/api": "file:../api"
   },
   "devDependencies": {
     "typescript": "^4.6.4",

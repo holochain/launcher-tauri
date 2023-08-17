@@ -35,7 +35,11 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "resources": [],
+      "resources": [
+        "icons/icon_priority_high_32x32.png",
+        "icons/icon_priority_medium_32x32.png",
+        "icons/32x32.png"
+      ],
       "externalBin": [
         "bins/holochain-v0.2.X-f527060",
         "bins/lair-keystore-v0.3.0"

@@ -34,6 +34,8 @@ mod system_tray;
 
 
 use crate::commands::choose_version::get_supported_versions;
+use crate::commands::notifications::IconState;
+use crate::commands::notifications::SysTrayIconState;
 use crate::commands::open_app::report_issue_cmd;
 use crate::commands::save_app::{save_app, fetch_and_save_app, fetch_gui};
 // use crate::commands::start_app::start_app;
@@ -50,7 +52,7 @@ use crate::commands::{
   install_app::install_app,
   install_devhub::install_devhub,
   network_stats::dump_network_stats,
-  notification::notify,
+  notifications::{notify_os, notify_tauri},
   open_app::open_app_ui,
   password::{initialize_keystore, unlock_and_launch},
   uninstall_app::uninstall_app,
@@ -101,7 +103,8 @@ fn main() {
       initialize_keystore,
       install_app,
       install_devhub,
-      notify,
+      notify_os,
+      notify_tauri,
       open_app_ui,
       holochain_launcher_utils::shared_commands::open_url_cmd,
       // start_app,
@@ -168,6 +171,8 @@ fn main() {
       println!("Selected profile: {:?}", profile);
 
       app.manage(profile.clone());
+
+      app.manage(Mutex::new(SysTrayIconState { icon_state: IconState::Clean }));
 
       if let Err(err) = setup_logs(profile.clone()) {
         println!("Error setting up the logs: {:?}", err);
