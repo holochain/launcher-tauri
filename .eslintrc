@@ -13,6 +13,12 @@
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
     "prettier/prettier": "error",
-    "vue/attribute-hyphenation": "off"
+    "vue/attribute-hyphenation": "off",
+    "vue/no-multiple-template-root": "off",
+    "vue/multi-word-component-names": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "argsIgnorePattern": "^_" }
+    ]
   }
 }

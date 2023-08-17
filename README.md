@@ -4,10 +4,14 @@ A cross-platform executable that launches a local Holochain conductor, and lets 
 
 > Feedback is more than welcome in the [issues section](https://github.com/holochain/launcher/issues).
 
-## Installing the Launcher
+## Download Holochain Launcher
 
-1. Go to the [Releases page](https://github.com/holochain/launcher/releases) and select the latest release.
-2. Download the appropriate executable for your platform and execute it.
+| Operating System | [Latest Stable Release](https://github.com/holochain/launcher/releases/tag/v0.9.4)<br>(Holochain v0.1.3) | Latest Experimental Release | How to Install                          |
+| ---------------- | --------------------- | --------------------------- | --------------------------------------- |
+| Windows          | [Download](https://github.com/holochain/launcher/releases/download/v0.9.4/Holochain.Launcher_0.9.4_x64_en-US.msi)<br>          | -                 | [Instructions](docs/install-windows.md) |
+| macOS | [Download](https://github.com/holochain/launcher/releases/download/v0.9.4/Holochain.Launcher_0.9.4_x64.dmg) | - |  [Instructions](docs/install-macos.md) |
+| Linux | [.AppImage](https://github.com/holochain/launcher/releases/download/v0.9.4/holochain-launcher_0.9.4_amd64.AppImage)<br>[.deb](https://github.com/holochain/launcher/releases/download/v0.9.4/holochain-launcher_0.9.4_amd64.deb) | - | [Instructions](docs/install-linux.md) |
+
 
 Notes:
 

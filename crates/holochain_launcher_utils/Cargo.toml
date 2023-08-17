@@ -14,13 +14,13 @@ categories = ["command-line-utilities", "development-tools"]
 [dependencies]
 
 # NEW_VERSION update holochain dependencies
-holochain_client = "0.4.1"
+holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "lair-keystore-0.3.0" }
 
-holochain_conductor_api = "0.2.1"
-holochain_types = "0.2.1"
-holochain_zome_types = "0.2.1"
+holochain_conductor_api = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
+holochain_types = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
+holochain_zome_types = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
 
-lair_keystore_api = "0.2.4"
+lair_keystore_api = "0.3.0"
 
 
 log = "0.4.14"

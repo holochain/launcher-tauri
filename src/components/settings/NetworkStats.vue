@@ -80,7 +80,6 @@ export default defineComponent({
     this.holochainVersions = holochainVersions;
 
     this.$nextTick(async () => {
-      const dialog = this.$refs.dialog as typeof HCGenericDialog;
       await getCurrent().listen("open-network-stats", async () => {
         this.open();
       });

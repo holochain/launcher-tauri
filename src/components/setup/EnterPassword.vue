@@ -207,7 +207,7 @@ export default defineComponent({
       try {
         await invoke("unlock_and_launch", { password });
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
-      } catch (e: any) {
+      } catch (e) {
         console.error(e);
         if (e === "Error launching the keystore: IncorrectPassword") {
           this.invalidPassword = true;

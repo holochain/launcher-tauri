@@ -36,7 +36,10 @@
         "icons/icon.ico"
       ],
       "resources": [],
-      "externalBin": ["bins/holochain-v0.2.1", "bins/lair-keystore-v0.2.4"],
+      "externalBin": [
+        "bins/holochain-v0.2.X-f527060",
+        "bins/lair-keystore-v0.3.0"
+      ],
       "copyright": "",
       "category": "DeveloperTool",
       "shortDescription": "",
@@ -55,7 +58,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://s3.eu-central-2.wasabisys.com/holochain-launcher/automatic-updates/updater_0_3.json",
+        "https://s3.eu-central-2.wasabisys.com/holochain-launcher/automatic-updates/updater_0_2.json",
         "https://drive.switch.ch/index.php/s/gTcgvbHAJPA56xA/download"
       ],
       "dialog": true,
