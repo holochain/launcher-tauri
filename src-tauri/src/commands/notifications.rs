@@ -11,7 +11,7 @@ pub struct HappNotification {
     title: String,
     body: String,
     notification_type: String,
-    file_name: Option<String>,
+    icon_file_name: Option<String>,
     urgency: String,
     timestamp: u64,
     custom_count_reset: Option<NotificationId>,
@@ -50,6 +50,7 @@ pub async fn notify_tauri(
     notifications: Vec<HappNotification>,
     app_id: InstalledAppId,
 ) -> tauri::Result<()> {
+    println!("Got notification from app with id: {}", app_id);
     // This tauri command is allowed for any window.
 
     // Send notifications to admin window to store to localStorage and check
@@ -94,16 +95,17 @@ pub async fn notify_os(
     if !admin_window_focused && !happ_window_focused {
         for message in notifications {
             if systray {
-                change_systray_icon_state(&app_handle, &message.urgency).await;
+                change_systray_icon_state(&app_handle, &message.urgency).await
+                    .map_err(|e| format!("Failed to change systray icon state: {}", e))?;
             }
             if os {
-                let mut os_notification =  Notification::new(&app_handle.config().tauri.bundle.identifier)
+                let os_notification =  Notification::new(&app_handle.config().tauri.bundle.identifier)
                     .body(message.body)
                     .title(format!("{}: {}", app_id, message.title));
 
                 // TODO add icon by deriving [app assets dir].join("icons").join(message.file_name)
                 // --> probably requires webhapp manager for the correct holochain ID (web_happ_manager.get_app_assets_dir())
-                // if let Some(file_name) = message.file_name {
+                // if let Some(file_name) = message.icon_file_name {
                 //     let file_path =
                 // }
 

@@ -12,7 +12,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "vite build",
     "build:watch": "tsc --watch --preserveWatchOutput"
   },
   "type": "module",

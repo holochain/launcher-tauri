@@ -31,12 +31,12 @@ export interface HappNotification {
   /**
    * type of notification, in a chat app e.g. "message" or "@mention"
    */
-  notificationType: string;
+  notification_type: string;
   /**
    * Icon for the message type. The Holochain Launcher looks for a file with this
    * name in the icons/ directory of the app's UI assets.
    */
-  filename: string | undefined;
+  icon_file_name: string | undefined;
   /**
    * urgency level "low" only shows up in the Launcher UI when opened
    * urgency level "medium" also shows up as a dot in the system tray icon

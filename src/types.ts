@@ -190,5 +190,5 @@ export interface ReleaseInfo {
 
 export interface NotificationPayload {
   notifications: Array<HappNotification>;
-  appId: string;
+  app_id: string;
 }

@@ -17,7 +17,7 @@
     "tauri": "tauri",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
     "format": "prettier .  --write",
-    "prepare": "curl -L --output DevHub.webhapp https://github.com/holochain/devhub-gui/releases/download/v0.16.1/devhub.webhapp && curl -L --output AppStore.webhapp https://github.com/holochain/app-store-gui/releases/download/v0.4.0/appstore.webhapp"
+    "prepare": "npm run build -w @holochain-launcher/api && curl -L --output DevHub.webhapp https://github.com/holochain/devhub-gui/releases/download/v0.16.1/devhub.webhapp && curl -L --output AppStore.webhapp https://github.com/holochain/app-store-gui/releases/download/v0.4.0/appstore.webhapp"
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",

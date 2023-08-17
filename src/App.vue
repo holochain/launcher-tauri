@@ -159,11 +159,11 @@ export default defineComponent({
         async (e: Event<NotificationPayload>) => {
           // store to localStorage
           // store to unread messages in store
-
+          console.log("Got app notification: ", e.payload);
           // send notifications to OS
           await invoke("notify_os", {
             notifications: e.payload.notifications,
-            appId: e.payload.appId,
+            appId: e.payload.app_id,
             systray: true,
             os: true,
           });
