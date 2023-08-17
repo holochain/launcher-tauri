@@ -4,8 +4,6 @@ use holochain_web_app_manager::derive_window_label;
 use serde::{Deserialize, Serialize};
 use tauri::{api::notification::Notification, Manager, Icon};
 
-use crate::file_system::Profile;
-
 pub type NotificationId = String;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -127,8 +127,9 @@ import "@fontsource/poppins/600.css";
 import "@fontsource/poppins/700.css";
 import "@fontsource/poppins/800.css";
 import "@fontsource/poppins/900.css";
-import { listen } from "@tauri-apps/api/event";
+import { Event, listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/tauri";
+import { NotificationPayload } from "./types";
 
 export default defineComponent({
   name: "App",
@@ -153,6 +154,21 @@ export default defineComponent({
       await listen("request-restart", () => {
         restartDialog.open();
       });
+      await listen(
+        "happ-notifications",
+        async (e: Event<NotificationPayload>) => {
+          // store to localStorage
+          // store to unread messages in store
+
+          // send notifications to OS
+          await invoke("notify_os", {
+            notifications: e.payload.notifications,
+            appId: e.payload.appId,
+            systray: true,
+            os: true,
+          });
+        }
+      );
     });
   },
   async created() {

@@ -6,6 +6,7 @@ import {
   DnaHashB64,
   AnyDhtHashB64,
 } from "@holochain/client";
+import { HappNotification } from "@holochain-launcher/api";
 import { Entity, GUIReleaseEntry, HappReleaseEntry } from "./appstore/types";
 
 declare global {
@@ -185,4 +186,9 @@ export interface ReleaseData {
 export interface ReleaseInfo {
   resource_locator: ResourceLocatorB64 | undefined;
   version: string | undefined;
+}
+
+export interface NotificationPayload {
+  notifications: Array<HappNotification>;
+  appId: string;
 }
