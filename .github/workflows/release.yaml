@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [windows-2019]
+        platform: [windows-2019, macos-11, ubuntu-20.04]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -37,9 +37,9 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.4 lair_keystore
+          cargo install --version 0.3.0 lair_keystore
           $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
-          Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.2.4-x86_64-pc-windows-msvc.exe
+          Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.3.0-x86_64-pc-windows-msvc.exe
 
 
           cargo install holochain --git https://github.com/holochain/holochain --locked --features sqlite-encrypted --rev f5270601c1a489086fed853812e1326726210dfd          HOLOCHAIN_PATH=$(which holochain)
@@ -53,9 +53,9 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.4 lair_keystore
+          cargo install --version 0.3.0 lair_keystore
           LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.4-x86_64-apple-darwin
+          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.3.0-x86_64-apple-darwin
 
           cargo install holochain --git https://github.com/holochain/holochain --locked --features sqlite-encrypted --rev f5270601c1a489086fed853812e1326726210dfd          HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.2.X-f527060-x86_64-apple-darwin
@@ -73,9 +73,9 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.4 lair_keystore
+          cargo install --version 0.3.0 lair_keystore
           LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.4-x86_64-unknown-linux-gnu
+          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.3.0-x86_64-unknown-linux-gnu
 
 
           cargo install holochain --git https://github.com/holochain/holochain --locked --features sqlite-encrypted --rev f5270601c1a489086fed853812e1326726210dfd          HOLOCHAIN_PATH=$(which holochain)
