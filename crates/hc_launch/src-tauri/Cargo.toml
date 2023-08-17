@@ -25,15 +25,15 @@ futures = "0.3"
 
 # NEW_VERSION update holochain dependencies
 holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "lair-keystore-0.3.0" }
-holochain_cli_sandbox = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
+holochain_cli_sandbox = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
 holochain_launcher_utils = { path = "../../holochain_launcher_utils" }
-holochain_types = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
-holochain_util = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c", features = [ "pw" ] }
-holochain_zome_types = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
-holochain_conductor_api = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
-holochain_trace = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
+holochain_types = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
+holochain_util = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd", features = [ "pw" ] }
+holochain_zome_types = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
+holochain_conductor_api = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
+holochain_trace = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
 
-holochain = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c", features = ["sqlite-encrypted"] }
+holochain = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd", features = ["sqlite-encrypted"] }
 
 
 lair_keystore_api = "0.3.0"

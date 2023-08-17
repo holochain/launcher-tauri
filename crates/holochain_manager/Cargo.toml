@@ -8,17 +8,17 @@ version = "0.1.0"
 [dependencies]
 # NEW_VERSION pick right client version
 
-holochain = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c", features = ["sqlite-encrypted"] }
+holochain = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd", features = ["sqlite-encrypted"] }
 holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "lair-keystore-0.3.0" }
 
 
 # NEW_VERSION add latest crates here
 
-holochain_conductor_api_0_2_1 = { package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
-holochain_p2p_0_2_1 = { package = "holochain_p2p", git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
-holochain_types_0_2_1 = { package = "holochain_types", git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
+holochain_conductor_api_0_2_1 = { package = "holochain_conductor_api", git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
+holochain_p2p_0_2_1 = { package = "holochain_p2p", git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
+holochain_types_0_2_1 = { package = "holochain_types", git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
 
-mr_bundle = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
+mr_bundle = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
 
 lair_keystore_manager = {path = "../lair_keystore_manager"}
 

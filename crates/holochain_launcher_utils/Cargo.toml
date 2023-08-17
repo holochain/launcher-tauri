@@ -16,9 +16,9 @@ categories = ["command-line-utilities", "development-tools"]
 # NEW_VERSION update holochain dependencies
 holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "lair-keystore-0.3.0" }
 
-holochain_conductor_api = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
-holochain_types = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
-holochain_zome_types = { git = "https://github.com/holochain/holochain", rev = "f010279667aa49b620f2d053b1cc9dc3e12ad76c" }
+holochain_conductor_api = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
+holochain_types = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
+holochain_zome_types = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
 
 lair_keystore_api = "0.3.0"
 
