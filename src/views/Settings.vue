@@ -54,6 +54,8 @@
 
   <Config ref="configDialog" />
 
+  <ChangeLanguage ref="change-language" />
+
   <HCLoading ref="downloading" :text="loadingText"></HCLoading>
 
   <div
@@ -161,6 +163,21 @@
       <!-- <div class="row section-container" style="display: flex; flex-direction: row;">
         Language
       </div> -->
+
+      <div class="row section">
+        <span class="section-title">{{
+          $t("dialogs.changeLanguage.languageSettings")
+        }}</span>
+      </div>
+
+      <div class="row section-container align-two-items">
+        <div style="font-size: 18px">
+          {{ $t("dialogs.changeLanguage.language") }}
+        </div>
+        <HCButton style="margin: 4px 6px" @click="openChangeLanguage()">
+          {{ capitalizeAndTranslate("setup.changeLanguage") }}</HCButton
+        >
+      </div>
 
       <!-- Advanced Settings Section -->
       <div
@@ -515,6 +532,7 @@ import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
 import StackedChart from "../components/subcomponents/StackedChart.vue";
 import { i18n } from "../locale";
 import { ActionTypes } from "../store/actions";
+import ChangeLanguage from "../components/settings/ChangeLanguage.vue";
 import {
   HolochainAppInfo,
   HolochainAppInfoExtended,
@@ -526,6 +544,7 @@ import {
   isAppPaused,
   isAppRunning,
   locatorToLocatorB64,
+  capitalizeFirstLetter,
 } from "../utils";
 
 export default defineComponent({
@@ -534,6 +553,7 @@ export default defineComponent({
     Config,
     HCButton,
     HCDialog,
+    ChangeLanguage,
     ToggleSwitch,
     LoadingDots,
     AppSettingsCard,
@@ -695,11 +715,18 @@ export default defineComponent({
     isAppPaused,
     isAppRunning,
     prettyBytes,
+    capitalizeAndTranslate(key: string) {
+      const translated = this.$t(key);
+      return capitalizeFirstLetter(translated);
+    },
     isLoading() {
       return this.$store.state.launcherStateInfo === "loading";
     },
     openConfig() {
       (this.$refs.configDialog as typeof Config).open();
+    },
+    openChangeLanguage() {
+      (this.$refs["change-language"] as typeof ChangeLanguage).open();
     },
     openHidden(app: HolochainAppInfoExtended) {
       return (
@@ -1192,6 +1219,11 @@ h2 {
   padding: 15px;
   box-shadow: 0 0px 5px #9b9b9b;
   margin-bottom: 20px;
+}
+
+.align-two-items {
+  align-items: center;
+  justify-content: space-between;
 }
 
 .hc-version {
