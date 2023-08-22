@@ -299,6 +299,7 @@ const messages = {
       appSettings: "App Settings",
       appSettingsHelper:
         "Settings for Holochain Apps mit Graphischer Benutzeroberfläche",
+      general: "Allgemein",
       headlessApps: "Headless Apps",
       headlessAppsHelper: "Holochain Apps ohne Graphische Benutzeroberfläche",
       holochainVersions: "Holochain Versionen",
