@@ -91,7 +91,7 @@ If you encounter an error message similar to the one below, please verify that t
 > **Important:** If you experience this error, you may need to rename your files inside `src-tauri/bins` to match the ones specified in the error messages.
 
 ```bash
-error: failed to run custom build command for `holochain-launcher v0.11.0 `
+error: failed to run custom build command for `holochain-launcher v0.11.1 `
 
 Caused by:
   process didn't exit successfully: `/Users/user/Work/launcher/target/debug/build/holochain-launcher-029336fae4a64bb2/build-script-build` (exit status: 1)
