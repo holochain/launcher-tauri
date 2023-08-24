@@ -228,7 +228,10 @@ impl LauncherManager {
       }
     }
 
-    let admin_port = portpicker::pick_unused_port().expect("No ports free");
+    let admin_port = match option_env!("ADMIN_PORT") {
+      Some(p) => p.parse().unwrap(),
+      None => portpicker::pick_unused_port().expect("No ports free"),
+    };
 
     let conductor_config_path = match custom_binary_path.is_some() {
       true => profile_config_dir(profile.clone())
