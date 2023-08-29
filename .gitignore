@@ -30,3 +30,5 @@ pnpm-debug.log*
 *.sln
 *.sw?
 *.webhapp
+
+/testing-apps
