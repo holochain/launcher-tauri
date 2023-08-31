@@ -24,16 +24,16 @@ anyhow = "1.0"
 futures = "0.3"
 
 # NEW_VERSION update holochain dependencies
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "lair-keystore-0.3.0" }
-holochain_cli_sandbox = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
+holochain_client = { git = "https://github.com/mrruby/holochain-client-rust.git" }
+holochain_cli_sandbox = "0.2.2-beta-rc.0"
 holochain_launcher_utils = { path = "../../holochain_launcher_utils" }
-holochain_types = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
-holochain_util = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd", features = [ "pw" ] }
-holochain_zome_types = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
-holochain_conductor_api = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
-holochain_trace = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd" }
+holochain_types = "0.2.2-beta-rc.0"
+holochain_util = { version = "0.2.1", features = [ "pw" ] }
+holochain_zome_types = "0.2.2-beta-rc.0"
+holochain_conductor_api = "0.2.2-beta-rc.0"
+holochain_trace = "0.2.1"
 
-holochain = { git = "https://github.com/holochain/holochain", rev = "f5270601c1a489086fed853812e1326726210dfd", features = ["sqlite-encrypted"] }
+holochain = { version = "0.2.2-beta-rc.0", features = ["sqlite-encrypted"] }
 
 
 lair_keystore_api = "0.3.0"
