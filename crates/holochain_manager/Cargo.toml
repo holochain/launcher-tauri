@@ -9,7 +9,7 @@ version = "0.1.0"
 # NEW_VERSION pick right client version
 
 holochain = { version = "0.2.2-beta-rc.0", features = ["sqlite-encrypted"] }
-holochain_client = { git = "https://github.com/mrruby/holochain-client-rust.git" }
+holochain_client = "0.4.2-rc.0"
 
 
 # NEW_VERSION add latest crates here
