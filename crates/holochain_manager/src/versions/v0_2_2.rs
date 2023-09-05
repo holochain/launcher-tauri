@@ -57,6 +57,7 @@ impl VersionManager for HolochainV0_2_2 {
     });
 
     let config = ConductorConfig {
+      chc_url: None,
       environment_path: conductor_environment_path.into(),
       dpki: None,
       keystore: KeystoreConfig::LairServer {
