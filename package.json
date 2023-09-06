@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "private": true,
   "scripts": {
     "dev:quasi-prod": "npm run build:ui && ADMIN_PORT=10001 cargo run --manifest-path ./src-tauri/Cargo.toml",
