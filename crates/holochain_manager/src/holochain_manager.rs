@@ -6,7 +6,9 @@ use std::{fs, time::Duration};
 
 // NEW_VERSION change holochain_types version
 use holochain_client::{AdminWebsocket, AgentPubKey, AppInfo, InstallAppPayload};
-use holochain_types_0_2_1::prelude::{AppBundleSource, CellId, DisableCloneCellPayload, CloneCellId};
+use holochain_types_0_2_2::prelude::{
+  AppBundleSource, CellId, CloneCellId, DisableCloneCellPayload,
+};
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use tauri::api::process::CommandChild;
 
@@ -48,13 +50,15 @@ impl HolochainManager {
       true => {
         let current_config_str = fs::read_to_string(conductor_config_path.clone())?;
 
-        version_manager.overwrite_config(
-          current_config_str,
-          config.admin_port,
-          config.keystore_connection_url.clone(),
-          config.bootstrap_server_url,
-          config.signaling_server_url,
-        ).map_err(|e| LaunchHolochainError::FailedToOverwriteConfig(e))?
+        version_manager
+          .overwrite_config(
+            current_config_str,
+            config.admin_port,
+            config.keystore_connection_url.clone(),
+            config.bootstrap_server_url,
+            config.signaling_server_url,
+          )
+          .map_err(|e| LaunchHolochainError::FailedToOverwriteConfig(e))?
       }
       false => version_manager.initial_config(
         config.admin_port,
@@ -94,9 +98,12 @@ impl HolochainManager {
     };
 
     let app_interface_port = {
-      let app_interfaces = ws.list_app_interfaces().await.map_err(|e|
-        LaunchHolochainError::CouldNotConnectToConductor(format!("Could not list app interfaces: {:?}", e)),
-      )?;
+      let app_interfaces = ws.list_app_interfaces().await.map_err(|e| {
+        LaunchHolochainError::CouldNotConnectToConductor(format!(
+          "Could not list app interfaces: {:?}",
+          e
+        ))
+      })?;
 
       if app_interfaces.len() > 0 {
         app_interfaces[0]
@@ -172,6 +179,7 @@ impl HolochainManager {
       installed_app_id: Some(app_id.clone().into()),
       membrane_proofs,
       network_seed,
+      ignore_genesis_failure: false,
     };
     self
       .ws
@@ -235,7 +243,8 @@ impl HolochainManager {
       .delete_clone_cell(DisableCloneCellPayload {
         app_id,
         clone_cell_id,
-      }).await
+      })
+      .await
       .map_err(|err| format!("Error deleting cloned cell: {:?}", err))?;
 
     Ok(())
@@ -260,5 +269,4 @@ impl HolochainManager {
 
     Ok(network_stats)
   }
-
 }
