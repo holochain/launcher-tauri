@@ -1,6 +1,6 @@
 import { CellInfo, encodeHashToBase64 } from "@holochain/client";
 import { CellId } from "@holochain/client";
-import { DisabledAppReason, NetworkInfo, AppInfo } from "@holochain/client";
+import { DisabledAppReason, AppInfo } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 import { Base64 } from "js-base64";
 
@@ -16,8 +16,13 @@ export function locatorToLocatorB64(
 }
 
 export function isAppRunning(app: AppInfo): boolean {
-  return (app.status as any) === "running";
+  return (app.status as unknown) === "running";
 }
+
+export function capitalizeFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
 export function isAppDisabled(app: AppInfo): boolean {
   return Object.keys(app.status).includes("disabled");
 }
@@ -35,9 +40,9 @@ export function getReason(app: AppInfo): string | undefined {
       }
     ).disabled.reason;
 
-    if ((reason as any) === "never_started") {
+    if ((reason as unknown) === "never_started") {
       return "App was never started";
-    } else if ((reason as any) === "user") {
+    } else if ((reason as unknown) === "user") {
       return "App was disabled by the user";
     } else {
       return `There was an error with this app: ${

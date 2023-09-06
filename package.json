@@ -1,12 +1,14 @@
 {
   "name": "launcher",
-  "version": "0.11.0",
+  "version": "0.10.980",
   "private": true,
   "scripts": {
-    "dev:quasi-prod": "npm run build:ui && cargo run --manifest-path ./src-tauri/Cargo.toml",
-    "dev": "vite",
+    "dev:quasi-prod": "npm run build:ui && ADMIN_PORT=10001 cargo run --manifest-path ./src-tauri/Cargo.toml",
+    "dev": "ADMIN_PORT=10001 npm run tauri dev",
+    "vite": "vite",
     "build:ui": "vue-tsc --noEmit && vite build",
     "build": "npm run tauri -- build -v",
+    "publish:apps": "ADMIN_PORT=10001 run-singleton \"node scripts/publish-apps.js --inspect\"",
     "preview": "vite preview",
     "test:unit": "vue-cli-service test:unit",
     "tauri": "tauri",
@@ -54,17 +56,21 @@
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-typescript": "^11.0.3",
     "@vue/test-utils": "^2.0.0-0",
+    "adm-zip": "^0.5.10",
     "concurrently": "^6.2.1",
     "eslint": "^8.46.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-vue": "^9.17.0",
+    "js-yaml": "^4.1.0",
     "lint-staged": "^9.5.0",
     "prettier": "3.0.1",
     "replace-in-files-cli": "^1.0.0",
+    "run-singleton-cli": "^0.0.7",
     "typescript": "^4.6.4",
     "vite": "^4.3.5",
     "vue-eslint-parser": "^9.3.1",
     "vue-tsc": "^1.0.11"
-  }
+  },
+  "type": "module"
 }

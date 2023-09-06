@@ -1,7 +1,7 @@
 use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
 use holochain_manager::config::LaunchHolochainConfig;
-use holochain_manager::errors::{LaunchHolochainError, InitializeConductorError};
-use holochain_web_app_manager::{error::LaunchWebAppManagerError, derive_window_label};
+use holochain_manager::errors::{InitializeConductorError, LaunchHolochainError};
+use holochain_web_app_manager::{derive_window_label, error::LaunchWebAppManagerError};
 use lair_keystore_manager::error::{LairKeystoreError, LaunchChildError};
 use lair_keystore_manager::utils::create_dir_if_necessary;
 use lair_keystore_manager::versions::v0_3::LairKeystoreManagerV0_3;
@@ -18,8 +18,8 @@ use holochain_manager::versions::HolochainVersion;
 use holochain_web_app_manager::WebAppManager;
 
 use crate::file_system::{
-  conductor_config_dir, holochain_version_data_dir, keystore_data_dir,
-  profile_holochain_data_dir, profile_lair_dir, profile_config_dir, Profile, launcher_config_dir,
+  conductor_config_dir, holochain_version_data_dir, keystore_data_dir, launcher_config_dir,
+  profile_config_dir, profile_holochain_data_dir, profile_lair_dir, Profile,
 };
 use crate::system_tray::AllInstalledApps;
 use crate::{running_state::RunningState, system_tray::update_system_tray, LauncherState};
@@ -35,7 +35,6 @@ pub enum KeystoreStatus {
   PasswordNecessary,
   LaunchKeystoreError(LairKeystoreError),
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "type", content = "content")]
@@ -53,17 +52,6 @@ impl Into<String> for HolochainId {
   }
 }
 
-impl HolochainId {
-  fn to_string(&self) -> String {
-    match self {
-      HolochainId::HolochainVersion(version) => version.to_string(),
-      HolochainId::CustomBinary => String::from("Custom Binary"),
-    }
-  }
-}
-
-
-
 pub struct LauncherManager {
   app_handle: Arc<AppHandle>,
   config: LauncherConfig,
@@ -77,13 +65,15 @@ pub struct LauncherManager {
 
 impl LauncherManager {
   pub async fn launch(app_handle: Arc<AppHandle>, profile: Profile) -> Result<Self, LauncherError> {
-
     create_dir_if_necessary(&profile_lair_dir(profile.clone())?)?;
     create_dir_if_necessary(&profile_holochain_data_dir(profile.clone())?)?;
     create_dir_if_necessary(&profile_config_dir(profile.clone())?)?;
     create_dir_if_necessary(&launcher_config_dir(profile.clone())?)?;
 
-    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_3::lair_keystore_version(), profile.clone())?;
+    let keystore_path = keystore_data_dir(
+      LairKeystoreManagerV0_3::lair_keystore_version(),
+      profile.clone(),
+    )?;
 
     let is_initialized = LairKeystoreManagerV0_3::is_initialized(keystore_path);
 
@@ -128,24 +118,31 @@ impl LauncherManager {
     password: String,
     profile: Profile,
   ) -> Result<(), String> {
-
     // emitting signal to the front-end for progress indication
-    self.app_handle.get_window("admin").unwrap()
+    self
+      .app_handle
+      .get_window("admin")
+      .unwrap()
       .emit("progress-update", String::from("Initializing keystore"))
       .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
-    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_3::lair_keystore_version(), profile.clone())
-      .map_err(|e| format!("Failed to get keystore data dir: {}", e))?;
+    let keystore_path = keystore_data_dir(
+      LairKeystoreManagerV0_3::lair_keystore_version(),
+      profile.clone(),
+    )
+    .map_err(|e| format!("Failed to get keystore data dir: {}", e))?;
 
     LairKeystoreManagerV0_3::initialize(keystore_path, password.clone())
       .await
       .map_err(|err| format!("Error initializing the keystore: {:?}", err))?;
 
     // emitting signal to the front-end for progress indication
-    self.app_handle.get_window("admin").unwrap()
+    self
+      .app_handle
+      .get_window("admin")
+      .unwrap()
       .emit("progress-update", String::from("Launching keystore"))
       .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
-
 
     // sleep for 300ms to prevent potential issue with DevHub's public key missing in lair keystore (https://github.com/holochain/launcher/issues/146)
     std::thread::sleep(std::time::Duration::from_millis(300));
@@ -155,16 +152,17 @@ impl LauncherManager {
     Ok(())
   }
 
-
   /// Launches LairKeystoreManager, HolochainManager(s) and WebAppManager(s).
   pub async fn launch_managers(
     &mut self,
     password: String,
     profile: Profile,
   ) -> Result<(), String> {
-
-    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_3::lair_keystore_version(), profile.clone())
-      .map_err(|e| format!("Failed to get keystore data dir: {}", e))?;
+    let keystore_path = keystore_data_dir(
+      LairKeystoreManagerV0_3::lair_keystore_version(),
+      profile.clone(),
+    )
+    .map_err(|e| format!("Failed to get keystore data dir: {}", e))?;
 
     let lair_keystore_manager =
       LairKeystoreManagerV0_3::launch(self.config.log_level, keystore_path, password.clone())
@@ -182,11 +180,19 @@ impl LauncherManager {
 
     for version in holochain_versions_to_run {
       // emitting signal to the front-end for progress indication
-      self.app_handle.get_window("admin").unwrap()
-        .emit("progress-update", format!("Launching Holochain version {}", version.to_string()))
+      self
+        .app_handle
+        .get_window("admin")
+        .unwrap()
+        .emit(
+          "progress-update",
+          format!("Launching Holochain version {}", version.to_string()),
+        )
         .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
-      self.launch_holochain_manager(version, None, profile.clone()).await?;
+      self
+        .launch_holochain_manager(version, None, profile.clone())
+        .await?;
     }
 
     if let Some(path) = self.config.custom_binary_path.clone() {
@@ -196,17 +202,20 @@ impl LauncherManager {
     } else {
       // If no custom holochain binary is specified in launcher-config.yaml, remove the data associated to previous
       // custom holochain binaries
-      let _r = std::fs::remove_dir_all(profile_config_dir(profile.clone())
-        .map_err(|e| format!("Failed to get profile config dir: {}", e))?
-        .join("custom"));
-      let _r = std::fs::remove_dir_all(profile_holochain_data_dir(profile)
-        .map_err(|e| format!("Failed to get profile holochain data dir: {}", e))?
-        .join("custom"));
+      let _r = std::fs::remove_dir_all(
+        profile_config_dir(profile.clone())
+          .map_err(|e| format!("Failed to get profile config dir: {}", e))?
+          .join("custom"),
+      );
+      let _r = std::fs::remove_dir_all(
+        profile_holochain_data_dir(profile)
+          .map_err(|e| format!("Failed to get profile holochain data dir: {}", e))?
+          .join("custom"),
+      );
     }
 
     Ok(())
   }
-
 
   /// Launches a Holochain Manager and the associated WebAppManager for a given holochain version
   /// or custom binary
@@ -228,7 +237,10 @@ impl LauncherManager {
       }
     }
 
-    let admin_port = portpicker::pick_unused_port().expect("No ports free");
+    let admin_port = match option_env!("ADMIN_PORT") {
+      Some(p) => p.parse().unwrap(),
+      None => portpicker::pick_unused_port().expect("No ports free"),
+    };
 
     let conductor_config_path = match custom_binary_path.is_some() {
       true => profile_config_dir(profile.clone())
@@ -243,8 +255,7 @@ impl LauncherManager {
         .map_err(|e| format!("Failed to get profile's holochain data dir: {}", e))?
         .join("custom"),
       false => holochain_version_data_dir(&version, profile.clone())
-        .map_err(|e| format!("Failed to get profile's holochain version data dir: {}", e))?
-      ,
+        .map_err(|e| format!("Failed to get profile's holochain version data dir: {}", e))?,
     };
 
     let lair_manager = self.get_lair_keystore_manager()?;
@@ -276,12 +287,9 @@ impl LauncherManager {
 
     let admin_window = self.app_handle.get_window("admin").unwrap();
 
-    let state = match WebAppManager::launch(
-      version,
-      config,
-      self.app_handle.clone(),
-      password,
-    ).await {
+    let state = match WebAppManager::launch(version, config, self.app_handle.clone(), password)
+      .await
+    {
       Ok(mut manager) => match version.eq(&HolochainVersion::default()) {
         true => match install_default_apps_if_necessary(&mut manager, admin_window).await {
           Ok(()) => {
@@ -328,7 +336,6 @@ impl LauncherManager {
       }
     };
 
-
     if custom_binary_path.is_some() {
       self.custom_binary_manager = Some(state);
     } else {
@@ -345,7 +352,6 @@ impl LauncherManager {
 
     Ok(())
   }
-
 
   pub fn get_lair_keystore_manager(&mut self) -> Result<&Box<dyn LairKeystoreManager>, String> {
     match &self.lair_keystore_manager {
@@ -368,7 +374,9 @@ impl LauncherManager {
     match holochain_id {
       HolochainId::HolochainVersion(version) => {
         if let None = self.holochain_managers.get(&version) {
-          self.launch_holochain_manager(version.clone(), None, profile).await?;
+          self
+            .launch_holochain_manager(version.clone(), None, profile)
+            .await?;
         }
       }
       HolochainId::CustomBinary => {
@@ -394,10 +402,9 @@ impl LauncherManager {
     holochain_id: HolochainId,
   ) -> Result<&mut WebAppManager, String> {
     let manager_state = match holochain_id {
-      HolochainId::HolochainVersion(version) => self
-        .holochain_managers
-        .get_mut(&version)
-        .ok_or(format!("Holochain version {} is not running.", version.to_string())),
+      HolochainId::HolochainVersion(version) => self.holochain_managers.get_mut(&version).ok_or(
+        format!("Holochain version {} is not running.", version.to_string()),
+      ),
       HolochainId::CustomBinary => self.custom_binary_manager.as_mut().ok_or(String::from(
         "There is no Holochain running with custom binary",
       )),
@@ -405,17 +412,17 @@ impl LauncherManager {
 
     match manager_state {
       RunningState::Running(m) => Ok(m),
-      RunningState::Error(error) => {
-        match holochain_id {
-          HolochainId::HolochainVersion(version) =>
-            Err(format!(
-            "Holochain Version {} threw an exception: {:?}",
-            version.to_string(),
-            error
-          )),
-          HolochainId::CustomBinary => Err(format!("Custom holochain binary threw an exception: {:?}", error))
-        }
-      }
+      RunningState::Error(error) => match holochain_id {
+        HolochainId::HolochainVersion(version) => Err(format!(
+          "Holochain Version {} threw an exception: {:?}",
+          version.to_string(),
+          error
+        )),
+        HolochainId::CustomBinary => Err(format!(
+          "Custom holochain binary threw an exception: {:?}",
+          error
+        )),
+      },
     }
   }
 
@@ -429,7 +436,8 @@ impl LauncherManager {
     };
 
     for version in versions {
-      if let Ok(web_app_manager) = self.get_web_happ_manager(HolochainId::HolochainVersion(version.clone()))
+      if let Ok(web_app_manager) =
+        self.get_web_happ_manager(HolochainId::HolochainVersion(version.clone()))
       {
         let running_apps = web_app_manager.list_apps().await?;
 
@@ -457,9 +465,7 @@ impl LauncherManager {
     Ok(())
   }
 
-
   pub fn open_app(&mut self, holochain_id: HolochainId, app_id: &String) -> Result<(), String> {
-
     let window_label = derive_window_label(&app_id);
 
     // Iterate over the open windows, focus if the app is already open
@@ -501,8 +507,6 @@ impl LauncherManager {
     // set window size to 80% of a common screen resolution of 1920 x 1080.
     window_builder = window_builder.inner_size(1536.0, 864.0);
 
-
-
     // placeholder for when apps come shipped with their custom icons:
     //
     // window_builder
@@ -513,22 +517,25 @@ impl LauncherManager {
     let _scaling_factor = 0.8;
 
     if cfg!(target_os = "macos") {
-      let _window = window_builder.build().map_err(|err| format!("Error opening app: {:?}", err))?;
+      let _window = window_builder
+        .build()
+        .map_err(|err| format!("Error opening app: {:?}", err))?;
       // removing this for now since it behaves inconsistently
       // set_window_size(window, scaling_factor);
     } else {
-      window_builder = window_builder
-        .menu(Menu::new().add_submenu(Submenu::new( // This overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
+      window_builder = window_builder.menu(Menu::new().add_submenu(Submenu::new(
+        // This overwrites the global menu on macOS (https://github.com/tauri-apps/tauri/issues/5768)
         "Settings",
         Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
-         )));
+      )));
 
       // Window opens weirdly out of bounds on windows if not centered.
-      if cfg!(target_os = "windows"){
+      if cfg!(target_os = "windows") {
         window_builder = window_builder.center();
       }
 
-      let window = window_builder.build()
+      let window = window_builder
+        .build()
         .map_err(|err| format!("Error opening app: {:?}", err))?;
       // Listen to "open-devtools" command
       let a = self.app_handle.clone();
@@ -545,30 +552,25 @@ impl LauncherManager {
 
     Ok(())
   }
-
 }
-
-
 
 fn _set_window_size(window: tauri::window::Window, scaling_factor: f64) -> () {
-    // set window to 80% of the monitor size if possible
-    match window.current_monitor() {
-      Ok(maybe_monitor) => {
-        if let Some(monitor) = maybe_monitor {
+  // set window to 80% of the monitor size if possible
+  match window.current_monitor() {
+    Ok(maybe_monitor) => {
+      if let Some(monitor) = maybe_monitor {
+        let size = monitor.size();
+        let new_width = (scaling_factor * size.width as f64) as u32;
+        let new_height = (scaling_factor * size.height as f64) as u32;
 
-          let size = monitor.size();
-          let new_width = (scaling_factor * size.width as f64) as u32;
-          let new_height = (scaling_factor * size.height as f64) as u32;
+        let new_size = PhysicalSize::new(new_width, new_height);
 
-          let new_size = PhysicalSize::new(new_width, new_height);
-
-          match window.set_size(new_size) {
-            Ok(()) => (),
-            Err(e) => log::error!("Failed to set window size: {:?}", e)
-          };
-        }
-      },
-      Err(e) => log::error!("Failed to get monitor option: {:?}", e),
-    };
+        match window.set_size(new_size) {
+          Ok(()) => (),
+          Err(e) => log::error!("Failed to set window size: {:?}", e),
+        };
+      }
+    }
+    Err(e) => log::error!("Failed to get monitor option: {:?}", e),
+  };
 }
-

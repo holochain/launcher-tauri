@@ -223,7 +223,6 @@ import ToggleSwitch from "../subcomponents/ToggleSwitch.vue";
 import LoadingDots from "../subcomponents/LoadingDots.vue";
 import ChangeLanguage from "../settings/ChangeLanguage.vue";
 import { listen } from "@tauri-apps/api/event";
-import ChangeLanguageVue from "../settings/ChangeLanguage.vue";
 
 export default defineComponent({
   name: "Setup",
@@ -264,9 +263,7 @@ export default defineComponent({
     });
   },
   created() {
-    this.$nextTick(() => {
-      const repeatPassword = this.$refs.repeatPassword as typeof PasswordField;
-    });
+    this.$nextTick(() => this.$refs.repeatPassword as typeof PasswordField);
   },
   methods: {
     async initialize() {
