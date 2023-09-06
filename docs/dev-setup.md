@@ -84,6 +84,14 @@ npm run dev:quasi-prod
 npm run build
 ```
 
+### Helper scripts
+
+In the scripts directory there is a `publish-apps.js` script that will help you to add multiple happs at once to the app store. To do this put multiple `.webhapp` files in the `testing-apps` directory and run the script within the nix-shell.
+
+```bash
+npm run publish:apps
+```
+
 ### Troubleshooting
 
 If you encounter an error message similar to the one below, please verify that the `holochain` and `lair-keystore` files in your `src-tauri/bins` folder have the correct names and versions.

@@ -5,6 +5,7 @@ node_modules
 /target
 /test-app
 /default_apps
+/testing-apps
 
 # temporary files
 .hc*
@@ -30,6 +31,5 @@ pnpm-debug.log*
 *.sln
 *.sw?
 *.webhapp
-
 
 .history
