@@ -9,7 +9,7 @@ version = "0.1.0"
 # NEW_VERSION pick right client version
 
 holochain = { version = "0.2.2-beta-rc.1", features = ["sqlite-encrypted"] }
-holochain_client = "0.4.2-rc.1"
+holochain_client = "0.5.0-rc.0"
 
 
 # NEW_VERSION add latest crates here
