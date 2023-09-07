@@ -199,7 +199,6 @@
 import { defineComponent, PropType } from "vue";
 
 import {
-  AppWebsocket,
   NetworkInfo,
   CellInfo,
   encodeHashToBase64,
@@ -209,7 +208,7 @@ import prettyBytes from "pretty-bytes";
 
 import { getCellId, getCellName, getCellNetworkSeed } from "../../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default defineComponent({
   name: "InstalledCellCard",
@@ -226,7 +225,6 @@ export default defineComponent({
   data(): {
     pollInterval: number | null;
     networkInfo: NetworkInfo | undefined;
-    appWebsocket: AppWebsocket | undefined;
     networkSeedVisible: boolean;
     showNetworkSeedCopiedTooltip: boolean;
     showDnaHashCopiedTooltip: boolean;
@@ -234,11 +232,13 @@ export default defineComponent({
     return {
       pollInterval: null,
       networkInfo: undefined,
-      appWebsocket: undefined,
       networkSeedVisible: false,
       showNetworkSeedCopiedTooltip: false,
       showDnaHashCopiedTooltip: false,
     };
+  },
+  computed: {
+    ...mapGetters(["appWebsocket"]),
   },
   async created() {
     await this.connectToWebsocket();
@@ -262,14 +262,9 @@ export default defineComponent({
     writeText,
     ...mapActions(["connectToWebsocket"]),
     async getNetworkInfo() {
-      // console.log("========================================");
-      // console.log("@getNetworkInfo: getting network info...")
-
       if (!this.appWebsocket) {
         await this.connectToWebsocket();
       }
-
-      // console.log("@getNetworkInfo: connected to app websocket: ", this.appWebsocket);
 
       let networkInfos: NetworkInfo[] = [];
 

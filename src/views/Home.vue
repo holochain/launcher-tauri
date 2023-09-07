@@ -130,6 +130,7 @@ import {
 } from "@holochain/client";
 import { getHappReleasesByActionHashes } from "../appstore/appstore-interface";
 import { HappReleaseEntry } from "../appstore/types";
+import { mapActions, mapGetters } from "vuex";
 
 type View =
   | {
@@ -170,16 +171,20 @@ export default defineComponent({
 
     await this.checkForUiUpdates();
   },
+  computed: {
+    ...mapGetters(["appWebsocket"]),
+  },
   methods: {
     isLoading() {
       return this.$store.state.launcherStateInfo === "loading";
     },
+    ...mapActions(["connectToWebsocket"]),
     async checkForUiUpdates() {
       const installedApps: Array<HolochainAppInfo> =
         this.$store.getters[`allApps`];
 
-      await this.$store.dispatch("connectToWebsocket");
-      const appWebsocket = this.$store.state.appWebsocket as AppWebsocket;
+      await this.connectToWebsocket();
+      const appWebsocket = this.appWebsocket as AppWebsocket;
 
       if (!appWebsocket) {
         return;
