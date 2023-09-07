@@ -85,6 +85,7 @@
     class="row"
     style="
       flex-wrap: wrap;
+      align-content: flex-start;
       margin: 16px;
       min-height: calc(100vh - 124px);
       margin-bottom: 80px;
@@ -211,7 +212,7 @@ import { HolochainId, ReleaseData, ReleaseInfo } from "../types";
 import prettyBytes from "pretty-bytes";
 import { AppEntry } from "../appstore/types";
 import { APPSTORE_APP_ID } from "../constants";
-import { mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default defineComponent({
   name: "AppStore",
@@ -315,9 +316,7 @@ export default defineComponent({
   },
   methods: {
     toSrc,
-    async connectAppWebsocket() {
-      return this.$store.dispatch("connectToWebsocket");
-    },
+    ...mapActions(["connectToWebsocket"]),
     async fetchApps(silent: boolean) {
       this.loading = silent ? false : true;
 
@@ -394,7 +393,7 @@ export default defineComponent({
 
       // 1. get happ releases for app from DevHub
       if (!this.appWebsocket) {
-        await this.connectAppWebsocket();
+        await this.connectToWebsocket();
       }
 
       this.$nextTick(() => {
@@ -418,7 +417,7 @@ export default defineComponent({
       if (!this.selectedIconSrc) {
         try {
           if (!this.appWebsocket) {
-            await this.connectAppWebsocket();
+            await this.connectToWebsocket();
           }
           this.loadingText = `Loading app icon from App Store...`;
           const collectedBytes = await collectBytes(
@@ -507,6 +506,7 @@ export default defineComponent({
       }
     },
     async selectFromFileSystem() {
+      this.selectedIconSrc = undefined;
       this.selectedAppBundlePath = (await open({
         filters: [
           { name: "Holochain Application", extensions: ["webhapp", "happ"] },
@@ -527,7 +527,7 @@ export default defineComponent({
      */
     async getQueuedBytes() {
       if (!this.appWebsocket) {
-        await this.connectAppWebsocket();
+        await this.connectToWebsocket();
       }
       const networkInfo: NetworkInfo[] = await this.appWebsocket!.networkInfo({
         agent_pub_key: getCellId(this.provisionedCells![0][1]!)![1],

@@ -54,6 +54,8 @@
 
   <Config ref="configDialog" />
 
+  <ChangeLanguage ref="change-language" />
+
   <HCLoading ref="downloading" :text="loadingText"></HCLoading>
 
   <div
@@ -161,6 +163,21 @@
       <!-- <div class="row section-container" style="display: flex; flex-direction: row;">
         Language
       </div> -->
+
+      <div class="row section">
+        <span class="section-title">{{
+          $t("dialogs.changeLanguage.languageSettings")
+        }}</span>
+      </div>
+
+      <div class="row section-container align-two-items">
+        <div style="font-size: 18px">
+          {{ $t("dialogs.changeLanguage.language") }}
+        </div>
+        <HCButton style="margin: 4px 6px" @click="openChangeLanguage()">
+          {{ capitalizeAndTranslate("setup.changeLanguage") }}</HCButton
+        >
+      </div>
 
       <!-- Advanced Settings Section -->
       <div
@@ -515,6 +532,7 @@ import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
 import StackedChart from "../components/subcomponents/StackedChart.vue";
 import { i18n } from "../locale";
 import { ActionTypes } from "../store/actions";
+import ChangeLanguage from "../components/settings/ChangeLanguage.vue";
 import {
   HolochainAppInfo,
   HolochainAppInfoExtended,
@@ -526,7 +544,9 @@ import {
   isAppPaused,
   isAppRunning,
   locatorToLocatorB64,
+  capitalizeFirstLetter,
 } from "../utils";
+import { mapGetters } from "vuex";
 
 export default defineComponent({
   name: "Settings",
@@ -534,6 +554,7 @@ export default defineComponent({
     Config,
     HCButton,
     HCDialog,
+    ChangeLanguage,
     ToggleSwitch,
     LoadingDots,
     AppSettingsCard,
@@ -549,7 +570,6 @@ export default defineComponent({
     },
   },
   data(): {
-    appWebsocket: AppWebsocket | undefined;
     appstoreAppInfo: AppInfo | undefined;
     appstoreHolochainAppInfo: HolochainAppInfo | undefined;
     devHubAppInfo: HolochainAppInfo | null;
@@ -579,7 +599,6 @@ export default defineComponent({
     return {
       appstoreAppInfo: undefined,
       appstoreHolochainAppInfo: undefined,
-      appWebsocket: undefined,
       devHubAppInfo: null,
       devModeEnabled: false,
       howToPublishUrl:
@@ -613,6 +632,7 @@ export default defineComponent({
     await this.refreshAppStates();
   },
   computed: {
+    ...mapGetters(["appWebsocket"]),
     devModeOn() {
       return this.devHubAppInfo
         ? isAppRunning(this.devHubAppInfo.webAppInfo.installed_app_info) ||
@@ -695,11 +715,18 @@ export default defineComponent({
     isAppPaused,
     isAppRunning,
     prettyBytes,
+    capitalizeAndTranslate(key: string) {
+      const translated = this.$t(key);
+      return capitalizeFirstLetter(translated);
+    },
     isLoading() {
       return this.$store.state.launcherStateInfo === "loading";
     },
     openConfig() {
       (this.$refs.configDialog as typeof Config).open();
+    },
+    openChangeLanguage() {
+      (this.$refs["change-language"] as typeof ChangeLanguage).open();
     },
     openHidden(app: HolochainAppInfoExtended) {
       return (
@@ -717,6 +744,7 @@ export default defineComponent({
       (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).close();
     },
     async refreshAppStates() {
+      console.log("Refreshing app states...");
       await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
       this.devHubAppInfo = null;
@@ -747,7 +775,7 @@ export default defineComponent({
       );
 
       await this.$store.dispatch("connectToWebsocket");
-      const appWebsocket = this.$store.state.appWebsocket as AppWebsocket;
+      const appWebsocket = this.appWebsocket;
 
       if (!appWebsocket) {
         return;
@@ -1008,7 +1036,7 @@ export default defineComponent({
             console.error(
               `Failed to get happ releases from DevHub host of network with DNA hash ${encodeHashToBase64(
                 devHubDnaHash
-              )}: ${JSON.stringify(e)}`
+              )}: ${e}`
             );
           }
         })
@@ -1192,6 +1220,11 @@ h2 {
   padding: 15px;
   box-shadow: 0 0px 5px #9b9b9b;
   margin-bottom: 20px;
+}
+
+.align-two-items {
+  align-items: center;
+  justify-content: space-between;
 }
 
 .hc-version {
