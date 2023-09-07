@@ -546,6 +546,7 @@ import {
   locatorToLocatorB64,
   capitalizeFirstLetter,
 } from "../utils";
+import { mapGetters } from "vuex";
 
 export default defineComponent({
   name: "Settings",
@@ -569,7 +570,6 @@ export default defineComponent({
     },
   },
   data(): {
-    appWebsocket: AppWebsocket | undefined;
     appstoreAppInfo: AppInfo | undefined;
     appstoreHolochainAppInfo: HolochainAppInfo | undefined;
     devHubAppInfo: HolochainAppInfo | null;
@@ -599,7 +599,6 @@ export default defineComponent({
     return {
       appstoreAppInfo: undefined,
       appstoreHolochainAppInfo: undefined,
-      appWebsocket: undefined,
       devHubAppInfo: null,
       devModeEnabled: false,
       howToPublishUrl:
@@ -633,6 +632,7 @@ export default defineComponent({
     await this.refreshAppStates();
   },
   computed: {
+    ...mapGetters(["appWebsocket"]),
     devModeOn() {
       return this.devHubAppInfo
         ? isAppRunning(this.devHubAppInfo.webAppInfo.installed_app_info) ||
@@ -775,8 +775,7 @@ export default defineComponent({
       );
 
       await this.$store.dispatch("connectToWebsocket");
-      const appWebsocket = this.$store.state.appWebsocket as AppWebsocket;
-      this.appWebsocket = appWebsocket;
+      const appWebsocket = this.appWebsocket;
 
       if (!appWebsocket) {
         return;
