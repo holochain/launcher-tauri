@@ -238,7 +238,6 @@ export default defineComponent({
     };
   },
   computed: {
-    // mix the getters into computed with object spread operator
     ...mapGetters(["appWebsocket"]),
   },
   async created() {
