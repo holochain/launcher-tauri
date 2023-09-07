@@ -508,6 +508,7 @@ export default defineComponent({
       }
     },
     async selectFromFileSystem() {
+      this.selectedIconSrc = undefined;
       this.selectedAppBundlePath = (await open({
         filters: [
           { name: "Holochain Application", extensions: ["webhapp", "happ"] },
