@@ -115,7 +115,7 @@ export async function getHappReleasesByActionHashes(
   happReleaseActionHashes: Array<ActionHash | undefined>
 ): Promise<Array<HappReleaseEntry | undefined>> {
   console.log(
-    "@getHappReleasesByActionHashes: getting happ releases by entry hashes"
+    "@getHappReleasesByActionHashes: getting happ releases by action hashes"
   );
   console.log(
     "@getHappReleasesByActionHashes: devhubDna: ",
@@ -431,9 +431,7 @@ export async function getAvailableHostForZomeFunction(
     }
   } catch (e) {
     return Promise.reject(
-      `Failed to get available host for zome ${zome_name} and function ${fn_name}: ${JSON.stringify(
-        e
-      )}`
+      `Failed to get available host for zome ${zome_name} and function ${fn_name}: ${e}`
     );
   }
 }

@@ -744,6 +744,7 @@ export default defineComponent({
       (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).close();
     },
     async refreshAppStates() {
+      console.log("Refreshing app states...");
       await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
       this.devHubAppInfo = null;
@@ -775,6 +776,7 @@ export default defineComponent({
 
       await this.$store.dispatch("connectToWebsocket");
       const appWebsocket = this.$store.state.appWebsocket as AppWebsocket;
+      this.appWebsocket = appWebsocket;
 
       if (!appWebsocket) {
         return;
@@ -1035,7 +1037,7 @@ export default defineComponent({
             console.error(
               `Failed to get happ releases from DevHub host of network with DNA hash ${encodeHashToBase64(
                 devHubDnaHash
-              )}: ${JSON.stringify(e)}`
+              )}: ${e}`
             );
           }
         })
