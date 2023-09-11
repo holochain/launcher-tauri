@@ -52,7 +52,7 @@ use crate::commands::{
   install_app::install_app,
   install_devhub::install_devhub,
   network_stats::dump_network_stats,
-  notifications::{notify_os, notify_tauri},
+  notifications::{notify_os, notify_tauri, clear_happ_notifications, clear_systray_icon},
   open_app::open_app_ui,
   password::{initialize_keystore, unlock_and_launch},
   uninstall_app::uninstall_app,
@@ -85,6 +85,8 @@ fn main() {
     })
     .invoke_handler(tauri::generate_handler![
       choose_version_for_hdk,
+      clear_happ_notifications,
+      clear_systray_icon,
       disable_app,
       delete_clone,
       dump_network_stats,

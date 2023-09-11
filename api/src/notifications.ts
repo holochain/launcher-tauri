@@ -29,7 +29,8 @@ export interface HappNotification {
    */
   body: string;
   /**
-   * type of notification, in a chat app e.g. "message" or "@mention"
+   * type of notification, in a chat app e.g. "message" or "@mention". May potentially be used to show
+   * notifications aggregated by type in notification feeds
    */
   notification_type: string;
   /**

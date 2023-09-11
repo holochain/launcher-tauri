@@ -51,7 +51,9 @@
       }${getAppStatus(app) === 'Offline/Paused' ? ' (OFFLINE/PAUSED)' : ''}`"
     >
       <!-- {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0,20) }}{{ app.webAppInfo.installed_app_info.installed_app_id.length > 20 ? '...' : '' }} -->
-      {{ app.webAppInfo.installed_app_info.installed_app_id }}
+      ({{ unreadNotifications.length }}){{
+        app.webAppInfo.installed_app_info.installed_app_id
+      }}
     </div>
   </div>
 </template>
@@ -59,25 +61,21 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { HolochainAppInfo, HolochainAppInfoExtended } from "../types";
-import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
+import {
+  isAppRunning,
+  isAppDisabled,
+  isAppPaused,
+  getReason,
+  readUnreadHappNotifications,
+} from "../utils";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
-// import "@holochain-open-dev/utils/dist/holo-identicon";
-import HoloIdenticon from "../components/subcomponents/HoloIdenticon.vue";
 
-import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
-import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
-import DisabledCloneCard from "./subcomponents/DisabledCloneCard.vue";
+import { HappNotification } from "@holochain-launcher/api";
 
 export default defineComponent({
   name: "InstalledAppCard",
-  components: {
-    HCGenericDialog,
-    HoloIdenticon,
-    InstalledCellCard,
-    DisabledCloneCard,
-  },
   props: {
     app: {
       type: Object as PropType<HolochainAppInfoExtended>,
@@ -86,12 +84,19 @@ export default defineComponent({
   },
   data(): {
     showPubKeyTooltip: boolean;
+    unreadNotifications: Array<HappNotification>;
   } {
     return {
       showPubKeyTooltip: false,
+      unreadNotifications: [],
     };
   },
   emits: ["openApp"],
+  mounted() {
+    this.unreadNotifications = readUnreadHappNotifications(
+      this.app.webAppInfo.installed_app_info.installed_app_id
+    );
+  },
   methods: {
     getReason,
     isAppRunning,

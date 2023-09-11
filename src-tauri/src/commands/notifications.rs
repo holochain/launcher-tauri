@@ -120,6 +120,29 @@ pub async fn notify_os(
 }
 
 
+#[tauri::command]
+pub async fn clear_happ_notifications(
+    app_handle: tauri::AppHandle,
+    window: tauri::Window,
+    app_id: InstalledAppId
+) -> Result<(), String> {
+    // This tauri command is allowed to be called only by the window of the corresponding app:
+    if window.label() != derive_window_label(&app_id) {
+        return Err(String::from("Unauthorized: Attempted to notifications for app that this tauri window is not associated to."))
+    }
+
+    // Send notifications to admin window to store to localStorage and check
+    // OS notification settings for this app.
+    if let Some(admin_window) = app_handle.get_window("admin") {
+        admin_window.emit("clear-happ-notifications", app_id)
+            .map_err(|e| format!("Failed to emit event to admin window: {}", e))
+    } else {
+        // The admin window must always be running invisibly in the background
+        // so this case should not occur
+        Ok(())
+    }
+}
+
 
 async fn change_systray_icon_state(
   app_handle: &tauri::AppHandle,
@@ -156,7 +179,18 @@ async fn change_systray_icon_state(
     Ok(())
 }
 
-
+#[tauri::command]
+pub async fn clear_systray_icon(
+    app_handle: tauri::AppHandle,
+  ) -> tauri::Result<()> {
+    let mutex = app_handle.state::<Mutex<SysTrayIconState>>();
+    let icon_path_option = app_handle.path_resolver().resolve_resource("icons/32x32.png");
+    if let Some(icon_path) = icon_path_option {
+        app_handle.tray_handle().set_icon(Icon::File(icon_path))?;
+    }
+    *mutex.lock().await = SysTrayIconState { icon_state: IconState::Clean };
+    Ok(())
+  }
 
 
 

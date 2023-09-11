@@ -130,6 +130,12 @@ import "@fontsource/poppins/900.css";
 import { Event, listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/tauri";
 import { NotificationPayload } from "./types";
+import {
+  clearHappNotifications,
+  storeHappNotifications,
+  validateNotifications,
+} from "./utils";
+import { InstalledAppId } from "@holochain/client";
 
 export default defineComponent({
   name: "App",
@@ -149,24 +155,29 @@ export default defineComponent({
   mounted() {
     // define window.__HC_LAUNCHER_ENV__ so that js-client routes zome-call signing to tauri
     window.__HC_LAUNCHER_ENV__ = {};
+
+    window.addEventListener("focus", async () => {
+      await invoke("clear_systray_icon", {});
+    });
+
     this.$nextTick(async () => {
       const restartDialog = this.$refs.restartDialog as typeof HCGenericDialog;
+
       await listen("request-restart", () => {
         restartDialog.open();
       });
+
       await listen(
         "happ-notifications",
         async (e: Event<NotificationPayload>) => {
-          // store to localStorage
-          // store to unread messages in store
-          console.log("Got app notification: ", e.payload);
-          // send notifications to OS
-          await invoke("notify_os", {
-            notifications: e.payload.notifications,
-            appId: e.payload.app_id,
-            systray: true,
-            os: true,
-          });
+          await this.handleNotifications(e);
+        }
+      );
+
+      await listen(
+        "clear-happ-notifications",
+        async (e: Event<InstalledAppId>) => {
+          await clearHappNotifications(e.payload);
         }
       );
     });
@@ -177,6 +188,24 @@ export default defineComponent({
   methods: {
     async restartLauncher() {
       await invoke("restart");
+    },
+    async handleNotifications(e: Event<NotificationPayload>) {
+      console.log("Got app notification: ", e.payload);
+
+      // store to localStorage - Note that app id is assumed to be unique across all holochain versions
+      // what about the case where the happ window is already open?
+      const notifications = validateNotifications(e.payload.notifications);
+      storeHappNotifications(notifications, e.payload.app_id);
+
+      // TODO check notification settings for app id
+
+      // send notifications to OS
+      await invoke("notify_os", {
+        notifications: e.payload.notifications,
+        appId: e.payload.app_id,
+        systray: true,
+        os: true,
+      });
     },
   },
 });

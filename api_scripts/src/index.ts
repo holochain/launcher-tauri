@@ -34,6 +34,12 @@ window.__HC_LAUNCHER_API__ = {
   },
 };
 
+window.addEventListener("focus", async () => {
+  await invoke("clear_happ_notifications", {
+    appId: window.__HC_LAUNCHER_ENV__.INSTALLED_APP_ID,
+  });
+});
+
 // const windowVisible = await appWindow.isVisible();
 // const now = Date.now();
 // await Promise.all(
