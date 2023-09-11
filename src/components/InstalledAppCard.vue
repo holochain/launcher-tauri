@@ -5,6 +5,7 @@
         ? 'disabled'
         : undefined
     "
+    style="position: relative"
   >
     <!-- App Logo -->
     <div
@@ -54,6 +55,25 @@
       ({{ unreadNotifications.length }}){{
         app.webAppInfo.installed_app_info.installed_app_id
       }}
+    </div>
+
+    <!-- notification dot -->
+    <div
+      class="notification-dot"
+      v-if="
+        $store.state.notificationState[
+          app.webAppInfo.installed_app_info.installed_app_id
+        ] &&
+        $store.state.notificationState[
+          app.webAppInfo.installed_app_info.installed_app_id
+        ].length > 0
+      "
+    >
+      <span style="padding: 0 5px">{{
+        $store.state.notificationState[
+          app.webAppInfo.installed_app_info.installed_app_id
+        ].length
+      }}</span>
     </div>
   </div>
 </template>
@@ -179,6 +199,21 @@ export default defineComponent({
 
 .icon-container:not(.container-disabled):focus {
   box-shadow: 0 0px 12px #676767;
+}
+
+.notification-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -8px;
+  right: -11px;
+  font-weight: bold;
+  background: #faf035;
+  border-radius: 16px;
+  height: 32px;
+  min-width: 32px;
+  box-shadow: 0 0 4px rgb(9, 9, 95);
 }
 
 .disabled {

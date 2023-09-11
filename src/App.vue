@@ -156,6 +156,8 @@ export default defineComponent({
     // define window.__HC_LAUNCHER_ENV__ so that js-client routes zome-call signing to tauri
     window.__HC_LAUNCHER_ENV__ = {};
 
+    this.$store.commit("loadNotificationState");
+
     window.addEventListener("focus", async () => {
       await invoke("clear_systray_icon", {});
     });
@@ -178,6 +180,7 @@ export default defineComponent({
         "clear-happ-notifications",
         async (e: Event<InstalledAppId>) => {
           await clearHappNotifications(e.payload);
+          this.$store.commit("loadNotificationState");
         }
       );
     });
@@ -196,6 +199,9 @@ export default defineComponent({
       // what about the case where the happ window is already open?
       const notifications = validateNotifications(e.payload.notifications);
       storeHappNotifications(notifications, e.payload.app_id);
+
+      // update store
+      this.$store.commit("loadNotificationState");
 
       // TODO check notification settings for app id
 
