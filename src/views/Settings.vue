@@ -744,7 +744,6 @@ export default defineComponent({
       (this.$refs["devModeDevsOnlyWarning"] as typeof HCDialog).close();
     },
     async refreshAppStates() {
-      console.log("Refreshing app states...");
       await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
       this.devHubAppInfo = null;
@@ -948,7 +947,6 @@ export default defineComponent({
       return app.webAppInfo.web_uis.default.type === "Headless";
     },
     async checkForUiUpdates() {
-      console.log("Checking for UI updates...");
       // check for GUI updates
       const allApps: Array<HolochainAppInfo> = this.$store.getters["allApps"];
 
@@ -984,10 +982,10 @@ export default defineComponent({
           );
 
           try {
-            console.log(
-              "@checkForUiPudates: actionHashes: ",
-              actionHashes.map((eh) => encodeHashToBase64(eh))
-            );
+            // console.log(
+            //   "@checkForUiPudates: actionHashes: ",
+            //   actionHashes.map((eh) => encodeHashToBase64(eh))
+            // );
             const happReleases: Array<HappReleaseEntry | undefined> =
               await getHappReleasesByActionHashes(
                 this.appWebsocket! as AppWebsocket,
@@ -997,14 +995,14 @@ export default defineComponent({
               );
 
             apps.forEach((app, idx) => {
-              if (happReleases[idx]) {
-                console.log(
-                  "official_gui: ",
-                  happReleases[idx]!.official_gui
-                    ? encodeHashToBase64(happReleases[idx]!.official_gui!)
-                    : undefined
-                );
-              }
+              // if (happReleases[idx]) {
+              //   console.log(
+              //     "official_gui: ",
+              //     happReleases[idx]!.official_gui
+              //       ? encodeHashToBase64(happReleases[idx]!.official_gui!)
+              //       : undefined
+              //   );
+              // }
 
               // if it's installed as a webapp and the happ release has an official GUI, check whether it's a new GUI
               if (
@@ -1016,7 +1014,7 @@ export default defineComponent({
                 const guiReleaseHash =
                   app.webAppInfo.web_uis.default.gui_release_info
                     ?.resource_locator!.resource_hash;
-                console.log("guiReleaseHash: ", guiReleaseHash);
+
                 if (guiReleaseInfo && guiReleaseHash) {
                   if (
                     guiReleaseHash !=
@@ -1057,9 +1055,8 @@ export default defineComponent({
 
         this.selectedGuiUpdate = guiReleaseResponse.content;
         this.selectedGuiUpdateLocator = app.guiUpdateAvailable;
-        console.log("Got GUI Release: ", guiReleaseResponse.content);
       } else {
-        alert!("Error: AppWebsocket or Appstore AppInfo undefined.");
+        console.error("Error: AppWebsocket or Appstore AppInfo undefined.");
         this.selectedGuiUpdate = undefined;
         this.selectedGuiUpdateLocator = undefined;
       }

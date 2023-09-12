@@ -497,12 +497,12 @@ export default defineComponent({
         return;
       }
 
-      console.log("@getReleaseDatas: got happReleases: ", happReleases);
+      // console.log("@getReleaseDatas: got happReleases: ", happReleases);
 
       // this.selectedHappReleases = happReleases.map((entity) => entity.content).sort((a, b) => b.last_updated - a.last_updated);
       const releaseDatas: Array<ReleaseData> = [];
 
-      console.log("@getReleaseDatas: fetching gui release entries...");
+      // console.log("@getReleaseDatas: fetching gui release entries...");
 
       try {
         await Promise.all(

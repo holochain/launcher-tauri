@@ -278,7 +278,6 @@ export default defineComponent({
         this.networkInfo = networkInfos[0]; // only one network info expected per cell
       } catch (e) {
         this.networkInfo = undefined;
-        console.log(`Failed to get network info: ${JSON.stringify(e)}`);
         console.error(`Failed to get network info: ${JSON.stringify(e)}`);
       }
     },

@@ -44,7 +44,7 @@
   <div
     v-if="loading"
     class="column"
-    style="flex: 1; min-height: calc(100vh - 124px); margin-top: 60px"
+    style="flex: 1; min-height: calc(100vh - 240px)"
   >
     <div class="column center-content" style="display: flex; flex: 1">
       <LoadingDots
@@ -319,7 +319,6 @@ export default defineComponent({
       );
       const filterList: Array<FilterListEntry> = await response.json();
       this.filterList = filterList;
-      console.log("Got filterlist: ", filterList);
     } catch (e) {
       console.warn("Failed to get filter list: ", e);
     }
@@ -339,36 +338,35 @@ export default defineComponent({
   computed: {
     ...mapGetters(["appWebsocket"]),
     filteredApps(): Array<AppEntry> {
-      let filteredApps: Array<AppEntry> = [];
-      if (this.installableApps.length === 0) {
-        return filteredApps;
-      }
+      if (this.installableApps.length === 0) return [];
 
-      if (this.filterList && !this.showFilteredApps) {
-        filteredApps = this.installableApps
-          .filter(
-            (appEntity) =>
-              !this.filterList!.map(
+      const listFilter =
+        this.filterList && !this.showFilteredApps
+          ? (appEntity: Entity<AppEntry>) => {
+              const filterActions = this.filterList!.map(
                 (listEntry) => listEntry.actionHash
-              ).includes(encodeHashToBase64(appEntity.action))
-          )
-          .map((appEntity) => appEntity.content);
-      } else {
-        filteredApps = this.installableApps.map(
-          (appEntity) => appEntity.content
-        );
-      }
+              );
+              return !filterActions.includes(
+                encodeHashToBase64(appEntity.action)
+              );
+            }
+          : (_appEntity: Entity<AppEntry>) => true;
 
       const searchString = (this.$refs["search-field"] as typeof HCTextField)
         .value;
-      if (searchString && searchString !== "") {
-        return filteredApps.filter(
-          (app) =>
-            app.title.toLowerCase().includes(searchString.toLowerCase()) ||
-            app.subtitle.toLowerCase().includes(searchString.toLowerCase())
+
+      const searchFilter = (app: AppEntry) => {
+        const lowerCaseSearchString = searchString.toLowerCase();
+        return (
+          app.title.toLowerCase().includes(lowerCaseSearchString) ||
+          app.subtitle.toLowerCase().includes(lowerCaseSearchString)
         );
-      }
-      return filteredApps;
+      };
+
+      return this.installableApps
+        .filter((appEntity: Entity<AppEntry>) => listFilter(appEntity))
+        .map((appEntity: Entity<AppEntry>) => appEntity.content)
+        .filter((app: AppEntry) => searchFilter(app));
     },
   },
   methods: {
@@ -390,9 +388,9 @@ export default defineComponent({
         installed_app_id: APPSTORE_APP_ID,
       });
 
-      console.log("@fetchApps: appStoreInfo: ", appStoreInfo);
+      // console.log("@fetchApps: appStoreInfo: ", appStoreInfo);
       const allCells = appStoreInfo.cell_info;
-      console.log("@fetchApps: allCells: ", allCells);
+      // console.log("@fetchApps: allCells: ", allCells);
 
       const provisionedCells: [string, CellInfo | undefined][] = Object.entries(
         allCells
@@ -403,7 +401,7 @@ export default defineComponent({
         ];
       });
 
-      console.log("@fetchApps: provisionedCells: ", provisionedCells);
+      // console.log("@fetchApps: provisionedCells: ", provisionedCells);
 
       this.provisionedCells = provisionedCells.sort(
         ([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => {
@@ -423,7 +421,7 @@ export default defineComponent({
         allApps = [];
       }
 
-      console.log("@fetchApps: allApps: ", allApps);
+      // console.log("@fetchApps: allApps: ", allApps);
 
       // filter by apps of the relevant DevHub dna hash
       // this.installableApps = allApps.filter((appEntry) => JSON.stringify(appEntry.devhub_address.dna) === JSON.stringify(DEVHUB_HAPP_LIBRARY_DNA_HASH));
@@ -540,10 +538,10 @@ export default defineComponent({
               ).open();
             });
 
-            console.log(
-              "@saveApp: selectedAppBundlePath: ",
-              this.selectedAppBundlePath
-            );
+            // console.log(
+            //   "@saveApp: selectedAppBundlePath: ",
+            //   this.selectedAppBundlePath
+            // );
           },
           this.appWebsocket as AppWebsocket,
           appStoreInfo,
