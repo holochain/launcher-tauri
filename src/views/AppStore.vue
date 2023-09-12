@@ -24,6 +24,23 @@
     </HCButton>
   </div>
 
+  <div class="row" style="justify-content: flex-end; margin-top: 70px">
+    <div
+      class="row"
+      style="align-items: center; margin-right: 10px"
+      :title="$t('appStore.showFilteredAppsTitle')"
+    >
+      <span style="margin-right: 5px">{{
+        $t("appStore.showFilteredApps")
+      }}</span>
+      <ToggleSwitch
+        :sliderOn="showFilteredApps"
+        @click="showFilteredApps = !showFilteredApps"
+        @keydown.enter="showFilteredApps = !showFilteredApps"
+      ></ToggleSwitch>
+    </div>
+  </div>
+
   <div
     v-if="loading"
     class="column"
@@ -89,20 +106,20 @@
       margin: 16px;
       min-height: calc(100vh - 124px);
       margin-bottom: 80px;
-      margin-top: 80px;
+      margin-top: 20px;
     "
   >
     <div
-      v-for="(app, i) of installableApps"
+      v-for="(appEntity, i) of installableApps"
       :key="i"
       class="column"
       style="margin-right: 16px; margin-bottom: 16px"
     >
       <AppPreviewCard
-        v-show="filteredApps.includes(app)"
-        :app="app"
+        v-show="filteredApps.includes(appEntity.content)"
+        :app="appEntity.content"
         :appWebsocket="appWebsocket"
-        @installApp="requestInstall(app, $event.imgSrc)"
+        @installApp="requestInstall(appEntity.content, $event.imgSrc)"
       />
     </div>
   </div>
@@ -208,9 +225,15 @@ import HCTextField from "../components/subcomponents/HCTextField.vue";
 import AppPreviewCard from "../components/AppPreviewCard.vue";
 import HCLoading from "../components/subcomponents/HCLoading.vue";
 import SelectReleaseDialog from "../components/SelectReleaseDialog.vue";
-import { HolochainId, ReleaseData, ReleaseInfo } from "../types";
+import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
+import {
+  FilterListEntry,
+  HolochainId,
+  ReleaseData,
+  ReleaseInfo,
+} from "../types";
 import prettyBytes from "pretty-bytes";
-import { AppEntry } from "../appstore/types";
+import { AppEntry, Entity } from "../appstore/types";
 import { APPSTORE_APP_ID } from "../constants";
 import { mapActions, mapGetters } from "vuex";
 
@@ -225,12 +248,14 @@ export default defineComponent({
     HCSnackbar,
     LoadingDots,
     SelectReleaseDialog,
+    ToggleSwitch,
   },
   emits: ["show-message", "select-view"],
   data(): {
+    filterList: Array<FilterListEntry> | undefined;
     loadingText: string;
     loading: boolean;
-    installableApps: Array<AppEntry>;
+    installableApps: Array<Entity<AppEntry>>;
     selectedAppBundlePath: string | undefined;
     holochainId: HolochainId | undefined;
     holochainSelection: boolean;
@@ -247,8 +272,10 @@ export default defineComponent({
     selectedApp: AppEntry | undefined;
     selectedIconSrc: string | undefined;
     showLoadingSpinner: boolean;
+    showFilteredApps: boolean;
   } {
     return {
+      filterList: undefined,
       loadingText: "",
       loading: true,
       installableApps: [],
@@ -268,6 +295,7 @@ export default defineComponent({
       selectedApp: undefined,
       selectedIconSrc: undefined,
       showLoadingSpinner: false,
+      showFilteredApps: false,
     };
   },
   beforeUnmount() {
@@ -285,6 +313,18 @@ export default defineComponent({
     }
 
     try {
+      // Temporary solution: Fetch centrally stored filter list to filter out orphaned apps in the appstore.
+      const response = await fetch(
+        "https://s3.eu-central-2.wasabisys.com/holochain-launcher/filter-lists/appstore_filter_list.json"
+      );
+      const filterList: Array<FilterListEntry> = await response.json();
+      this.filterList = filterList;
+      console.log("Got filterlist: ", filterList);
+    } catch (e) {
+      console.warn("Failed to get filter list: ", e);
+    }
+
+    try {
       await this.fetchApps(false);
     } catch (e) {
       console.error(`Failed to fetch apps in mounted() hook: ${e}`);
@@ -299,19 +339,36 @@ export default defineComponent({
   computed: {
     ...mapGetters(["appWebsocket"]),
     filteredApps(): Array<AppEntry> {
+      let filteredApps: Array<AppEntry> = [];
       if (this.installableApps.length === 0) {
-        return [];
+        return filteredApps;
       }
+
+      if (this.filterList && !this.showFilteredApps) {
+        filteredApps = this.installableApps
+          .filter(
+            (appEntity) =>
+              !this.filterList!.map(
+                (listEntry) => listEntry.actionHash
+              ).includes(encodeHashToBase64(appEntity.action))
+          )
+          .map((appEntity) => appEntity.content);
+      } else {
+        filteredApps = this.installableApps.map(
+          (appEntity) => appEntity.content
+        );
+      }
+
       const searchString = (this.$refs["search-field"] as typeof HCTextField)
         .value;
       if (searchString && searchString !== "") {
-        return this.installableApps.filter(
+        return filteredApps.filter(
           (app) =>
             app.title.toLowerCase().includes(searchString.toLowerCase()) ||
             app.subtitle.toLowerCase().includes(searchString.toLowerCase())
         );
       }
-      return this.installableApps;
+      return filteredApps;
     },
   },
   methods: {
@@ -354,7 +411,7 @@ export default defineComponent({
         }
       );
 
-      let allApps: Array<AppEntry>;
+      let allApps: Array<Entity<AppEntry>>;
       try {
         allApps = await getAllApps(
           this.appWebsocket! as AppWebsocket,
@@ -620,6 +677,7 @@ export default defineComponent({
   align-items: center;
   background-color: #e8e8eb;
   box-shadow: 0 0px 5px #9b9b9b;
+  z-index: 1;
 }
 
 .progress-indicator {

@@ -80,6 +80,9 @@ const messages = {
         "There are no apps available yet in the App Library or Synchronization with Peers is not complete.",
       noAppsForSearch: "No apps found for search input...",
       receivingData: "Receiving new data",
+      showFilteredApps: "show filtered apps",
+      showFilteredAppsTitle:
+        "Some apps are not shown because they are reportedly orphaned and thus cannot be downloaded from any of the recently active peers",
       searchingForPeers: "Searching for peers",
       searchingForPeersDetail:
         "Looking for other peers in the App Store network to fetch the list of installable apps.",
@@ -284,6 +287,9 @@ const messages = {
         "Es sind noch keine Apps im App Store verfügbar oder die Synchronisierung mit Peers ist noch unvollständig.",
       noAppsForSearch: "Keine Apps gefunden für die gewählte Such-Eingabe...",
       receivingData: "Neue Daten werden empfangen",
+      showFilteredApps: "gefilterete Apps anzeigen",
+      showFilteredAppsTitle:
+        "Einige Apps werden nicht angezeigt da sie verwaist sind und von keinen der in letzter Zeit aktiven Peers heruntergeladen werden können",
       searchingForPeers: "Suche Peers",
       searchingForPeersDetail:
         "Suche nach anderen Peers im App Store Netzwerk um die Liste installierbarer Apps zu erhalten.",

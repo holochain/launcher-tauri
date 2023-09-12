@@ -5,6 +5,7 @@ import {
   DnaHash,
   DnaHashB64,
   AnyDhtHashB64,
+  ActionHashB64,
 } from "@holochain/client";
 import { Entity, GUIReleaseEntry, HappReleaseEntry } from "./appstore/types";
 
@@ -185,4 +186,9 @@ export interface ReleaseData {
 export interface ReleaseInfo {
   resource_locator: ResourceLocatorB64 | undefined;
   version: string | undefined;
+}
+
+export interface FilterListEntry {
+  actionHash: ActionHashB64;
+  reason: string;
 }

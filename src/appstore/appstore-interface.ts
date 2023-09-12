@@ -29,13 +29,10 @@ import { ResourceLocator } from "../types";
 export async function getAllApps(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo
-): Promise<Array<AppEntry>> {
-  console.log("@getAllApps");
+): Promise<Array<Entity<AppEntry>>> {
   const appstoreCell = appStoreApp.cell_info["appstore"].find(
     (c) => "provisioned" in c
   );
-
-  console.log("@getAllApps: appstoreCell", appstoreCell);
 
   if (!appstoreCell) {
     throw new Error("appstore cell not found.");
@@ -49,9 +46,18 @@ export async function getAllApps(
         provenance: getCellId(appstoreCell)![1],
       });
 
-    console.log("@getAllApps: allApps", allApps);
+    console.log("@getAllApps: allApps raw", allApps);
+    console.log(
+      "@getAllApps: allApps",
+      allApps.payload.map((appEntity) => {
+        return {
+          actionHash: encodeHashToBase64(appEntity.action),
+          appEntry: appEntity.content,
+        };
+      })
+    );
 
-    return allApps.payload.map((appEntity) => appEntity.content);
+    return allApps.payload;
   }
 }
 
