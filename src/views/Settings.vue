@@ -546,6 +546,7 @@ import {
   locatorToLocatorB64,
   capitalizeFirstLetter,
 } from "../utils";
+import { mapGetters } from "vuex";
 
 export default defineComponent({
   name: "Settings",
@@ -569,7 +570,6 @@ export default defineComponent({
     },
   },
   data(): {
-    appWebsocket: AppWebsocket | undefined;
     appstoreAppInfo: AppInfo | undefined;
     appstoreHolochainAppInfo: HolochainAppInfo | undefined;
     devHubAppInfo: HolochainAppInfo | null;
@@ -599,7 +599,6 @@ export default defineComponent({
     return {
       appstoreAppInfo: undefined,
       appstoreHolochainAppInfo: undefined,
-      appWebsocket: undefined,
       devHubAppInfo: null,
       devModeEnabled: false,
       howToPublishUrl:
@@ -633,6 +632,7 @@ export default defineComponent({
     await this.refreshAppStates();
   },
   computed: {
+    ...mapGetters(["appWebsocket"]),
     devModeOn() {
       return this.devHubAppInfo
         ? isAppRunning(this.devHubAppInfo.webAppInfo.installed_app_info) ||
@@ -774,7 +774,7 @@ export default defineComponent({
       );
 
       await this.$store.dispatch("connectToWebsocket");
-      const appWebsocket = this.$store.state.appWebsocket as AppWebsocket;
+      const appWebsocket = this.appWebsocket;
 
       if (!appWebsocket) {
         return;
@@ -947,7 +947,6 @@ export default defineComponent({
       return app.webAppInfo.web_uis.default.type === "Headless";
     },
     async checkForUiUpdates() {
-      console.log("Checking for UI updates...");
       // check for GUI updates
       const allApps: Array<HolochainAppInfo> = this.$store.getters["allApps"];
 
@@ -983,10 +982,10 @@ export default defineComponent({
           );
 
           try {
-            console.log(
-              "@checkForUiPudates: actionHashes: ",
-              actionHashes.map((eh) => encodeHashToBase64(eh))
-            );
+            // console.log(
+            //   "@checkForUiPudates: actionHashes: ",
+            //   actionHashes.map((eh) => encodeHashToBase64(eh))
+            // );
             const happReleases: Array<HappReleaseEntry | undefined> =
               await getHappReleasesByActionHashes(
                 this.appWebsocket! as AppWebsocket,
@@ -996,14 +995,14 @@ export default defineComponent({
               );
 
             apps.forEach((app, idx) => {
-              if (happReleases[idx]) {
-                console.log(
-                  "official_gui: ",
-                  happReleases[idx]!.official_gui
-                    ? encodeHashToBase64(happReleases[idx]!.official_gui!)
-                    : undefined
-                );
-              }
+              // if (happReleases[idx]) {
+              //   console.log(
+              //     "official_gui: ",
+              //     happReleases[idx]!.official_gui
+              //       ? encodeHashToBase64(happReleases[idx]!.official_gui!)
+              //       : undefined
+              //   );
+              // }
 
               // if it's installed as a webapp and the happ release has an official GUI, check whether it's a new GUI
               if (
@@ -1015,7 +1014,7 @@ export default defineComponent({
                 const guiReleaseHash =
                   app.webAppInfo.web_uis.default.gui_release_info
                     ?.resource_locator!.resource_hash;
-                console.log("guiReleaseHash: ", guiReleaseHash);
+
                 if (guiReleaseInfo && guiReleaseHash) {
                   if (
                     guiReleaseHash !=
@@ -1035,7 +1034,7 @@ export default defineComponent({
             console.error(
               `Failed to get happ releases from DevHub host of network with DNA hash ${encodeHashToBase64(
                 devHubDnaHash
-              )}: ${JSON.stringify(e)}`
+              )}: ${e}`
             );
           }
         })
@@ -1056,9 +1055,8 @@ export default defineComponent({
 
         this.selectedGuiUpdate = guiReleaseResponse.content;
         this.selectedGuiUpdateLocator = app.guiUpdateAvailable;
-        console.log("Got GUI Release: ", guiReleaseResponse.content);
       } else {
-        alert!("Error: AppWebsocket or Appstore AppInfo undefined.");
+        console.error("Error: AppWebsocket or Appstore AppInfo undefined.");
         this.selectedGuiUpdate = undefined;
         this.selectedGuiUpdateLocator = undefined;
       }

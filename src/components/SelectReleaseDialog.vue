@@ -81,7 +81,7 @@
                 "
               ></span>
               <span v-if="peerHostStatus"
-                ><span style="font-weight: 600"
+                ><span style="font-weight: 600" :title="availablePeerHostList()"
                   >{{ peerHostStatus.responded.length }} available</span
                 >
                 peer host{{
@@ -309,7 +309,7 @@ import {
   HostAvailability,
   PublisherEntry,
 } from "../appstore/types";
-import { AppWebsocket } from "@holochain/client";
+import { AppWebsocket, encodeHashToBase64 } from "@holochain/client";
 import { APPSTORE_APP_ID } from "../constants";
 import {
   collectBytes,
@@ -342,7 +342,7 @@ export default defineComponent({
       required: true,
     },
     appWebsocket: {
-      type: Object as PropType<any>,
+      type: Object as PropType<AppWebsocket>,
       required: true,
     },
     imgSrc: {
@@ -442,7 +442,8 @@ export default defineComponent({
             // also succeeds (but with an empty array) if the devhub host does not yet
             // have the HappEntry which would misleadingly end up suggesting that there
             // are no happ releases for that happ.
-            const happEntry = await remoteCallToDevHubHost<Entity<HappEntry>>(
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const _happEntry = await remoteCallToDevHubHost<Entity<HappEntry>>(
               this.appWebsocket as AppWebsocket,
               appStoreInfo,
               happLocator.dna_hash,
@@ -496,12 +497,12 @@ export default defineComponent({
         return;
       }
 
-      console.log("@getReleaseDatas: got happReleases: ", happReleases);
+      // console.log("@getReleaseDatas: got happReleases: ", happReleases);
 
       // this.selectedHappReleases = happReleases.map((entity) => entity.content).sort((a, b) => b.last_updated - a.last_updated);
       const releaseDatas: Array<ReleaseData> = [];
 
-      console.log("@getReleaseDatas: fetching gui release entries...");
+      // console.log("@getReleaseDatas: fetching gui release entries...");
 
       try {
         await Promise.all(
@@ -567,6 +568,14 @@ export default defineComponent({
       );
       this.getReleaseDatasError = undefined;
     },
+    availablePeerHostList() {
+      return this.peerHostStatus && this.peerHostStatus?.responded.length > 0
+        ? this.peerHostStatus.responded
+            .map((key) => encodeHashToBase64(key))
+            .toString()
+            .replaceAll(",", "\n")
+        : undefined;
+    },
     async open() {
       (this.$refs.dialog as typeof HCDialog).open();
 
@@ -589,18 +598,18 @@ export default defineComponent({
             appStoreInfo,
             this.app.publisher
           );
+          const collectedBytes = await collectBytes(
+            this.appWebsocket,
+            appStoreInfo,
+            this.app.icon
+          );
+          this.imgSrcFetched = toSrc(
+            collectedBytes,
+            this.app.metadata.icon_mime_type
+          );
         } catch (e) {
           console.error(`Failed to fetch icon: ${JSON.stringify(e)}`);
         }
-        const collectedBytes = await collectBytes(
-          this.appWebsocket,
-          appStoreInfo,
-          this.app.icon
-        );
-        this.imgSrcFetched = toSrc(
-          collectedBytes,
-          this.app.metadata.icon_mime_type
-        );
       }
     },
     async fetchPublisher() {

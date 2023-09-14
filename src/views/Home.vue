@@ -130,6 +130,7 @@ import {
 } from "@holochain/client";
 import { getHappReleasesByActionHashes } from "../appstore/appstore-interface";
 import { HappReleaseEntry } from "../appstore/types";
+import { mapActions, mapGetters } from "vuex";
 
 type View =
   | {
@@ -170,16 +171,20 @@ export default defineComponent({
 
     await this.checkForUiUpdates();
   },
+  computed: {
+    ...mapGetters(["appWebsocket"]),
+  },
   methods: {
     isLoading() {
       return this.$store.state.launcherStateInfo === "loading";
     },
+    ...mapActions(["connectToWebsocket"]),
     async checkForUiUpdates() {
       const installedApps: Array<HolochainAppInfo> =
         this.$store.getters[`allApps`];
 
-      await this.$store.dispatch("connectToWebsocket");
-      const appWebsocket = this.$store.state.appWebsocket as AppWebsocket;
+      await this.connectToWebsocket();
+      const appWebsocket = this.appWebsocket as AppWebsocket;
 
       if (!appWebsocket) {
         return;
@@ -211,7 +216,7 @@ export default defineComponent({
 
       let updatesAvailable = false;
 
-      console.log("updatableAppsByLocatorDna: ", updatableAppsByLocatorDna);
+      // console.log("updatableAppsByLocatorDna: ", updatableAppsByLocatorDna);
 
       await Promise.allSettled(
         Object.values(updatableAppsByLocatorDna).map(async (apps) => {
@@ -225,10 +230,10 @@ export default defineComponent({
           );
 
           try {
-            console.log(
-              "@Home.vue @created: actionHashes: ",
-              actionHashes.map((eh) => encodeHashToBase64(eh))
-            );
+            // console.log(
+            //   "@Home.vue @created: actionHashes: ",
+            //   actionHashes.map((eh) => encodeHashToBase64(eh))
+            // );
             const happReleases: Array<HappReleaseEntry | undefined> =
               await getHappReleasesByActionHashes(
                 appWebsocket as AppWebsocket,
@@ -238,14 +243,14 @@ export default defineComponent({
               );
 
             apps.forEach((app, idx) => {
-              if (happReleases[idx]) {
-                console.log(
-                  "official_gui: ",
-                  happReleases[idx]!.official_gui
-                    ? encodeHashToBase64(happReleases[idx]!.official_gui!)
-                    : undefined
-                );
-              }
+              // if (happReleases[idx]) {
+              //   console.log(
+              //     "official_gui: ",
+              //     happReleases[idx]!.official_gui
+              //       ? encodeHashToBase64(happReleases[idx]!.official_gui!)
+              //       : undefined
+              //   );
+              // }
 
               // if it's installed as a webapp and the happ release has an official GUI, check whether it's a new GUI
               if (
@@ -257,7 +262,7 @@ export default defineComponent({
                 const guiReleaseHash =
                   app.webAppInfo.web_uis.default.gui_release_info
                     ?.resource_locator!.resource_hash;
-                console.log("guiReleaseHash: ", guiReleaseHash);
+                // console.log("guiReleaseHash: ", guiReleaseHash);
                 if (guiReleaseInfo && guiReleaseHash) {
                   if (
                     guiReleaseHash !=

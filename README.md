@@ -6,11 +6,11 @@ A cross-platform executable that launches a local Holochain conductor, and lets 
 
 ## Download Holochain Launcher
 
-| Operating System | [Latest Stable Release](https://github.com/holochain/launcher/releases/tag/v0.9.4)<br>(Holochain v0.1.3) | [Latest Unstable Release](https://github.com/holochain/launcher/releases/tag/v0.10.980)<br>(Holochain v0.2.X) | How to Install                          |
+| Operating System | [Latest Stable Release](https://github.com/holochain/launcher/releases/tag/v0.9.4)<br>(Holochain v0.1.3) | [Latest Unstable Release](https://github.com/holochain/launcher/releases/tag/v0.11.0)<br>(Holochain v0.2.X) | How to Install                          |
 | ---------------- | --------------------- | --------------------------- | --------------------------------------- |
-| Windows          | [Download](https://github.com/holochain/launcher/releases/download/v0.9.4/Holochain.Launcher_0.9.4_x64_en-US.msi)<br>          | [Download](https://github.com/holochain/launcher/releases/download/v0.10.980/Holochain.Launcher.Beta.2_0.10.980_x64_en-US.msi)  | [Instructions](docs/install-windows.md) |
-| macOS | [Download](https://github.com/holochain/launcher/releases/download/v0.9.4/Holochain.Launcher_0.9.4_x64.dmg) | [Download](https://github.com/holochain/launcher/releases/download/v0.10.980/Holochain.Launcher.Beta.2_0.10.980_x64.dmg) |  [Instructions](docs/install-macos.md) |
-| Linux | [.AppImage](https://github.com/holochain/launcher/releases/download/v0.9.4/holochain-launcher_0.9.4_amd64.AppImage)<br>[.deb](https://github.com/holochain/launcher/releases/download/v0.9.4/holochain-launcher_0.9.4_amd64.deb) | [.AppImage](https://github.com/holochain/launcher/releases/download/v0.10.980/holochain-launcher-beta-2_0.10.980_amd64.AppImage)<br>[.deb](https://github.com/holochain/launcher/releases/download/v0.10.980/holochain-launcher-beta-2_0.10.980_amd64.deb) | [Instructions](docs/install-linux.md) |
+| Windows          | [Download](https://github.com/holochain/launcher/releases/download/v0.9.4/Holochain.Launcher_0.9.4_x64_en-US.msi)<br>          | [Download](https://github.com/holochain/launcher/releases/download/v0.11.0/Holochain.Launcher.Beta.2_0.11.0_x64_en-US.msi)  | [Instructions](docs/install-windows.md) |
+| macOS | [Download](https://github.com/holochain/launcher/releases/download/v0.9.4/Holochain.Launcher_0.9.4_x64.dmg) | [Download](https://github.com/holochain/launcher/releases/download/v0.11.0/Holochain.Launcher.Beta.2_0.11.0_x64.dmg) |  [Instructions](docs/install-macos.md) |
+| Linux | [.AppImage](https://github.com/holochain/launcher/releases/download/v0.9.4/holochain-launcher_0.9.4_amd64.AppImage)<br>[.deb](https://github.com/holochain/launcher/releases/download/v0.9.4/holochain-launcher_0.9.4_amd64.deb) | [.AppImage](https://github.com/holochain/launcher/releases/download/v0.11.0/holochain-launcher-beta-2_0.11.0_amd64.AppImage)<br>[.deb](https://github.com/holochain/launcher/releases/download/v0.11.0/holochain-launcher-beta-2_0.11.0_amd64.deb) | [Instructions](docs/install-linux.md) |
 
 
 

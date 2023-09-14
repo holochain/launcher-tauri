@@ -106,7 +106,7 @@
         </svg>
 
         <div
-          v-show="showNetworkSeedCopiedTooltip"
+          v-show="!!showNetworkSeedCopiedTooltip"
           style="
             background: black;
             color: white;
@@ -117,7 +117,7 @@
             padding: 2px 5px;
           "
         >
-          {{ $t("main.copied") }}!
+          {{ showNetworkSeedCopiedTooltip }}
         </div>
         <img
           src="/img/copy_icon.svg"
@@ -199,7 +199,6 @@
 import { defineComponent, PropType } from "vue";
 
 import {
-  AppWebsocket,
   NetworkInfo,
   CellInfo,
   encodeHashToBase64,
@@ -209,7 +208,8 @@ import prettyBytes from "pretty-bytes";
 
 import { getCellId, getCellName, getCellNetworkSeed } from "../../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
+import { i18n } from "../../locale";
 
 export default defineComponent({
   name: "InstalledCellCard",
@@ -226,19 +226,20 @@ export default defineComponent({
   data(): {
     pollInterval: number | null;
     networkInfo: NetworkInfo | undefined;
-    appWebsocket: AppWebsocket | undefined;
     networkSeedVisible: boolean;
-    showNetworkSeedCopiedTooltip: boolean;
+    showNetworkSeedCopiedTooltip: string | undefined;
     showDnaHashCopiedTooltip: boolean;
   } {
     return {
       pollInterval: null,
       networkInfo: undefined,
-      appWebsocket: undefined,
       networkSeedVisible: false,
-      showNetworkSeedCopiedTooltip: false,
+      showNetworkSeedCopiedTooltip: undefined,
       showDnaHashCopiedTooltip: false,
     };
+  },
+  computed: {
+    ...mapGetters(["appWebsocket"]),
   },
   async created() {
     await this.connectToWebsocket();
@@ -262,14 +263,9 @@ export default defineComponent({
     writeText,
     ...mapActions(["connectToWebsocket"]),
     async getNetworkInfo() {
-      // console.log("========================================");
-      // console.log("@getNetworkInfo: getting network info...")
-
       if (!this.appWebsocket) {
         await this.connectToWebsocket();
       }
-
-      // console.log("@getNetworkInfo: connected to app websocket: ", this.appWebsocket);
 
       let networkInfos: NetworkInfo[] = [];
 
@@ -283,7 +279,6 @@ export default defineComponent({
         this.networkInfo = networkInfos[0]; // only one network info expected per cell
       } catch (e) {
         this.networkInfo = undefined;
-        console.log(`Failed to get network info: ${JSON.stringify(e)}`);
         console.error(`Failed to get network info: ${JSON.stringify(e)}`);
       }
     },
@@ -294,10 +289,11 @@ export default defineComponent({
       const networkSeed = getCellNetworkSeed(this.cellInfo);
       if (networkSeed) {
         writeText(networkSeed);
-        this.showNetworkSeedCopiedTooltip = true;
-        setTimeout(() => (this.showNetworkSeedCopiedTooltip = false), 1500);
+        this.showNetworkSeedCopiedTooltip = i18n.global.t("main.copied");
+        setTimeout(() => (this.showNetworkSeedCopiedTooltip = undefined), 1500);
       } else {
-        writeText("");
+        this.showNetworkSeedCopiedTooltip = i18n.global.t("main.nothingToCopy");
+        setTimeout(() => (this.showNetworkSeedCopiedTooltip = undefined), 1500);
       }
     },
     copyDnaHash() {
