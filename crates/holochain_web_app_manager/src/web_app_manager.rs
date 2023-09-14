@@ -549,7 +549,7 @@ impl WebAppManager {
 
     let app_gui_dir = app_ui_dir(&self.environment_path, app_id, ui_name);
     create_dir_if_necessary(&app_gui_dir)
-      .map_err(|e| format!("Failed to create app's data directory before storing happ release hash: {:?}", e))?;
+      .map_err(|e| format!("Failed to create app's data directory before storing gui release hash: {:?}", e))?;
 
     let dot_guirelease_path = app_gui_dir.join(".guirelease");
     // if there is already a .guirelease file, store its contents to a .guirelease.previous file in order to be able
