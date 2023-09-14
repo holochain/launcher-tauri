@@ -86,7 +86,7 @@ import prettyBytes from "pretty-bytes";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 import { AppInfo, AppWebsocket } from "@holochain/client";
 import { i18n } from "../locale";
-import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
+import { APPSTORE_APP_ID, DEVHUB_APP_ID, OLD_APPSTORE_APP_ID } from "../constants";
 
 
 export default defineComponent({
@@ -148,6 +148,7 @@ export default defineComponent({
       sortedAppList = sortedAppList.filter(
         (app) => app.webAppInfo.installed_app_info.installed_app_id !== APPSTORE_APP_ID
         && app.webAppInfo.installed_app_info.installed_app_id !== DEVHUB_APP_ID
+        && app.webAppInfo.installed_app_info.installed_app_id !== OLD_APPSTORE_APP_ID
         && app.webAppInfo.web_uis.default.type !== "Headless"
       );
 
