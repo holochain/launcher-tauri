@@ -2,14 +2,13 @@ import { createI18n } from "vue-i18n";
 
 // a mapping between locale abbreviations and full Language names
 export const languageNames = {
-  "de": "🇩🇪 Deutsch",
-  "en": "🇬🇧 English",
-  "fr": "🇫🇷 Français",
-  "it": "🇮🇹 Italiano",
-}
+  de: "🇩🇪 Deutsch",
+  en: "🇬🇧 English",
+  fr: "🇫🇷 Français",
+  it: "🇮🇹 Italiano",
+};
 
 const messages = {
-
   // =========================================================================
   // 🇬🇧 ENGLISH
   // =========================================================================
@@ -39,7 +38,8 @@ const messages = {
       copyNetworkSeed: "Copy Network Seed",
       cloneName: "Name",
       developerMode: "Developer Mode",
-      devModeExplainer: "If you are an app developer and want to publish apps, activate the developer mode.",
+      devModeExplainer:
+        "If you are an app developer and want to publish apps, activate the developer mode.",
       happVersion: "happ Version",
       hide: "Hide",
       hideNetworkSeed: "Hide Network Seed",
@@ -54,6 +54,7 @@ const messages = {
       noApps: "There are no apps installed",
       noClonedCells: "There are no cloned cells in this app.",
       noDisabledClonedCells: "There are no disabled cloned cells in this app.",
+      nothingToCopy: "Nothing to copy...",
       outgoing: "outgoing",
       refresh: "Refresh",
       reportIssue: "Report Issue",
@@ -71,7 +72,8 @@ const messages = {
       activeDataExchanges: "currently ongoing data exchanges with peers",
       appStore: "App Store",
       appLibrarySynchronization: "App Library Synchronization",
-      fullSynchronizationRequired: "Full synchronization with peers required to reliably download all apps.",
+      fullSynchronizationRequired:
+        "Full synchronization with peers required to reliably download all apps.",
       inQueue: "in queue",
       noOngoingPeerSynchronization: "no ongoing peer synchronization",
       selectAppFromFileSystem: "Select app from filesystem",
@@ -81,10 +83,12 @@ const messages = {
       receivingData: "Receiving new data",
       showFilteredApps: "show filtered apps",
       showFilteredAppsTitle:
-        "Some apps are not shown because they are reportedly orphaned and thus cannot be downloaded from any of the recently active peers",
+        "Some apps may not be shown because they are reportedly orphaned and thus cannot be downloaded from any of the recently active peers",
       searchingForPeers: "Searching for peers",
-      searchingForPeersDetail: "Looking for other peers in the App Store network to fetch the list of installable apps.",
-      synchronizationNotCompleteError: "App Library Synchronization not Complete. Please try again later."
+      searchingForPeersDetail:
+        "Looking for other peers in the App Store network to fetch the list of installable apps.",
+      synchronizationNotCompleteError:
+        "App Library Synchronization not Complete. Please try again later.",
     },
     launcher: {
       filesystem: "Filesystem",
@@ -93,20 +97,22 @@ const messages = {
     settings: {
       advancedSettings: "Advanced Settings",
       appSettings: "App Settings",
-      appSettingsHelper: "Settings for Holochain Apps with Graphical User Interfaces",
+      appSettingsHelper:
+        "Settings for Holochain Apps with Graphical User Interfaces",
       headlessApps: "Headless Apps",
       headlessAppsHelper: "Holochain Apps without Graphical User Interface",
       holochainVersions: "Holochain Versions",
       holochainVersionsHelper: "Installed Holochain Versions",
       launcherConfiguration: "Launcher Configuration",
-      launcherConfigurationDescription: "Adjust log level, bootstrap server, proxy server, or use a custom holochain binary",
+      launcherConfigurationDescription:
+        "Adjust log level, bootstrap server, proxy server, or use a custom holochain binary",
       noHeadlessApps: "There are no headless apps installed",
       noHolochainVersions: "There are no Holochain versions installed.",
       noWebApps: "There are no web apps installed",
       openAppStore: "Open App Store",
       openDevHub: "Open Dev Hub",
       publicKey: "Public Key",
-      publishAnApp: "Publish an app"
+      publishAnApp: "Publish an app",
     },
     buttons: {
       back: "Back",
@@ -136,7 +142,7 @@ const messages = {
         restoreDefaults: "Reset to Default Values",
         useMdns: "Use MDNS.",
         useMdnsNote: "This will disable bootstrap & proxy configurations.",
-        saveAndRestart:"Save and Restart",
+        saveAndRestart: "Save and Restart",
       },
       restart:
         "Do you want to clean up all holochain processes and restart the Holochain Launcher?",
@@ -165,7 +171,7 @@ const messages = {
         part1:
           "Unfortunately, the Holochain Launcher does not support a password recovery mechanism at this stage.",
         part2:
-        "Your only option is to do a factory reset (Settings > Factory Reset) to delete your current profile alongside with all your holochain apps and restart from scratch. You will need to select the option \"Delete data of ALL Holochain versions, reset password and delete private keys\".",
+          'Your only option is to do a factory reset (Settings > Factory Reset) to delete your current profile alongside with all your holochain apps and restart from scratch. You will need to select the option "Delete data of ALL Holochain versions, reset password and delete private keys".',
       },
       factoryReset: {
         title: "Factory Reset",
@@ -180,7 +186,8 @@ const messages = {
         optionalDeletions: "Optional:",
         deleteLair: "Delete Private Keys",
         deleteLogs: "Delete Logs",
-        deleteAllHolochainVersions: "(not recommended) Delete data of ALL Holochain versions, reset password and delete private keys. This can include deletion of Holochain versions that are or were used by other versions of the Holochain Launcher."
+        deleteAllHolochainVersions:
+          "(not recommended) Delete data of ALL Holochain versions, reset password and delete private keys. This can include deletion of Holochain versions that are or were used by other versions of the Holochain Launcher.",
       },
       guiUpdate: {
         title: "UI Update",
@@ -194,12 +201,15 @@ const messages = {
         language: "Language",
         languageSettings: "Language Settings",
       },
-      confirmUninstallApp: "Are you sure you want to uninstall this App? This will irrevocably delete all data stored in it.",
+      confirmUninstallApp:
+        "Are you sure you want to uninstall this App? This will irrevocably delete all data stored in it.",
       confirmUninstallDevHub: {
         text: "Uninstalling the DevHub means that you permanently lose editor access to any apps that you have published with this instance of the DevHub (i.e. with the associated public key). This means that you won't be able to publish any further releases or updates to those apps - even if you later reinstall the DevHub.",
-        confirmation: "I have read the warning and confirm that I want to uninstall the DevHub."
+        confirmation:
+          "I have read the warning and confirm that I want to uninstall the DevHub.",
       },
-      confirmUninstallCell: "Are you sure you want to delete this cell? This will irrevocably delete all data stored in it.",
+      confirmUninstallCell:
+        "Are you sure you want to delete this cell? This will irrevocably delete all data stored in it.",
       networkStats: {
         networkStats: "Network Statistics",
         changeHolochainVersion: "Choose Holochain Version",
@@ -237,7 +247,8 @@ const messages = {
       copyNetworkSeed: "Network Seed kopieren",
       cloneName: "Name",
       developerMode: "Entwickler Modus",
-      devModeExplainer: "Wenn du ein App-Entwickler bist und Apps publizieren möchtest, kannst du den Entwickler-Modus aktivieren.",
+      devModeExplainer:
+        "Wenn du ein App-Entwickler bist und Apps publizieren möchtest, kannst du den Entwickler-Modus aktivieren.",
       happVersion: "happ Version",
       hide: "Verbergen",
       hideNetworkSeed: "Network Seed verbergen",
@@ -252,6 +263,7 @@ const messages = {
       noClonedCells: "Diese App hat keine Cloned Cells.",
       noDisabledClonedCells: "Diese App hat keine deaktivierten Cloned Cells.",
       noApps: "Es sind keine Apps installiert.",
+      nothingToCopy: "Nichts zu kopieren...",
       outgoing: "ausgehend",
       refresh: "Aktualisieren",
       reportIssue: "Problem Melden",
@@ -269,7 +281,8 @@ const messages = {
       activeDataExchanges: "Zurzeit aktiver Datenaustausch mit Peers",
       appStore: "App Store",
       appLibrarySynchronization: "App Store Synchronisation",
-      fullSynchronizationRequired: "Vollständige Synchronisation mit Peers erforderlich, um alle Apps herunterladen zu können.",
+      fullSynchronizationRequired:
+        "Vollständige Synchronisation mit Peers erforderlich, um alle Apps herunterladen zu können.",
       inQueue: "ausstehend",
       noOngoingPeerSynchronization: "keine aktiven Synchronisationen mit Peers",
       selectAppFromFileSystem: "Installiere App von Datei",
@@ -279,10 +292,12 @@ const messages = {
       receivingData: "Neue Daten werden empfangen",
       showFilteredApps: "gefilterete Apps anzeigen",
       showFilteredAppsTitle:
-        "Einige Apps werden nicht angezeigt da sie verwaist sind und von keinen der in letzter Zeit aktiven Peers heruntergeladen werden können",
+        "Einige Apps werden möglicherweise nicht angezeigt da sie verwaist sind und von keinen der in letzter Zeit aktiven Peers heruntergeladen werden können",
       searchingForPeers: "Suche Peers",
-      searchingForPeersDetail: "Suche nach anderen Peers im App Store Netzwerk um die Liste installierbarer Apps zu erhalten.",
-      synchronizationNotCompleteError: "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut."
+      searchingForPeersDetail:
+        "Suche nach anderen Peers im App Store Netzwerk um die Liste installierbarer Apps zu erhalten.",
+      synchronizationNotCompleteError:
+        "App Store Synchronisation noch nicht abgeschlossen. Bitte versuche es später erneut.",
     },
     launcher: {
       filesystem: "Aus Datei",
@@ -291,13 +306,15 @@ const messages = {
     settings: {
       advancedSettings: "Erweiterte Einstellungen",
       appSettings: "App Settings",
-      appSettingsHelper: "Einstellungen für Holochain Apps mit Graphischer Benutzeroberfläche",
+      appSettingsHelper:
+        "Einstellungen für Holochain Apps mit Graphischer Benutzeroberfläche",
       headlessApps: "Headless Apps",
       headlessAppsHelper: "Holochain Apps ohne Graphische Benutzeroberfläche",
       holochainVersions: "Holochain Versionen",
       holochainVersionsHelper: "Installierte Holochain Versionen",
       launcherConfiguration: "Launcher Konfiguration",
-      launcherConfigurationDescription: "Passen Sie die Protokollebene, den Bootstrap-Server, den Proxy-Server an oder verwenden Sie eine benutzerdefinierte Holochain-Binärdatei",
+      launcherConfigurationDescription:
+        "Passen Sie die Protokollebene, den Bootstrap-Server, den Proxy-Server an oder verwenden Sie eine benutzerdefinierte Holochain-Binärdatei",
       noHeadlessApps: "Es sind keine Headless Apps installiert",
       noHolochainVersions: "Es sind keine Holochain Versionen installiert.",
       noWebApps: "Es sind keine Web Apps installiert",
@@ -334,7 +351,7 @@ const messages = {
         restoreDefaults: "Zurücksetzen zu Standardwerten",
         useMdns: "Benutze MDNS.",
         useMdnsNote: "Dies deaktiviert die Bootstrap & Proxy Konfigurationen.",
-        saveAndRestart:"Speichern und Neustart",
+        saveAndRestart: "Speichern und Neustart",
       },
       restart:
         "Möchtest du alle Holochain Prozesse beenden und den Holochain Launcher neu starten?",
@@ -363,7 +380,7 @@ const messages = {
         part1:
           "Leider unterstützt Holochain Launcher momentan noch keinen Passwort Wiederherstellungs-Mechanismus.",
         part2:
-        "Die einzige Option ist, den Holochain Launcher komplett zurückzusetzen (Settings > Factory Reset) um dein Profil und all deine Holochain Apps zu löschen und von vorne zu beginnen. Du musst dabei die Option \"Daten ALLER Holochain Versionen löschen, Passwort zurücksetzen und Private Keys löschen\" wählen.",
+          'Die einzige Option ist, den Holochain Launcher komplett zurückzusetzen (Settings > Factory Reset) um dein Profil und all deine Holochain Apps zu löschen und von vorne zu beginnen. Du musst dabei die Option "Daten ALLER Holochain Versionen löschen, Passwort zurücksetzen und Private Keys löschen" wählen.',
       },
       factoryReset: {
         title: "Zurücksetzen",
@@ -378,7 +395,8 @@ const messages = {
         optionalDeletions: "Optional:",
         deleteLair: "Private Schlüssel löschen",
         deleteLogs: "Log Dateien löschen",
-        deleteAllHolochainVersions: "(Nicht empfohlen) Daten ALLER Holochain Versionen löschen, Passwort zurücksetzen und Private Keys löschen. Dies kann das Löschen von Holochain Versionen beinhalten, die von anderen Versionen des Holochain Launcher verwendet werden oder wurden."
+        deleteAllHolochainVersions:
+          "(Nicht empfohlen) Daten ALLER Holochain Versionen löschen, Passwort zurücksetzen und Private Keys löschen. Dies kann das Löschen von Holochain Versionen beinhalten, die von anderen Versionen des Holochain Launcher verwendet werden oder wurden.",
       },
       guiUpdate: {
         title: "UI Update",
@@ -392,12 +410,15 @@ const messages = {
         language: "Sprache",
         languageSettings: "Sprach-Einstellungen",
       },
-      confirmUninstallApp: "Bist du sicher, dass du diese App deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
+      confirmUninstallApp:
+        "Bist du sicher, dass du diese App deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
       confirmUninstallDevHub: {
         text: "Wenn du den DevHub deinstallierst verlierst du unwiderruflich die Bearbeitungsrechte für jegliche Apps die du mit dieser DevHub-Instanz (sprich mit dem dazugehörigen Public Key) publiziert hast. Dies bedeutet, dass du keine weiteren Releases oder Updates für diese Apps mehr publizieren kannst - auch dann, wenn du den DevHub wieder neu installierst.",
-        confirmation: "Ich habe die Warning gelesen und bestätige, dass ich den DevHub deinstallieren möchte."
+        confirmation:
+          "Ich habe die Warning gelesen und bestätige, dass ich den DevHub deinstallieren möchte.",
       },
-      confirmUninstallCell: "Bist du sicher, dass du diese Cell deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
+      confirmUninstallCell:
+        "Bist du sicher, dass du diese Cell deinstallieren möchtest? Dies wird unwiderruflich alle Daten löschen, die darin gespeichert sind.",
       networkStats: {
         networkStats: "Netzwerkstatistik",
         changeHolochainVersion: "Holochain Version",
@@ -406,8 +427,6 @@ const messages = {
     },
   },
 };
-
-
 
 export const i18n = createI18n({
   locale: "en",
