@@ -28,40 +28,38 @@ jobs:
       - name: install Go stable
         uses: actions/setup-go@v4
         with:
-          go-version: 'stable'
+          go-version: "stable"
       - name: install app dependencies and info
         run: npm install && npm run tauri info
-
 
       - name: setup binaries (Windows only)
         if: matrix.platform == 'windows-2019'
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.4 lair_keystore
+          cargo install --version 0.3.0 lair_keystore
           $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
-          Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.2.4-x86_64-pc-windows-msvc.exe
+          Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.3.0-x86_64-pc-windows-msvc.exe
 
 
-          cargo install holochain --version 0.1.5 --features sqlite-encrypted
+          cargo install holochain --version 0.1.6 --features sqlite-encrypted
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
-          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.1.5-Beta-x86_64-pc-windows-msvc.exe
+          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.1.6-Beta-x86_64-pc-windows-msvc.exe
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
-
 
       - name: setup binaries (macos only)
         if: matrix.platform == 'macos-11'
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.4 lair_keystore
+          cargo install --version 0.3.0 lair_keystore
           LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.4-x86_64-apple-darwin
+          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.3.0-x86_64-apple-darwin
 
-          cargo install holochain --version 0.1.5 --features sqlite-encrypted
+          cargo install holochain --version 0.1.6 --features sqlite-encrypted
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.1.5-Beta-x86_64-apple-darwin
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.1.6-Beta-x86_64-apple-darwin
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
@@ -71,20 +69,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev libcanberra-gtk-module libcanberra-gtk3-module build-essential curl wget libssl-dev libgtk-3-dev squashfs-tools libgtksourceview-3.0-dev libappindicator3-dev patchelf librsvg2-dev ayatana-indicator-application
 
-
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.2.4 lair_keystore
+          cargo install --version 0.3.0 lair_keystore
           LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.4-x86_64-unknown-linux-gnu
+          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.3.0-x86_64-unknown-linux-gnu
 
 
-          cargo install holochain --version 0.1.5 --features sqlite-encrypted
+          cargo install holochain --version 0.1.6 --features sqlite-encrypted
           HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.1.5-Beta-x86_64-unknown-linux-gnu
+          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.1.6-Beta-x86_64-unknown-linux-gnu
 
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
@@ -137,7 +134,6 @@ jobs:
         env:
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-
 
       - name: upload signed .msi, .msi.zip, .msi.zip.sig files to github release (Windows only)
         uses: matthme/tauri-action-ev-signing@dist

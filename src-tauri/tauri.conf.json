@@ -37,8 +37,8 @@
       ],
       "resources": [],
       "externalBin": [
-        "bins/holochain-v0.1.5-Beta",
-        "bins/lair-keystore-v0.2.4"
+        "bins/holochain-v0.1.6-Beta",
+        "bins/lair-keystore-v0.3.0"
       ],
       "copyright": "",
       "category": "DeveloperTool",

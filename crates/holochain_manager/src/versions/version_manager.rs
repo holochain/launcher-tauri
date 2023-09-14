@@ -1,4 +1,3 @@
-use holochain_p2p_0_1_5::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::lair_keystore_api::dependencies::serde_yaml::mapping;
 use serde_yaml::{Mapping, Value};
 use std::path::PathBuf;
 
@@ -16,7 +15,7 @@ pub trait VersionManager {
 
   fn lair_keystore_version(&self) -> LairKeystoreVersion {
     // For now all holochain versions run the same lair keystore version
-    LairKeystoreVersion::V0_2
+    LairKeystoreVersion::V0_3
   }
 
   fn initial_config(

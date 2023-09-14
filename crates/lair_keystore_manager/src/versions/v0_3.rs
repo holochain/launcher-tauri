@@ -16,7 +16,7 @@ use super::{
 };
 use crate::{error::LairKeystoreError, utils::create_dir_if_necessary, LairKeystoreManager};
 
-pub struct LairKeystoreManagerV0_2 {
+pub struct LairKeystoreManagerV0_3 {
   _keystore_path: PathBuf,
   connection_url: Url2,
   password: String,
@@ -24,9 +24,9 @@ pub struct LairKeystoreManagerV0_2 {
 }
 
 #[async_trait]
-impl LairKeystoreManager for LairKeystoreManagerV0_2 {
+impl LairKeystoreManager for LairKeystoreManagerV0_3 {
   fn lair_keystore_version() -> LairKeystoreVersion {
-    LairKeystoreVersion::V0_2
+    LairKeystoreVersion::V0_3
   }
 
   fn is_initialized(keystore_path: PathBuf) -> bool {
@@ -51,7 +51,7 @@ impl LairKeystoreManager for LairKeystoreManagerV0_2 {
       .map_err(|e| LairKeystoreError::ErrorCreatingLairClient(format!("Failed to create LairClient: {:?}", e)))?;
 
 
-    Ok(LairKeystoreManagerV0_2 {
+    Ok(LairKeystoreManagerV0_3 {
       password,
       connection_url,
       _keystore_path: keystore_path,
