@@ -156,8 +156,8 @@
         </div>
 
         <div v-else-if="getReleaseDatasError" style="background: #f4b2b2; padding: 5px 10px; border-radius: 5px; width: 610px;">
-          <b>Error getting releases from peer host:</b><br>
-          {{ getReleaseDatasError }}
+          <span v-if="getReleaseDatasError.type == 'noHosts'"><b>Error:</b> No peer host(s) found.</span>
+          <span v-else><b>Error:</b> Failed to fetch releases from peer host(s). See console for details.</span>
         </div>
 
         <div v-else class="column" style="align-items: center; width: 100%;">
@@ -196,10 +196,15 @@ import HCSnackbar from "./subcomponents/HCSnackbar.vue";
 
 import { ResourceLocator, ReleaseData } from "../types";
 import { AppEntry, Entity, GUIReleaseEntry, HappReleaseEntry, HostAvailability, PublisherEntry } from "../appstore/types";
-import { AppWebsocket, encodeHashToBase64 } from "@holochain/client";
+import { AppWebsocket } from "@holochain/client";
 import { APPSTORE_APP_ID } from "../constants";
-import { collectBytes, fetchGuiReleaseEntry, getHappReleases, getHappReleasesFromHost, getPublisher, getVisibleHostsForZomeFunction, remoteCallToDevHubHost, tryWithHosts } from "../appstore/appstore-interface";
+import { getHappReleasesFromHost, getPublisher, getVisibleHostsForZomeFunction, remoteCallToDevHubHost, tryWithHosts } from "../appstore/appstore-interface";
 import { HappEntry } from "../devhub/types";
+
+interface GetReleasesError {
+  type: "noHosts" | "other",
+  error: string,
+}
 
 export default defineComponent({
   name: "SelectReleaseDialog",
@@ -227,7 +232,7 @@ export default defineComponent({
     snackbarText: string | undefined;
     error: boolean;
     locale: string;
-    getReleaseDatasError: string | undefined;
+    getReleaseDatasError: GetReleasesError | undefined;
     peerHostStatus: HostAvailability | undefined;
     pollInterval: number | null;
     publisher: PublisherEntry | undefined;
@@ -301,7 +306,6 @@ export default defineComponent({
 
       // first try to get HappEntry to ensure that happ is available at all
       // otherwise cascade to another host.
-
       try {
         happReleases = await tryWithHosts(
           async (host) => {
@@ -334,13 +338,28 @@ export default defineComponent({
         )
         // happReleases = await getHappReleases(this.appWebsocket as AppWebsocket, appStoreInfo, happLocator)
       } catch (e) {
-        this.getReleaseDatasError = `Failed to find available releases: ${JSON.stringify(e)}`;
-        console.error(`Failed to find available releases: ${JSON.stringify(e)}`)
-        return;
+        if (JSON.stringify(e).includes("No available peer host found")) {
+          this.getReleaseDatasError = {
+            type: "noHosts",
+            error: "No available peer host found.",
+          };
+          console.error(`Failed to find available releases: ${JSON.stringify(e)}`)
+          return;
+        } else {
+          this.getReleaseDatasError = {
+            type: "other",
+            error: `Failed to find available releases: ${JSON.stringify(e)}`
+          };
+          console.error(`Failed to find available releases: ${JSON.stringify(e)}`)
+          return;
+        }
       }
 
       if (!happReleases) {
-        this.getReleaseDatasError = `Failed to find available releases: happReleases undefined.`;
+        this.getReleaseDatasError = {
+          type: "other",
+          error: `Failed to find available releases: happReleases undefined.`
+        };
         return;
       }
 
@@ -387,10 +406,17 @@ export default defineComponent({
         );
       } catch (e) {
         if (JSON.stringify(e).includes("No available peer host found")) {
-          this.getReleaseDatasError = "No available peer host found.";
+          this.getReleaseDatasError = {
+            type: "noHosts",
+            error: "No available peer host found.",
+          };
+          console.error(`Failed to find available releases: ${JSON.stringify(e)}`)
           return;
         } else {
-          this.getReleaseDatasError = `Failed to find available releases: ${JSON.stringify(e)}`;
+          this.getReleaseDatasError = {
+            type: "other",
+            error: `Failed to find available releases: ${JSON.stringify(e)}`
+          };
           console.error(`Failed to find available releases: ${JSON.stringify(e)}`)
           return;
         }
