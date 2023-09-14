@@ -179,7 +179,6 @@ impl HolochainManager {
       installed_app_id: Some(app_id.clone().into()),
       membrane_proofs,
       network_seed,
-      ignore_genesis_failure: false,
     };
     self
       .ws

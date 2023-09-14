@@ -54,6 +54,7 @@ const messages = {
       noApps: "There are no apps installed",
       noClonedCells: "There are no cloned cells in this app.",
       noDisabledClonedCells: "There are no disabled cloned cells in this app.",
+      nothingToCopy: "Nothing to copy...",
       outgoing: "outgoing",
       refresh: "Refresh",
       reportIssue: "Report Issue",
@@ -82,7 +83,7 @@ const messages = {
       receivingData: "Receiving new data",
       showFilteredApps: "show filtered apps",
       showFilteredAppsTitle:
-        "Some apps are not shown because they are reportedly orphaned and thus cannot be downloaded from any of the recently active peers",
+        "Some apps may not be shown because they are reportedly orphaned and thus cannot be downloaded from any of the recently active peers",
       searchingForPeers: "Searching for peers",
       searchingForPeersDetail:
         "Looking for other peers in the App Store network to fetch the list of installable apps.",
@@ -261,6 +262,7 @@ const messages = {
       noClonedCells: "Diese App hat keine Cloned Cells.",
       noDisabledClonedCells: "Diese App hat keine deaktivierten Cloned Cells.",
       noApps: "Es sind keine Apps installiert.",
+      nothingToCopy: "Nichts zu kopieren...",
       outgoing: "ausgehend",
       refresh: "Aktualisieren",
       reportIssue: "Problem Melden",
@@ -289,7 +291,7 @@ const messages = {
       receivingData: "Neue Daten werden empfangen",
       showFilteredApps: "gefilterete Apps anzeigen",
       showFilteredAppsTitle:
-        "Einige Apps werden nicht angezeigt da sie verwaist sind und von keinen der in letzter Zeit aktiven Peers heruntergeladen werden können",
+        "Einige Apps werden möglicherweise nicht angezeigt da sie verwaist sind und von keinen der in letzter Zeit aktiven Peers heruntergeladen werden können",
       searchingForPeers: "Suche Peers",
       searchingForPeersDetail:
         "Suche nach anderen Peers im App Store Netzwerk um die Liste installierbarer Apps zu erhalten.",

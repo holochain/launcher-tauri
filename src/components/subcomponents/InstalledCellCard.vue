@@ -106,7 +106,7 @@
         </svg>
 
         <div
-          v-show="showNetworkSeedCopiedTooltip"
+          v-show="!!showNetworkSeedCopiedTooltip"
           style="
             background: black;
             color: white;
@@ -117,7 +117,7 @@
             padding: 2px 5px;
           "
         >
-          {{ $t("main.copied") }}!
+          {{ showNetworkSeedCopiedTooltip }}
         </div>
         <img
           src="/img/copy_icon.svg"
@@ -209,6 +209,7 @@ import prettyBytes from "pretty-bytes";
 import { getCellId, getCellName, getCellNetworkSeed } from "../../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
 import { mapActions, mapGetters } from "vuex";
+import { i18n } from "../../locale";
 
 export default defineComponent({
   name: "InstalledCellCard",
@@ -226,14 +227,14 @@ export default defineComponent({
     pollInterval: number | null;
     networkInfo: NetworkInfo | undefined;
     networkSeedVisible: boolean;
-    showNetworkSeedCopiedTooltip: boolean;
+    showNetworkSeedCopiedTooltip: string | undefined;
     showDnaHashCopiedTooltip: boolean;
   } {
     return {
       pollInterval: null,
       networkInfo: undefined,
       networkSeedVisible: false,
-      showNetworkSeedCopiedTooltip: false,
+      showNetworkSeedCopiedTooltip: undefined,
       showDnaHashCopiedTooltip: false,
     };
   },
@@ -288,10 +289,11 @@ export default defineComponent({
       const networkSeed = getCellNetworkSeed(this.cellInfo);
       if (networkSeed) {
         writeText(networkSeed);
-        this.showNetworkSeedCopiedTooltip = true;
-        setTimeout(() => (this.showNetworkSeedCopiedTooltip = false), 1500);
+        this.showNetworkSeedCopiedTooltip = i18n.global.t("main.copied");
+        setTimeout(() => (this.showNetworkSeedCopiedTooltip = undefined), 1500);
       } else {
-        writeText("");
+        this.showNetworkSeedCopiedTooltip = i18n.global.t("main.nothingToCopy");
+        setTimeout(() => (this.showNetworkSeedCopiedTooltip = undefined), 1500);
       }
     },
     copyDnaHash() {
