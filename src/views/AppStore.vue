@@ -52,7 +52,18 @@
     </div>
   </div>
 
-  <div ref="apps-list" v-else class="row" style="flex-wrap: wrap; margin: 16px; min-height: calc(100vh - 124px); margin-bottom: 80px; margin-top: 80px;">
+  <div
+    ref="apps-list"
+    v-else
+    class="row"
+    style="
+      flex-wrap: wrap;
+      align-content: flex-start;
+      margin: 16px;
+      min-height: calc(100vh - 124px);
+      margin-bottom: 80px;
+      margin-top: 80px;"
+    >
     <div
       v-for="(app, i) of installableApps"
       :key="i"

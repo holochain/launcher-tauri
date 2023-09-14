@@ -58,7 +58,7 @@
           <div>
             <div class="row" style="align-items: center;" title="number of known peers that are part of the app distribution peer network and currently responsive">
               <span style="background-color: #17d310; border-radius: 50%; width: 10px; height: 10px; margin-right: 10px;"></span>
-              <span v-if="peerHostStatus"><span style="font-weight: 600;">{{ peerHostStatus.responded.length }} available</span> peer host{{ peerHostStatus.responded.length === 1 ? "" : "s"}}</span>
+              <span v-if="peerHostStatus"><span style="font-weight: 600;" :title="availablePeerHostList()">{{ peerHostStatus.responded.length }} available</span> peer host{{ peerHostStatus.responded.length === 1 ? "" : "s"}}</span>
               <span v-else>pinging peer hosts...</span>
             </div>
             <div class="row" style="align-items: center;" title="number of known peers that registered themselves in the app distribution peer network but are currently unresponsive">
@@ -196,7 +196,7 @@ import HCCircularProgress from "./subcomponents/HCCircularProgress.vue";
 
 import { ResourceLocator, ReleaseData } from "../types";
 import { AppEntry, Entity, GUIReleaseEntry, HappReleaseEntry, HostAvailability, PublisherEntry } from "../appstore/types";
-import { AppWebsocket } from "@holochain/client";
+import { AppWebsocket, encodeHashToBase64 } from "@holochain/client";
 import { APPSTORE_APP_ID } from "../constants";
 import { collectBytes, getHappReleasesFromHost, getPublisher, getVisibleHostsForZomeFunction, remoteCallToDevHubHost, tryWithHosts } from "../appstore/appstore-interface";
 import { HappEntry } from "../devhub/types";
@@ -319,7 +319,8 @@ export default defineComponent({
             // also succeeds (but with an empty array) if the devhub host does not yet
             // have the HappEntry which would misleadingly end up suggesting that there
             // are no happ releases for that happ.
-            const happEntry = await remoteCallToDevHubHost<Entity<HappEntry>>(
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const _happEntry = await remoteCallToDevHubHost<Entity<HappEntry>>(
               this.appWebsocket as AppWebsocket,
               appStoreInfo,
               happLocator.dna_hash,
@@ -431,6 +432,14 @@ export default defineComponent({
       this.releaseDatas = releaseDatas.sort((a, b) => b.happRelease.content.published_at - a.happRelease.content.published_at);
       this.getReleaseDatasError = undefined;
     },
+    availablePeerHostList() {
+      return this.peerHostStatus && this.peerHostStatus?.responded.length > 0
+        ? this.peerHostStatus.responded
+            .map((key) => encodeHashToBase64(key))
+            .toString()
+            .replaceAll(",", "\n")
+        : undefined;
+    },
     async open() {
       (this.$refs.dialog as typeof HCDialog).open();
 
@@ -449,11 +458,11 @@ export default defineComponent({
             installed_app_id: APPSTORE_APP_ID,
           });
           this.publisher = await getPublisher(this.appWebsocket, appStoreInfo, this.app.publisher);
+          const collectedBytes = await collectBytes(this.appWebsocket, appStoreInfo, this.app.icon);
+          this.imgSrcFetched = toSrc(collectedBytes, this.app.metadata.icon_mime_type);
         } catch (e) {
           console.error(`Failed to fetch icon: ${JSON.stringify(e)}`)
         }
-        const collectedBytes = await collectBytes(this.appWebsocket, appStoreInfo, this.app.icon);
-        this.imgSrcFetched = toSrc(collectedBytes, this.app.metadata.icon_mime_type);
       }
     },
     async fetchPublisher() {
