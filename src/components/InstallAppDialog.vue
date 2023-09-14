@@ -12,10 +12,9 @@
       "
     >
       <!-- <img class="halo" src="/img/Holochain_Halo_no_gradient.svg" /> -->
-      <mwc-circular-progress
-        indeterminate
+      <HCCircularProgress
         style="margin-top: 40px; margin-bottom: 40px"
-      ></mwc-circular-progress>
+      ></HCCircularProgress>
       <div style="margin-bottom: 10px">Processing file...</div>
     </div>
 
@@ -31,10 +30,9 @@
       "
     >
       <!-- <img class="halo" src="/img/Holochain_Halo_no_gradient.svg" /> -->
-      <mwc-circular-progress
-        indeterminate
+      <HCCircularProgress
         style="margin-top: 40px; margin-bottom: 40px"
-      ></mwc-circular-progress>
+      ></HCCircularProgress>
       <div style="margin-bottom: 10px">Installing...</div>
     </div>
 
@@ -197,6 +195,7 @@ import { toUint8Array } from "js-base64";
 import { encodeHashToBase64 } from "@holochain/client";
 
 import HCButton from "./subcomponents/HCButton.vue";
+import HCCircularProgress from "./subcomponents/HCCircularProgress.vue";
 import HCDialog from "./subcomponents/HCDialog.vue";
 import HCTextField from "./subcomponents/HCTextField.vue";
 import HCTextArea from "./subcomponents/HCTextArea.vue";
@@ -215,6 +214,7 @@ export default defineComponent({
   name: "InstallAppDialog",
   emits: ["error", "closing-dialog", "app-installed"],
   components: {
+    HCCircularProgress,
     HCDialog,
     HCTextField,
     HCTextArea,
