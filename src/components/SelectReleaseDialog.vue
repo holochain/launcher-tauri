@@ -11,8 +11,8 @@
         <div class="row" style="align-items: center; margin-bottom: 20px;">
           <!-- if icon provided -->
           <img
-            v-if="imgSrc"
-            :src="imgSrc"
+            v-if="imgSrc || imgSrcFetched"
+            :src="imgSrc ? imgSrc : imgSrcFetched"
             alt="app icon"
             style="
               width: 120px;
@@ -141,10 +141,7 @@
                   <!-- GUI version as well here? Needs to be fetched independently from a DevHub host -->
                 </div>
                 <span style="display: flex; flex: 1;"></span>
-                <HCButton @click="() => {
-                  $emit('release-selected', releaseDatas ? releaseDatas[0] : undefined);
-                  close();
-                }">Install</HCButton>
+                <HCButton @click="() => releaseSelected()">Install</HCButton>
               </div>
             </div>
 
@@ -155,9 +152,12 @@
           There are no installable releases available for this app.
         </div>
 
-        <div v-else-if="getReleaseDatasError" style="background: #f4b2b2; padding: 5px 10px; border-radius: 5px; width: 610px;">
-          <span v-if="getReleaseDatasError.type == 'noHosts'"><b>Error:</b> No peer host(s) found.</span>
-          <span v-else><b>Error:</b> Failed to fetch releases from peer host(s). See console for details.</span>
+        <div v-else-if="getReleaseDatasError" class="column" style="align-items: center;">
+          <div style="background: #f4b2b2; padding: 5px 10px; border-radius: 5px; width: 610px;">
+            <span v-if="getReleaseDatasError.type == 'noHosts'"><b>Error:</b> No peer host(s) found.</span>
+            <span v-else><b>Error:</b> Failed to fetch releases from peer host(s). See console for details.</span>
+          </div>
+          <HCButton @click="async () => await getReleaseDatas()" style="margin-top: 10px;">{{ $t('buttons.retry') }}</HCButton>
         </div>
 
         <div v-else class="column" style="align-items: center; width: 100%;">
@@ -198,8 +198,9 @@ import { ResourceLocator, ReleaseData } from "../types";
 import { AppEntry, Entity, GUIReleaseEntry, HappReleaseEntry, HostAvailability, PublisherEntry } from "../appstore/types";
 import { AppWebsocket } from "@holochain/client";
 import { APPSTORE_APP_ID } from "../constants";
-import { getHappReleasesFromHost, getPublisher, getVisibleHostsForZomeFunction, remoteCallToDevHubHost, tryWithHosts } from "../appstore/appstore-interface";
+import { collectBytes, getHappReleasesFromHost, getPublisher, getVisibleHostsForZomeFunction, remoteCallToDevHubHost, tryWithHosts } from "../appstore/appstore-interface";
 import { HappEntry } from "../devhub/types";
+import { toSrc } from "../utils";
 
 interface GetReleasesError {
   type: "noHosts" | "other",
@@ -233,6 +234,7 @@ export default defineComponent({
     error: boolean;
     locale: string;
     getReleaseDatasError: GetReleasesError | undefined;
+    imgSrcFetched: string | undefined;
     peerHostStatus: HostAvailability | undefined;
     pollInterval: number | null;
     publisher: PublisherEntry | undefined;
@@ -244,6 +246,7 @@ export default defineComponent({
       error: false,
       locale: "en-US",
       getReleaseDatasError: undefined,
+      imgSrcFetched: undefined,
       peerHostStatus: undefined,
       pollInterval: null,
       publisher: undefined,
@@ -290,6 +293,8 @@ export default defineComponent({
   },
   methods: {
     async getReleaseDatas(): Promise<void> {
+
+      this.getReleaseDatasError = undefined;
 
       const appStoreInfo = await this.appWebsocket!.appInfo({
         installed_app_id: APPSTORE_APP_ID,
@@ -428,6 +433,29 @@ export default defineComponent({
     async open() {
       (this.$refs.dialog as typeof HCDialog).open();
 
+      await Promise.all([
+        this.fetchPublisher(),
+        this.fetchIconIfNecessary(),
+        this.getReleaseDatas()
+      ])
+    },
+    async fetchIconIfNecessary() {
+      // if icon not provided already by AppStore component, fetch it explicitly
+      if (!this.imgSrc) {
+        let appStoreInfo = undefined;
+        try {
+          appStoreInfo = await this.appWebsocket!.appInfo({
+            installed_app_id: APPSTORE_APP_ID,
+          });
+          this.publisher = await getPublisher(this.appWebsocket, appStoreInfo, this.app.publisher);
+        } catch (e) {
+          console.error(`Failed to fetch icon: ${JSON.stringify(e)}`)
+        }
+        const collectedBytes = await collectBytes(this.appWebsocket, appStoreInfo, this.app.icon);
+        this.imgSrcFetched = toSrc(collectedBytes, this.app.metadata.icon_mime_type);
+      }
+    },
+    async fetchPublisher() {
       let appStoreInfo = undefined;
 
       try {
@@ -438,9 +466,16 @@ export default defineComponent({
       } catch (e) {
         console.error(`Failed to get publisher info: ${JSON.stringify(e)}`)
       }
-
-      await this.getReleaseDatas();
-
+    },
+    releaseSelected() {
+      this.$emit(
+        'release-selected',
+        {
+          releaseData: this.releaseDatas ? this.releaseDatas[0] : undefined,
+          appEntry: this.app
+        }
+      );
+      this.close();
     },
     close() {
       (this.$refs.dialog as typeof HCDialog).close();
