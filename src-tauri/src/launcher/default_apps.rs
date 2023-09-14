@@ -11,7 +11,8 @@ use holochain_web_app_manager::{WebAppManager, ReleaseInfo};
 const APPSTORE_VERSION: &str = "5265a828ae96915786a3f9b22a37aa64a0e1d7a3"; // shasum
 pub const DEVHUB_VERSION: &str = "c81126389eff0ad6b28357df28633bb34b8f6a94"; // shasum
 
-const APPSTORE_APP_ID: &str = "AppStore";
+const APPSTORE_APP_ID: &str = "App Store";
+const OLD_APPSTORE_APP_ID: &str = "AppStore";
 pub const DEVHUB_APP_ID: &str = "DevHub";
 
 
@@ -32,7 +33,7 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
     window.emit("progress-update", String::from("Installing AppStore"))
       .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
-    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { None };
+    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { Some(String::from("launcher")) };
 
     let happ_release_info = ReleaseInfo {
       resource_locator: None,
@@ -55,6 +56,16 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
         Some(gui_release_info),
       )
       .await?;
+
+    // try disabling old appstore
+    // emitting signal to the front-end for progress indication
+    window.emit("progress-update", String::from("Disabling previous AppStore"))
+      .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
+    match manager.disable_app(OLD_APPSTORE_APP_ID.into()).await {
+      Ok(()) => (),
+      Err(_) => (),
+    }
+
   } else { // If the AppStore is already installed, check UI version
 
     // emitting signal to the front-end for progress indication

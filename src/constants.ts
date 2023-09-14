@@ -1,7 +1,7 @@
 import { DnaHash, DnaHashB64, decodeHashFromBase64 } from "@holochain/client";
 
 
-export const APPSTORE_APP_ID = "AppStore";
+export const APPSTORE_APP_ID = "App Store";
 export const DEVHUB_APP_ID = "DevHub";
 
 // hard coded dna hash of the DevHub in use
