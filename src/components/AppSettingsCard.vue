@@ -3,32 +3,39 @@
     @confirm="uninstallApp(app)"
     closeOnSideClick
     ref="uninstall-app-dialog"
-    :primaryButtonLabel="uninstalling ? $t('buttons.uninstalling') : $t('buttons.uninstall')"
+    :primaryButtonLabel="
+      uninstalling ? $t('buttons.uninstalling') : $t('buttons.uninstall')
+    "
     :primaryButtonDisabled="uninstalling"
     ><div style="text-align: center">
-      {{ $t('dialogs.confirmUninstallApp') }}
+      {{ $t("dialogs.confirmUninstallApp") }}
     </div>
   </HCGenericDialog>
 
-
   <HCGenericDialog
-    @confirm="uninstallApp(app);"
+    @confirm="uninstallApp(app)"
     @closing="confirmUninstallDevHub = false"
     closeOnSideClick
     ref="uninstall-devhub-dialog"
-    :primaryButtonLabel="uninstalling ? $t('buttons.uninstalling') : $t('buttons.uninstall')"
+    :primaryButtonLabel="
+      uninstalling ? $t('buttons.uninstalling') : $t('buttons.uninstall')
+    "
     :primaryButtonDisabled="!confirmUninstallDevHub || uninstalling"
   >
-    <div style="text-align: center; padding: 0 20px;">
-      <h1 style="margin-top: -10px;">{{ $t('dialogs.warning') }}</h1>
-      <div style="text-align: left; margin-top: 40px;">{{ $t('dialogs.confirmUninstallDevHub.text') }}</div>
-      <div class="row" style="margin-top: 40px; margin-left: 10px;">
+    <div style="text-align: center; padding: 0 20px">
+      <h1 style="margin-top: -10px">{{ $t("dialogs.warning") }}</h1>
+      <div style="text-align: left; margin-top: 40px">
+        {{ $t("dialogs.confirmUninstallDevHub.text") }}
+      </div>
+      <div class="row" style="margin-top: 40px; margin-left: 10px">
         <ToggleSwitch
           :sliderOn="confirmUninstallDevHub"
           @click="confirmUninstallDevHub = !confirmUninstallDevHub"
           @keydown.enter="confirmUninstallDevHub = !confirmUninstallDevHub"
         ></ToggleSwitch>
-        <div style="text-align: left; margin-left: 20px;">{{ $t('dialogs.confirmUninstallDevHub.confirmation') }}</div>
+        <div style="text-align: left; margin-left: 20px">
+          {{ $t("dialogs.confirmUninstallDevHub.confirmation") }}
+        </div>
       </div>
     </div>
   </HCGenericDialog>
@@ -44,7 +51,7 @@
         height: 110px;
       "
     >
-    <!-- App Logo with Holo Identicon -->
+      <!-- App Logo with Holo Identicon -->
       <div style="position: relative">
         <img
           v-if="app.webAppInfo.icon_src"
@@ -87,7 +94,9 @@
       >
         <div
           :class="{
-            running: isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info),
+            running:
+              isAppRunning(app.webAppInfo.installed_app_info) ||
+              isAppPaused(app.webAppInfo.installed_app_info),
             stopped: isAppDisabled(app.webAppInfo.installed_app_info),
             paused: false,
           }"
@@ -98,17 +107,40 @@
       </sl-tooltip>
       <!-- ----------------- -->
 
+      <!-- Deprecation Notice -->
+      <div
+        v-if="
+          deprecatedApps.includes(
+            app.webAppInfo.installed_app_info.installed_app_id
+          )
+        "
+        title="This app has been deprecated and the new version was automatically installed."
+        style="
+          display: flex;
+          font-size: 23px;
+          font-weight: 600;
+          margin-right: 30px;
+          word-break: break-all;
+          color: #c72b2b;
+        "
+      >
+        DEPRECATED
+      </div>
+
       <!-- spacer -->
-      <div style="flex: 1;"></div>
+      <div style="flex: 1"></div>
 
       <!-- GUI update available Icon -->
       <div
-        v-if="
-          app.guiUpdateAvailable
-        "
-        style="display: flex; position: relative;"
+        v-if="app.guiUpdateAvailable"
+        style="display: flex; position: relative"
       >
-        <sl-tooltip class="tooltip" hoist placement="top" content="New UI available">
+        <sl-tooltip
+          class="tooltip"
+          hoist
+          placement="top"
+          content="New UI available"
+        >
           <!-- <img
             tabindex="0"
             style="margin-right: 29px; width: 24px; cursor: pointer"
@@ -124,7 +156,17 @@
           >
             Update
           </div>
-          <div style="background: rgb(255, 217, 0); border-radius: 50%; height: 15px; width: 15px; position: absolute; bottom: 20px; right: 22px;"></div>
+          <div
+            style="
+              background: rgb(255, 217, 0);
+              border-radius: 50%;
+              height: 15px;
+              width: 15px;
+              position: absolute;
+              bottom: 20px;
+              right: 22px;
+            "
+          ></div>
         </sl-tooltip>
       </div>
       <!-- -------------------- -->
@@ -132,7 +174,10 @@
       <!-- Open App Icon Button -->
       <div
         v-if="
-          (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) && !isAppHeadless(app) && !hideOpenButton
+          (isAppRunning(app.webAppInfo.installed_app_info) ||
+            isAppPaused(app.webAppInfo.installed_app_info)) &&
+          !isAppHeadless(app) &&
+          !hideOpenButton
         "
         style="display: flex"
       >
@@ -188,11 +233,11 @@
     <div
       v-if="showMore"
       class="column appDetails"
-      style="align-items: left; margin-bottom: 20px; padding-left: 115px;"
+      style="align-items: left; margin-bottom: 20px; padding-left: 115px"
     >
       <div class="row">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
-          >{{ $t('main.holochainVersion') }}:</span
+          >{{ $t("main.holochainVersion") }}:</span
         >
         <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
           app.holochainId.type === "CustomBinary"
@@ -208,35 +253,50 @@
         > -->
       </div>
 
-      <div class="row" style="margin-top: -10px;">
+      <div class="row" style="margin-top: -10px">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
-          >{{ $t('main.happVersion') }}:</span
+          >{{ $t("main.happVersion") }}:</span
         >
         <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
-          app.webAppInfo.happ_release_info?.version ? app.webAppInfo.happ_release_info.version : $t('main.unknown')
+          app.webAppInfo.happ_release_info?.version
+            ? app.webAppInfo.happ_release_info.version
+            : $t("main.unknown")
         }}</span>
       </div>
 
-      <div class="row" style="margin-top: -15px;">
+      <div class="row" style="margin-top: -15px">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
-          >{{ $t('main.uiVersion') }}:</span
+          >{{ $t("main.uiVersion") }}:</span
         >
         <span style="opacity: 0.7; font-family: monospace: font-size: 1em;">{{
-          ((app.webAppInfo.web_uis.default?.type === "WebApp")
-            && app.webAppInfo.web_uis.default?.gui_release_info?.version)
+          app.webAppInfo.web_uis.default?.type === "WebApp" &&
+          app.webAppInfo.web_uis.default?.gui_release_info?.version
             ? app.webAppInfo.web_uis.default.gui_release_info.version
-            : $t('main.unknown')
+            : $t("main.unknown")
         }}</span>
       </div>
 
       <!-- Public Key -->
-      <div class="row" style="align-items: center;">
+      <div class="row" style="align-items: center">
         <!-- assumes same agent pub key for all cells (just taking the first one) -->
         <!-- <div v-show="showPubKeyTooltip" class="tooltip">Copied!</div> -->
-        <span style="margin-right: 10px; font-weight: bold; font-size: 1em; vertical-align: middle;"
-          >{{ $t('settings.publicKey') }}:</span
+        <span
+          style="
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 1em;
+            vertical-align: middle;
+          "
+          >{{ $t("settings.publicKey") }}:</span
         >
-        <sl-tooltip class="tooltip" hoist placement="top" :content="showPubKeyTooltip ? $t('main.copied') : $t('main.yourPublicKey')">
+        <sl-tooltip
+          class="tooltip"
+          hoist
+          placement="top"
+          :content="
+            showPubKeyTooltip ? $t('main.copied') : $t('main.yourPublicKey')
+          "
+        >
           <HoloIdenticon
             class="holoIdenticon"
             :hash="getPubKey()"
@@ -249,17 +309,20 @@
       </div>
 
       <!-- provisioned cells -->
-      <div
-        class="row"
-        style="margin-right: 30px"
-      >
+      <div class="row" style="margin-right: 30px">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Provisioned Cells:</span
-        ><span style="display: flex; flex: 1">{{ provisionedCells.length }}</span>
+        ><span style="display: flex; flex: 1">{{
+          provisionedCells.length
+        }}</span>
         <span
           style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
           @click="showProvisionedCells = !showProvisionedCells"
-          >{{ showProvisionedCells ? `[${$t('main.hide')}]` : `[${$t('main.show')}]` }}
+          >{{
+            showProvisionedCells
+              ? `[${$t("main.hide")}]`
+              : `[${$t("main.show")}]`
+          }}
         </span>
       </div>
       <div v-if="showProvisionedCells" style="margin-right: 20px">
@@ -275,23 +338,21 @@
       </div>
 
       <!-- enabled cloned cells -->
-      <div
-        class="row"
-        style="margin-top: 20px; margin-right: 30px"
-      >
+      <div class="row" style="margin-top: 20px; margin-right: 30px">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Cloned Cells:</span
-        ><span style="display: flex; flex: 1">{{ enabledClonedCells.length }}</span>
+        ><span style="display: flex; flex: 1">{{
+          enabledClonedCells.length
+        }}</span>
         <span
           style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
           @click="showClonedCells = !showClonedCells"
-          >{{ showClonedCells ? `[${$t('main.hide')}]` : `[${$t('main.show')}]` }}
+          >{{
+            showClonedCells ? `[${$t("main.hide")}]` : `[${$t("main.show")}]`
+          }}
         </span>
       </div>
-      <div
-        v-if="showClonedCells"
-        style="margin-right: 20px"
-      >
+      <div v-if="showClonedCells" style="margin-right: 20px">
         <div v-if="enabledClonedCells.length > 0">
           <InstalledCellCard
             v-for="[roleName, cellInfo] in enabledClonedCells"
@@ -308,30 +369,29 @@
         </div>
       </div>
 
-
       <!-- disabled cloned cells -->
-      <div
-        class="row"
-        style="margin-top: 20px; margin-right: 30px"
-      >
+      <div class="row" style="margin-top: 20px; margin-right: 30px">
         <span style="margin-right: 10px; font-weight: bold; font-size: 1em"
           >Disabled Cloned Cells:</span
-        ><span style="display: flex; flex: 1">{{ disabledClonedCells.length }}</span>
+        ><span style="display: flex; flex: 1">{{
+          disabledClonedCells.length
+        }}</span>
         <span
           style="opacity: 0.7; cursor: pointer; font-size: 0.8em"
           @click="showDisabledClonedCells = !showDisabledClonedCells"
-          >{{ showDisabledClonedCells ? `[${$t('main.hide')}]` : `[${$t('main.show')}]` }}
+          >{{
+            showDisabledClonedCells
+              ? `[${$t("main.hide")}]`
+              : `[${$t("main.show")}]`
+          }}
         </span>
       </div>
-      <div
-        v-if="showDisabledClonedCells"
-        style="margin-right: 20px"
-      >
+      <div v-if="showDisabledClonedCells" style="margin-right: 20px">
         <div v-if="disabledClonedCells.length > 0">
           <DisabledCloneCard
             v-for="[roleName, cellInfo] in disabledClonedCells"
             :key="roleName"
-            style="margin: 12px 0;"
+            style="margin: 12px 0"
             :cellInfo="cellInfo"
             :roleName="roleName"
             :holochainId="app.holochainId"
@@ -347,7 +407,7 @@
 
       <span
         v-if="getReason(app.webAppInfo.installed_app_info)"
-        style="margin-top: 16px;"
+        style="margin-top: 16px"
       >
         {{ getReason(app.webAppInfo.installed_app_info) }}
       </span>
@@ -395,7 +455,7 @@
           >{{ $t("buttons.enable") }}
         </HCButton>
         <HCButton
-          style="--hc-primary-color: #008704;"
+          style="--hc-primary-color: #008704"
           v-if="false"
           @click="startApp(app)"
           outlined
@@ -409,9 +469,22 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { HolochainAppInfo, HolochainAppInfoExtended } from "../types";
-import { isAppRunning, isAppDisabled, isAppPaused, getReason, flattenCells, getCellId } from "../utils";
+import {
+  isAppRunning,
+  isAppDisabled,
+  isAppPaused,
+  getReason,
+  flattenCells,
+  getCellId,
+} from "../utils";
 import { writeText } from "@tauri-apps/api/clipboard";
-import { CellInfo, CellType, ClonedCell, encodeHashToBase64, NetworkInfo } from "@holochain/client";
+import {
+  CellInfo,
+  CellType,
+  ClonedCell,
+  encodeHashToBase64,
+  NetworkInfo,
+} from "@holochain/client";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
@@ -424,7 +497,12 @@ import HCMoreToggle from "./subcomponents/HCMoreToggle.vue";
 import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
 import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
 import DisabledCloneCard from "./subcomponents/DisabledCloneCard.vue";
-import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
+import {
+  APPSTORE_APP_ID,
+  DEVHUB_APP_ID,
+  OLD_APPSTORE_APP_ID,
+  OLD_DEVHUB_APP_ID,
+} from "../constants";
 
 export default defineComponent({
   name: "AppSettingsCard",
@@ -447,10 +525,11 @@ export default defineComponent({
     },
     hideOpenButton: {
       type: Boolean,
-    }
+    },
   },
   data(): {
     confirmUninstallDevHub: boolean;
+    deprecatedApps: Array<string>;
     showMore: boolean;
     showPubKeyTooltip: boolean;
     gossipInfo: Record<string, NetworkInfo>;
@@ -461,6 +540,7 @@ export default defineComponent({
   } {
     return {
       confirmUninstallDevHub: false,
+      deprecatedApps: [OLD_APPSTORE_APP_ID, OLD_DEVHUB_APP_ID],
       showMore: false,
       showPubKeyTooltip: false,
       gossipInfo: {},
@@ -470,28 +550,52 @@ export default defineComponent({
       uninstalling: false,
     };
   },
-  emits: ["openApp", "enableApp", "disableApp", "startApp", "uninstallApp", "updateGui"],
+  emits: [
+    "openApp",
+    "enableApp",
+    "disableApp",
+    "startApp",
+    "uninstallApp",
+    "updateGui",
+  ],
   computed: {
     provisionedCells(): [string, CellInfo][] {
-      const provisionedCells = flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
+      const provisionedCells = flattenCells(
+        this.app.webAppInfo.installed_app_info.cell_info
+      )
         .filter(([_roleName, cellInfo]) => "provisioned" in cellInfo)
-        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
-      return provisionedCells
+        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) =>
+          roleName_a.localeCompare(roleName_b)
+        );
+      return provisionedCells;
     },
     enabledClonedCells(): [string, CellInfo][] {
       return flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
         .filter(([_roleName, cellInfo]) => "cloned" in cellInfo)
-        .filter(([_roleName, cellInfo]) => (cellInfo as { [CellType.Cloned]: ClonedCell }).cloned.enabled)
-        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
+        .filter(
+          ([_roleName, cellInfo]) =>
+            (cellInfo as { [CellType.Cloned]: ClonedCell }).cloned.enabled
+        )
+        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) =>
+          roleName_a.localeCompare(roleName_b)
+        );
     },
     disabledClonedCells(): [string, CellInfo][] {
       return flattenCells(this.app.webAppInfo.installed_app_info.cell_info)
         .filter(([_roleName, cellInfo]) => "cloned" in cellInfo)
-        .filter(([_roleName, cellInfo]) => !(cellInfo as { [CellType.Cloned]: ClonedCell }).cloned.enabled)
-        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => roleName_a.localeCompare(roleName_b));
+        .filter(
+          ([_roleName, cellInfo]) =>
+            !(cellInfo as { [CellType.Cloned]: ClonedCell }).cloned.enabled
+        )
+        .sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) =>
+          roleName_a.localeCompare(roleName_b)
+        );
     },
     isSliderOn() {
-      return (isAppRunning(this.app.webAppInfo.installed_app_info) || isAppPaused(this.app.webAppInfo.installed_app_info));
+      return (
+        isAppRunning(this.app.webAppInfo.installed_app_info) ||
+        isAppPaused(this.app.webAppInfo.installed_app_info)
+      );
     },
   },
   methods: {
@@ -506,8 +610,13 @@ export default defineComponent({
       return app.webAppInfo.web_uis.default.type === "Headless";
     },
     requestUninstall() {
-      if (this.app.webAppInfo.installed_app_info.installed_app_id === DEVHUB_APP_ID) {
-        (this.$refs["uninstall-devhub-dialog"] as typeof HCGenericDialog).open();
+      if (
+        this.app.webAppInfo.installed_app_info.installed_app_id ===
+        DEVHUB_APP_ID
+      ) {
+        (
+          this.$refs["uninstall-devhub-dialog"] as typeof HCGenericDialog
+        ).open();
       } else {
         (this.$refs["uninstall-app-dialog"] as typeof HCGenericDialog).open();
       }
@@ -526,7 +635,10 @@ export default defineComponent({
       this.uninstalling = true;
     },
     getAppStatus(app: HolochainAppInfo) {
-      if (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) {
+      if (
+        isAppRunning(app.webAppInfo.installed_app_info) ||
+        isAppPaused(app.webAppInfo.installed_app_info)
+      ) {
         return "Running";
       }
       if (isAppDisabled(app.webAppInfo.installed_app_info)) {
@@ -543,7 +655,10 @@ export default defineComponent({
       return installedAppId !== APPSTORE_APP_ID;
     },
     async handleSlider(app: HolochainAppInfo) {
-      if (isAppRunning(app.webAppInfo.installed_app_info) || isAppPaused(app.webAppInfo.installed_app_info)) {
+      if (
+        isAppRunning(app.webAppInfo.installed_app_info) ||
+        isAppPaused(app.webAppInfo.installed_app_info)
+      ) {
         await this.disableApp(app);
       } else if (isAppDisabled(app.webAppInfo.installed_app_info)) {
         await this.enableApp(app);
@@ -556,8 +671,7 @@ export default defineComponent({
       }
     },
     copyPubKey() {
-      const pubKey =
-        this.getPubKey();
+      const pubKey = this.getPubKey();
       this.writeText(encodeHashToBase64(new Uint8Array(pubKey)));
       this.showPubKeyTooltip = true;
       setTimeout(() => {
@@ -565,8 +679,9 @@ export default defineComponent({
       }, 1200);
     },
     getPubKey() {
-      const cell = Object.values(this.app.webAppInfo.installed_app_info.cell_info)[0]
-        .find((c) => "provisioned" in c);
+      const cell = Object.values(
+        this.app.webAppInfo.installed_app_info.cell_info
+      )[0].find((c) => "provisioned" in c);
 
       if (!cell || !("provisioned" in cell)) {
         throw new Error("no provisioned cell found");
@@ -668,5 +783,4 @@ export default defineComponent({
 .update-button:hover {
   opacity: 0.6;
 }
-
 </style>

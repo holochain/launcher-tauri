@@ -2,9 +2,9 @@ use std::collections::HashMap;
 
 use holochain_manager::versions::HolochainVersion;
 use holochain_types::web_app::WebAppBundle;
-use holochain_web_app_manager::ReleaseInfo;
+use holochain_web_app_manager::{ReleaseInfo, WebAppManager};
 
-use crate::launcher::{state::LauncherState, manager::HolochainId, default_apps::{DEVHUB_APP_ID, DEVHUB_VERSION}};
+use crate::launcher::{state::LauncherState, manager::HolochainId, default_apps::{DEVHUB_APP_ID, DEVHUB_VERSION, DEVHUB_NETWORK_SEED}};
 
 
 /// Installs the DevHub if it is not already installed.
@@ -26,39 +26,12 @@ pub async fn install_devhub(
 
   let apps = webapp_manager.list_apps().await?;
 
-  let devhub_app_id = String::from("DevHub");
-
   if apps.iter()
     .map(|info| info.installed_app_info.installed_app_id.clone())
     .collect::<Vec<String>>()
     .contains(&DEVHUB_APP_ID.to_string()) == false {
 
-    let devhub_bundle = WebAppBundle::decode(include_bytes!("../../../DevHub.webhapp"))
-      .or(Err("Malformed webhapp bundle file"))?;
-
-    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { None };
-
-    let happ_release_info = ReleaseInfo {
-      resource_locator: None,
-      version: Some(DEVHUB_VERSION.to_string()),
-    };
-
-    let gui_release_info = ReleaseInfo {
-      resource_locator: None,
-      version: Some(DEVHUB_VERSION.to_string()),
-    };
-
-    webapp_manager
-      .install_web_app(
-        DEVHUB_APP_ID.to_string(),
-        devhub_bundle,
-        network_seed,
-        HashMap::new(),
-        None,
-        Some(happ_release_info),
-        Some(gui_release_info),
-      )
-      .await?;
+    install_devhub_inner(webapp_manager).await?;
 
     Ok(())
 
@@ -66,4 +39,39 @@ pub async fn install_devhub(
     Err(String::from("DevHub is already installed."))
   }
 
+}
+
+
+pub async fn install_devhub_inner(
+  webapp_manager: &mut WebAppManager,
+) -> Result<(), String> {
+
+  let devhub_bundle = WebAppBundle::decode(include_bytes!("../../../DevHub.webhapp"))
+  .or(Err("Malformed webhapp bundle file"))?;
+
+  let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { Some(DEVHUB_NETWORK_SEED.into()) };
+
+  let happ_release_info = ReleaseInfo {
+    resource_locator: None,
+    version: Some(DEVHUB_VERSION.to_string()),
+  };
+
+  let gui_release_info = ReleaseInfo {
+    resource_locator: None,
+    version: Some(DEVHUB_VERSION.to_string()),
+  };
+
+  webapp_manager
+    .install_web_app(
+      DEVHUB_APP_ID.to_string(),
+      devhub_bundle,
+      network_seed,
+      HashMap::new(),
+      None,
+      Some(happ_release_info),
+      Some(gui_release_info),
+    )
+    .await?;
+
+  Ok(())
 }

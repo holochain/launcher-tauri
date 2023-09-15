@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use holochain_manager::versions::holochain_types_latest::web_app::WebAppBundle;
 use holochain_web_app_manager::{WebAppManager, ReleaseInfo};
+
+use crate::commands::install_devhub::install_devhub_inner;
 // use holochain_manager::versions::version_manager::VersionManager;
 
 
@@ -11,9 +13,13 @@ use holochain_web_app_manager::{WebAppManager, ReleaseInfo};
 const APPSTORE_VERSION: &str = "5265a828ae96915786a3f9b22a37aa64a0e1d7a3"; // shasum
 pub const DEVHUB_VERSION: &str = "c81126389eff0ad6b28357df28633bb34b8f6a94"; // shasum
 
-const APPSTORE_APP_ID: &str = "App Store";
+const APPSTORE_APP_ID: &str = "AppStore NEW";
 const OLD_APPSTORE_APP_ID: &str = "AppStore";
-pub const DEVHUB_APP_ID: &str = "DevHub";
+pub const DEVHUB_APP_ID: &str = "DevHub NEW";
+const OLD_DEVHUB_APP_ID: &str = "DevHub";
+
+const APPSTORE_NETWORK_SEED: &str = "launcher";
+pub const DEVHUB_NETWORK_SEED: &str = "launcher";
 
 
 
@@ -33,7 +39,7 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
     window.emit("progress-update", String::from("Installing AppStore"))
       .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
-    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { Some(String::from("launcher")) };
+    let network_seed = if cfg!(debug_assertions) { Some(String::from("launcher-dev")) } else { Some(APPSTORE_NETWORK_SEED.into()) };
 
     let happ_release_info = ReleaseInfo {
       resource_locator: None,
@@ -103,11 +109,26 @@ pub async fn install_default_apps_if_necessary(manager: &mut WebAppManager, wind
 
   }
 
+  // Check whether old DevHub is already installed and if yes and new devhub is not yet installed, install new one
+  if apps.iter()
+    .map(|info| info.installed_app_info.installed_app_id.clone())
+    .collect::<Vec<String>>()
+    .contains(&OLD_DEVHUB_APP_ID.to_string())
+    && !apps.iter()
+    .map(|info| info.installed_app_info.installed_app_id.clone())
+    .collect::<Vec<String>>()
+    .contains(&DEVHUB_APP_ID.to_string())
+  {
+    window.emit("progress-update", String::from("Installing new DevHub"))
+      .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
+    install_devhub_inner(manager).await?;
+  }
+
   // Check whether DevHub is installed and if yes, check whether a new UI needs to be installed
   if apps.iter()
     .map(|info| info.installed_app_info.installed_app_id.clone())
     .collect::<Vec<String>>()
-    .contains(&DEVHUB_APP_ID.to_string()) == true {
+    .contains(&DEVHUB_APP_ID.to_string()) {
 
     // emitting signal to the front-end for progress indication
     window.emit("progress-update", String::from("Checking DevHub UI version"))
