@@ -56,7 +56,7 @@
   <div
     v-else-if="installableApps.length === 0"
     class="column center-content"
-    style="flex: 1; min-height: calc(100vh - 124px); margin: 16px"
+    style="flex: 1; min-height: calc(100vh - 240px); margin: 16px"
   >
     <div class="column center-content">
       <div class="radar halo" style="width: 200px; height: 200px">
