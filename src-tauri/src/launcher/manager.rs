@@ -4,7 +4,7 @@ use holochain_manager::errors::{LaunchHolochainError, InitializeConductorError};
 use holochain_web_app_manager::{error::LaunchWebAppManagerError, derive_window_label};
 use lair_keystore_manager::error::{LairKeystoreError, LaunchChildError};
 use lair_keystore_manager::utils::create_dir_if_necessary;
-use lair_keystore_manager::versions::v0_2::LairKeystoreManagerV0_2;
+use lair_keystore_manager::versions::v0_3::LairKeystoreManagerV0_3;
 use lair_keystore_manager::LairKeystoreManager;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -83,9 +83,9 @@ impl LauncherManager {
     create_dir_if_necessary(&profile_config_dir(profile.clone())?)?;
     create_dir_if_necessary(&launcher_config_dir(profile.clone())?)?;
 
-    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_2::lair_keystore_version(), profile.clone())?;
+    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_3::lair_keystore_version(), profile.clone())?;
 
-    let is_initialized = LairKeystoreManagerV0_2::is_initialized(keystore_path);
+    let is_initialized = LairKeystoreManagerV0_3::is_initialized(keystore_path);
 
     let keystore_status = match is_initialized {
       true => KeystoreStatus::PasswordNecessary,
@@ -134,10 +134,10 @@ impl LauncherManager {
       .emit("progress-update", String::from("Initializing keystore"))
       .map_err(|e| format!("Failed to send signal to the frontend: {:?}", e))?;
 
-    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_2::lair_keystore_version(), profile.clone())
+    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_3::lair_keystore_version(), profile.clone())
       .map_err(|e| format!("Failed to get keystore data dir: {}", e))?;
 
-    LairKeystoreManagerV0_2::initialize(keystore_path, password.clone())
+    LairKeystoreManagerV0_3::initialize(keystore_path, password.clone())
       .await
       .map_err(|err| format!("Error initializing the keystore: {:?}", err))?;
 
@@ -163,11 +163,11 @@ impl LauncherManager {
     profile: Profile,
   ) -> Result<(), String> {
 
-    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_2::lair_keystore_version(), profile.clone())
+    let keystore_path = keystore_data_dir(LairKeystoreManagerV0_3::lair_keystore_version(), profile.clone())
       .map_err(|e| format!("Failed to get keystore data dir: {}", e))?;
 
     let lair_keystore_manager =
-      LairKeystoreManagerV0_2::launch(self.config.log_level, keystore_path, password.clone())
+      LairKeystoreManagerV0_3::launch(self.config.log_level, keystore_path, password.clone())
         .await
         .map_err(|err| format!("Error launching the keystore: {:?}", err))?;
 

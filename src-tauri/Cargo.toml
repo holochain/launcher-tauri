@@ -18,7 +18,7 @@ tauri-build = { version = "1.4.0", features = [] }
 [dependencies]
 
 # NEW_VERSION update holochain client version if requireds
-holochain_client = "0.4.1"
+holochain_client = "0.4.2"
 
 holochain_manager = { path = "../crates/holochain_manager" }
 holochain_launcher_utils = { path = "../crates/holochain_launcher_utils" }
@@ -26,15 +26,15 @@ holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
 lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 
 # NEW_VERSION update holochain dependencies
-holochain_types = "0.2.1"
-holochain_state = "0.2.1"
-hdk = "0.2.1"
+holochain_types = "0.2.2"
+holochain_state = "0.2.2"
+hdk = "0.2.2"
 
-holochain = { version = "0.2.1", features = ["sqlite-encrypted"] }
+holochain = { version = "0.2.2", features = ["sqlite-encrypted"] }
 
-mr_bundle = "0.2.1"
+mr_bundle = "0.2.2"
 
-devhub_types = { git = "https://github.com/holochain/devhub-dnas", rev = "44f61801dadf6d63444f6a46f26113305c699ad7"}
+devhub_types = { git = "https://github.com/mrruby/devhub-dnas", rev = "f51d06ef95228e618efb17991d50b86bbdd8381b" }
 
 
 async-recursion = "1.0.4"
