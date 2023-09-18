@@ -396,9 +396,9 @@ export default defineComponent({
         installed_app_id: APPSTORE_APP_ID,
       });
 
-      console.log("@fetchApps: appStoreInfo: ", appStoreInfo);
+      // console.log("@fetchApps: appStoreInfo: ", appStoreInfo);
       const allCells = appStoreInfo.cell_info;
-      console.log("@fetchApps: allCells: ", allCells);
+      // console.log("@fetchApps: allCells: ", allCells);
 
       const provisionedCells: [string, CellInfo | undefined][] = Object.entries(
         allCells
@@ -409,7 +409,7 @@ export default defineComponent({
         ];
       });
 
-      console.log("@fetchApps: provisionedCells: ", provisionedCells);
+      // console.log("@fetchApps: provisionedCells: ", provisionedCells);
 
       this.provisionedCells = provisionedCells.sort(
         ([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => {
@@ -429,7 +429,15 @@ export default defineComponent({
         allApps = [];
       }
 
-      console.log("@fetchApps: allApps: ", allApps);
+      console.log(
+        "@fetchApps: allApps: ",
+        allApps.map((appEntity) => {
+          return {
+            app: appEntity.content,
+            actionHash: encodeHashToBase64(appEntity.action),
+          };
+        })
+      );
 
       // filter by apps of the relevant DevHub dna hash
       // this.installableApps = allApps.filter((appEntry) => JSON.stringify(appEntry.devhub_address.dna) === JSON.stringify(DEVHUB_HAPP_LIBRARY_DNA_HASH));
@@ -466,6 +474,7 @@ export default defineComponent({
       });
     },
     async saveApp(releaseInfo: ReleaseData, appEntry: AppEntry) {
+      console.log("@saveApp: releaseInfo: ", releaseInfo);
       // if downloading, always take holochain version of DevHub
       this.holochainSelection = false;
       this.loadingText = "searching available peer host";
