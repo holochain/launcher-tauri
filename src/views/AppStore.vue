@@ -2,22 +2,24 @@
   <HCLoading ref="downloading" :text="loadingText" />
 
   <div class="row search-bar">
-     <mwc-icon style="font-size: 38px; margin-left: 16px;">search</mwc-icon>
+    <mwc-icon style="font-size: 38px; margin-left: 16px">search</mwc-icon>
     <HCTextField
       ref="search-field"
-      style="height: 45px; margin-left: 5px;"
+      style="height: 45px; margin-left: 5px"
       placeholder="Search..."
       @input="highlightSearchString"
-     ></HCTextField>
-     <span style="display: flex; flex: 1;"></span>
+    ></HCTextField>
+    <span style="display: flex; flex: 1"></span>
     <HCButton
-      style="border-radius: 10px; height: 40px; margin-right: 7px;"
+      style="border-radius: 10px; height: 40px; margin-right: 7px"
       @click="selectFromFileSystem()"
       @keypress.enter="selectFromFileSystem()"
     >
-      <div class="row" style="margin: -12px;">
+      <div class="row" style="margin: -12px">
         <mwc-icon>folder</mwc-icon>
-        <span style="margin-left: 10px;">{{ $t('appStore.selectAppFromFileSystem') }}</span>
+        <span style="margin-left: 10px">{{
+          $t("appStore.selectAppFromFileSystem")
+        }}</span>
       </div>
     </HCButton>
   </div>
@@ -39,33 +41,58 @@
     </div>
   </div>
 
-  <div v-if="loading" class="column" style="flex: 1; min-height: calc(100vh - 240px);">
-    <div class="column center-content" style="display: flex; flex: 1;">
-      <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5;"></LoadingDots>
+  <div
+    v-if="loading"
+    class="column"
+    style="flex: 1; min-height: calc(100vh - 240px)"
+  >
+    <div class="column center-content" style="display: flex; flex: 1">
+      <LoadingDots
+        style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"
+      ></LoadingDots>
     </div>
   </div>
 
   <div
     v-else-if="installableApps.length === 0"
     class="column center-content"
-    style="flex: 1; min-height: calc(100vh - 240px); margin: 16px;"
+    style="flex: 1; min-height: calc(100vh - 240px); margin: 16px"
   >
     <div class="column center-content">
-      <div class="radar halo" style="width: 200px; height: 200px;">
+      <div class="radar halo" style="width: 200px; height: 200px">
         <div class="__dot"></div>
         <div class="__dot"></div>
         <div class="__dot"></div>
       </div>
-      <span style="max-width: 600px; text-align: center; margin-top: 25px; font-size: 20px;">{{ $t('appStore.searchingForPeers') }}...</span>
-      <span style="max-width: 600px; text-align: center; margin-top: 15px; opacity: 0.8;">{{ $t('appStore.searchingForPeersDetail') }}</span>
+      <span
+        style="
+          max-width: 600px;
+          text-align: center;
+          margin-top: 25px;
+          font-size: 20px;
+        "
+        >{{ $t("appStore.searchingForPeers") }}...</span
+      >
+      <span
+        style="
+          max-width: 600px;
+          text-align: center;
+          margin-top: 15px;
+          opacity: 0.8;
+        "
+        >{{ $t("appStore.searchingForPeersDetail") }}</span
+      >
     </div>
   </div>
 
-  <div
-    v-else-if="filteredApps.length === 0"
-  >
-    <div class="column center-content" style="margin-top: 300px; font-size: 20px;">
-      <span style="max-width: 600px; text-align: center;">{{ $t("appStore.noAppsForSearch") }}</span>
+  <div v-else-if="filteredApps.length === 0">
+    <div
+      class="column center-content"
+      style="margin-top: 300px; font-size: 20px"
+    >
+      <span style="max-width: 600px; text-align: center">{{
+        $t("appStore.noAppsForSearch")
+      }}</span>
     </div>
   </div>
 
@@ -82,14 +109,10 @@
       margin-top: 20px;
     "
   >
-    <div
-      v-for="(appEntity, i) of installableApps"
-      :key="i"
-      class="column"
-      style="margin-right: 16px; margin-bottom: 16px"
-    >
+    <div v-for="(appEntity, i) of installableApps" :key="i" class="column">
       <AppPreviewCard
         v-show="filteredApps.includes(appEntity.content)"
+        style="margin-right: 16px; margin-bottom: 16px"
         :app="appEntity.content"
         :appWebsocket="appWebsocket"
         @installApp="requestInstall(appEntity.content, $event.imgSrc)"
@@ -113,7 +136,6 @@
     <span :class="queuedBytes ? 'loader' : 'inactive-loader'" style="position: absolute; bottom: 0;"></span>
   </div> -->
 
-
   <!-- refresh button -->
 
   <HCButton
@@ -121,7 +143,7 @@
       height: 50px;
       border-radius: 18px;
       padding: 0 20px;
-      position:fixed;
+      position: fixed;
       bottom: 20px;
       right: 20px;
       font-size: 18px;
@@ -132,12 +154,9 @@
   >
     <div class="row center-content">
       <mwc-icon>refresh</mwc-icon>
-      <span style="margin-left: 8px">{{
-        $t("main.refresh")
-      }}</span>
+      <span style="margin-left: 8px">{{ $t("main.refresh") }}</span>
     </div>
   </HCButton>
-
 
   <!-- Dialog to select releases -->
   <SelectReleaseDialog
@@ -146,9 +165,11 @@
     :appWebsocket="appWebsocket"
     :imgSrc="selectedIconSrc"
     ref="selectAppReleasesDialog"
-    @cancel="() => {
-      selectedApp = undefined;
-    }"
+    @cancel="
+      () => {
+        selectedApp = undefined;
+      }
+    "
     @release-selected="saveApp($event.releaseData, $event.appEntry)"
   >
   </SelectReleaseDialog>
@@ -164,16 +185,13 @@
       holochainSelection = true;
       installClosed();
       showMessage(`Installed App ${$event}`);
-      $emit('select-view', { type: 'launcher' });;
+      $emit('select-view', { type: 'launcher' });
     "
     @closing-dialog="installClosed()"
     @error="(e) => showMessage(e)"
     ref="install-app-dialog"
   ></InstallAppDialog>
-  <HCSnackbar
-    :labelText="errorText"
-    ref="snackbar"
-  ></HCSnackbar>
+  <HCSnackbar :labelText="errorText" ref="snackbar"></HCSnackbar>
 </template>
 
 <script lang="ts">
@@ -181,7 +199,12 @@ import { defineComponent } from "vue";
 import "@material/mwc-circular-progress";
 import "@material/mwc-icon";
 import "@material/mwc-icon-button";
-import { AppWebsocket, NetworkInfo, CellInfo, encodeHashToBase64 } from "@holochain/client";
+import {
+  AppWebsocket,
+  NetworkInfo,
+  CellInfo,
+  encodeHashToBase64,
+} from "@holochain/client";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 import { toSrc, getCellId } from "../utils";
@@ -211,8 +234,6 @@ import prettyBytes from "pretty-bytes";
 import { AppEntry, Entity } from "../appstore/types";
 import { getAllApps } from "../appstore/appstore-interface";
 import { APPSTORE_APP_ID } from "../constants";
-
-
 
 export default defineComponent({
   name: "AppStore",
@@ -311,13 +332,10 @@ export default defineComponent({
     }
 
     // await this.getQueuedBytes();
-    this.pollInterval = window.setInterval(
-      async () => {
-        // await this.getQueuedBytes();
-        await this.fetchApps(true);
-      },
-      3000
-    );
+    this.pollInterval = window.setInterval(async () => {
+      // await this.getQueuedBytes();
+      await this.fetchApps(true);
+    }, 3000);
   },
   computed: {
     filteredApps(): Array<AppEntry> {
@@ -360,11 +378,13 @@ export default defineComponent({
       this.holochainId = holochainId;
       // connect to AppWebsocket
       const port = this.$store.getters["appInterfacePort"](holochainId);
-      this.appWebsocket = await AppWebsocket.connect(`ws://localhost:${port}`, 40000);
+      this.appWebsocket = await AppWebsocket.connect(
+        `ws://localhost:${port}`,
+        40000
+      );
       // console.log("connected to AppWebsocket.");
     },
     async fetchApps(silent: boolean) {
-
       this.loading = silent ? false : true;
 
       if (!this.appWebsocket) {
@@ -379,20 +399,29 @@ export default defineComponent({
       const allCells = appStoreInfo.cell_info;
       console.log("@fetchApps: allCells: ", allCells);
 
-      const provisionedCells: [string, CellInfo | undefined][] = Object.entries(allCells).map(([roleName, cellInfos]) => {
-        return [roleName, cellInfos.find((cellInfo) => "provisioned" in cellInfo)]
+      const provisionedCells: [string, CellInfo | undefined][] = Object.entries(
+        allCells
+      ).map(([roleName, cellInfos]) => {
+        return [
+          roleName,
+          cellInfos.find((cellInfo) => "provisioned" in cellInfo),
+        ];
       });
 
       console.log("@fetchApps: provisionedCells: ", provisionedCells);
 
-      this.provisionedCells = provisionedCells.sort(([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => {
-        return roleName_a.localeCompare(roleName_b);
-      });
-
+      this.provisionedCells = provisionedCells.sort(
+        ([roleName_a, _cellInfo_a], [roleName_b, _cellInfo_b]) => {
+          return roleName_a.localeCompare(roleName_b);
+        }
+      );
 
       let allApps: Array<Entity<AppEntry>>;
       try {
-        allApps = await getAllApps((this.appWebsocket! as AppWebsocket), appStoreInfo);
+        allApps = await getAllApps(
+          this.appWebsocket! as AppWebsocket,
+          appStoreInfo
+        );
       } catch (e) {
         console.error(`Error getting all apps: ${e}`);
         // Catch other errors than being offline
@@ -421,7 +450,6 @@ export default defineComponent({
      *
      */
     async requestInstall(app: AppEntry, imgSrc: string | undefined) {
-
       this.selectedIconSrc = imgSrc ? imgSrc : undefined;
       this.selectedApp = app;
 
@@ -431,7 +459,9 @@ export default defineComponent({
       }
 
       this.$nextTick(() => {
-        (this.$refs.selectAppReleasesDialog as typeof SelectReleaseDialog).open();
+        (
+          this.$refs.selectAppReleasesDialog as typeof SelectReleaseDialog
+        ).open();
       });
     },
     async saveApp(releaseInfo: ReleaseData, appEntry: AppEntry) {
@@ -439,7 +469,6 @@ export default defineComponent({
       this.holochainSelection = false;
       this.loadingText = "searching available peer host";
       (this.$refs.downloading as typeof HCLoading).open();
-
 
       const appStoreInfo = await this.appWebsocket!.appInfo({
         installed_app_id: APPSTORE_APP_ID,
@@ -453,8 +482,15 @@ export default defineComponent({
             await this.connectAppWebsocket();
           }
           this.loadingText = `Loading app icon from App Store...`;
-          const collectedBytes = await collectBytes(this.appWebsocket as any, appStoreInfo, appEntry.icon);
-          this.selectedIconSrc = toSrc(collectedBytes, appEntry.metadata.icon_mime_type);
+          const collectedBytes = await collectBytes(
+            this.appWebsocket as any,
+            appStoreInfo,
+            appEntry.icon
+          );
+          this.selectedIconSrc = toSrc(
+            collectedBytes,
+            appEntry.metadata.icon_mime_type
+          );
         } catch (e) {
           console.error("Error fetching app icon from App Store: ", e);
           errorFetchingIcon = true;
@@ -471,17 +507,26 @@ export default defineComponent({
         },
         version: releaseInfo.happRelease.content.version,
       };
-      this.selectedGuiReleaseInfo = guiReleaseHash ? {
-        resource_locator: {
-          dna_hash: encodeHashToBase64(releaseInfo.devhubDnaHash),
-          resource_hash: encodeHashToBase64(guiReleaseHash),
-        },
-        version: releaseInfo.guiRelease?.content.version
-      } : undefined;
+      this.selectedGuiReleaseInfo = guiReleaseHash
+        ? {
+            resource_locator: {
+              dna_hash: encodeHashToBase64(releaseInfo.devhubDnaHash),
+              resource_hash: encodeHashToBase64(guiReleaseHash),
+            },
+            version: releaseInfo.guiRelease?.content.version,
+          }
+        : undefined;
 
-      this.loadingText = `${errorFetchingIcon ? "Failed to fetch icon from App Store. F" : "f"}etching app from peer host${errorFetchingIcon ? " without icon " : ""}...`;
+      this.loadingText = `${
+        errorFetchingIcon ? "Failed to fetch icon from App Store. F" : "f"
+      }etching app from peer host${
+        errorFetchingIcon ? " without icon " : ""
+      }...`;
 
-      console.log("@saveApp: devhubDnaHash", encodeHashToBase64(releaseInfo.devhubDnaHash));
+      console.log(
+        "@saveApp: devhubDnaHash",
+        encodeHashToBase64(releaseInfo.devhubDnaHash)
+      );
 
       try {
         await tryWithHosts<void>(
@@ -500,19 +545,22 @@ export default defineComponent({
             this.loadingText = "";
 
             this.$nextTick(() => {
-              (this.$refs["install-app-dialog"] as typeof InstallAppDialog).open();
+              (
+                this.$refs["install-app-dialog"] as typeof InstallAppDialog
+              ).open();
             });
 
-            console.log("@saveApp: selectedAppBundlePath: ", this.selectedAppBundlePath);
-
+            console.log(
+              "@saveApp: selectedAppBundlePath: ",
+              this.selectedAppBundlePath
+            );
           },
           this.appWebsocket as AppWebsocket,
           appStoreInfo,
           releaseInfo.devhubDnaHash,
           "happ_library",
-          "get_webhapp_package",
-        )
-
+          "get_webhapp_package"
+        );
       } catch (e) {
         console.error("Error fetching webhapp from DevHub host(s): ", e);
         this.selectedHappReleaseInfo = undefined;
@@ -541,16 +589,19 @@ export default defineComponent({
       // this.hdkVersionForApp = undefined;
     },
     /**
-    * Gets aggregated bytes that are in queue for the DevHub cells
-    */
+     * Gets aggregated bytes that are in queue for the DevHub cells
+     */
     async getQueuedBytes() {
       if (!this.appWebsocket) {
         await this.connectAppWebsocket();
       }
       const networkInfo: NetworkInfo[] = await this.appWebsocket!.networkInfo({
         agent_pub_key: getCellId(this.provisionedCells![0][1]!)![1],
-        dnas: this.provisionedCells!.filter(([_roleName, cellInfo]) => !!cellInfo)
-          .map(([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array),
+        dnas: this.provisionedCells!.filter(
+          ([_roleName, cellInfo]) => !!cellInfo
+        ).map(
+          ([_roleName, cellInfo]) => getCellId(cellInfo!)![0] as Uint8Array
+        ),
       } as any);
       let queuedBytes = 0;
       networkInfo.forEach((info, _idx) => {
@@ -562,7 +613,7 @@ export default defineComponent({
         this.latestQueuedBytesUpdate = now;
         // console.log("updated timestamp: ", this.latestQueuedBytesUpdate);
       }
-      if ((now - this.latestQueuedBytesUpdate) < 5000) {
+      if (now - this.latestQueuedBytesUpdate < 5000) {
         this.showLoadingSpinner = true;
       } else {
         this.showLoadingSpinner = false;
@@ -574,7 +625,10 @@ export default defineComponent({
       this.$emit("show-message", message);
     },
     progressRatio(idx: number) {
-      if ((this.networkStates[idx] || this.networkStates[idx] === 0) && this.cachedMaxExpected[idx]) {
+      if (
+        (this.networkStates[idx] || this.networkStates[idx] === 0) &&
+        this.cachedMaxExpected[idx]
+      ) {
         return (
           (1 - this.networkStates[idx]! / this.cachedMaxExpected[idx]!) * 100
         );
@@ -590,8 +644,12 @@ export default defineComponent({
       }
     },
     byteDiff(idx: number) {
-      const cachedMax = this.cachedMaxExpected[idx] ? this.cachedMaxExpected[idx] : 0;
-      const currentExpected = this.networkStates[idx] ? this.networkStates[idx] : 0;
+      const cachedMax = this.cachedMaxExpected[idx]
+        ? this.cachedMaxExpected[idx]
+        : 0;
+      const currentExpected = this.networkStates[idx]
+        ? this.networkStates[idx]
+        : 0;
       const diff = cachedMax! - currentExpected!;
 
       if (diff < 0) {
@@ -601,20 +659,25 @@ export default defineComponent({
       }
     },
     highlightSearchString() {
-      const searchString = (this.$refs["search-field"] as typeof HCTextField).value;
-      const appsListElement = this.$refs["apps-list"] as HTMLElement | undefined;
+      const searchString = (this.$refs["search-field"] as typeof HCTextField)
+        .value;
+      const appsListElement = this.$refs["apps-list"] as
+        | HTMLElement
+        | undefined;
       if (appsListElement) {
         var instance = new Mark(appsListElement);
         instance.unmark();
-        instance.mark(searchString, { className: "mark", caseSensitive: false });
+        instance.mark(searchString, {
+          className: "mark",
+          caseSensitive: false,
+        });
       }
-    }
+    },
   },
 });
 </script>
 
 <style scoped>
-
 .search-bar {
   position: fixed;
   width: 100%;
@@ -664,36 +727,40 @@ export default defineComponent({
   overflow: hidden;
 }
 .radar::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: conic-gradient(transparent 94%, #05edc600 94%, #05edc6); /* scanner  color*/
-    border-radius: 50%;
-    animation: spin 2.5s linear infinite;
-  }
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: conic-gradient(
+    transparent 94%,
+    #05edc600 94%,
+    #05edc6
+  ); /* scanner  color*/
+  border-radius: 50%;
+  animation: spin 2.5s linear infinite;
+}
 .radar .__dot {
-    position: absolute;
-    width: 8%;
-    height: 8%;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: blink 2.5s ease-out infinite;
+  position: absolute;
+  width: 8%;
+  height: 8%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: blink 2.5s ease-out infinite;
 }
 .radar .__dot:first-of-type {
-      top: 24%;
-      left: 76%;
-      animation-delay: 0.3s;
+  top: 24%;
+  left: 76%;
+  animation-delay: 0.3s;
 }
-    .radar .__dot:nth-of-type(2) {
-      top: 83%;
-      left: 55%;
-      animation-delay: 1.15s;
-    }
-    .radar .__dot:last-of-type {
-      top: 36%;
-      left: 36%;
-      animation-delay: 2.2s;
-    }
+.radar .__dot:nth-of-type(2) {
+  top: 83%;
+  left: 55%;
+  animation-delay: 1.15s;
+}
+.radar .__dot:last-of-type {
+  top: 36%;
+  left: 36%;
+  animation-delay: 2.2s;
+}
 @keyframes spin {
   to {
     transform: rotate(1turn);
@@ -710,7 +777,6 @@ export default defineComponent({
     background-color: transparent;
   }
 }
-
 </style>
 
 <style>
