@@ -1600,8 +1600,8 @@ checksum = "3c877555693c14d2f84191cfd3ad8582790fc52b5e2274b40b59cf5f5cea25c7"
 
 [[package]]
 name = "devhub_types"
-version = "0.1.3-beta-rc.1"
-source = "git+https://github.com/holochain/devhub-dnas?branch=holochain-v0.1.x-support#99f4b4696011087d6eb0a42da62452603fa24c96"
+version = "0.1.4"
+source = "git+https://github.com/holochain/devhub-dnas?branch=holochain-v0.1.x-support#6c23951c7ad26ac0998d4398331b4d3cd4ae4974"
 dependencies = [
  "essence_payloads",
  "flate2",
@@ -1611,7 +1611,7 @@ dependencies = [
  "rmp-serde 0.15.5",
  "serde",
  "serde_yaml 0.8.26",
- "sha2 0.10.6",
+ "sha2 0.9.9",
  "thiserror",
 ]
 
@@ -2669,7 +2669,7 @@ dependencies = [
 [[package]]
 name = "hc_crud_ceps"
 version = "0.77.0"
-source = "git+https://github.com/mjbrisebois/rust-hc-crud-ceps.git?rev=1f4295a79e93438474c4cf7a8d304e4143a4b94f#1f4295a79e93438474c4cf7a8d304e4143a4b94f"
+source = "git+https://github.com/mjbrisebois/rust-hc-crud-ceps.git?rev=91438a2e167b5bfea3c6673fe2f1da827c7da2c9#91438a2e167b5bfea3c6673fe2f1da827c7da2c9"
 dependencies = [
  "hdk",
  "holo_hash 0.1.4",
@@ -4878,7 +4878,7 @@ checksum = "21805a2d7f92656c9d088e565ef4a9962c92673239a621d19c36825b003c9936"
 dependencies = [
  "hdi 0.4.0-beta-dev.3",
  "serde",
- "sha2 0.10.6",
+ "sha2 0.9.9",
 ]
 
 [[package]]
