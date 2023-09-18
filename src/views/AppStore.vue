@@ -109,14 +109,10 @@
       margin-top: 20px;
     "
   >
-    <div
-      v-for="(appEntity, i) of installableApps"
-      :key="i"
-      class="column"
-      style="margin-right: 16px; margin-bottom: 16px"
-    >
+    <div v-for="(appEntity, i) of installableApps" :key="i" class="column">
       <AppPreviewCard
         v-show="filteredApps.includes(appEntity.content)"
+        style="margin-right: 16px; margin-bottom: 16px"
         :app="appEntity.content"
         :appWebsocket="appWebsocket"
         @installApp="requestInstall(appEntity.content, $event.imgSrc)"
