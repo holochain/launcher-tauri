@@ -168,7 +168,13 @@
                 <!-- GUI version as well here? Needs to be fetched independently from a DevHub host -->
               </div>
               <span style="display: flex; flex: 1"></span>
-              <HCButton @click="() => releaseSelected()">Install</HCButton>
+              <HCButton
+                @click="
+                  () =>
+                    releaseDatas ? releaseSelected(releaseDatas[0]) : undefined
+                "
+                >Install</HCButton
+              >
             </div>
           </div>
 
@@ -228,7 +234,9 @@
                   <!-- GUI version as well here? Needs to be fetched independently from a DevHub host -->
                 </div>
                 <span style="display: flex; flex: 1"></span>
-                <HCButton @click="() => releaseSelected()">Install</HCButton>
+                <HCButton @click="() => releaseSelected(releaseData)"
+                  >Install</HCButton
+                >
               </div>
             </div>
           </div>
@@ -628,9 +636,9 @@ export default defineComponent({
         console.error(`Failed to get publisher info: ${JSON.stringify(e)}`);
       }
     },
-    releaseSelected() {
+    releaseSelected(releaseData: ReleaseData) {
       this.$emit("release-selected", {
-        releaseData: this.releaseDatas ? this.releaseDatas[0] : undefined,
+        releaseData,
         appEntry: this.app,
       });
       this.close();
