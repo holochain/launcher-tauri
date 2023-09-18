@@ -311,7 +311,8 @@ export default defineComponent({
     try {
       // Temporary solution: Fetch centrally stored filter list to filter out orphaned apps in the appstore.
       const response = await fetch(
-        "https://s3.eu-central-2.wasabisys.com/holochain-launcher/filter-lists/appstore_filter_list.json"
+        "https://s3.eu-central-2.wasabisys.com/holochain-launcher/filter-lists/appstore_filter_list.json",
+        { cache: "no-cache" }
       );
       const filterList: Array<FilterListEntry> = await response.json();
       this.filterList = filterList;
