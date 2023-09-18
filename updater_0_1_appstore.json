@@ -13,7 +13,7 @@
     },
     "linux-x86_64": {
       "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTTjgxanpVUmtYb2tONVFnK0txdjBVVjFwdnpTeUhDLzJIWjdCYWlWSXJYL1hoUEFRLy9LTlFFcEpRTXFmV0lDRmJONU5MWkZOSDBNYjREK3RScTdIWkd6akZWOWFHNlFNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNjk1MDY1NTMwCWZpbGU6aG9sb2NoYWluLWxhdW5jaGVyLWJldGEtMV8wLjEwLjJfYW1kNjQuQXBwSW1hZ2UudGFyLmd6Ck9qeWJNanBmRmovY0VNNm5UUStYSFQrbDdPTE1zWmxxeUlHa0VLMThkNDdoVW9YRXkrQS93Z1MwaGJWeTgvTzVTQkZWc2hDZWR2ZTBvcU9IS1h3a0JRPT0K",
-      "url": "https://github.com/holochain/launcher/releases/download/v0.10.2/holochain-launcher-beta-1_0.10.2_amd64.AppImage.tar.gz.sig"
+      "url": "https://github.com/holochain/launcher/releases/download/v0.10.2/holochain-launcher-beta-1_0.10.2_amd64.AppImage.tar.gz"
     },
     "windows-x86_64": {
       "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTTjgxanpVUmtYb3BFcllDbXBxZldTRlJOeFB4U2prdjVMZE5rNUVhYVFrTnFKNGQ0OEwwQUZkZjhEd0ZpN2ZMNFlVSXozcmViNmJEdjdOekZFd09ZM0pJSkFkU1grYkEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNjk1MDY4MDk4CWZpbGU6SG9sb2NoYWluIExhdW5jaGVyIEJldGEgMV8wLjEwLjJfeDY0X2VuLVVTLm1zaS56aXAKUlJHN29Zd2I2azVrc1BNQ0h1RHhldGI4MVBaejE0blpWUVY1RGppYmZKUW5tS2Q1RElmdVJnOXZnZWFNZy91VVZnSkxCN2pkaWxMRnlXQnE2YjdlQ2c9PQo=",
