@@ -25,7 +25,6 @@
         >
         </HCSelect>
       </div>
-
     </div>
   </HCGenericDialog>
 </template>
@@ -85,7 +84,7 @@ export default defineComponent({
     },
     open() {
       (this.$refs.dialog as typeof HCGenericDialog).open();
-    }
+    },
   },
 });
 </script>

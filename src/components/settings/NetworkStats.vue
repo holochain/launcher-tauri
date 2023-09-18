@@ -26,10 +26,19 @@
         </HCSelect>
       </div>
 
-      <div style="background: rgb(236, 236, 236); border-radius: 8px; padding: 10px 20px; font-size: 15px; overflow-x: auto;">
-        <pre>{{ networkStats ? networkStats : "Loading network statistics..." }}</pre>
+      <div
+        style="
+          background: rgb(236, 236, 236);
+          border-radius: 8px;
+          padding: 10px 20px;
+          font-size: 15px;
+          overflow-x: auto;
+        "
+      >
+        <pre>{{
+          networkStats ? networkStats : "Loading network statistics..."
+        }}</pre>
       </div>
-
     </div>
   </HCGenericDialog>
 </template>
@@ -60,9 +69,14 @@ export default defineComponent({
   mounted() {
     let holochainVersions: [string, HolochainId][] = [];
 
-    this.$store.getters["runningHolochainIds"].forEach(async (id: HolochainId) => {
-      holochainVersions.push([id.type == "HolochainVersion" ? id.content : id.type, id]);
-    })
+    this.$store.getters["runningHolochainIds"].forEach(
+      async (id: HolochainId) => {
+        holochainVersions.push([
+          id.type == "HolochainVersion" ? id.content : id.type,
+          id,
+        ]);
+      }
+    );
     this.holochainVersions = holochainVersions;
 
     this.$nextTick(async () => {
@@ -75,9 +89,14 @@ export default defineComponent({
   methods: {
     async open() {
       let holochainVersions: [string, HolochainId][] = [];
-      this.$store.getters["runningHolochainIds"].forEach(async (id: HolochainId) => {
-        holochainVersions.push([id.type == "HolochainVersion" ? id.content : id.type, id]);
-      })
+      this.$store.getters["runningHolochainIds"].forEach(
+        async (id: HolochainId) => {
+          holochainVersions.push([
+            id.type == "HolochainVersion" ? id.content : id.type,
+            id,
+          ]);
+        }
+      );
 
       this.holochainVersions = holochainVersions;
 
@@ -85,18 +104,24 @@ export default defineComponent({
 
       if (holochainVersions.length > 0) {
         this.selectedHolochainVersion = holochainVersions[0][1];
-        (this.$refs.selectHolochainVersion as typeof HCSelect)
-          .select([this.selectedHolochainVersion.type == "HolochainVersion" ? this.selectedHolochainVersion.content : this.selectedHolochainVersion.type, this.selectedHolochainVersion]);
-        this.networkStats = await invoke('dump_network_stats', { holochainId: holochainVersions[0][1] });
-      };
+        (this.$refs.selectHolochainVersion as typeof HCSelect).select([
+          this.selectedHolochainVersion.type == "HolochainVersion"
+            ? this.selectedHolochainVersion.content
+            : this.selectedHolochainVersion.type,
+          this.selectedHolochainVersion,
+        ]);
+        this.networkStats = await invoke("dump_network_stats", {
+          holochainId: holochainVersions[0][1],
+        });
+      }
     },
     close() {
       (this.$refs.dialog as typeof HCGenericDialog).close();
     },
     async changedHolochainVersion(holochainId: HolochainId) {
       this.selectedHolochainVersion = holochainId;
-      this.networkStats = await invoke('dump_network_stats', { holochainId });
-    }
+      this.networkStats = await invoke("dump_network_stats", { holochainId });
+    },
   },
 });
 </script>

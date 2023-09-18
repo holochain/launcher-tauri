@@ -142,12 +142,10 @@ export const store = createStore<LauncherAdminState>({
         const error = allHolochains.find((v) => v.type === "Error");
         if (
           error &&
-          error.content.toString().includes("Could not initialize Conductor from configuration") &&
           error.content
             .toString()
-            .includes(
-              "Address already in use"
-            )
+            .includes("Could not initialize Conductor from configuration") &&
+          error.content.toString().includes("Address already in use")
         ) {
           return true;
         }
@@ -347,9 +345,10 @@ export const store = createStore<LauncherAdminState>({
       if (!holochainState || holochainState.type === "Error") return [];
 
       const allCellInfos = flatten(
-        holochainState.content.installed_apps.map(
-          (app) => flattenCells(app.installed_app_info.cell_info)
-            .filter(([roleName, cellInfo]) => !("Stem" in cellInfo))
+        holochainState.content.installed_apps.map((app) =>
+          flattenCells(app.installed_app_info.cell_info).filter(
+            ([roleName, cellInfo]) => !("Stem" in cellInfo)
+          )
         )
       );
       return uniq(allCellInfos.map((c) => new Uint8Array(getCellId(c[1])![1])));

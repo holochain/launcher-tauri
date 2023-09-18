@@ -1,21 +1,18 @@
 import { CellInfo, encodeHashToBase64 } from "@holochain/client";
 import { CellId } from "@holochain/client";
-import {
-  DisabledAppReason,
-  NetworkInfo,
-  AppInfo,
-} from "@holochain/client";
+import { DisabledAppReason, NetworkInfo, AppInfo } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 import { Base64 } from "js-base64";
 
 import { GossipProgress, ResourceLocator, ResourceLocatorB64 } from "./types";
 
-
-export function locatorToLocatorB64(locator: ResourceLocator): ResourceLocatorB64 {
+export function locatorToLocatorB64(
+  locator: ResourceLocator
+): ResourceLocatorB64 {
   return {
     dna_hash: encodeHashToBase64(locator.dna_hash),
     resource_hash: encodeHashToBase64(locator.resource_hash),
-  }
+  };
 }
 
 export function isAppRunning(app: AppInfo): boolean {
@@ -52,18 +49,24 @@ export function getReason(app: AppInfo): string | undefined {
       }`;
     }
   } else {
-    return `You may be offline:\n\n${(
-      app.status as unknown as {
-        paused: { reason: { error: string } };
-      }
-    ).paused.reason.error}`;
+    return `You may be offline:\n\n${
+      (
+        app.status as unknown as {
+          paused: { reason: { error: string } };
+        }
+      ).paused.reason.error
+    }`;
   }
 }
 
-export function flattenCells(cell_info: Record<string, CellInfo[]>): [string, CellInfo][] {
-  return Object.entries(cell_info).map(([roleName, cellInfos]) => {
-    return cellInfos.map((CellInfo) => [roleName, CellInfo])
-  }).flat() as any
+export function flattenCells(
+  cell_info: Record<string, CellInfo[]>
+): [string, CellInfo][] {
+  return Object.entries(cell_info)
+    .map(([roleName, cellInfos]) => {
+      return cellInfos.map((CellInfo) => [roleName, CellInfo]);
+    })
+    .flat() as any;
 }
 
 export function getCellId(cellInfo: CellInfo): CellId | undefined {
@@ -116,14 +119,14 @@ export function gossipProgressString(progress: GossipProgress | undefined) {
   )}`;
 }
 
-
-export function toSrc(data: Uint8Array | undefined, mimeType?: string): string | undefined {
+export function toSrc(
+  data: Uint8Array | undefined,
+  mimeType?: string
+): string | undefined {
   if (data) {
     const base64Data = Base64.fromUint8Array(data);
-    return `data:${mimeType ? mimeType : 'image/png'};base64,${base64Data}`;
+    return `data:${mimeType ? mimeType : "image/png"};base64,${base64Data}`;
   }
 
   return undefined;
 }
-
-

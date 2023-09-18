@@ -1,5 +1,10 @@
 <template>
-  <HCDialog ref="dialog" @closing="$emit('closing-dialog')" :prohibit-escape="showNetworkSeedInfo" @keypress.enter="installApp">
+  <HCDialog
+    ref="dialog"
+    @closing="$emit('closing-dialog')"
+    :prohibit-escape="showNetworkSeedInfo"
+    @keypress.enter="installApp"
+  >
     <div
       v-if="isLoadingFile"
       class="column"
@@ -64,14 +69,14 @@
         @item-selected="handleHolochainIdSelected($event)"
       >
       </HCSelect>
-      <div class="row" style="align-items: flex-start;">
+      <div class="row" style="align-items: flex-start">
         <HCTextField
-            placeholder="Network Seed (Optional)"
-            label="Network Seed (Optional)"
-            title="If in doubt, leave this blank"
-            style="margin: 5px; margin-bottom: 25px; width: 325px;"
-            helper="Peers with the same network seed are part of the same network"
-            ref="network-seed-field"
+          placeholder="Network Seed (Optional)"
+          label="Network Seed (Optional)"
+          title="If in doubt, leave this blank"
+          style="margin: 5px; margin-bottom: 25px; width: 325px"
+          helper="Peers with the same network seed are part of the same network"
+          ref="network-seed-field"
         />
         <img
           @mouseover="openNetworkSeedInfo"
@@ -80,17 +85,23 @@
           @keydown.esc="closeNetworkSeedInfo"
           tabindex="0"
           src="/img/info_icon.svg"
-          style="width: 27px; cursor: pointer; margin-top: 18px; margin-left: 3px; margin-right: 5px; opacity: 0.9;"
-        >
+          style="
+            width: 27px;
+            cursor: pointer;
+            margin-top: 18px;
+            margin-left: 3px;
+            margin-right: 5px;
+            opacity: 0.9;
+          "
+        />
       </div>
       <div class="column" style="width: 100%">
-        <div class="row" style="margin: 20px 0 15px 20px;"
-        >
+        <div class="row" style="margin: 20px 0 15px 20px">
           <div
             @click="showAdvanced = !showAdvanced"
             @keydown.enter="showAdvanced = !showAdvanced"
             class="row advanced-button"
-            style="align-items: center;"
+            style="align-items: center"
             tabindex="0"
           >
             <div
@@ -105,14 +116,13 @@
             </div>
             <div style="font-size: 20px; margin-left: 10px">Advanced</div>
           </div>
-          <span style="display: flex; flex: 1;"></span>
+          <span style="display: flex; flex: 1"></span>
         </div>
       </div>
 
       <div v-show="showAdvanced" class="column" style="align-items: center">
-
         <HCSelect
-          style="margin: 5px; margin-bottom: 15px; width: 360px; display: none;"
+          style="margin: 5px; margin-bottom: 15px; width: 360px; display: none"
           label="Public Key"
           :items="allPubKeys"
           :invalid="holochainId ? undefined : 'Select Holochain version first'"
@@ -170,12 +180,12 @@
   </HCDialog>
 
   <div class="info-popup row" v-if="showNetworkSeedInfo">
-    <img src="/img/info_icon.svg" style="opacity: 0.9; width: 40px;">
-    <div style="margin: 0 15px;">
-      If you enter a network seed, you create an app instance with its
-      own network and data store. If in doubt, leave this field blank to join
-      the app's public network. Make sure that others who want to collaborate
-      with you enter the same network seed!
+    <img src="/img/info_icon.svg" style="opacity: 0.9; width: 40px" />
+    <div style="margin: 0 15px">
+      If you enter a network seed, you create an app instance with its own
+      network and data store. If in doubt, leave this field blank to join the
+      app's public network. Make sure that others who want to collaborate with
+      you enter the same network seed!
     </div>
   </div>
 
@@ -238,7 +248,7 @@ export default defineComponent({
     },
     iconSrc: {
       type: String,
-    }
+    },
   },
   data(): {
     showAdvanced: boolean;
@@ -337,10 +347,10 @@ export default defineComponent({
 
     try {
       console.log("@created: this.appBundlePath: ", this.appBundlePath);
-    this.appInfo = (await invoke("get_app_info", {
-      appBundlePath: this.appBundlePath,
-    })) as WebAppInfo;
-    this.appId = this.appInfo.app_name;
+      this.appInfo = (await invoke("get_app_info", {
+        appBundlePath: this.appBundlePath,
+      })) as WebAppInfo;
+      this.appId = this.appInfo.app_name;
 
       this.$nextTick(() => {
         const appIdField = this.$refs["app-id-field"] as typeof HCTextField;
@@ -348,7 +358,7 @@ export default defineComponent({
         this.checkAppIdValidity();
       });
     } catch (e) {
-      this.$emit("error", `Error: ${JSON.stringify(e)}`)
+      this.$emit("error", `Error: ${JSON.stringify(e)}`);
       console.log("Error getting app info: ", e);
       this.close();
     }
@@ -359,7 +369,7 @@ export default defineComponent({
     },
     closeNetworkSeedInfo() {
       // Called with a lag to make sure the escape key is still blocked on the main dialog
-      window.setTimeout(() => this.showNetworkSeedInfo = false, 50);
+      window.setTimeout(() => (this.showNetworkSeedInfo = false), 50);
     },
     open() {
       (this.$refs.dialog as typeof HCDialog).open();
@@ -376,7 +386,8 @@ export default defineComponent({
         this.appIdInvalid = "App Id must not be empty.";
         return;
       } else if (newValue === DEVHUB_APP_ID) {
-        this.appIdInvalid = "The app id 'DevHub' is reserved for the official DevHub and cannot be used."
+        this.appIdInvalid =
+          "The app id 'DevHub' is reserved for the official DevHub and cannot be used.";
         return;
       } else if (!regExp.test(newValue)) {
         // this restriction is added here because labels of tauri windows require it and we base window labels on app id's
@@ -461,9 +472,12 @@ export default defineComponent({
           guiReleaseInfo: this.guiReleaseInfo,
         });
 
-
         if (this.iconSrc) {
-          await invoke("store_icon_src", { appId, holochainId: this.holochainId, iconSrc: this.iconSrc });
+          await invoke("store_icon_src", {
+            appId,
+            holochainId: this.holochainId,
+            iconSrc: this.iconSrc,
+          });
         }
 
         await this.$store.dispatch(ActionTypes.fetchStateInfo);
@@ -471,7 +485,6 @@ export default defineComponent({
         this.$emit("app-installed", appId);
 
         this.installing = false;
-
       } catch (e) {
         console.log("Error installing the app: ", e);
         this.showMessage(`Error installing app: ${JSON.stringify(e)}`);

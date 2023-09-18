@@ -60,7 +60,9 @@
               white-space: nowrap;
             "
             >holochain-v</span
-          > and <span
+          >
+          and
+          <span
             style="
               font-family: monospace;
               font-size: 1.1em;

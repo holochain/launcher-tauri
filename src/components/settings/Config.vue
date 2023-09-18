@@ -18,7 +18,7 @@
       <div class="row" style="margin-top: 20px; margin-bottom: 16px">
         <HCSelect
           ref="selectLogLevel"
-          style="margin: 5px; width: 380px;"
+          style="margin: 5px; width: 380px"
           label="Log Level"
           :items="levels"
           @item-selected="newConfig.log_level = $event"
@@ -26,21 +26,23 @@
         </HCSelect>
       </div>
 
-
-      <div class="row" style="margin: 20px 5px; width: 380px;">
+      <div class="row" style="margin: 20px 5px; width: 380px">
         <ToggleSwitch
           ref="sliderMdns"
           :sliderOn="mdns"
           @click="handleSliderMdns"
         />
-        <span style="margin-left: 10px">{{ $t('dialogs.config.useMdns') }} <i>{{ $t('dialogs.config.useMdnsNote') }}</i></span>
+        <span style="margin-left: 10px"
+          >{{ $t("dialogs.config.useMdns") }}
+          <i>{{ $t("dialogs.config.useMdnsNote") }}</i></span
+        >
       </div>
 
       <HCTextField
         v-show="!mdns"
         ref="bootstrapServerField"
         placeholder="https://bootstrap.holo.host"
-        style="margin: 5px; width: 380px;"
+        style="margin: 5px; width: 380px"
         label="Bootstrap Server URL"
       ></HCTextField>
 
@@ -48,12 +50,14 @@
         v-show="!mdns"
         ref="proxyServerField"
         placeholder="kitsune-proxy://f3gH2VMkJ4qvZJOXx0ccL_Zo5n-s_CnBjSzAsEHHDCA/kitsune-quic/h/137.184.142.208/p/5788/--"
-        style="margin: 5px; margin-top: 20px; width: 380px;"
+        style="margin: 5px; margin-top: 20px; width: 380px"
         label="Proxy Server URL"
       ></HCTextField>
 
-
-      <div class="row" style="margin: 5px; margin-top: 40px; margin-bottom: 10px; width: 380px;">
+      <div
+        class="row"
+        style="margin: 5px; margin-top: 40px; margin-bottom: 10px; width: 380px"
+      >
         <ToggleSwitch
           ref="slider"
           :sliderOn="customBinary"
@@ -74,11 +78,15 @@
 
     <HCButton
       outlined
-      style="min-width: 270px; height: 30px; margin-bottom: -15px; margin-top: 10px;"
+      style="
+        min-width: 270px;
+        height: 30px;
+        margin-bottom: -15px;
+        margin-top: 10px;
+      "
       @click="restoreDefaults()"
-    >{{ $t('dialogs.config.restoreDefaults') }}
+      >{{ $t("dialogs.config.restoreDefaults") }}
     </HCButton>
-
   </HCGenericDialog>
 </template>
 
@@ -95,7 +103,13 @@ import HCButton from "../subcomponents/HCButton.vue";
 
 export default defineComponent({
   name: "Config",
-  components: { HCButton, HCGenericDialog, HCSelect, HCTextField, ToggleSwitch },
+  components: {
+    HCButton,
+    HCGenericDialog,
+    HCSelect,
+    HCTextField,
+    ToggleSwitch,
+  },
   data(): {
     levels: [string, string][];
     newConfig: any;
@@ -152,11 +166,15 @@ export default defineComponent({
       (this.newConfig as any).mdns = this.mdns;
 
       if (this.proxyUrl) {
-        (this.newConfig as any).proxy_server_url = (this.$refs.proxyServerField as typeof HCTextField).value;
+        (this.newConfig as any).proxy_server_url = (
+          this.$refs.proxyServerField as typeof HCTextField
+        ).value;
       }
 
       if (this.bootstrapUrl) {
-        (this.newConfig as any).bootstrap_server_url = (this.$refs.bootstrapServerField as typeof HCTextField).value;
+        (this.newConfig as any).bootstrap_server_url = (
+          this.$refs.bootstrapServerField as typeof HCTextField
+        ).value;
       }
 
       // console.log("newConfig: ", this.newConfig);
@@ -172,7 +190,7 @@ export default defineComponent({
     /**
      * Restoring to the values as they are currently stored in the launcher-config.yaml
      */
-     restoreCurrent() {
+    restoreCurrent() {
       const currentConfig = (this.$store.state.launcherStateInfo as any).config;
 
       this.newConfig = currentConfig;
@@ -202,19 +220,21 @@ export default defineComponent({
         this.mdns = true;
       }
 
-      const currentProxyUrl = (this.newConfig as any)
-        .proxy_server_url;
+      const currentProxyUrl = (this.newConfig as any).proxy_server_url;
 
       if (currentProxyUrl && currentProxyUrl !== "") {
-        (this.$refs.proxyServerField as typeof HCTextField).setValue(currentProxyUrl);
+        (this.$refs.proxyServerField as typeof HCTextField).setValue(
+          currentProxyUrl
+        );
         this.proxyUrl = currentProxyUrl;
       }
 
-      const currentBootstrapUrl = (this.newConfig as any)
-        .bootstrap_server_url;
+      const currentBootstrapUrl = (this.newConfig as any).bootstrap_server_url;
 
       if (currentBootstrapUrl && currentBootstrapUrl !== "") {
-        (this.$refs.bootstrapServerField as typeof HCTextField).setValue(currentBootstrapUrl);
+        (this.$refs.bootstrapServerField as typeof HCTextField).setValue(
+          currentBootstrapUrl
+        );
         this.bootstrapUrl = currentBootstrapUrl;
       }
     },
@@ -226,7 +246,9 @@ export default defineComponent({
 
       const bootstrapUrl: string = await invoke("get_default_bootstrap", {});
       this.bootstrapUrl = bootstrapUrl;
-      (this.$refs.bootstrapServerField as typeof HCTextField).setValue(bootstrapUrl);
+      (this.$refs.bootstrapServerField as typeof HCTextField).setValue(
+        bootstrapUrl
+      );
 
       const proxyUrl: string = await invoke("get_default_proxy", {});
       this.proxyUrl = proxyUrl;

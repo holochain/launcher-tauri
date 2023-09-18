@@ -6,7 +6,6 @@
     title="Click to see details and install"
     tabindex="0"
   >
-
     <div class="column" style="flex: 1">
       <div class="row" style="align-items: center">
         <!-- if icon provided -->
@@ -41,7 +40,7 @@
           </div>
         </div>
 
-        <div class="column" style="overflow: hidden;">
+        <div class="column" style="overflow: hidden">
           <div
             style="
               font-size: 25px;
@@ -70,7 +69,6 @@
         <span>{{ app.subtitle }}</span>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -112,13 +110,17 @@ export default defineComponent({
     };
   },
   emits: ["installApp"],
-  async mounted () {
+  async mounted() {
     const iconHash = this.app.icon;
     const appStoreInfo = await this.appWebsocket!.appInfo({
       installed_app_id: APPSTORE_APP_ID,
     });
 
-    const collectedBytes = await collectBytes(this.appWebsocket, appStoreInfo, iconHash);
+    const collectedBytes = await collectBytes(
+      this.appWebsocket,
+      appStoreInfo,
+      iconHash
+    );
     this.imgSrc = toSrc(collectedBytes, this.app.metadata.icon_mime_type);
   },
 });
@@ -138,5 +140,4 @@ export default defineComponent({
   background: #f4f4fc;
   box-shadow: 0 0px 5px #9b9b9b;
 }
-
 </style>

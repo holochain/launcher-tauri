@@ -1,15 +1,17 @@
 <template>
-
   <div
     v-if="isLoading()"
-    class="column center-content" style="flex: 1; height: calc(100vh - 64px);"
+    class="column center-content"
+    style="flex: 1; height: calc(100vh - 64px)"
   >
-    <LoadingDots style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"></LoadingDots>
+    <LoadingDots
+      style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"
+    ></LoadingDots>
   </div>
 
   <div
     class="column"
-    style="flex: 1; min-height: calc(100vh - 64px); align-items: center;"
+    style="flex: 1; min-height: calc(100vh - 64px); align-items: center"
   >
     <InstalledAppsList
       :installedApps="$store.getters[`allApps`]"
@@ -35,14 +37,20 @@ import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
 export default defineComponent({
   name: "Launcher",
-  components: { InstalledAppsList, HCButton, HCSnackbar, HCDialog, ToggleSwitch, LoadingDots },
-  emits: ['show-message', 'select-view'],
+  components: {
+    InstalledAppsList,
+    HCButton,
+    HCSnackbar,
+    HCDialog,
+    ToggleSwitch,
+    LoadingDots,
+  },
+  emits: ["show-message", "select-view"],
   data(): {
     snackbarText: string | undefined;
   } {
     return {
-      snackbarText: undefined
-
+      snackbarText: undefined,
     };
   },
   methods: {
@@ -50,7 +58,6 @@ export default defineComponent({
       return this.$store.state.launcherStateInfo === "loading";
     },
     async openApp(app: HolochainAppInfo) {
-
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
       try {
         await invoke("open_app_ui", { appId, holochainId: app.holochainId });
