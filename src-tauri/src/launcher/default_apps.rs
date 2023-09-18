@@ -10,8 +10,8 @@ use crate::commands::install_devhub::install_devhub_inner;
 // Versions of Appstore and Devhub (commit hash of Github release of the UI or shasum of the .webhapp file).
 // Those are used to install new Appstore/DevHub UI's if necessary
 // NEW_VERSION Change appstore and devhub versions here if required
-const APPSTORE_VERSION: &str = "5265a828ae96915786a3f9b22a37aa64a0e1d7a3"; // shasum
-pub const DEVHUB_VERSION: &str = "c81126389eff0ad6b28357df28633bb34b8f6a94"; // shasum
+const APPSTORE_VERSION: &str = "048f0e820f1049f2c4a72c8bebde51460cabd947"; // shasum
+pub const DEVHUB_VERSION: &str = "39dafa29e0a29ee927d2aaf92ffabfbe1e555266"; // shasum
 
 const APPSTORE_APP_ID: &str = "AppStore NEW";
 const OLD_APPSTORE_APP_ID: &str = "AppStore";
