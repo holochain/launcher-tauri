@@ -140,7 +140,7 @@ export default defineComponent({
         : 1;
 
     const sortedApps = computed(() => {
-      const order = window.localStorage.getItem("draggableListOrder");
+      const order = window.localStorage.getItem("installedAppsListOrder");
       const orderParsed = order ? JSON.parse(order) : [];
 
       const sortedAppList: Array<HolochainAppInfoExtended> = installedApps.value
@@ -172,7 +172,7 @@ export default defineComponent({
         const order = newList.map(
           (app) => app.webAppInfo.installed_app_info.installed_app_id
         );
-        localStorage.setItem("draggableListOrder", JSON.stringify(order));
+        localStorage.setItem("installedAppsListOrder", JSON.stringify(order));
       },
       {
         deep: true,
