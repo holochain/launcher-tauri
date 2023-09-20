@@ -27,13 +27,11 @@
       <img
         v-if="app.webAppInfo.icon_src"
         class="appIcon"
-        :class="getAppStatus(app) === 'Running' ? 'pointer' : 'cursor-default'"
         :src="`${app.webAppInfo.icon_src}`"
       />
       <div
         v-else
         class="appIcon column center-content"
-        :class="getAppStatus(app) === 'Running' ? 'pointer' : 'cursor-default'"
         style="background-color: #372ba5"
       >
         <div style="color: white; font-size: 45px; font-weight: 600">
@@ -63,21 +61,9 @@ import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
-// import "@holochain-open-dev/utils/dist/holo-identicon";
-import HoloIdenticon from "../components/subcomponents/HoloIdenticon.vue";
-
-import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
-import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
-import DisabledCloneCard from "./subcomponents/DisabledCloneCard.vue";
 
 export default defineComponent({
   name: "InstalledAppCard",
-  components: {
-    HCGenericDialog,
-    HoloIdenticon,
-    InstalledCellCard,
-    DisabledCloneCard,
-  },
   props: {
     app: {
       type: Object as PropType<HolochainAppInfoExtended>,
@@ -153,14 +139,6 @@ export default defineComponent({
   padding: 0;
   border-radius: 22px;
   object-fit: cover;
-}
-
-.pointer {
-  cursor: pointer;
-}
-
-.cursor-default {
-  cursor: default;
 }
 
 .icon-container {

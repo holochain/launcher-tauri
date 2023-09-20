@@ -8,13 +8,12 @@
       style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"
     ></LoadingDots>
   </div>
-
   <div
+    v-else
     class="column"
     style="flex: 1; min-height: calc(100vh - 64px); align-items: center"
   >
     <InstalledAppsList
-      :installedApps="$store.getters[`allApps`]"
       @openApp="openApp($event)"
       @select-view="$emit('select-view', $event)"
     />
@@ -30,20 +29,14 @@ import { defineComponent } from "vue";
 
 import { HolochainAppInfo } from "../types";
 import InstalledAppsList from "../components/InstalledAppsList.vue";
-import HCButton from "../components/subcomponents/HCButton.vue";
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
-import HCDialog from "../components/subcomponents/HCDialog.vue";
-import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
 export default defineComponent({
   name: "Launcher",
   components: {
     InstalledAppsList,
-    HCButton,
     HCSnackbar,
-    HCDialog,
-    ToggleSwitch,
     LoadingDots,
   },
   emits: ["show-message", "select-view"],
