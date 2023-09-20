@@ -1,18 +1,8 @@
 <template>
-  <div
-    v-if="isLoading()"
-    class="column center-content"
-    style="flex: 1; height: calc(100vh - 64px)"
-  >
-    <LoadingDots
-      style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"
-    ></LoadingDots>
+  <div v-if="isLoading()" class="column center-content loading-container">
+    <LoadingDots class="loading-dots"></LoadingDots>
   </div>
-  <div
-    v-else
-    class="column"
-    style="flex: 1; min-height: calc(100vh - 64px); align-items: center"
-  >
+  <div v-else class="column content-container">
     <InstalledAppsList
       @openApp="openApp($event)"
       @select-view="$emit('select-view', $event)"
@@ -73,6 +63,21 @@ export default defineComponent({
 <!-- We don't have scoped styles with classes because it becomes harder to export a reusable library -->
 
 <style scoped>
+.loading-container {
+  flex: 1;
+  height: calc(100vh - 64px);
+}
+.loading-dots {
+  --radius: 15px;
+  --dim-color: #e8e8eb;
+  --fill-color: #b5b5b5;
+}
+.content-container {
+  flex: 1;
+  min-width: 480px;
+  min-height: calc(100vh - 64px);
+  align-items: center;
+}
 .btn-install:hover {
   cursor: pointer;
   --hc-primary-color: #5537fc;
