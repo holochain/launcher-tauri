@@ -52,32 +52,41 @@
     </div>
   </div>
 
-  <div v-else class="app-grid-container" style="margin-top: 60px">
-    <div
-      v-for="app in sortedApps"
-      :key="app.webAppInfo.installed_app_info.installed_app_id"
-      style="margin: 5px 12px"
-    >
-      <InstalledAppCard :app="app" @openApp="$emit('openApp', $event)" />
-    </div>
+  <div class="container">
+    <draggable :list="draggableList" class="grid">
+      <transition-group>
+        <div
+          v-for="item in draggableList"
+          :key="item.webAppInfo.installed_app_info.installed_app_id"
+          class="grid-item"
+        >
+          <InstalledAppCard
+            @openApp="$emit('openApp', $event)"
+            :app="item"
+            class="list-group-item"
+          />
+        </div>
+      </transition-group>
+    </draggable>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
 
 import "@material/mwc-button";
 import "@material/mwc-icon-button";
 import "@material/mwc-icon";
 
 import { HolochainAppInfo, HolochainAppInfoExtended } from "../types";
+import { VueDraggableNext } from "vue-draggable-next";
 import { isAppRunning } from "../utils";
 import InstalledAppCard from "./InstalledAppCard.vue";
 import HCLoading from "./subcomponents/HCLoading.vue";
 import HCButton from "./subcomponents/HCButton.vue";
 import prettyBytes from "pretty-bytes";
 import HCSnackbar from "./subcomponents/HCSnackbar.vue";
-import { mapActions } from "vuex";
+import { mapActions, useStore } from "vuex";
 import { APPSTORE_APP_ID, DEVHUB_APP_ID } from "../constants";
 
 export default defineComponent({
@@ -87,12 +96,92 @@ export default defineComponent({
     HCLoading,
     HCSnackbar,
     HCButton,
+    draggable: VueDraggableNext,
   },
-  props: {
-    installedApps: {
-      type: Object as PropType<Array<HolochainAppInfo>>,
-      required: true,
-    },
+  async mounted() {
+    await this.connectToWebsocket();
+  },
+  setup() {
+    const store = useStore();
+
+    const installedApps = computed(() => store.getters.allApps);
+
+    const createExtendedApp = (
+      app: HolochainAppInfo
+    ): HolochainAppInfoExtended => ({
+      webAppInfo: app.webAppInfo,
+      holochainId: app.holochainId,
+      holochainVersion: app.holochainVersion,
+      guiUpdateAvailable: undefined,
+    });
+
+    const isNotAppStoreOrDevHub = (app: HolochainAppInfoExtended) =>
+      app.webAppInfo.installed_app_info.installed_app_id !== APPSTORE_APP_ID &&
+      app.webAppInfo.installed_app_info.installed_app_id !== DEVHUB_APP_ID &&
+      app.webAppInfo.web_uis.default.type !== "Headless";
+
+    const compareAppIds = (
+      appA: HolochainAppInfoExtended,
+      appB: HolochainAppInfoExtended
+    ) =>
+      appA.webAppInfo.installed_app_info.installed_app_id.localeCompare(
+        appB.webAppInfo.installed_app_info.installed_app_id
+      );
+
+    const compareRunningApps = (
+      appA: HolochainAppInfoExtended,
+      appB: HolochainAppInfoExtended
+    ) =>
+      isAppRunning(appA.webAppInfo.installed_app_info) ===
+      isAppRunning(appB.webAppInfo.installed_app_info)
+        ? 0
+        : isAppRunning(appA.webAppInfo.installed_app_info)
+        ? -1
+        : 1;
+
+    const sortedApps = computed(() => {
+      const order = window.localStorage.getItem("installedAppsListOrder");
+      const orderParsed = order ? JSON.parse(order) : [];
+
+      const sortedAppList: Array<HolochainAppInfoExtended> = installedApps.value
+        .map(createExtendedApp)
+        .filter(isNotAppStoreOrDevHub)
+        .sort(compareAppIds)
+        .sort(compareRunningApps);
+
+      if (orderParsed.length > 0) {
+        sortedAppList.sort(
+          (a, b) =>
+            orderParsed.indexOf(
+              a.webAppInfo.installed_app_info.installed_app_id
+            ) -
+            orderParsed.indexOf(
+              b.webAppInfo.installed_app_info.installed_app_id
+            )
+        );
+      }
+
+      return sortedAppList;
+    });
+
+    const draggableList = ref([...sortedApps.value]);
+
+    watch(
+      draggableList,
+      (newList) => {
+        const order = newList.map(
+          (app) => app.webAppInfo.installed_app_info.installed_app_id
+        );
+        localStorage.setItem("installedAppsListOrder", JSON.stringify(order));
+      },
+      {
+        deep: true,
+      }
+    );
+
+    return {
+      draggableList,
+    };
   },
   data(): {
     loadingText: string;
@@ -104,53 +193,9 @@ export default defineComponent({
     };
   },
   emits: ["openApp", "select-view"],
-  async mounted() {
-    await this.connectToWebsocket();
-  },
   computed: {
-    sortedApps() {
-      // if extended happ releases are not yet fetched from the DevHub to include potential
-      // GUI updates, just return installedApps with guiUpdateAvailable undefined
-      let sortedAppList: Array<HolochainAppInfoExtended> =
-        this.installedApps.map((app) => {
-          return {
-            webAppInfo: app.webAppInfo,
-            holochainId: app.holochainId,
-            holochainVersion: app.holochainVersion,
-            guiUpdateAvailable: undefined,
-          };
-        });
-
-      // Filter out App Store and DevHub
-      sortedAppList = sortedAppList.filter(
-        (app) =>
-          app.webAppInfo.installed_app_info.installed_app_id !==
-            APPSTORE_APP_ID &&
-          app.webAppInfo.installed_app_info.installed_app_id !==
-            DEVHUB_APP_ID &&
-          app.webAppInfo.web_uis.default.type !== "Headless"
-      );
-
-      // sort alphabetically, then disabled last
-      sortedAppList = sortedAppList
-        .sort((appA, appB) =>
-          appA.webAppInfo.installed_app_info.installed_app_id.localeCompare(
-            appB.webAppInfo.installed_app_info.installed_app_id
-          )
-        )
-        .sort((appA, appB) => {
-          return isAppRunning(appA.webAppInfo.installed_app_info) ===
-            isAppRunning(appB.webAppInfo.installed_app_info)
-            ? 0
-            : isAppRunning(appA.webAppInfo.installed_app_info)
-            ? -1
-            : 1;
-        });
-
-      return sortedAppList;
-    },
     noWebApps(): boolean {
-      return this.sortedApps.every(
+      return this.draggableList.every(
         (app) => app.webAppInfo.web_uis.default.type === "Headless"
       );
     },
@@ -186,19 +231,27 @@ export default defineComponent({
   border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 }
 
-.app-grid-container {
-  min-width: 70vw;
-  max-width: 80%;
+.button-large {
+  height: 65px;
+  min-width: 200px;
+  border-radius: 12px;
+}
+
+.container {
+  padding: 2rem;
+  width: calc(100% - 4rem);
+}
+
+.grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   /* This is better for small screens, once min() is better supported */
   grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
   gap: 1rem;
+  user-select: none;
 }
 
-.button-large {
-  height: 65px;
-  min-width: 200px;
-  border-radius: 12px;
+.grid-item {
+  cursor: pointer;
 }
 </style>
