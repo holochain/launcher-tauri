@@ -41,7 +41,7 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
 
         match mutex.get_running() {
           Ok(manager) => {
-            if let Err(err) = manager.open_app(version, &app_id) {
+            if let Err(err) = manager.open_app(version, &app_id, true) {
               log::error!("Error opening app: {:?}", err);
             }
           }

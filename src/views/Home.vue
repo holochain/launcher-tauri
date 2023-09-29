@@ -121,7 +121,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { defineComponent } from "vue";
 import "@material/mwc-fab";
 import { APPSTORE_APP_ID } from "../constants";
-import { HolochainAppInfo } from "../types";
+import { HappNotificationSettings, HolochainAppInfo } from "../types";
 import {
   AppWebsocket,
   decodeHashFromBase64,
@@ -131,6 +131,7 @@ import {
 import { getHappReleasesByActionHashes } from "../appstore/appstore-interface";
 import { HappReleaseEntry } from "../appstore/types";
 import { mapActions, mapGetters } from "vuex";
+import { getHappNotificationSettings } from "../utils";
 
 type View =
   | {
@@ -167,7 +168,15 @@ export default defineComponent({
     };
   },
   async created() {
+    console.log("Home.vue is being created now.");
     await this.$store.dispatch(ActionTypes.fetchStateInfo);
+
+    const installedApps: Array<HolochainAppInfo> =
+      this.$store.getters[`allApps`];
+
+    console.log("allApps: ", installedApps);
+
+    await this.openBackgroundWindows(installedApps);
 
     await this.checkForUiUpdates();
   },
@@ -179,6 +188,25 @@ export default defineComponent({
       return this.$store.state.launcherStateInfo === "loading";
     },
     ...mapActions(["connectToWebsocket"]),
+    async openBackgroundWindows(apps: Array<HolochainAppInfo>) {
+      Promise.all(
+        apps.map(async (app) => {
+          const appId = app.webAppInfo.installed_app_info.installed_app_id;
+          // check whether notifications are enabled for this app
+          const notificationSettings: HappNotificationSettings =
+            getHappNotificationSettings(appId);
+          // if any of the settings is set to true, open an invisible window of this happ
+          // in the background in order to get notifications from the UI
+          if (Object.values(notificationSettings).some((e) => !!e)) {
+            await invoke("open_app_ui", {
+              appId,
+              holochainId: app.holochainId,
+              visible: false,
+            });
+          }
+        })
+      );
+    },
     async checkForUiUpdates() {
       const installedApps: Array<HolochainAppInfo> =
         this.$store.getters[`allApps`];

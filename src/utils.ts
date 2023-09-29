@@ -1,11 +1,20 @@
-import { CellInfo, encodeHashToBase64 } from "@holochain/client";
+import {
+  CellInfo,
+  InstalledAppId,
+  encodeHashToBase64,
+} from "@holochain/client";
 import { CellId } from "@holochain/client";
 import { DisabledAppReason, AppInfo } from "@holochain/client";
 import prettyBytes from "pretty-bytes";
 import { Base64 } from "js-base64";
 
-import { GossipProgress, ResourceLocator, ResourceLocatorB64 } from "./types";
-import { HappNotification } from "@holochain/launcher-api";
+import {
+  GossipProgress,
+  HappNotificationSettings,
+  ResourceLocator,
+  ResourceLocatorB64,
+} from "./types";
+import { HappNotification, NotificationId } from "@holochain/launcher-api";
 
 export function locatorToLocatorB64(
   locator: ResourceLocator
@@ -209,7 +218,7 @@ export function readUnreadHappNotifications(
   }
 }
 
-export function clearHappNotifications(appId: string) {
+export function clearHappNotifications(appId: InstalledAppId) {
   // clear all happ notifications without customCountReset id
   const unreadNotificationsJson: string | null = window.localStorage.getItem(
     `happNotificationsUnread#${appId}`
@@ -221,6 +230,37 @@ export function clearHappNotifications(appId: string) {
     );
     const unreadNotificationsCleared = unreadNotifications.filter(
       (notification) => !!notification.customCountReset
+    );
+    window.localStorage.setItem(
+      `happNotificationsUnread#${appId}`,
+      JSON.stringify(unreadNotificationsCleared)
+    );
+  } else {
+    window.localStorage.setItem(
+      `happNotificationsUnread#${appId}`,
+      JSON.stringify([])
+    );
+  }
+}
+
+export function resetHappNotificationCount(
+  appId: InstalledAppId,
+  notificationIds: Array<NotificationId>
+) {
+  // clear all happ notifications **with** customCountReset id
+  const unreadNotificationsJson: string | null = window.localStorage.getItem(
+    `happNotificationsUnread#${appId}`
+  );
+
+  if (unreadNotificationsJson) {
+    const unreadNotifications: Array<HappNotification> = JSON.parse(
+      unreadNotificationsJson
+    );
+    const unreadNotificationsCleared = unreadNotifications.filter(
+      (notification) => {
+        if (!notification.customCountReset) return true;
+        return !notificationIds.includes(notification.customCountReset);
+      }
     );
     window.localStorage.setItem(
       `happNotificationsUnread#${appId}`,
@@ -281,4 +321,42 @@ function isMillisecondTimestamp(timestamp: number): boolean {
     return false;
   }
   return true;
+}
+
+/**
+ * Gets the user-defined notification settings for the specified applet Id from localStorage
+ * @param installedAppId
+ * @returns
+ */
+export function getHappNotificationSettings(
+  installedAppId: InstalledAppId
+): HappNotificationSettings {
+  const happNotificationSettingsJson: string | null =
+    window.localStorage.getItem(`happNotificationSettings#${installedAppId}`);
+  const happNotificationSettings: HappNotificationSettings =
+    happNotificationSettingsJson
+      ? JSON.parse(happNotificationSettingsJson)
+      : {
+          allowOSNotification: true,
+          showInSystray: true,
+          showInLauncherView: true,
+          showInFeed: true,
+        };
+
+  return happNotificationSettings;
+}
+
+/**
+ * Gets the user-defined notification settings for the specified applet Id from localStorage
+ * @param installedAppId
+ * @returns
+ */
+export function setHappNotificationSettings(
+  installedAppId: InstalledAppId,
+  settings: HappNotificationSettings
+): void {
+  window.localStorage.setItem(
+    `happNotificationSettings#${installedAppId}`,
+    JSON.stringify(settings)
+  );
 }

@@ -27,9 +27,12 @@ window.__HC_LAUNCHER_API__ = {
   resetNotificationCount: async (notificationIds: Array<NotificationId>) => {
     const appId = window.__HC_LAUNCHER_ENV__.INSTALLED_APP_ID;
     try {
-      await invoke("reset_happ_notification_count", { notificationIds, appId });
+      await invoke("reset_happ_notification_count", { appId, notificationIds });
     } catch (e) {
-      console.error("Failed to invoke tauri command 'notify_tauri': ", e);
+      console.error(
+        "Failed to invoke tauri command 'reset_happ_notification_count': ",
+        e
+      );
     }
   },
 };

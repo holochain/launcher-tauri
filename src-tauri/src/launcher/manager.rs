@@ -465,17 +465,22 @@ impl LauncherManager {
     Ok(())
   }
 
-  pub fn open_app(&mut self, holochain_id: HolochainId, app_id: &String) -> Result<(), String> {
+  pub fn open_app(&mut self, holochain_id: HolochainId, app_id: &String, visible: bool) -> Result<(), String> {
     let window_label = derive_window_label(&app_id);
 
     // Iterate over the open windows, focus if the app is already open
 
     if let Some(w) = self.app_handle.get_window(window_label.as_str()) {
-      if let Err(err) = w.unminimize() {
-        log::error!("Error unminimizing the window: {:?}", err);
-      }
-      if let Err(err) = w.set_focus() {
-        log::error!("Error setting focus to the window: {:?}", err);
+      if visible {
+        if let Err(err) = w.show() {
+          log::error!("Error showing the window: {:?}", err);
+        }
+        if let Err(err) = w.unminimize() {
+          log::error!("Error unminimizing the window: {:?}", err);
+        }
+        if let Err(err) = w.set_focus() {
+          log::error!("Error setting focus to the window: {:?}", err);
+        }
       }
       return Ok(());
     }
@@ -501,6 +506,10 @@ impl LauncherManager {
       true,
     );
 
+    if !visible {
+      window_builder = window_builder.visible(false);
+    }
+
     // needs to be removed in order for set_size() to work apparently
     // window_builder = window_builder.maximized(true);
 
@@ -508,7 +517,7 @@ impl LauncherManager {
     window_builder = window_builder.inner_size(1536.0, 864.0);
 
     // add launcher API scripts
-    window_builder = window_builder.initialization_script(include_str!("../../../api_scripts/dist/api-scripts.js"));
+    window_builder = window_builder.initialization_script(include_str!("../../../api_scripts/dist/launcher-api-scripts.js"));
 
     // placeholder for when apps come shipped with their custom icons:
     //

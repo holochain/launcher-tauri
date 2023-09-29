@@ -129,9 +129,15 @@ import "@fontsource/poppins/800.css";
 import "@fontsource/poppins/900.css";
 import { Event, listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/tauri";
-import { NotificationPayload } from "./types";
+import {
+  HappNotificationSettings,
+  NotificationPayload,
+  ResetHappNotificationPayload,
+} from "./types";
 import {
   clearHappNotifications,
+  getHappNotificationSettings,
+  resetHappNotificationCount,
   storeHappNotifications,
   validateNotifications,
 } from "./utils";
@@ -183,9 +189,21 @@ export default defineComponent({
           this.$store.commit("loadNotificationState");
         }
       );
+
+      await listen(
+        "reset-happ-notification-count",
+        async (e: Event<ResetHappNotificationPayload>) => {
+          await resetHappNotificationCount(
+            e.payload.app_id,
+            e.payload.notification_ids
+          );
+          this.$store.commit("loadNotificationState");
+        }
+      );
     });
   },
   async created() {
+    console.log("App.vue component is created.");
     await this.$store.dispatch(ActionTypes.fetchStateInfo);
   },
   methods: {
@@ -196,22 +214,42 @@ export default defineComponent({
       console.log("Got app notification: ", e.payload);
 
       // store to localStorage - Note that app id is assumed to be unique across all holochain versions
-      // what about the case where the happ window is already open?
+      // TODO what about the case where the happ window is already open and in the foreground?
       const notifications = validateNotifications(e.payload.notifications);
       storeHappNotifications(notifications, e.payload.app_id);
 
       // update store
       this.$store.commit("loadNotificationState");
 
-      // TODO check notification settings for app id
+      // TODO potentially improve filter logic, e.g. take into accound when the conductor was started up
+      // filter out notifications that are older than 5 minutes, assuming they originate
+      // from before the launcher was started
+      // (such notifications should not trigger OS notifications but only show up
+      // as notification dots)
+      const now = Date.now();
+      console.log("NOW: ", now);
+      console.log("received notifications: ", e.payload.notifications);
 
-      // send notifications to OS
-      await invoke("notify_os", {
-        notifications: e.payload.notifications,
-        appId: e.payload.app_id,
-        systray: true,
-        os: true,
-      });
+      const freshNotifications = e.payload.notifications.filter(
+        (notification) => now - notification.timestamp < 5 * 60 * 1000
+      );
+
+      // TODO check notification settings for app id
+      const notificationSettings: HappNotificationSettings =
+        getHappNotificationSettings(e.payload.app_id);
+
+      if (
+        notificationSettings.showInSystray ||
+        notificationSettings.allowOSNotification
+      ) {
+        // send notifications to OS
+        await invoke("notify_os", {
+          notifications: freshNotifications,
+          appId: e.payload.app_id,
+          systray: notificationSettings.showInSystray,
+          os: notificationSettings.allowOSNotification,
+        });
+      }
     },
   },
 });

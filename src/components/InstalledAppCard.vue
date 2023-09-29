@@ -58,21 +58,9 @@
     </div>
 
     <!-- notification dot -->
-    <div
-      class="notification-dot"
-      v-if="
-        $store.state.notificationState[
-          app.webAppInfo.installed_app_info.installed_app_id
-        ] &&
-        $store.state.notificationState[
-          app.webAppInfo.installed_app_info.installed_app_id
-        ].length > 0
-      "
-    >
+    <div class="notification-dot" v-if="happNotificationState(app)">
       <span style="padding: 0 5px">{{
-        $store.state.notificationState[
-          app.webAppInfo.installed_app_info.installed_app_id
-        ].length
+        happNotificationState(app)?.counts
       }}</span>
     </div>
   </div>
@@ -93,6 +81,11 @@ import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 
 import { HappNotification } from "@holochain/launcher-api";
+
+interface HappNotificationState {
+  counts: number;
+  urgency: "high" | "medium" | "low";
+}
 
 export default defineComponent({
   name: "InstalledAppCard",
@@ -143,6 +136,27 @@ export default defineComponent({
       if (!isAppDisabled(this.app.webAppInfo.installed_app_info)) {
         this.$emit("openApp", this.app);
       }
+    },
+    happNotificationState(
+      app: HolochainAppInfoExtended
+    ): HappNotificationState | undefined {
+      const notificationState =
+        this.$store.state.notificationState[
+          app.webAppInfo.installed_app_info.installed_app_id
+        ];
+
+      if (!notificationState || notificationState.length < 1) return undefined;
+
+      const urgency = notificationState.some(
+        (notification) => notification.urgency === "high"
+      )
+        ? "high"
+        : "medium";
+
+      return {
+        counts: notificationState.length,
+        urgency,
+      };
     },
   },
 });
@@ -206,7 +220,7 @@ export default defineComponent({
   justify-content: center;
   position: absolute;
   top: -8px;
-  right: -11px;
+  right: 15px;
   font-weight: bold;
   background: #faf035;
   border-radius: 16px;

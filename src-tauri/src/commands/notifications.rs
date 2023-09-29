@@ -98,7 +98,7 @@ pub async fn notify_os(
                 change_systray_icon_state(&app_handle, &message.urgency).await
                     .map_err(|e| format!("Failed to change systray icon state: {}", e))?;
             }
-            if os {
+            if os && message.urgency == "high" {
                 let os_notification =  Notification::new(&app_handle.config().tauri.bundle.identifier)
                     .body(message.body)
                     .title(format!("{}: {}", app_id, message.title));
@@ -135,6 +135,36 @@ pub async fn clear_happ_notifications(
     // OS notification settings for this app.
     if let Some(admin_window) = app_handle.get_window("admin") {
         admin_window.emit("clear-happ-notifications", app_id)
+            .map_err(|e| format!("Failed to emit event to admin window: {}", e))
+    } else {
+        // The admin window must always be running invisibly in the background
+        // so this case should not occur
+        Ok(())
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct ResetHappNotificationPayload {
+    app_id: InstalledAppId,
+    notification_ids: Vec<NotificationId>,
+}
+
+#[tauri::command]
+pub async fn reset_happ_notification_count(
+    app_handle: tauri::AppHandle,
+    window: tauri::Window,
+    app_id: InstalledAppId,
+    notification_ids: Vec<NotificationId>,
+) -> Result<(), String> {
+    // This tauri command is allowed to be called only by the window of the corresponding app:
+    if window.label() != derive_window_label(&app_id) {
+        return Err(String::from("Unauthorized: Attempted to notifications for app that this tauri window is not associated to."))
+    }
+
+    // Send notifications to admin window to store to localStorage and check
+    // OS notification settings for this app.
+    if let Some(admin_window) = app_handle.get_window("admin") {
+        admin_window.emit("reset-happ-notification-count", ResetHappNotificationPayload { app_id, notification_ids })
             .map_err(|e| format!("Failed to emit event to admin window: {}", e))
     } else {
         // The admin window must always be running invisibly in the background

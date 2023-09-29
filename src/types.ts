@@ -7,7 +7,7 @@ import {
   AnyDhtHashB64,
   ActionHashB64,
 } from "@holochain/client";
-import { HappNotification } from "@holochain/launcher-api";
+import { HappNotification, NotificationId } from "@holochain/launcher-api";
 import { Entity, GUIReleaseEntry, HappReleaseEntry } from "./appstore/types";
 
 declare global {
@@ -194,7 +194,19 @@ export interface NotificationPayload {
   app_id: string;
 }
 
+export interface ResetHappNotificationPayload {
+  app_id: string;
+  notification_ids: Array<NotificationId>;
+}
+
 export interface FilterListEntry {
   actionHash: ActionHashB64;
   reason: string;
+}
+
+export interface HappNotificationSettings {
+  allowOSNotification: boolean;
+  showInSystray: boolean;
+  showInLauncherView: boolean;
+  showInFeed: boolean;
 }
