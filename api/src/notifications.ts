@@ -64,5 +64,5 @@ export interface HappNotification {
   //  * CAUTION: If handled improperly by the app, this can lead to accumulation
   //  * of stale notifications.
   //  */
-  customCountReset?: NotificationId;
+  custom_count_reset?: NotificationId;
 }

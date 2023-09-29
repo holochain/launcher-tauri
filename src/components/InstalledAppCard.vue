@@ -52,9 +52,7 @@
       }${getAppStatus(app) === 'Offline/Paused' ? ' (OFFLINE/PAUSED)' : ''}`"
     >
       <!-- {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0,20) }}{{ app.webAppInfo.installed_app_info.installed_app_id.length > 20 ? '...' : '' }} -->
-      ({{ unreadNotifications.length }}){{
-        app.webAppInfo.installed_app_info.installed_app_id
-      }}
+      {{ app.webAppInfo.installed_app_info.installed_app_id }}
     </div>
 
     <!-- notification dot -->

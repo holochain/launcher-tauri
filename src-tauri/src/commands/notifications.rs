@@ -50,7 +50,6 @@ pub async fn notify_tauri(
     notifications: Vec<HappNotification>,
     app_id: InstalledAppId,
 ) -> tauri::Result<()> {
-    println!("Got notification from app with id: {}", app_id);
     // This tauri command is allowed for any window.
 
     // Send notifications to admin window to store to localStorage and check

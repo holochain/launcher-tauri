@@ -219,7 +219,7 @@ export function readUnreadHappNotifications(
 }
 
 export function clearHappNotifications(appId: InstalledAppId) {
-  // clear all happ notifications without customCountReset id
+  // clear all happ notifications without custom_count_reset id
   const unreadNotificationsJson: string | null = window.localStorage.getItem(
     `happNotificationsUnread#${appId}`
   );
@@ -229,7 +229,7 @@ export function clearHappNotifications(appId: InstalledAppId) {
       unreadNotificationsJson
     );
     const unreadNotificationsCleared = unreadNotifications.filter(
-      (notification) => !!notification.customCountReset
+      (notification) => !!notification.custom_count_reset
     );
     window.localStorage.setItem(
       `happNotificationsUnread#${appId}`,
@@ -247,7 +247,7 @@ export function resetHappNotificationCount(
   appId: InstalledAppId,
   notificationIds: Array<NotificationId>
 ) {
-  // clear all happ notifications **with** customCountReset id
+  // clear all happ notifications **with** custom_count_reset id
   const unreadNotificationsJson: string | null = window.localStorage.getItem(
     `happNotificationsUnread#${appId}`
   );
@@ -258,8 +258,8 @@ export function resetHappNotificationCount(
     );
     const unreadNotificationsCleared = unreadNotifications.filter(
       (notification) => {
-        if (!notification.customCountReset) return true;
-        return !notificationIds.includes(notification.customCountReset);
+        if (!notification.custom_count_reset) return true;
+        return !notificationIds.includes(notification.custom_count_reset);
       }
     );
     window.localStorage.setItem(
