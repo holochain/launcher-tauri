@@ -408,9 +408,6 @@ export const store = createStore<LauncherAdminState>({
         }
       });
 
-      console.log("### LOADING Notificationstate");
-      console.log("notificationState: ", notificationState);
-
       state.notificationState = notificationState;
     },
   },

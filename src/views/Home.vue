@@ -168,13 +168,10 @@ export default defineComponent({
     };
   },
   async created() {
-    console.log("Home.vue is being created now.");
     await this.$store.dispatch(ActionTypes.fetchStateInfo);
 
     const installedApps: Array<HolochainAppInfo> =
       this.$store.getters[`allApps`];
-
-    console.log("allApps: ", installedApps);
 
     await this.openBackgroundWindows(installedApps);
 

@@ -203,7 +203,6 @@ export default defineComponent({
     });
   },
   async created() {
-    console.log("App.vue component is created.");
     await this.$store.dispatch(ActionTypes.fetchStateInfo);
   },
   methods: {
@@ -211,8 +210,6 @@ export default defineComponent({
       await invoke("restart");
     },
     async handleNotifications(e: Event<NotificationPayload>) {
-      console.log("Got app notification: ", e.payload);
-
       // store to localStorage - Note that app id is assumed to be unique across all holochain versions
       // TODO what about the case where the happ window is already open and in the foreground?
       const notifications = validateNotifications(e.payload.notifications);
@@ -227,8 +224,6 @@ export default defineComponent({
       // (such notifications should not trigger OS notifications but only show up
       // as notification dots)
       const now = Date.now();
-      console.log("NOW: ", now);
-      console.log("received notifications: ", e.payload.notifications);
 
       const freshNotifications = e.payload.notifications.filter(
         (notification) => now - notification.timestamp < 5 * 60 * 1000
