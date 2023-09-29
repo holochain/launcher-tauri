@@ -5,7 +5,7 @@ import prettyBytes from "pretty-bytes";
 import { Base64 } from "js-base64";
 
 import { GossipProgress, ResourceLocator, ResourceLocatorB64 } from "./types";
-import { HappNotification } from "@holochain-launcher/api";
+import { HappNotification } from "@holochain/launcher-api";
 
 export function locatorToLocatorB64(
   locator: ResourceLocator

@@ -8,7 +8,7 @@ export default defineConfig({
     target: ["es2021", "chrome100", "safari11"],
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
-      name: "@holochain-launcher/api-scripts",
+      name: "@holochain/launcher-api-scripts",
     },
   },
 });

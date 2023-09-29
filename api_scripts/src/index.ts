@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api";
-import { HappNotification, NotificationId } from "@holochain-launcher/api";
+import { HappNotification, NotificationId } from "@holochain/launcher-api";
 declare global {
   interface Window {
     __HC_LAUNCHER_API__: {

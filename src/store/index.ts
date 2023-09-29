@@ -9,7 +9,7 @@ import { createStore } from "vuex";
 import { flatten, uniq } from "lodash-es";
 import { flattenCells, getCellId, readUnreadHappNotifications } from "../utils";
 import { AppWebsocket, InstalledAppId } from "@holochain/client";
-import { HappNotification } from "@holochain-launcher/api";
+import { HappNotification } from "@holochain/launcher-api";
 
 export interface LauncherAdminState {
   launcherStateInfo: "loading" | LauncherStateInfo;

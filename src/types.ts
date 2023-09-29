@@ -7,7 +7,7 @@ import {
   AnyDhtHashB64,
   ActionHashB64,
 } from "@holochain/client";
-import { HappNotification } from "@holochain-launcher/api";
+import { HappNotification } from "@holochain/launcher-api";
 import { Entity, GUIReleaseEntry, HappReleaseEntry } from "./appstore/types";
 
 declare global {

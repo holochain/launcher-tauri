@@ -1,5 +1,5 @@
 {
-  "name": "@holochain-launcher/api-scripts",
+  "name": "@holochain/launcher-api-scripts",
   "private": true,
   "version": "0.0.1",
   "main": "./dist/index.js",
@@ -18,7 +18,7 @@
   "type": "module",
   "dependencies": {
     "@tauri-apps/api": "1.4.0",
-    "@holochain-launcher/api": "file:../api"
+    "@holochain/launcher-api": "file:../api"
   },
   "devDependencies": {
     "typescript": "^4.6.4",

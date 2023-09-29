@@ -92,7 +92,7 @@ import {
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 
-import { HappNotification } from "@holochain-launcher/api";
+import { HappNotification } from "@holochain/launcher-api";
 
 export default defineComponent({
   name: "InstalledAppCard",
