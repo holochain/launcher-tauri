@@ -29,13 +29,10 @@ import { ResourceLocator } from "../types";
 export async function getAllApps(
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo
-): Promise<Array<AppEntry>> {
-  console.log("@getAllApps");
+): Promise<Array<Entity<AppEntry>>> {
   const appstoreCell = appStoreApp.cell_info["appstore"].find(
     (c) => "provisioned" in c
   );
-
-  console.log("@getAllApps: appstoreCell", appstoreCell);
 
   if (!appstoreCell) {
     throw new Error("appstore cell not found.");
@@ -49,9 +46,17 @@ export async function getAllApps(
         provenance: getCellId(appstoreCell)![1],
       });
 
-    console.log("@getAllApps: allApps", allApps);
+    console.log(
+      "@getAllApps: allApps",
+      allApps.payload.map((appEntity) => {
+        return {
+          actionHash: encodeHashToBase64(appEntity.action),
+          appEntry: appEntity.content,
+        };
+      })
+    );
 
-    return allApps.payload.map((appEntity) => appEntity.content);
+    return allApps.payload;
   }
 }
 
@@ -114,13 +119,13 @@ export async function getHappReleasesByActionHashes(
   devhubDna: DnaHash,
   happReleaseActionHashes: Array<ActionHash | undefined>
 ): Promise<Array<HappReleaseEntry | undefined>> {
-  console.log(
-    "@getHappReleasesByActionHashes: getting happ releases by action hashes"
-  );
-  console.log(
-    "@getHappReleasesByActionHashes: devhubDna: ",
-    encodeHashToBase64(devhubDna)
-  );
+  // console.log(
+  //   "@getHappReleasesByActionHashes: getting happ releases by action hashes"
+  // );
+  // console.log(
+  //   "@getHappReleasesByActionHashes: devhubDna: ",
+  //   encodeHashToBase64(devhubDna)
+  // );
   // Find an online host
   const host: AgentPubKey = await getAvailableHostForZomeFunction(
     appWebsocket,
@@ -130,7 +135,7 @@ export async function getHappReleasesByActionHashes(
     "get_happ_releases"
   );
 
-  console.log("@getHappReleasesByActionHashes: found host: ", host);
+  // console.log("@getHappReleasesByActionHashes: found host: ", host);
 
   // make zome calls for each ActionHash to this one host
   const happReleases = await Promise.all(
@@ -149,10 +154,10 @@ export async function getHappReleasesByActionHashes(
     })
   );
 
-  console.log(
-    "@getHappReleasesByActionHashes: Found happReleases: ",
-    happReleases
-  );
+  // console.log(
+  //   "@getHappReleasesByActionHashes: Found happReleases: ",
+  //   happReleases
+  // );
 
   return happReleases.map((response) => {
     if (response) {
@@ -577,12 +582,12 @@ export async function collectBytes(
   appStoreApp: AppInfo,
   entryHash: EntryHash
 ): Promise<Uint8Array> {
-  console.log("@collectBytes");
+  // console.log("@collectBytes");
   const appstoreCell = appStoreApp.cell_info["appstore"].find(
     (c) => "provisioned" in c
   );
 
-  console.log("@collectBytes: appstoreCell", appstoreCell);
+  // console.log("@collectBytes: appstoreCell", appstoreCell);
 
   if (!appstoreCell) {
     throw new Error("appstore cell not found.");
@@ -595,7 +600,7 @@ export async function collectBytes(
       provenance: getCellId(appstoreCell)![1],
     });
 
-    console.log("@collectBytes RECEIVED RESPONSE: ", response);
+    // console.log("@collectBytes RECEIVED RESPONSE: ", response);
 
     if (!(response.type === "success")) {
       return Promise.reject(`Failed to get MemoryEntry: ${response.payload}`);

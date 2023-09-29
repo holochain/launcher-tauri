@@ -344,12 +344,12 @@ export default defineComponent({
       try {
         this.holochainId = this.$store.getters["holochainIdForDevhub"];
       } catch (e) {
-        console.log("Failed to get holochain version: ", e);
+        console.error("Failed to get holochain version: ", e);
       }
     }
 
     try {
-      console.log("@created: this.appBundlePath: ", this.appBundlePath);
+      // console.log("@created: this.appBundlePath: ", this.appBundlePath);
       this.appInfo = (await invoke("get_app_info", {
         appBundlePath: this.appBundlePath,
       })) as WebAppInfo;
@@ -362,7 +362,7 @@ export default defineComponent({
       });
     } catch (e) {
       this.$emit("error", `Error: ${JSON.stringify(e)}`);
-      console.log("Error getting app info: ", e);
+      console.error("Error getting app info: ", e);
       this.close();
     }
   },
@@ -490,7 +490,7 @@ export default defineComponent({
 
         this.installing = false;
       } catch (e) {
-        console.log("Error installing the app: ", e);
+        console.error("Error installing the app: ", e);
         this.showMessage(`Error installing app: ${JSON.stringify(e)}`);
         this.installing = false;
         this.$nextTick(() => {

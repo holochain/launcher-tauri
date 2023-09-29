@@ -34,8 +34,8 @@
       <div
         v-else
         class="appIcon column center-content"
-        :class="getAppStatus(app) === 'Running' ? 'pointer' : 'cursor-default'"
         style="background-color: #372ba5"
+        :class="getAppStatus(app) === 'Running' ? 'pointer' : 'cursor-default'"
       >
         <div style="color: white; font-size: 45px; font-weight: 600">
           {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0, 2) }}
@@ -159,6 +159,13 @@ export default defineComponent({
   /* box-shadow: 0 0 2px rgb(131, 128, 176); */
 }
 
+.pointer {
+  cursor: pointer;
+}
+.cursor-default {
+  cursor: default;
+}
+
 .btn {
   margin: 5px;
 }
@@ -178,14 +185,6 @@ export default defineComponent({
   padding: 0;
   border-radius: 22px;
   object-fit: cover;
-}
-
-.pointer {
-  cursor: pointer;
-}
-
-.cursor-default {
-  cursor: default;
 }
 
 .icon-container {

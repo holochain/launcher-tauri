@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.10.980",
+  "version": "0.11.1",
   "private": true,
   "workspaces": [
     "api",
@@ -46,6 +46,7 @@
     "mark.js": "^8.11.1",
     "pretty-bytes": "^6.0.0",
     "vue": "^3.2.45",
+    "vue-draggable-next": "^2.2.1",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"

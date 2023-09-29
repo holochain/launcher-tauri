@@ -78,7 +78,7 @@ type Locale = "en" | "de";
 
 const customLocale = window.localStorage.getItem("customLocale");
 
-console.log("Fetched customLocale: ", customLocale);
+// console.log("Fetched customLocale: ", customLocale);
 
 if (customLocale) {
   if (i18n.global.availableLocales.includes(customLocale as Locale)) {

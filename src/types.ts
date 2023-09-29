@@ -5,6 +5,7 @@ import {
   DnaHash,
   DnaHashB64,
   AnyDhtHashB64,
+  ActionHashB64,
 } from "@holochain/client";
 import { HappNotification } from "@holochain-launcher/api";
 import { Entity, GUIReleaseEntry, HappReleaseEntry } from "./appstore/types";
@@ -191,4 +192,9 @@ export interface ReleaseInfo {
 export interface NotificationPayload {
   notifications: Array<HappNotification>;
   app_id: string;
+}
+
+export interface FilterListEntry {
+  actionHash: ActionHashB64;
+  reason: string;
 }
