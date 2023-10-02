@@ -146,6 +146,15 @@ export function toSrc(
   return undefined;
 }
 
+function getLocalStorageItem<T>(key: string): T | undefined {
+  const item: string | null = window.localStorage.getItem(key);
+  return item ? JSON.parse(item) : undefined;
+}
+
+function setLocalStorageItem<T>(key: string, value: T): void {
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
+
 /**
  * Stores happ notifications to localStorage - to the array of unread notifications
  * as well as to a persistent (deduplicated) log of all received notifications
@@ -159,45 +168,33 @@ export function storeHappNotifications(
   appId: string
 ): Array<HappNotification> {
   // store them to unread messages
-  const unreadNotificationsJson: string | null = window.localStorage.getItem(
+  let unreadNotifications = getLocalStorageItem<Array<HappNotification>>(
     `happNotificationsUnread#${appId}`
   );
-  let unreadNotifications: Array<HappNotification>;
 
-  if (unreadNotificationsJson) {
-    unreadNotifications = JSON.parse(unreadNotificationsJson);
-    unreadNotifications = [
-      ...new Set([...unreadNotifications, ...notifications]),
-    ]; // dedpulicated array
-  } else {
-    unreadNotifications = [...notifications];
-  }
+  unreadNotifications = unreadNotifications
+    ? [...new Set([...unreadNotifications, ...notifications])]
+    : [...notifications];
 
-  window.localStorage.setItem(
+  setLocalStorageItem<Array<HappNotification>>(
     `happNotificationsUnread#${appId}`,
-    JSON.stringify(unreadNotifications)
+    unreadNotifications
   );
 
   // store to persistend time-indexed notifications log
   notifications.forEach((notification) => {
     const timestamp = notification.timestamp;
     const daysSinceEpoch = Math.floor(timestamp / 8.64e7);
-    const notificationsOfSameDateJSON: string | null =
-      window.localStorage.getItem(
-        `happNotifications#${daysSinceEpoch}#${appId}`
-      );
-    let notificationsOfSameDate: Array<HappNotification>;
-    if (notificationsOfSameDateJSON) {
-      notificationsOfSameDate = JSON.parse(notificationsOfSameDateJSON);
-      notificationsOfSameDate = [
-        ...new Set([...notificationsOfSameDate, notification]),
-      ];
-    } else {
-      notificationsOfSameDate = [notification];
-    }
-    window.localStorage.setItem(
+    let notificationsOfSameDate = getLocalStorageItem<Array<HappNotification>>(
+      `happNotifications#${daysSinceEpoch}#${appId}`
+    );
+    notificationsOfSameDate = notificationsOfSameDate
+      ? [...new Set([...notificationsOfSameDate, notification])]
+      : [notification];
+
+    setLocalStorageItem<Array<HappNotification>>(
       `happNotifications#${daysSinceEpoch}#${appId}`,
-      JSON.stringify(notificationsOfSameDate)
+      notificationsOfSameDate
     );
   });
 
@@ -207,40 +204,26 @@ export function storeHappNotifications(
 export function readUnreadHappNotifications(
   appId: string
 ): Array<HappNotification> {
-  const unreadNotificationsJson: string | null = window.localStorage.getItem(
+  const unreadNotifications = getLocalStorageItem<Array<HappNotification>>(
     `happNotificationsUnread#${appId}`
   );
-
-  if (unreadNotificationsJson) {
-    return JSON.parse(unreadNotificationsJson);
-  } else {
-    return [];
-  }
+  return unreadNotifications ? unreadNotifications : [];
 }
 
 export function clearHappNotifications(appId: InstalledAppId) {
   // clear all happ notifications without custom_count_reset id
-  const unreadNotificationsJson: string | null = window.localStorage.getItem(
+  const unreadNotifications = getLocalStorageItem<Array<HappNotification>>(
     `happNotificationsUnread#${appId}`
   );
 
-  if (unreadNotificationsJson) {
-    const unreadNotifications: Array<HappNotification> = JSON.parse(
-      unreadNotificationsJson
-    );
-    const unreadNotificationsCleared = unreadNotifications.filter(
-      (notification) => !!notification.custom_count_reset
-    );
-    window.localStorage.setItem(
-      `happNotificationsUnread#${appId}`,
-      JSON.stringify(unreadNotificationsCleared)
-    );
-  } else {
-    window.localStorage.setItem(
-      `happNotificationsUnread#${appId}`,
-      JSON.stringify([])
-    );
-  }
+  setLocalStorageItem(
+    `happNotificationsUnread#${appId}`,
+    unreadNotifications
+      ? unreadNotifications.filter(
+          (notification) => !!notification.custom_count_reset
+        )
+      : []
+  );
 }
 
 export function resetHappNotificationCount(
@@ -248,30 +231,19 @@ export function resetHappNotificationCount(
   notificationIds: Array<NotificationId>
 ) {
   // clear all happ notifications **with** custom_count_reset id
-  const unreadNotificationsJson: string | null = window.localStorage.getItem(
+  const urneadNotifications = getLocalStorageItem<Array<HappNotification>>(
     `happNotificationsUnread#${appId}`
   );
 
-  if (unreadNotificationsJson) {
-    const unreadNotifications: Array<HappNotification> = JSON.parse(
-      unreadNotificationsJson
-    );
-    const unreadNotificationsCleared = unreadNotifications.filter(
-      (notification) => {
-        if (!notification.custom_count_reset) return true;
-        return !notificationIds.includes(notification.custom_count_reset);
-      }
-    );
-    window.localStorage.setItem(
-      `happNotificationsUnread#${appId}`,
-      JSON.stringify(unreadNotificationsCleared)
-    );
-  } else {
-    window.localStorage.setItem(
-      `happNotificationsUnread#${appId}`,
-      JSON.stringify([])
-    );
-  }
+  setLocalStorageItem(
+    `happNotificationsUnread#${appId}`,
+    urneadNotifications
+      ? urneadNotifications.filter((notification) => {
+          if (!notification.custom_count_reset) return true;
+          return !notificationIds.includes(notification.custom_count_reset);
+        })
+      : []
+  );
 }
 
 export function validateNotifications(
@@ -331,19 +303,18 @@ function isMillisecondTimestamp(timestamp: number): boolean {
 export function getHappNotificationSettings(
   installedAppId: InstalledAppId
 ): HappNotificationSettings {
-  const happNotificationSettingsJson: string | null =
-    window.localStorage.getItem(`happNotificationSettings#${installedAppId}`);
-  const happNotificationSettings: HappNotificationSettings =
-    happNotificationSettingsJson
-      ? JSON.parse(happNotificationSettingsJson)
-      : {
-          allowOSNotification: true,
-          showInSystray: true,
-          showInLauncherView: true,
-          showInFeed: true,
-        };
-
-  return happNotificationSettings;
+  const happNotificationSettings =
+    getLocalStorageItem<HappNotificationSettings>(
+      `happNotificationSettings#${installedAppId}`
+    );
+  return happNotificationSettings
+    ? happNotificationSettings
+    : {
+        allowOSNotification: true,
+        showInSystray: true,
+        showInLauncherView: true,
+        showInFeed: true,
+      };
 }
 
 /**
@@ -355,8 +326,5 @@ export function setHappNotificationSettings(
   installedAppId: InstalledAppId,
   settings: HappNotificationSettings
 ): void {
-  window.localStorage.setItem(
-    `happNotificationSettings#${installedAppId}`,
-    JSON.stringify(settings)
-  );
+  setLocalStorageItem(`happNotificationSettings#${installedAppId}`, settings);
 }
