@@ -14,26 +14,27 @@ declare global {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const invokeTauriCommand = async (command: string, params: any) => {
+  try {
+    await invoke(command, params);
+  } catch (e) {
+    console.error(`Failed to invoke tauri command '${command}': ${e}`);
+  }
+};
+
 window.__HC_LAUNCHER_API__ = {
   notify: async (notifications: Array<HappNotification>) => {
     // store notifications to unread notifications of the app
     const appId = window.__HC_LAUNCHER_ENV__.INSTALLED_APP_ID;
-    try {
-      await invoke("notify_tauri", { notifications, appId });
-    } catch (e) {
-      console.error("Failed to invoke tauri command 'notify_tauri': ", e);
-    }
+    await invokeTauriCommand("notify_tauri", { notifications, appId });
   },
   resetNotificationCount: async (notificationIds: Array<NotificationId>) => {
     const appId = window.__HC_LAUNCHER_ENV__.INSTALLED_APP_ID;
-    try {
-      await invoke("reset_happ_notification_count", { appId, notificationIds });
-    } catch (e) {
-      console.error(
-        "Failed to invoke tauri command 'reset_happ_notification_count': ",
-        e
-      );
-    }
+    await invokeTauriCommand("reset_happ_notification_count", {
+      appId,
+      notificationIds,
+    });
   },
 };
 

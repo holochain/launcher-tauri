@@ -186,7 +186,7 @@ export default defineComponent({
     },
     ...mapActions(["connectToWebsocket"]),
     async openBackgroundWindows(apps: Array<HolochainAppInfo>) {
-      Promise.all(
+      return Promise.all(
         apps.map(async (app) => {
           const appId = app.webAppInfo.installed_app_info.installed_app_id;
           // check whether notifications are enabled for this app
