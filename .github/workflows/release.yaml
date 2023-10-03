@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [windows-2019, macos-11, ubuntu-20.04]
+        platform: [macos-11]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -107,6 +107,7 @@ jobs:
           releaseBody: "See assets below to download and install this version."
           releaseDraft: true
           prerelease: true
+          args: --verbose
 
       - name: build and sign the app (Windows only)
         if: matrix.platform == 'windows-2019'
