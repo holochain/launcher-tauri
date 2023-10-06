@@ -1671,12 +1671,12 @@ checksum = "3c877555693c14d2f84191cfd3ad8582790fc52b5e2274b40b59cf5f5cea25c7"
 [[package]]
 name = "devhub_types"
 version = "0.0.0"
-source = "git+https://github.com/mrruby/devhub-dnas#f51d06ef95228e618efb17991d50b86bbdd8381b"
+source = "git+https://github.com/matthme/devhub-dnas?branch=holochain-0.3.0-beta-dev.20#0f11c9fca0a0ca1fe4e20cb94d72a8e64f8b6b6c"
 dependencies = [
  "essence_payloads",
  "flate2",
  "hc_crud_caps",
- "hdk 0.2.2",
+ "hdk",
  "hex",
  "rmp-serde 0.15.5",
  "serde",
@@ -2847,10 +2847,10 @@ dependencies = [
 [[package]]
 name = "hc_crud_caps"
 version = "0.9.1"
-source = "git+https://github.com/mrruby/rust-hc-crud-caps#2c5494834d8ba55bb3f5d1f30352e35cee947513"
+source = "git+https://github.com/matthme/rust-hc-crud-caps?branch=holochain-0.3.0-beta-dev.20#24fe3f997de86c72f71f5653f3f1d6239a137386"
 dependencies = [
- "hdk 0.2.2",
- "holo_hash 0.2.2",
+ "hdk",
+ "holo_hash 0.3.0-beta-dev.9",
  "serde",
  "thiserror",
 ]
@@ -2872,54 +2872,17 @@ dependencies = [
 
 [[package]]
 name = "hdi"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b12f620a0d22b7dcd534a849f0024b0b47c4343b15f1c0ec02e37f4990f6f16"
-dependencies = [
- "hdk_derive 0.2.2",
- "holo_hash 0.2.2",
- "holochain_integrity_types 0.2.2",
- "holochain_wasmer_guest 0.0.84",
- "paste",
- "serde",
- "serde_bytes",
- "tracing",
- "tracing-core",
-]
-
-[[package]]
-name = "hdi"
 version = "0.4.0-beta-dev.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f4a4064e197c2961531bac2bd3aea9f1308efaa01b9f9b1567efcf90ad45600c"
 dependencies = [
- "hdk_derive 0.3.0-beta-dev.12",
+ "hdk_derive",
  "holo_hash 0.3.0-beta-dev.9",
  "holochain_integrity_types 0.3.0-beta-dev.12",
- "holochain_wasmer_guest 0.0.85",
+ "holochain_wasmer_guest",
  "paste",
  "serde",
  "serde_bytes",
- "tracing",
- "tracing-core",
-]
-
-[[package]]
-name = "hdk"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d50da8f292a1b819ae6a7651e9c3cb2ec97f00729125ad9ec3d31df8154eef7"
-dependencies = [
- "getrandom 0.2.7",
- "hdi 0.3.2",
- "hdk_derive 0.2.2",
- "holo_hash 0.2.2",
- "holochain_wasmer_guest 0.0.84",
- "holochain_zome_types 0.2.2",
- "paste",
- "serde",
- "serde_bytes",
- "thiserror",
  "tracing",
  "tracing-core",
 ]
@@ -2931,10 +2894,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "07dcea23847f5d5adb854e9b77ebc5e80f863001aa038d91e47760f6efa8bde9"
 dependencies = [
  "getrandom 0.2.7",
- "hdi 0.4.0-beta-dev.12",
- "hdk_derive 0.3.0-beta-dev.12",
+ "hdi",
+ "hdk_derive",
  "holo_hash 0.3.0-beta-dev.9",
- "holochain_wasmer_guest 0.0.85",
+ "holochain_wasmer_guest",
  "holochain_zome_types 0.3.0-beta-dev.13",
  "paste",
  "serde",
@@ -2942,22 +2905,6 @@ dependencies = [
  "thiserror",
  "tracing",
  "tracing-core",
-]
-
-[[package]]
-name = "hdk_derive"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc855dc170fec9ca44d2b21cba90fb961ef92acadaae0f0c7d090312a6212552"
-dependencies = [
- "darling 0.14.4",
- "heck 0.4.1",
- "holochain_integrity_types 0.2.2",
- "paste",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
 ]
 
 [[package]]
@@ -3121,7 +3068,7 @@ dependencies = [
  "get_if_addrs",
  "getrandom 0.2.7",
  "ghost_actor 0.3.0-alpha.6",
- "hdk 0.3.0-beta-dev.16",
+ "hdk",
  "holo_hash 0.3.0-beta-dev.9",
  "holochain_cascade",
  "holochain_conductor_api",
@@ -3200,7 +3147,7 @@ dependencies = [
  "devhub_types",
  "dirs-next",
  "futures",
- "hdk 0.3.0-beta-dev.16",
+ "hdk",
  "holochain",
  "holochain_client",
  "holochain_launcher_utils",
@@ -3242,8 +3189,8 @@ dependencies = [
  "fixt 0.3.0-beta-dev.0",
  "futures",
  "ghost_actor 0.3.0-alpha.6",
- "hdk 0.3.0-beta-dev.16",
- "hdk_derive 0.3.0-beta-dev.12",
+ "hdk",
+ "hdk_derive",
  "holo_hash 0.3.0-beta-dev.9",
  "holochain_p2p",
  "holochain_serialized_bytes 0.0.53",
@@ -3797,20 +3744,6 @@ dependencies = [
  "thiserror",
  "wasmer",
  "wasmer-engine",
-]
-
-[[package]]
-name = "holochain_wasmer_guest"
-version = "0.0.84"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92b2026e44595cb16108464973622577936605582aa22932933a5130ad32ce42"
-dependencies = [
- "holochain_serialized_bytes 0.0.51",
- "holochain_wasmer_common 0.0.84",
- "parking_lot 0.12.1",
- "paste",
- "serde",
- "tracing",
 ]
 
 [[package]]
@@ -5493,10 +5426,10 @@ dependencies = [
 [[package]]
 name = "mere_memory_types"
 version = "0.88.1"
-source = "git+https://github.com/mrruby/hc-zome-mere-memory#05b0b3d87e4507547c17e52e704d7d65c008e592"
+source = "git+https://github.com/matthme/hc-zome-mere-memory?branch=holochain-0.3.0-beta-dev.20#4c3beb677fde4ae619a220dfd62f1aed35d43336"
 dependencies = [
  "getrandom 0.2.7",
- "hdi 0.3.2",
+ "hdi",
  "serde",
  "sha2 0.10.7",
 ]
@@ -7933,9 +7866,9 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.166"
+version = "1.0.188"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d01b7404f9d441d3ad40e6a636a7782c377d2abdbe4fa2440e2edcc2f4f10db8"
+checksum = "cf9e0fcba69a370eed61bcf2b728575f726b50b55cba78064753d708ddc7549e"
 dependencies = [
  "serde_derive",
 ]
@@ -8000,9 +7933,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.166"
+version = "1.0.188"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5dd83d6dde2b6b2d466e14d9d1acce8816dedee94f735eac6395808b3483c6d6"
+checksum = "4eca7ac642d82aa35b60049a6eccb4be6be75e599bd2e9adb5f875a737654af2"
 dependencies = [
  "proc-macro2",
  "quote",

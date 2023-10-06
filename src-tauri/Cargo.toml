@@ -34,7 +34,7 @@ holochain = { version = "0.3.0-beta-dev.20", features = ["sqlite-encrypted"] }
 
 mr_bundle = "0.3.0-beta-dev.1"
 
-devhub_types = { git = "https://github.com/mrruby/devhub-dnas" }
+devhub_types = { git = "https://github.com/matthme/devhub-dnas", branch = "holochain-0.3.0-beta-dev.20" }
 
 
 async-recursion = "1.0.4"
@@ -44,12 +44,12 @@ dirs-next = "2.0.0"
 futures = "0.3"
 log = "0.4.14"
 log4rs = "1.0.0"
-mere_memory_types = { git = "https://github.com/mrruby/hc-zome-mere-memory" }
+mere_memory_types = { git = "https://github.com/matthme/hc-zome-mere-memory", branch = "holochain-0.3.0-beta-dev.20" }
 open = "5.0.0"
 opener = "0.6.1"
 portpicker = "0.1.1"
 rmpv = { version = "1.0.0", features = ["with-serde"] }
-serde = {version = "1", features = ["derive"] }
+serde = {version = ">1.0.166", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
 strum = "0.25.0"
