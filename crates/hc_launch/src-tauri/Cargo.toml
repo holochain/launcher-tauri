@@ -17,7 +17,7 @@ path = "src/bin/hc-launch.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.4.0", features = [] }
+tauri-build = { version = "1.5.0", features = [] }
 
 [dependencies]
 anyhow = "1.0"
@@ -48,7 +48,7 @@ tempdir = "0.3.7"
 thiserror = "1.0.22"
 
 serde = { version = "1", features = ["derive"] }
-tauri = {version = "1.4.0", features = ["clipboard-write-text", "dialog-all", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored", "shell-open"] }
+tauri = {version = "1.5.1", features = ["clipboard-write-text", "dialog-all", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored", "shell-open"] }
 tauri-plugin-localhost = "0.1.0"
 
 tokio = "1.21.2"
