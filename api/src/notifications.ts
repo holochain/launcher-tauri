@@ -7,10 +7,24 @@ declare global {
   }
 }
 
-export async function notify(notifications: Array<HappNotification>) {
+export async function launcherApiAvailable() {
+  return !!window.__HC_LAUNCHER_API__;
+}
+
+/**
+ * Sends notifications to the Holochain Launcher
+ *
+ * @param notifications Array of notifications to send
+ */
+export async function notifyLauncher(notifications: Array<HappNotification>) {
   window.__HC_LAUNCHER_API__.notify(notifications);
 }
 
+/**
+ * Resets the notifications counts for the notifications with the specified ids
+ *
+ * @param notificationIds Ids of the notifications whose counts shall be reset
+ */
 export async function resetNotificationCount(
   notificationIds: Array<NotificationId>
 ) {
@@ -54,15 +68,15 @@ export interface HappNotification {
    * that notification on startup.
    */
   timestamp: number;
-  // /**
-  //  * If not provided, Launcher resets the notification count (used for
-  //  * dots on app icons and similar) for this message automatically when
-  //  * the user opens the app (default). Otherwise, the app is assumed
-  //  * to take care of clearing the notification count for this message via
-  //  * use of resetNotificationCount() and based on applet-internal logic.
-  //  *
-  //  * CAUTION: If handled improperly by the app, this can lead to accumulation
-  //  * of stale notifications.
-  //  */
+  /**
+   * If not provided, Launcher resets the notification count (used for
+   * dots on app icons and similar) for this message automatically when
+   * the user opens the app (default). Otherwise, the app is assumed
+   * to take care of clearing the notification count for this message via
+   * use of resetNotificationCount() and based on applet-internal logic.
+   *
+   * CAUTION: If handled improperly by the app, this can lead to accumulation
+   * of stale notifications.
+   */
   custom_count_reset?: NotificationId;
 }
