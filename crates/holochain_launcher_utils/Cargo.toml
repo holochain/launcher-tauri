@@ -26,5 +26,5 @@ log = "0.4.14"
 mime_guess = "2.0.4"
 open = "5.0.0"
 serde = { version = "1", features = ["derive"] }
-tauri = {version = "1.4.0", features = ["clipboard-write-text", "dialog-all", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored"] }
+tauri = {version = "1.5.1", features = ["clipboard-write-text", "dialog-all", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored"] }
 
