@@ -825,7 +825,11 @@ export default defineComponent({
     async openApp(app: HolochainAppInfo) {
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
       try {
-        await invoke("open_app_ui", { appId, holochainId: app.holochainId });
+        await invoke("open_app_ui", {
+          appId,
+          holochainId: app.holochainId,
+          visible: true,
+        });
         this.showMessage(`App ${appId} opened`);
       } catch (e) {
         const error = `Error opening app ${appId}: ${JSON.stringify(e)}`;

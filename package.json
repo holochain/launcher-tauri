@@ -2,24 +2,29 @@
   "name": "launcher",
   "version": "0.11.1",
   "private": true,
+  "workspaces": [
+    "api",
+    "api_scripts"
+  ],
   "scripts": {
-    "dev:quasi-prod": "npm run build:ui && ADMIN_PORT=10001 cargo run --manifest-path ./src-tauri/Cargo.toml",
-    "dev": "ADMIN_PORT=10001 npm run tauri dev",
-    "vite": "vite",
+    "start:dev": "npm run build -w @holochain/launcher-api-scripts && npm run tauri dev",
+    "start:dev2": "npm run build -w @holochain/launcher-api-scripts && npm run build:ui && cargo run --manifest-path ./src-tauri/Cargo.toml",
+    "dev": "vite",
     "build:ui": "vue-tsc --noEmit && vite build",
-    "build": "npm run tauri -- build -v",
-    "publish:apps": "ADMIN_PORT=10001 run-singleton \"node scripts/publish-apps.js --inspect\"",
+    "build": "npm run build -w @holochain/launcher-api-scripts && npm run tauri -- build -v",
     "preview": "vite preview",
+    "publish:apps": "ADMIN_PORT=10001 run-singleton \"node scripts/publish-apps.js --inspect\"",
     "test:unit": "vue-cli-service test:unit",
     "tauri": "tauri",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
     "format": "prettier .  --write",
-    "prepare": "curl -L --output DevHub.webhapp https://github.com/holochain/devhub-gui/releases/download/v0.16.1/devhub.webhapp && curl -L --output AppStore.webhapp https://github.com/holochain/app-store-gui/releases/download/v0.4.0/appstore.webhapp"
+    "prepare": "npm run build -w @holochain/launcher-api && curl -L --output DevHub.webhapp https://github.com/holochain/devhub-gui/releases/download/v0.16.1/devhub.webhapp && curl -L --output AppStore.webhapp https://github.com/holochain/app-store-gui/releases/download/v0.4.0/appstore.webhapp"
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",
     "@holo-host/identicon": "^0.1.0",
     "@holochain/client": "^0.16.0",
+    "@holochain/launcher-api": "file:./api",
     "@material/mwc-button": "^0.25.1",
     "@material/mwc-circular-progress": "0.25.1",
     "@material/mwc-dialog": "^0.25.1",

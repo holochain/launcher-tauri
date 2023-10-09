@@ -8,6 +8,7 @@ use hdk::prelude::AgentPubKey;
 use launcher::error::LauncherError;
 use running_state::RunningState;
 use tauri::Window;
+use tauri::WindowEvent;
 use std::collections::HashMap;
 use std::path::Path;
 use std::path::PathBuf;
@@ -34,6 +35,8 @@ mod system_tray;
 
 
 use crate::commands::choose_version::get_supported_versions;
+use crate::commands::notifications::IconState;
+use crate::commands::notifications::SysTrayIconState;
 use crate::commands::open_app::report_issue_cmd;
 use crate::commands::save_app::{save_app, fetch_and_save_app, fetch_gui};
 // use crate::commands::start_app::start_app;
@@ -50,6 +53,7 @@ use crate::commands::{
   install_app::install_app,
   install_devhub::install_devhub,
   network_stats::dump_network_stats,
+  notifications::{notify_os, notify_tauri, clear_happ_notifications, clear_systray_icon, reset_happ_notification_count},
   open_app::open_app_ui,
   password::{initialize_keystore, unlock_and_launch},
   uninstall_app::uninstall_app,
@@ -82,6 +86,8 @@ fn main() {
     })
     .invoke_handler(tauri::generate_handler![
       choose_version_for_hdk,
+      clear_happ_notifications,
+      clear_systray_icon,
       disable_app,
       delete_clone,
       dump_network_stats,
@@ -100,11 +106,14 @@ fn main() {
       initialize_keystore,
       install_app,
       install_devhub,
+      notify_os,
+      notify_tauri,
       open_app_ui,
       holochain_launcher_utils::shared_commands::open_url_cmd,
       // start_app,
       quit,
       report_issue_cmd,
+      reset_happ_notification_count,
       restart,
       save_app,
       sign_zome_call,
@@ -167,6 +176,8 @@ fn main() {
 
       app.manage(profile.clone());
 
+      app.manage(Mutex::new(SysTrayIconState { icon_state: IconState::Clean }));
+
       if let Err(err) = setup_logs(profile.clone()) {
         println!("Error setting up the logs: {:?}", err);
       }
@@ -191,16 +202,33 @@ fn main() {
 
   match builder_result {
     Ok(builder) => {
-      builder.run(|_app_handle, event| {
-        // This event is emitted upon quitting the Launcher via cmq+Q on macOS.
-        // Sidecar binaries need to get explicitly killed in this case (https://github.com/holochain/launcher/issues/141)
-        if let RunEvent::Exit = event {
-          tauri::api::process::kill_children();
-        }
-        // This event is emitted upon pressing the x to close the Launcher admin window
-        // The app is prevented from exiting to keep it running in the background with the system tray
-        if let RunEvent::ExitRequested { api, .. } = event {
-          api.prevent_exit();
+      builder.run(|app_handle, event| {
+
+        match event {
+          // This event is emitted upon quitting the Launcher via cmq+Q on macOS.
+          // Sidecar binaries need to get explicitly killed in this case (https://github.com/holochain/launcher/issues/141)
+          RunEvent::Exit => tauri::api::process::kill_children(),
+
+          // This event is emitted upon pressing the x to close the Launcher admin window
+          // The app is prevented from exiting to keep it running in the background with the system tray
+          RunEvent::ExitRequested { api, .. } => api.prevent_exit(),
+
+          // If a window is requested to be closed, hide it instead. This is to keep the UI running in the
+          // background to be able to send/receive notifications.
+          // TODO garbage collect windows in the front-end if they have notificationSettings all turned off
+          RunEvent::WindowEvent { label, event: window_event, .. } => {
+            match window_event {
+              WindowEvent::CloseRequested { api, .. } => {
+                let window_option = app_handle.get_window(&label);
+                if let Some(window) = window_option {
+                  window.hide().unwrap();
+                  api.prevent_close();
+                }
+              },
+              _ => (),
+            }
+          },
+          _ => (),
         }
       });
     }

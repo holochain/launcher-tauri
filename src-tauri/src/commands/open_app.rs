@@ -6,6 +6,7 @@ pub async fn open_app_ui(
   state: tauri::State<'_, LauncherState>,
   holochain_id: HolochainId,
   app_id: String,
+  visible: bool,
 ) -> Result<(), String> {
   if window.label() != "admin" {
     return Err(String::from("Unauthorized: Attempted to call an unauthorized tauri command. (J)"))
@@ -14,7 +15,7 @@ pub async fn open_app_ui(
   let manager = mutex.get_running()?;
 
   manager
-    .open_app(holochain_id, &app_id)
+    .open_app(holochain_id, &app_id, visible)
     .map_err(|err| format!("Error opening app: {}", err))?;
 
   log::info!("Opening app {}", app_id.clone(),);

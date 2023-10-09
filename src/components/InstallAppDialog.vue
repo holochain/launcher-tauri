@@ -400,6 +400,7 @@ export default defineComponent({
         return;
       }
 
+      // Check that app id is unique across all holochain versions (things get complicated otherwise)
       const holochainIds: HolochainId[] =
         this.$store.getters["runningHolochainIds"];
 

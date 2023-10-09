@@ -647,7 +647,7 @@ export default defineComponent({
     highlightSearchString() {
       const searchString = (this.$refs["search-field"] as typeof HCTextField)
         .value;
-      console.log("searchstring: ", searchString);
+      // console.log("searchstring: ", searchString);
       const appsListElement = this.$refs["apps-list"] as
         | HTMLElement
         | undefined;

@@ -7,18 +7,21 @@ import {
 import { invoke } from "@tauri-apps/api/tauri";
 import { createStore } from "vuex";
 import { flatten, uniq } from "lodash-es";
-import { flattenCells, getCellId } from "../utils";
-import { AppWebsocket } from "@holochain/client";
+import { flattenCells, getCellId, readUnreadHappNotifications } from "../utils";
+import { AppWebsocket, InstalledAppId } from "@holochain/client";
+import { HappNotification } from "@holochain/launcher-api";
 
 export interface LauncherAdminState {
   launcherStateInfo: "loading" | LauncherStateInfo;
   appWebsocket?: AppWebsocket;
+  notificationState: Record<InstalledAppId, Array<HappNotification>>;
 }
 
 export const store = createStore<LauncherAdminState>({
   state: {
     launcherStateInfo: "loading",
     appWebsocket: undefined,
+    notificationState: {},
   },
   getters: {
     isConnectedToWebSocket(state) {
@@ -391,6 +394,21 @@ export const store = createStore<LauncherAdminState>({
     },
     setAppWebsocket(state, appWebsocket) {
       state.appWebsocket = appWebsocket;
+    },
+    loadNotificationState(state) {
+      const notificationState: Record<
+        InstalledAppId,
+        Array<HappNotification>
+      > = {};
+
+      Object.keys(localStorage).forEach((key) => {
+        if (key.includes("happNotificationsUnread#")) {
+          const appId = key.slice(24);
+          notificationState[appId] = readUnreadHappNotifications(appId);
+        }
+      });
+
+      state.notificationState = notificationState;
     },
   },
   actions: {
