@@ -2,11 +2,11 @@ use std::{path::PathBuf, sync::Arc};
 use url2::Url2;
 
 // NEW_VERSION: Import the exact same types but from the new crates
-use holochain_conductor_api_0_2_2::{
+use holochain_conductor_api_0_2_3::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_2_2::kitsune_p2p::{
+use holochain_p2p_0_2_3::kitsune_p2p::{
   dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams,
   KitsuneP2pConfig, TransportConfig,
 };
@@ -17,17 +17,17 @@ use super::{
   HdiVersion, HdkVersion,
 };
 
-pub struct HolochainV0_2_2;
+pub struct HolochainV0_2_3;
 
-impl VersionManager for HolochainV0_2_2 {
+impl VersionManager for HolochainV0_2_3 {
   // NEW_VERSION: Careful! Indicate here which HDK version comes bundled with this Holochain version
   fn hdk_version(&self) -> HdkVersion {
-    HdkVersion::V0_2_2
+    HdkVersion::V0_2_3
   }
 
   // NEW_VERSION: Careful! Indicate here which HDI version comes bundled with this Holochain version
   fn hdi_version(&self) -> HdiVersion {
-    HdiVersion::V0_3_2
+    HdiVersion::V0_3_3
   }
 
   // NEW_VERSION: Duplicate and change whatever config is necessary to change
