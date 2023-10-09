@@ -3124,7 +3124,7 @@ dependencies = [
 
 [[package]]
 name = "holochain_cli_launch"
-version = "0.0.13"
+version = "0.0.14"
 dependencies = [
  "anyhow",
  "clap 4.4.2",
