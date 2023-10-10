@@ -2,7 +2,7 @@
 
 A cross-platform executable that launches a local Holochain conductor, and lets you install and run [Holochain](https://www.holochain.org) apps.
 
-> Feedback is more than welcome in the [issues section](https://github.com/holochain/launcher/issues).
+> Feedback is welcome in the [issues section](https://github.com/holochain/launcher/issues).
 
 ## Download Holochain Launcher
 
@@ -19,31 +19,16 @@ Notes:
 - **macOS**: If you are running the Holochain Launcher from a `.app` file extracted from an `app.tar.gz` bundle instead of having it installed from a `.dmg` file, automatic updates will only succeed if the `.app` file is located in the `Applications` folder due to file permissions.
 - **Linux**: Automatic updates are currently not supported when the Launcher is installed from a `.deb` file instead of runniing it from the `.AppImage`.
 
-## Usage
-
-### Setting Up the Password
-
-The first time you start the Holochain Launcher, it will ask you to set up a password. This password will be used later to unlock the encrypted data that will be stored in your computer.
-
-WARNING! If you lose this password, you will also lose access any data from your Holochain applications, as there is no password recovery mechanism.
-
-### Installing a Holochain App (hApp)
-
-When you are on the `Installed Apps` section, click `Install New App`. This will bring up the `App Library`, from where you can:
-
-1. Install an application from the list of published applications or install one from your file system.
-2. Choose a unique `AppId` for the app, optionally enter a network seed and click install. It may take a while.
-   > This AppId only needs to be unique inside your Holochain Launcher, it doesn't affect other users.
-3. When the installation is finished, the hApp will appear in the list of active hApps.
-4. Click on the icon that says "Open App" when hovering over it to open the app in a new window.
 
 # For Developers
-
+👉 [Package a Web hApp for the Launcher](#packaging-a-web-happ)<br>
+👉 [Publish your Web hApp to DevHub and AppStore](#publishing-and-updating-an-app-in-the-app-store) for end-users to download from within the Launcher<br>
+👉 [Use the launcher API](https://www.npmjs.com/package/@holochain/launcher-api) to send notifications to end-users (currently only available on the latest unstable release)
 ### Packaging a Web hApp
 
 Requirements:
 
-The Holochain Launcher is currently using a `0.1.X` version of Holochain. Use an HDK and HDI version that is compatible with it.
+Depending in which version of the Launcher you are targeting, use an HDK and HDI version that is compatible with the Holochain version it's using.
 
 The easiest way to create a Holochain web-app is to use holochain's [scaffolding tool](https://docs.rs/holochain_scaffolding_cli/latest/holochain_scaffolding_cli/). If you develop in [nix-shell](https://developer.holochain.org/install/), `hc scaffold` will be readily available to you to call in the command line.
 

@@ -2,13 +2,14 @@
 
 This package contains the API for Holochain apps to interact with the Holochain Launcher for things like sending notifications to the operating system.
 
+⚠️ This API is still in experimental stage. Do not consider it stable.
 
 ## Example Usage
 
 ```typescript
 import { notifyLauncher, launcherApiAvailable } from "@holochain/launcher-api";
 
-// In case your happ UI supports multiple environments, you can check whether the launcher API is available in the first place
+// In case your happ UI supports multiple environments and since not all versions of the Launcher support the API at the moment, check whether the launcher API is available in the first place
 if (launcherApiAvailable) {
   const notification = {
     title: "Test";
