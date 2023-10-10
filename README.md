@@ -2,7 +2,7 @@
 
 A cross-platform executable that launches a local Holochain conductor, and lets you install and run [Holochain](https://www.holochain.org) apps.
 
-> Feedback is welcome in the [issues section](https://github.com/holochain/launcher/issues).
+Feedback is welcome in the [issues section](https://github.com/holochain/launcher/issues).
 
 ## Download Holochain Launcher
 
