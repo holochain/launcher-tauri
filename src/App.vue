@@ -127,8 +127,21 @@ import "@fontsource/poppins/600.css";
 import "@fontsource/poppins/700.css";
 import "@fontsource/poppins/800.css";
 import "@fontsource/poppins/900.css";
-import { listen } from "@tauri-apps/api/event";
+import { Event, listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/tauri";
+import {
+  HappNotificationSettings,
+  NotificationPayload,
+  ResetHappNotificationPayload,
+} from "./types";
+import {
+  clearHappNotifications,
+  getHappNotificationSettings,
+  resetHappNotificationCount,
+  storeHappNotifications,
+  validateNotifications,
+} from "./utils";
+import { InstalledAppId } from "@holochain/client";
 
 export default defineComponent({
   name: "App",
@@ -148,11 +161,45 @@ export default defineComponent({
   mounted() {
     // define window.__HC_LAUNCHER_ENV__ so that js-client routes zome-call signing to tauri
     window.__HC_LAUNCHER_ENV__ = {};
+
+    this.$store.commit("loadNotificationState");
+
+    window.addEventListener("focus", async () => {
+      await invoke("clear_systray_icon", {});
+    });
+
     this.$nextTick(async () => {
       const restartDialog = this.$refs.restartDialog as typeof HCGenericDialog;
+
       await listen("request-restart", () => {
         restartDialog.open();
       });
+
+      await listen(
+        "happ-notifications",
+        async (e: Event<NotificationPayload>) => {
+          await this.handleNotifications(e);
+        }
+      );
+
+      await listen(
+        "clear-happ-notifications",
+        async (e: Event<InstalledAppId>) => {
+          await clearHappNotifications(e.payload);
+          this.$store.commit("loadNotificationState");
+        }
+      );
+
+      await listen(
+        "reset-happ-notification-count",
+        async (e: Event<ResetHappNotificationPayload>) => {
+          await resetHappNotificationCount(
+            e.payload.app_id,
+            e.payload.notification_ids
+          );
+          this.$store.commit("loadNotificationState");
+        }
+      );
     });
   },
   async created() {
@@ -161,6 +208,43 @@ export default defineComponent({
   methods: {
     async restartLauncher() {
       await invoke("restart");
+    },
+    async handleNotifications(e: Event<NotificationPayload>) {
+      // store to localStorage - Note that app id is assumed to be unique across all holochain versions
+      // TODO what about the case where the happ window is already open and in the foreground?
+      const notifications = validateNotifications(e.payload.notifications);
+      storeHappNotifications(notifications, e.payload.app_id);
+
+      // update store
+      this.$store.commit("loadNotificationState");
+
+      // TODO potentially improve filter logic, e.g. take into accound when the conductor was started up
+      // filter out notifications that are older than 5 minutes, assuming they originate
+      // from before the launcher was started
+      // (such notifications should not trigger OS notifications but only show up
+      // as notification dots)
+      const now = Date.now();
+
+      const freshNotifications = e.payload.notifications.filter(
+        (notification) => now - notification.timestamp < 5 * 60 * 1000
+      );
+
+      // TODO check notification settings for app id
+      const notificationSettings: HappNotificationSettings =
+        getHappNotificationSettings(e.payload.app_id);
+
+      if (
+        notificationSettings.showInSystray ||
+        notificationSettings.allowOSNotification
+      ) {
+        // send notifications to OS
+        await invoke("notify_os", {
+          notifications: freshNotifications,
+          appId: e.payload.app_id,
+          systray: notificationSettings.showInSystray,
+          os: notificationSettings.allowOSNotification,
+        });
+      }
     },
   },
 });

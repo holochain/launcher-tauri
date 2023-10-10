@@ -1,15 +1,11 @@
 [
   {
-    "actionHash": "uhCkk7mk-kFJrJzWdkiIIYjNZz5iZExcdFN-uD3G5rcCtkYk9mGUU",
-    "reason": "orphaned"
+    "actionHash": "uhCkka1ZIuxAZJWHTe_6l6o1fidRSfJwm5YehpCRDzJH3Q-cPoJPe",
+    "reason": "duplicate"
   },
   {
-    "actionHash": "uhCkk07uXeRMcmL8G1EH8XhZJqPEDCNgNgoQRAurwkmHWj29pbNBx",
-    "reason": "orphaned"
-  },
-  {
-    "actionHash": "uhCkktZbttaM0CAepWH0ZGl3Dm4OMr0adbxdP-9KZdoFXnRj_FC17",
-    "reason": "orphaned"
+    "actionHash": "uhCkkrclj_h0BOOferyvrusoTxQltMO4OzVF8D6qW6DZz_P3zAHSw",
+    "reason": "testing"
   },
   {
     "actionHash": "uhCkk8G77cvmuP0QSFBgBosDDVQQU7cSR8jj_28fHburjdhnbpNa_",

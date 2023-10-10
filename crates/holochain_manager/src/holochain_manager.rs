@@ -6,7 +6,7 @@ use std::{fs, time::Duration};
 
 // NEW_VERSION change holochain_types version
 use holochain_client::{AdminWebsocket, AgentPubKey, AppInfo, InstallAppPayload};
-use holochain_types_0_2_2::prelude::{
+use holochain_types_0_2_3::prelude::{
   AppBundleSource, CellId, CloneCellId, DisableCloneCellPayload,
 };
 use lair_keystore_manager::utils::create_dir_if_necessary;

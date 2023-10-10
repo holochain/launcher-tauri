@@ -1,20 +1,9 @@
 <template>
-  <div
-    v-if="isLoading()"
-    class="column center-content"
-    style="flex: 1; height: calc(100vh - 64px)"
-  >
-    <LoadingDots
-      style="--radius: 15px; --dim-color: #e8e8eb; --fill-color: #b5b5b5"
-    ></LoadingDots>
+  <div v-if="isLoading()" class="column center-content loading-container">
+    <LoadingDots class="loading-dots"></LoadingDots>
   </div>
-
-  <div
-    class="column"
-    style="flex: 1; min-height: calc(100vh - 64px); align-items: center"
-  >
+  <div v-else class="column content-container">
     <InstalledAppsList
-      :installedApps="$store.getters[`allApps`]"
       @openApp="openApp($event)"
       @select-view="$emit('select-view', $event)"
     />
@@ -30,20 +19,14 @@ import { defineComponent } from "vue";
 
 import { HolochainAppInfo } from "../types";
 import InstalledAppsList from "../components/InstalledAppsList.vue";
-import HCButton from "../components/subcomponents/HCButton.vue";
 import HCSnackbar from "../components/subcomponents/HCSnackbar.vue";
-import HCDialog from "../components/subcomponents/HCDialog.vue";
-import ToggleSwitch from "../components/subcomponents/ToggleSwitch.vue";
 import LoadingDots from "../components/subcomponents/LoadingDots.vue";
 
 export default defineComponent({
   name: "Launcher",
   components: {
     InstalledAppsList,
-    HCButton,
     HCSnackbar,
-    HCDialog,
-    ToggleSwitch,
     LoadingDots,
   },
   emits: ["show-message", "select-view"],
@@ -61,7 +44,11 @@ export default defineComponent({
     async openApp(app: HolochainAppInfo) {
       const appId = app.webAppInfo.installed_app_info.installed_app_id;
       try {
-        await invoke("open_app_ui", { appId, holochainId: app.holochainId });
+        await invoke("open_app_ui", {
+          appId,
+          holochainId: app.holochainId,
+          visible: true,
+        });
         this.showMessage(`App ${appId} opened`);
       } catch (e) {
         const error = `Error opening app ${appId}: ${JSON.stringify(e)}`;
@@ -80,6 +67,21 @@ export default defineComponent({
 <!-- We don't have scoped styles with classes because it becomes harder to export a reusable library -->
 
 <style scoped>
+.loading-container {
+  flex: 1;
+  height: calc(100vh - 64px);
+}
+.loading-dots {
+  --radius: 15px;
+  --dim-color: #e8e8eb;
+  --fill-color: #b5b5b5;
+}
+.content-container {
+  flex: 1;
+  min-width: 480px;
+  min-height: calc(100vh - 64px);
+  align-items: center;
+}
 .btn-install:hover {
   cursor: pointer;
   --hc-primary-color: #5537fc;

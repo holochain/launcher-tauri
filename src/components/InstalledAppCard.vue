@@ -5,6 +5,7 @@
         ? 'disabled'
         : undefined
     "
+    style="position: relative"
   >
     <!-- App Logo -->
     <div
@@ -33,8 +34,8 @@
       <div
         v-else
         class="appIcon column center-content"
-        :class="getAppStatus(app) === 'Running' ? 'pointer' : 'cursor-default'"
         style="background-color: #372ba5"
+        :class="getAppStatus(app) === 'Running' ? 'pointer' : 'cursor-default'"
       >
         <div style="color: white; font-size: 45px; font-weight: 600">
           {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0, 2) }}
@@ -53,31 +54,39 @@
       <!-- {{ app.webAppInfo.installed_app_info.installed_app_id.slice(0,20) }}{{ app.webAppInfo.installed_app_info.installed_app_id.length > 20 ? '...' : '' }} -->
       {{ app.webAppInfo.installed_app_info.installed_app_id }}
     </div>
+
+    <!-- notification dot -->
+    <div class="notification-dot" v-if="happNotificationState(app)">
+      <span style="padding: 0 5px">{{
+        happNotificationState(app)?.counts
+      }}</span>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { HolochainAppInfo, HolochainAppInfoExtended } from "../types";
-import { isAppRunning, isAppDisabled, isAppPaused, getReason } from "../utils";
+import {
+  isAppRunning,
+  isAppDisabled,
+  isAppPaused,
+  getReason,
+  readUnreadHappNotifications,
+} from "../utils";
 
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/themes/light.css";
-// import "@holochain-open-dev/utils/dist/holo-identicon";
-import HoloIdenticon from "../components/subcomponents/HoloIdenticon.vue";
 
-import HCGenericDialog from "./subcomponents/HCGenericDialog.vue";
-import InstalledCellCard from "./subcomponents/InstalledCellCard.vue";
-import DisabledCloneCard from "./subcomponents/DisabledCloneCard.vue";
+import { HappNotification } from "@holochain/launcher-api";
+
+interface HappNotificationState {
+  counts: number;
+  urgency: "high" | "medium" | "low";
+}
 
 export default defineComponent({
   name: "InstalledAppCard",
-  components: {
-    HCGenericDialog,
-    HoloIdenticon,
-    InstalledCellCard,
-    DisabledCloneCard,
-  },
   props: {
     app: {
       type: Object as PropType<HolochainAppInfoExtended>,
@@ -86,12 +95,19 @@ export default defineComponent({
   },
   data(): {
     showPubKeyTooltip: boolean;
+    unreadNotifications: Array<HappNotification>;
   } {
     return {
       showPubKeyTooltip: false,
+      unreadNotifications: [],
     };
   },
   emits: ["openApp"],
+  mounted() {
+    this.unreadNotifications = readUnreadHappNotifications(
+      this.app.webAppInfo.installed_app_info.installed_app_id
+    );
+  },
   methods: {
     getReason,
     isAppRunning,
@@ -119,6 +135,27 @@ export default defineComponent({
         this.$emit("openApp", this.app);
       }
     },
+    happNotificationState(
+      app: HolochainAppInfoExtended
+    ): HappNotificationState | undefined {
+      const notificationState =
+        this.$store.state.notificationState[
+          app.webAppInfo.installed_app_info.installed_app_id
+        ];
+
+      if (!notificationState || notificationState.length < 1) return undefined;
+
+      const urgency = notificationState.some(
+        (notification) => notification.urgency === "high"
+      )
+        ? "high"
+        : "medium";
+
+      return {
+        counts: notificationState.length,
+        urgency,
+      };
+    },
   },
 });
 </script>
@@ -132,6 +169,13 @@ export default defineComponent({
   align-items: center;
   margin: 8px;
   /* box-shadow: 0 0 2px rgb(131, 128, 176); */
+}
+
+.pointer {
+  cursor: pointer;
+}
+.cursor-default {
+  cursor: default;
 }
 
 .btn {
@@ -155,14 +199,6 @@ export default defineComponent({
   object-fit: cover;
 }
 
-.pointer {
-  cursor: pointer;
-}
-
-.cursor-default {
-  cursor: default;
-}
-
 .icon-container {
   width: 120px;
   box-shadow: 0 0px 5px #9b9b9b;
@@ -174,6 +210,21 @@ export default defineComponent({
 
 .icon-container:not(.container-disabled):focus {
   box-shadow: 0 0px 12px #676767;
+}
+
+.notification-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -8px;
+  right: 15px;
+  font-weight: bold;
+  background: #faf035;
+  border-radius: 16px;
+  height: 32px;
+  min-width: 32px;
+  box-shadow: 0 0 4px rgb(9, 9, 95);
 }
 
 .disabled {

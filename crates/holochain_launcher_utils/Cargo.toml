@@ -13,19 +13,18 @@ categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 
-# NEW_VERSION update holochain dependencies
-holochain_client = "0.4.2"
+holochain_client = { workspace = true }
 
-holochain_conductor_api = "0.2.2"
-holochain_types = "0.2.2"
-holochain_zome_types = "0.2.2"
+holochain_conductor_api = { workspace = true }
+holochain_types = { workspace = true }
+holochain_zome_types = { workspace = true }
 
-lair_keystore_api = "0.3.0"
+lair_keystore_api = { workspace = true }
 
 
 log = "0.4.14"
 mime_guess = "2.0.4"
-open = "2.0.1"
-serde = { version = "1.0", features = ["derive"] }
-tauri = {version = "1.4.0", features = ["clipboard-write-text", "dialog-all", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored"] }
+open = "5.0.0"
+serde = { version = "1", features = ["derive"] }
+tauri = {version = "1.5.1", features = ["clipboard-write-text", "dialog-all", "devtools", "native-tls-vendored", "reqwest-native-tls-vendored"] }
 
