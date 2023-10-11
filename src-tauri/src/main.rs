@@ -218,15 +218,6 @@ fn main() {
           // TODO garbage collect windows in the front-end if they have notificationSettings all turned off
           RunEvent::WindowEvent { label, event: window_event, .. } => {
             match window_event {
-              // On macOS the window remains in the dock even when hidden, i.e. it needs to become visible again
-              // upon clicking on the icon in the dock
-              #[cfg(target_os = "macos")]
-              WindowEvent::Focused(true) => {
-                let window_option = app_handle.get_window(&label);
-                if let Some(window) = window_option {
-                  window.show().unwrap();
-                }
-              }
               WindowEvent::CloseRequested { api, .. } => {
                 let window_option = app_handle.get_window(&label);
                 if let Some(window) = window_option {
