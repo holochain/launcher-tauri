@@ -127,7 +127,7 @@ pub async fn clear_happ_notifications(
 ) -> Result<(), String> {
     // This tauri command is allowed to be called only by the window of the corresponding app:
     if window.label() != derive_window_label(&app_id) {
-        return Err(String::from("Unauthorized: Attempted to notifications for app that this tauri window is not associated to."))
+        return Err(String::from("Unauthorized: Attempted to clear notifications for app that this tauri window is not associated to."))
     }
 
     // Send notifications to admin window to store to localStorage and check

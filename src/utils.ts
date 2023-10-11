@@ -328,3 +328,22 @@ export function setHappNotificationSettings(
 ): void {
   setLocalStorageItem(`happNotificationSettings#${installedAppId}`, settings);
 }
+
+/**
+ * Deletes all notification storage related to an app. To be called upon unsinstalling the app
+ */
+export function deleteNotificationStorage(
+  installedAppId: InstalledAppId
+): void {
+  window.localStorage.removeItem(`happNotificationSettings#${installedAppId}`);
+  window.localStorage.removeItem(`happNotificationsUnread#${installedAppId}`);
+  // Remove all historical notificationss
+  Object.keys(window.localStorage).forEach((key) => {
+    if (
+      key.includes("happNotifications#") &&
+      key.includes(`#${installedAppId}`)
+    ) {
+      window.localStorage.removeItem(key);
+    }
+  });
+}

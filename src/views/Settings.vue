@@ -545,6 +545,7 @@ import {
   isAppRunning,
   locatorToLocatorB64,
   capitalizeFirstLetter,
+  deleteNotificationStorage,
 } from "../utils";
 import { mapGetters } from "vuex";
 
@@ -915,6 +916,7 @@ export default defineComponent({
 
       try {
         await invoke("uninstall_app", { appId, holochainId: app.holochainId });
+        deleteNotificationStorage(appId);
         await this.refreshAppStates();
         this.showMessage(`Uninstalled ${appId}`);
       } catch (e) {
