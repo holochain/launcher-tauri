@@ -187,6 +187,17 @@ export default defineComponent({
         async (e: Event<InstalledAppId>) => {
           await clearHappNotifications(e.payload);
           this.$store.commit("loadNotificationState");
+          // Check whether there are any unread messages left across all apps
+          // and if not, clear the systray icon dot
+          const overallUnreadNotifications = Object.entries(
+            this.$store.state.notificationState
+          ).filter(
+            ([_appId, unreadNotifications]) =>
+              unreadNotifications && unreadNotifications.length > 0
+          );
+          if (overallUnreadNotifications.length === 0) {
+            await invoke("clear_systray_icon", {});
+          }
         }
       );
 

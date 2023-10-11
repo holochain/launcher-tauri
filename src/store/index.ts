@@ -415,6 +415,7 @@ export const store = createStore<LauncherAdminState>({
     async fetchStateInfo({ commit }) {
       commit("loadStateInfo");
       const StateInfo: LauncherStateInfo = await invoke("get_state_info", {});
+      commit("loadNotificationState");
 
       commit("setStateInfo", StateInfo);
     },
