@@ -8,17 +8,17 @@ version = "0.1.0"
 [dependencies]
 # NEW_VERSION pick right client version
 
-holochain = { version = "0.1.6", features = ["sqlite-encrypted"] }
-holochain_client = "0.3.1"
+holochain = { workspace = true }
+holochain_client = { workspace = true }
 
 
 # NEW_VERSION add latest crates here
 
-holochain_conductor_api_0_1_6 = { package = "holochain_conductor_api", version = "0.1.6" }
-holochain_p2p_0_1_6 = { package = "holochain_p2p", version = "0.1.6" }
-holochain_types_0_1_6 = { package = "holochain_types", version = "0.1.6" }
+holochain_conductor_api_0_1_7 = { package = "holochain_conductor_api", version = "0.1.7" }
+holochain_p2p_0_1_7 = { package = "holochain_p2p", version = "0.1.7" }
+holochain_types_0_1_7 = { package = "holochain_types", version = "0.1.7" }
 
-mr_bundle = "0.1.2"
+mr_bundle = { workspace = true }
 
 lair_keystore_manager = {path = "../lair_keystore_manager"}
 

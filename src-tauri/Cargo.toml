@@ -7,7 +7,7 @@ edition = "2021"
 license = ""
 name = "holochain-launcher"
 repository = ""
-version = "0.10.2"
+version = "0.10.3"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -18,7 +18,7 @@ tauri-build = { version = "1.5.0", features = [] }
 [dependencies]
 
 # NEW_VERSION update holochain client version if requireds
-holochain_client = "0.3.1"
+holochain_client = { workspace = true }
 
 holochain_manager = { path = "../crates/holochain_manager" }
 holochain_launcher_utils = { path = "../crates/holochain_launcher_utils" }
@@ -26,15 +26,15 @@ holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
 lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 
 # NEW_VERSION update holochain dependencies
-holochain_types = "0.1.6"
-holochain_state = "0.1.6"
-hdk = "0.1.4"
+holochain_types = { workspace = true }
+holochain_state = { workspace = true }
+hdk = { workspace = true }
 
-holochain = { version = "0.1.6", features = ["sqlite-encrypted"] }
+holochain = { workspace = true }
 
-mr_bundle = "0.1.2"
+mr_bundle = { workspace = true }
 
-devhub_types = { git = "https://github.com/holochain/devhub-dnas", branch = "holochain-v0.1.x-support" }
+devhub_types = { workspace = true }
 
 async-recursion = "1.0.4"
 async-trait = "0.1.52"

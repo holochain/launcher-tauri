@@ -24,18 +24,18 @@ anyhow = "1.0"
 futures = "0.3"
 
 # NEW_VERSION update holochain dependencies
-holochain_client = "0.3.1"
-holochain_cli_sandbox = "0.1.6"
+holochain_client = { workspace = true }
+holochain_cli_sandbox = { workspace = true }
 holochain_launcher_utils = { path = "../../holochain_launcher_utils" }
-holochain_types = "0.1.6"
-holochain_util = { version = "0.1.2", features = [ "pw" ] }
-holochain_zome_types = "0.1.4"
-holochain_conductor_api = "0.1.6"
+holochain_types = { workspace = true }
+holochain_util = { workspace = true }
+holochain_zome_types = { workspace = true }
+holochain_conductor_api = { workspace = true }
 
-holochain = { version = "0.1.6", features = ["sqlite-encrypted"] }
+holochain = { workspace = true }
 
 
-lair_keystore_api = "0.3.0"
+lair_keystore_api = { workspace = true }
 
 
 log = "0.4.14"
