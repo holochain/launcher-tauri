@@ -26,7 +26,7 @@ use v0_2_3::HolochainV0_2_3;
 // NEW_VERSION: Add the new HDK version to this enum (if there is a new HDK version)
 #[derive(Copy, Clone, Debug, PartialEq, Hash, Eq, Deserialize_enum_str, Serialize_enum_str)]
 pub enum HdkVersion {
-  #[serde(rename = "0.2.2")]
+  #[serde(rename = "0.2.3")]
   V0_2_3,
 }
 
@@ -56,7 +56,7 @@ impl Into<String> for HdiVersion {
 pub enum HolochainVersion {
   #[serde(rename = "Custom Binary")]
   CustomBinary,
-  #[serde(rename = "0.2.3-beta-rc.1")]
+  #[serde(rename = "0.2.3-rc.0")]
   V0_2_3,
   // Note that the foldername of the conductor database is currently only defined by the
   // minor version, i.e. 0.2
