@@ -3057,7 +3057,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-launcher"
-version = "0.11.2"
+version = "0.11.3"
 dependencies = [
  "async-recursion 1.0.5",
  "async-trait",
