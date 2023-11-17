@@ -41,7 +41,7 @@
         "icons/32x32.png"
       ],
       "externalBin": [
-        "bins/holochain-v0.2.3-rc.0",
+        "bins/holochain-v0.2.3-rc.1",
         "bins/lair-keystore-v0.3.0"
       ],
       "copyright": "",
