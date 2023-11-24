@@ -20,15 +20,15 @@ The commands to install them should look like below, replacing the version numbe
 ```
 mkdir src-tauri/bins
 
-cargo install --version 0.2.4 lair_keystore
+cargo install --version 0.3.0 lair_keystore
 LAIR_PATH=$(which lair-keystore)
-cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.4-x86_64-apple-darwin
-cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.2.4-[_ARCHITECTURE_]
+cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.3.0-x86_64-apple-darwin
+cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.3.0-[_ARCHITECTURE_]
 
 
-cargo install holochain --version 0.3.0-beta-dev.20 --locked --features db-encryption
+cargo install holochain --version 0.3.0-beta-dev.25 --features sqlite-encrypted
 HOLOCHAIN_PATH=$(which holochain)
-cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.3.0-beta-dev.20-[_ARCHITECTURE_]
+cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.3.0-beta-dev.25-[_ARCHITECTURE_]
 
 
 [... install further holochain versions if required]
@@ -44,9 +44,9 @@ cargo install --version 0.2.4 lair_keystore
 $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
 Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.2.4-x86_64-pc-windows-msvc.exe
 
-cargo install holochain --version 0.3.0-beta-dev.20 --locked --features db-encryption
+cargo install holochain --version 0.3.0-beta-dev.25 --locked --features db-encryption
 $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
-Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.3.0-beta-dev.20-x86_64-pc-windows-msvc.exe
+Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.3.0-beta-dev.25-x86_64-pc-windows-msvc.exe
 
 [... install further holochain versions if required]
 
@@ -108,6 +108,6 @@ Caused by:
   cargo:rerun-if-changed=tauri.conf.json
   cargo:rustc-cfg=desktop
   cargo:rustc-cfg=dev
-  path matching bins/holochain-v0.3.0-beta-dev.20-aarch64-apple-darwin not found.
+  path matching bins/holochain-v0.3.0-beta-dev.25-aarch64-apple-darwin not found.
 warning: build failed, waiting for other jobs to finish...
 ```

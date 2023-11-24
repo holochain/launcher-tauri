@@ -6,8 +6,8 @@ use holochain_conductor_api_0_3_0::{
   conductor::{ConductorConfig, KeystoreConfig},
   AdminInterfaceConfig, InterfaceDriver,
 };
-use holochain_p2p_0_3_0::kitsune_p2p::{
-  dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams,
+use holochain_p2p_0_3_0::kitsune_p2p::dependencies::kitsune_p2p_types::config::{
+  tuning_params_struct::KitsuneP2pTuningParams,
   KitsuneP2pConfig, TransportConfig,
 };
 
@@ -68,6 +68,7 @@ impl VersionManager for HolochainV0_3_0 {
       network: Some(network_config),
       db_sync_strategy: Default::default(),
       tracing_override: None,
+      tracing_scope: None,
     };
 
     serde_yaml::to_string(&config).expect("Could not convert conductor config to string")

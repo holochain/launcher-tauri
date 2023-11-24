@@ -3107,6 +3107,7 @@ dependencies = [
  "holochain_client",
  "holochain_launcher_utils",
  "holochain_manager",
+ "holochain_nonce",
  "holochain_state",
  "holochain_types",
  "holochain_web_app_manager",
