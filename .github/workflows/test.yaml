@@ -20,7 +20,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           override: true
-          toolchain: stable
+          toolchain: 1.71.1
       - name: install Go stable
         uses: actions/setup-go@v4
         with:
