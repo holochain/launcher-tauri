@@ -2,7 +2,7 @@
 use holochain_client::AgentPubKey;
 use holochain_conductor_api::ZomeCall;
 use holochain_types::prelude::ZomeCallUnsigned;
-use holochain_zome_types::{Signature, CellId, ZomeName, FunctionName, CapSecret, ExternIO, Timestamp};
+use holochain_zome_types::prelude::{Signature, CellId, ZomeName, FunctionName, CapSecret, ExternIO, Timestamp};
 use lair_keystore_api::LairClient;
 
 use serde::Deserialize;

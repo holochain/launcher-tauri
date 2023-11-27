@@ -430,7 +430,7 @@ async fn spawn_sandboxes(
   create: Create,
   app_id: InstalledAppId,
 ) -> anyhow::Result<Vec<(Child, Option<Child>)>> {
-  let sandbox_paths = generate(holochain_path, Some(happ_path), create, app_id, Output::Log).await?;
+  let sandbox_paths = generate(holochain_path, Some(happ_path), create, app_id, None, Output::Log).await?;
 
   let port = portpicker::pick_unused_port().expect("Cannot find any unused port");
   let force_admin_ports: Vec<u16> = vec![];

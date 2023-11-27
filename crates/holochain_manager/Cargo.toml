@@ -8,17 +8,17 @@ version = "0.1.0"
 [dependencies]
 # NEW_VERSION pick right client version
 
-holochain = { version = "0.3.0-beta-dev.20", features = ["sqlite-encrypted"] }
-holochain_client = { git = "https://github.com/holochain/holochain-client-rust", branch = "holochain-0.3.0-beta-dev.20" }
+holochain = { version = "0.3.0-beta-dev.25", features = ["sqlite-encrypted"] }
+holochain_client = "0.5.0-dev.25"
 
 
 # NEW_VERSION add latest crates here
 
-holochain_conductor_api_0_3_0 = { package = "holochain_conductor_api", version = "0.3.0-beta-dev.20" }
-holochain_p2p_0_3_0 = { package = "holochain_p2p", version = "0.3.0-beta-dev.19" }
-holochain_types_0_3_0 = { package = "holochain_types", version = "0.3.0-beta-dev.17" }
+holochain_conductor_api_0_3_0 = { package = "holochain_conductor_api", version = "0.3.0-beta-dev.25" }
+holochain_p2p_0_3_0 = { package = "holochain_p2p", version = "0.3.0-beta-dev.24" }
+holochain_types_0_3_0 = { package = "holochain_types", version = "0.3.0-beta-dev.22" }
 
-mr_bundle = "0.3.0-beta-dev.1"
+mr_bundle = "0.3.0-beta-dev.2"
 
 lair_keystore_manager = {path = "../lair_keystore_manager"}
 

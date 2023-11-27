@@ -11,7 +11,7 @@ use hdk::prelude::{
 use holochain::conductor::api::ProvisionedCell;
 use holochain_client::{AgentPubKey, AppInfo, AppWebsocket};
 use holochain_manager::versions::holochain_conductor_api_latest::CellInfo;
-use holochain_state::nonce::fresh_nonce;
+use holochain_nonce::fresh_nonce;
 use holochain_types::prelude::{ActionHashB64, AgentPubKeyB64, DnaHash};
 use lair_keystore_manager::LairKeystoreManager;
 use mere_memory_types::{MemoryBlockEntry, MemoryEntry};
