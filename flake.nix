@@ -27,6 +27,7 @@
         config,
         pkgs,
         system,
+        lib,
         ...
       }: let
         libraries = with pkgs; [
@@ -38,6 +39,11 @@
           dbus
           openssl_3
           librsvg
+        ] ++ lib.optionals pkgs.stdenv.isLinux [
+          bzip2
+          pango
+          libsoup
+          libappindicator
         ];
 
         packages = with pkgs; [
