@@ -491,7 +491,7 @@ pub async fn run(
   force_admin_port: Option<u16>,
 ) -> anyhow::Result<(Child, Option<Child>)> {
   let (port, holochain, lair) =
-    run_async(holochain_path, sandbox_path.clone(), force_admin_port, Output::Log).await?;
+    run_async(holochain_path, sandbox_path.clone().into(), force_admin_port, Output::Log).await?;
   println!("Running conductor on admin port {} {:?}", port, app_ports);
   for app_port in app_ports {
     let mut cmd = CmdRunner::try_new(port).await?;
