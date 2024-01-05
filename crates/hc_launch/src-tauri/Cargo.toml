@@ -25,7 +25,7 @@ futures = "0.3"
 
 # NEW_VERSION update holochain dependencies
 holochain_client = "0.5.0-dev.25"
-holochain_cli_sandbox = "0.3.0-beta-dev.29"
+holochain_cli_sandbox = { version = "0.3.0-beta-dev.29" }
 holochain_launcher_utils = { path = "../../holochain_launcher_utils" }
 holochain_types = "0.3.0-beta-dev.22"
 holochain_util = { version = "0.3.0-beta-dev.2", features = ["pw"] }
