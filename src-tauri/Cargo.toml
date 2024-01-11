@@ -26,16 +26,16 @@ holochain_web_app_manager = { path = "../crates/holochain_web_app_manager" }
 lair_keystore_manager = { path = "../crates/lair_keystore_manager" }
 
 # NEW_VERSION update holochain dependencies
-holochain_types = "0.3.0-beta-dev.22"
-holochain_state = "0.3.0-beta-dev.24"
-holochain_nonce = "0.3.0-beta-dev.22"
-hdk = "0.3.0-beta-dev.20"
+holochain_types = { workspace = true }
+holochain_state = { workspace = true }
+holochain_nonce = { workspace = true }
+hdk = { workspace = true }
 
-holochain = { version = "0.3.0-beta-dev.25", features = ["sqlite-encrypted"] }
+holochain = { workspace = true }
 
-mr_bundle = "0.3.0-beta-dev.2"
+mr_bundle = { workspace = true }
 
-devhub_types = { git = "https://github.com/matthme/devhub-dnas", branch = "holochain-0.3.0-beta-dev.20" }
+devhub_types = { workspace = true }
 
 
 async-recursion = "1.0.4"
@@ -45,7 +45,7 @@ dirs-next = "2.0.0"
 futures = "0.3"
 log = "0.4.14"
 log4rs = "1.0.0"
-mere_memory_types = { git = "https://github.com/matthme/hc-zome-mere-memory", branch = "holochain-0.3.0-beta-dev.20" }
+mere_memory_types = { workspace = true }
 open = "5.0.0"
 opener = "0.6.1"
 portpicker = "0.1.1"

@@ -7,3 +7,26 @@ members = [
 ]
 resolver = "2"
 
+
+[workspace.dependencies]
+# NEW_VERSION Update holochain dependencies here
+holochain = { git = "https://github.com/holochain/holochain", rev = "21584d0d3f4562641b438537bd0edb7e4837af21", features = ["sqlite-encrypted"] }
+holochain_cli_sandbox = { git = "https://github.com/holochain/holochain", rev = "21584d0d3f4562641b438537bd0edb7e4837af21" }
+holochain_nonce = { git = "https://github.com/holochain/holochain", rev = "21584d0d3f4562641b438537bd0edb7e4837af21" }
+holochain_types = { git = "https://github.com/holochain/holochain", rev = "21584d0d3f4562641b438537bd0edb7e4837af21" }
+holochain_util = { version = "0.3.0-beta-dev.3", features = [ "pw" ] }
+holochain_zome_types = { git = "https://github.com/holochain/holochain", rev = "21584d0d3f4562641b438537bd0edb7e4837af21" }
+holochain_conductor_api = { git = "https://github.com/holochain/holochain", rev = "21584d0d3f4562641b438537bd0edb7e4837af21" }
+holochain_trace = { git = "https://github.com/holochain/holochain", rev = "21584d0d3f4562641b438537bd0edb7e4837af21" }
+holochain_state = { git = "https://github.com/holochain/holochain", rev = "21584d0d3f4562641b438537bd0edb7e4837af21" }
+
+hdk = { git = "https://github.com/holochain/holochain", rev = "21584d0d3f4562641b438537bd0edb7e4837af21" }
+
+holochain_client = "0.5.0-dev.25"
+
+lair_keystore_api = "0.3.0"
+
+mr_bundle = { git = "https://github.com/holochain/holochain", rev = "21584d0d3f4562641b438537bd0edb7e4837af21" }
+
+devhub_types = { git = "https://github.com/matthme/devhub-dnas", branch = "holochain-0.3.0-beta-dev.20" }
+mere_memory_types = { git = "https://github.com/matthme/hc-zome-mere-memory", branch = "holochain-0.3.0-beta-dev.20" }
