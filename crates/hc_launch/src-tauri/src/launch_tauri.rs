@@ -345,7 +345,7 @@ async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
 fn read_lair_yaml(path: PathBuf) -> Option<String> {
   let yaml_content = match std::fs::read_to_string(
     PathBuf::from(path)
-      .join("keystore")
+      .join("ks")
       .join("lair-keystore-config.yaml"),
   ) {
     Ok(content) => content,
