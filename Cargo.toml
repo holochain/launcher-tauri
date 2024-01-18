@@ -9,22 +9,22 @@ resolver = "2"
 
 [workspace.dependencies]
 # NEW_VERSION Update holochain dependencies here
-holochain = { version = "0.2.4-rc.0", features = ["sqlite-encrypted"] }
-holochain_cli_sandbox = "0.2.4-rc.0"
-holochain_types = "0.2.4-rc.0"
-holochain_util = { version = "0.2.3", features = [ "pw" ] }
-holochain_zome_types = "0.2.4-rc.0"
-holochain_conductor_api = "0.2.4-rc.0"
-holochain_trace = "0.2.3"
-holochain_state = "0.2.4-rc.0"
+holochain = { version = "0.2.4", features = ["sqlite-encrypted"] }
+holochain_cli_sandbox = "0.2.4"
+holochain_types = "0.2.4"
+holochain_util = { version = "0.2.4", features = [ "pw" ] }
+holochain_zome_types = "0.2.4"
+holochain_conductor_api = "0.2.4"
+holochain_trace = "0.2.4"
+holochain_state = "0.2.4"
 
-hdk = "0.2.4-rc.0"
+hdk = "0.2.4"
 
 holochain_client = "0.4.6-rc.0"
 
 lair_keystore_api = "0.3.0"
 
-mr_bundle = "0.2.3"
+mr_bundle = "0.2.4"
 
 devhub_types = { git = "https://github.com/matthme/devhub-dnas", branch = "holochain-0.2.4-rc.0" }
 mere_memory_types = { git = "https://github.com/matthme/hc-zome-mere-memory", branch = "holochain-0.2.4-rc.0" }
