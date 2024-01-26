@@ -7,3 +7,26 @@ members = [
 ]
 resolver = "2"
 
+
+[workspace.dependencies]
+# NEW_VERSION Update holochain dependencies here
+holochain = { version = "0.3.0-beta-dev.34" }
+holochain_cli_sandbox = "0.3.0-beta-dev.34"
+holochain_nonce = "0.3.0-beta-dev.22"
+holochain_types = "0.3.0-beta-dev.31"
+holochain_util = { version = "0.3.0-beta-dev.3", features = [ "pw" ] }
+holochain_zome_types = "0.3.0-beta-dev.25"
+holochain_conductor_api = "0.3.0-beta-dev.34"
+holochain_trace = "0.3.0-beta-dev.6"
+holochain_state = "0.3.0-beta-dev.33"
+
+hdk = "0.3.0-beta-dev.29"
+
+holochain_client = "0.5.0-dev.25"
+
+lair_keystore_api = "0.4.0"
+
+mr_bundle = "0.3.0-beta-dev.4"
+
+devhub_types = { git = "https://github.com/matthme/devhub-dnas", branch = "holochain-0.3.0-beta-dev.20" }
+mere_memory_types = { git = "https://github.com/matthme/hc-zome-mere-memory", branch = "holochain-0.3.0-beta-dev.20" }

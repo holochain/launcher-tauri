@@ -3,34 +3,30 @@
   windows_subsystem = "windows"
 )]
 
-
-use holochain_client::AdminWebsocket;
-use holochain_types::prelude::AgentPubKey;
+use holochain_client::{AdminWebsocket, AgentPubKey};
 use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
-use tauri::utils::config::AppUrl;
-use tauri::WindowUrl;
-use tauri::{CustomMenuItem, Menu, Submenu};
 use std::collections::HashMap;
 use std::path::PathBuf;
+use tauri::utils::config::AppUrl;
 use tauri::Manager;
 use tauri::RunEvent;
 use tauri::Window;
 use tauri::WindowEvent;
+use tauri::WindowUrl;
+use tauri::{CustomMenuItem, Menu, Submenu};
 use url::Url;
 
 use lair_keystore_api::dependencies::sodoken;
-use lair_keystore_api::{LairClient, ipc_keystore_connect};
-
+use lair_keystore_api::{ipc_keystore_connect, LairClient};
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
-
 
 pub fn launch_tauri(
   ui_source: UISource,
   app_id: String,
   local_storage_dir: PathBuf,
   watch: bool,
-  passphrase: sodoken::BufRead
+  passphrase: sodoken::BufRead,
 ) -> () {
   // tauri::async_runtime::set(tokio::runtime::Handle::current());
 
@@ -46,8 +42,9 @@ pub fn launch_tauri(
 
   let builder = match ui_source {
     UISource::Path(_) => tauri::Builder::default(),
-    UISource::Port(port) => tauri::Builder::default()
-    .plugin(tauri_plugin_localhost::Builder::new(port).build())
+    UISource::Port(port) => {
+      tauri::Builder::default().plugin(tauri_plugin_localhost::Builder::new(port).build())
+    }
   };
 
   // build tauri windows
@@ -67,7 +64,10 @@ pub fn launch_tauri(
       let dot_hc_content = match std::fs::read_to_string(dot_hc_path) {
         Ok(p) => p,
         Err(e) => {
-          println!("[hc launch] ERROR: Failed to read content of .hc file: {}", e);
+          println!(
+            "[hc launch] ERROR: Failed to read content of .hc file: {}",
+            e
+          );
           panic!("Failed to read content of .hc file: {}", e);
         }
       };
@@ -88,7 +88,10 @@ pub fn launch_tauri(
             let admin_port = match std::fs::read_to_string(dot_hc_live_path) {
               Ok(p) => p,
               Err(e) => {
-                println!("[hc launch] ERROR: Failed to read content of .hc_live file: {}", e);
+                println!(
+                  "[hc launch] ERROR: Failed to read content of .hc_live file: {}",
+                  e
+                );
                 panic!("Failed to read content of .hc_live file: {}", e);
               }
             };
@@ -98,7 +101,10 @@ pub fn launch_tauri(
             let app_port = match get_app_websocket(admin_port_string).await {
               Ok(ws) => ws,
               Err(e) => {
-                println!("[hc launch] ERROR:  Failed to get app websocket port: {}", e);
+                println!(
+                  "[hc launch] ERROR:  Failed to get app websocket port: {}",
+                  e
+                );
                 panic!("Failed to get app websocket port.");
               }
             };
@@ -106,7 +112,10 @@ pub fn launch_tauri(
             let admin_port = match admin_port.trim().parse::<u16>() {
               Ok(u) => u,
               Err(e) => {
-                println!("[hc launch] ERROR: Failed to convert admin port from String to u16: {}", e);
+                println!(
+                  "[hc launch] ERROR: Failed to convert admin port from String to u16: {}",
+                  e
+                );
                 panic!("Failed to convert admin port from String to u16: {}", e);
               }
             };
@@ -123,32 +132,32 @@ pub fn launch_tauri(
             let app_handle = app.handle();
 
             let mut window_builder = match ui_source.clone() {
-              UISource::Path(ui_path) => {
-                happ_window_builder(
-                  &app_handle,
-                  app_id.clone(),
-                  window_label.clone(),
-                  window_title.clone(),
-                  UISource::Path(ui_path.clone()),
-                  local_storage_dir.clone().join(format!("Conductor-{}-{}", app_counter, sanitized_app_id)),
-                  app_port,
-                  admin_port,
-                  false,
-                )
-              },
-              UISource::Port(ui_port) => {
-                happ_window_builder(
-                  &app_handle,
-                  app_id.clone(),
-                  window_label.clone(),
-                  window_title.clone(),
-                  UISource::Port(ui_port),
-                  local_storage_dir.clone().join(format!("Conductor-{}-{}", app_counter, sanitized_app_id)),
-                  app_port,
-                  admin_port,
-                  false,
-                )
-              }
+              UISource::Path(ui_path) => happ_window_builder(
+                &app_handle,
+                app_id.clone(),
+                window_label.clone(),
+                window_title.clone(),
+                UISource::Path(ui_path.clone()),
+                local_storage_dir
+                  .clone()
+                  .join(format!("Conductor-{}-{}", app_counter, sanitized_app_id)),
+                app_port,
+                admin_port,
+                false,
+              ),
+              UISource::Port(ui_port) => happ_window_builder(
+                &app_handle,
+                app_id.clone(),
+                window_label.clone(),
+                window_title.clone(),
+                UISource::Port(ui_port),
+                local_storage_dir
+                  .clone()
+                  .join(format!("Conductor-{}-{}", app_counter, sanitized_app_id)),
+                app_port,
+                admin_port,
+                false,
+              ),
             };
 
             window_builder = window_builder.inner_size(window_width, window_height);
@@ -158,12 +167,13 @@ pub fn launch_tauri(
                 "Settings",
                 Menu::new().add_item(CustomMenuItem::new("show-devtools", "Show DevTools")),
               )))
-              .build() {
-                Ok(window) => window,
-                Err(e) => {
-                  println!("[hc launch] ERROR: Failed to build window: {}", e);
-                  panic!("Failed to build Window: {:?}", e);
-                }
+              .build()
+            {
+              Ok(window) => window,
+              Err(e) => {
+                println!("[hc launch] ERROR: Failed to build window: {}", e);
+                panic!("Failed to build Window: {:?}", e);
+              }
             };
 
             let a = app.handle().clone();
@@ -184,10 +194,11 @@ pub fn launch_tauri(
             windows.push(window);
 
             // get public key of installed app and add it to the pubkey map used to verify provenance
-            let mut ws = match AdminWebsocket::connect(format!("ws://localhost:{}", admin_port)).await {
-              Ok(ws) => ws,
-              Err(e) => panic!("Failed to connect to admin websocket: {:?}", e),
-            };
+            let mut ws =
+              match AdminWebsocket::connect(format!("ws://localhost:{}", admin_port)).await {
+                Ok(ws) => ws,
+                Err(e) => panic!("Failed to connect to admin websocket: {:?}", e),
+              };
 
             let installed_apps = match ws.list_apps(None).await {
               Ok(apps) => apps,
@@ -217,7 +228,10 @@ pub fn launch_tauri(
               match ipc_keystore_connect(connection_url.clone(), passphrase.clone()).await {
                 Ok(client) => client,
                 Err(e) => {
-                  println!("[hc launch] ERROR: Failed to connect to lair client: {:?}", e);
+                  println!(
+                    "[hc launch] ERROR: Failed to connect to lair client: {:?}",
+                    e
+                  );
                   panic!("Failed to connect to lair client");
                 }
               };
@@ -237,7 +251,10 @@ pub fn launch_tauri(
       // watch for file changes in the UI folder if requested
       match (watch, ui_source) {
         (true, UISource::Path(ui_path)) => {
-          println!("[hc launch] Watching file changes in folder {:?}", ui_path.as_path());
+          println!(
+            "[hc launch] Watching file changes in folder {:?}",
+            ui_path.as_path()
+          );
 
           let _watch_handle = std::thread::spawn(move || {
             let (tx_watcher, rx_watcher) = std::sync::mpsc::channel();
@@ -267,8 +284,10 @@ pub fn launch_tauri(
               }
             }
           });
-        },
-        (true, UISource::Port(_port)) => println!("[hc launch] WARNING: The --watch flag has no effect if the UI is served from localhost."),
+        }
+        (true, UISource::Port(_port)) => println!(
+          "[hc launch] WARNING: The --watch flag has no effect if the UI is served from localhost."
+        ),
         _ => (),
       }
 
@@ -326,12 +345,15 @@ async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
 fn read_lair_yaml(path: PathBuf) -> Option<String> {
   let yaml_content = match std::fs::read_to_string(
     PathBuf::from(path)
-      .join("keystore")
+      .join("ks")
       .join("lair-keystore-config.yaml"),
   ) {
     Ok(content) => content,
     Err(e) => {
-      println!("[hc launch] ERROR: Failed to read lair-keystore-config.yaml: {:?}", e);
+      println!(
+        "[hc launch] ERROR: Failed to read lair-keystore-config.yaml: {:?}",
+        e
+      );
       panic!("Failed to read lair-keystore-config.yaml");
     }
   };
@@ -353,7 +375,9 @@ fn derive_window_label(conductor_nr: i32, app_id: String) -> String {
   return format!("Conductor-{}-{}", conductor_nr, sanitized_app_id);
 }
 
-
 fn sanitize_app_id(app_id: String) -> String {
-  return app_id.replace("-", "--").replace(" ", "-").replace(".", "_");
+  return app_id
+    .replace("-", "--")
+    .replace(" ", "-")
+    .replace(".", "_");
 }
