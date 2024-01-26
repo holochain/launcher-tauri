@@ -560,11 +560,11 @@ pub fn get_running_ports(path: PathBuf, n_expected: usize) -> Vec<u16> {
       Err(e) => match n {
         0 => {
           println!("[hc launch] ERROR: No running sandbox conductors found. If you use the --reuse-conductors flag there need to be existing sandbox conductors running.\n {}", e);
-          panic!("ERROR: No running snadbox conductors found. If you use the --reuse-conductors flag there need to be existing sandbox conductors running.\n {}", e);
+          panic!("ERROR: No running sandbox conductors found. If you use the --reuse-conductors flag there need to be existing sandbox conductors running.\n {}", e);
         }
         _ => {
           println!("[hc launch] ERROR: Not enough running sandbox conductors found. If you use the --reuse-conductors flag there need to be as many running sandbox conductors as mentioned in the .hc file.\n {}", e);
-          panic!("ERROR: No running snadbox conductors found. If you use the --reuse-conductors flag there need to be as many running sandbox conductors as mentioned in the .hc file.\n {}", e);
+          panic!("ERROR: No running sandbox conductors found. If you use the --reuse-conductors flag there need to be as many running sandbox conductors as mentioned in the .hc file.\n {}", e);
         }
       },
     };
