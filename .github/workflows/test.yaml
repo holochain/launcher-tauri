@@ -28,15 +28,23 @@ jobs:
       - name: install webkit2gtk (ubuntu only)
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get install libwebkit2gtk-4.0-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libssl-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
 
       - name: install Holochain
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.3.0 lair_keystore
+          cargo install --version 0.4.2 lair_keystore
           LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.3.0-x86_64-unknown-linux-gnu
+          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.4.2-x86_64-unknown-linux-gnu
 
 
           cargo install holochain --version 0.2.6 --locked --features sqlite-encrypted
