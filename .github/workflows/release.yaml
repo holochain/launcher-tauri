@@ -9,8 +9,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-22.04]
-        # platform: [windows-2019, macos-11, ubuntu-22.04]
+        # platform: [ubuntu-22.04]
+        platform: [windows-2019, macos-11, ubuntu-22.04]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -42,9 +42,9 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.3.0 lair_keystore
+          cargo install --version 0.4.2 lair_keystore
           $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
-          Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.3.0-x86_64-pc-windows-msvc.exe
+          Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.4.2-x86_64-pc-windows-msvc.exe
 
           cargo install holochain --version 0.2.6 --locked --features sqlite-encrypted
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
@@ -57,9 +57,9 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.3.0 lair_keystore
+          cargo install --version 0.4.2 lair_keystore
           LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.3.0-x86_64-apple-darwin
+          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.4.2-x86_64-apple-darwin
 
           cargo install holochain --version 0.2.6 --locked --features sqlite-encrypted
           HOLOCHAIN_PATH=$(which holochain)
@@ -71,16 +71,24 @@ jobs:
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libcanberra-gtk-module libcanberra-gtk3-module build-essential curl wget libssl-dev libgtk-3-dev squashfs-tools libgtksourceview-3.0-dev libappindicator3-dev patchelf librsvg2-dev ayatana-indicator-application
+          sudo apt-get install libwebkit2gtk-4.0-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libssl-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
 
       - name: setup binaries (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.3.0 lair_keystore
+          cargo install --version 0.4.2 lair_keystore
           LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.3.0-x86_64-unknown-linux-gnu
+          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.4.2-x86_64-unknown-linux-gnu
 
 
           cargo install holochain --version 0.2.6 --locked --features sqlite-encrypted
