@@ -68,6 +68,7 @@ impl VersionManager for HolochainV0_2_6 {
       network: Some(network_config),
       db_sync_strategy: Default::default(),
       tracing_override: None,
+      tracing_scope: None,
     };
 
     serde_yaml::to_string(&config).expect("Could not convert conductor config to string")
