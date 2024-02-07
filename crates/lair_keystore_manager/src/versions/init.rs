@@ -1,4 +1,7 @@
-use std::{path::{Path, PathBuf}, time::Duration};
+use std::{
+  path::{Path, PathBuf},
+  time::Duration,
+};
 
 use tauri::api::process::{Command, CommandEvent};
 
@@ -12,7 +15,7 @@ pub fn is_initialized(keystore_path: PathBuf) -> bool {
 
 pub async fn initialize(keystore_path: PathBuf, password: String) -> Result<(), LairKeystoreError> {
   // NEW_VERSION Check whether lair-keystore version needs to get updated
-  let (mut lair_rx, mut command_child) = Command::new_sidecar("lair-keystore-v0.3.0")
+  let (mut lair_rx, mut command_child) = Command::new_sidecar("lair-keystore-v0.4.2")
     .or(Err(LairKeystoreError::LaunchChildError(
       LaunchChildError::BinaryNotFound,
     )))?
