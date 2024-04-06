@@ -5,7 +5,9 @@
 
 use holochain_client::{AdminWebsocket, AgentPubKey};
 use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
+use holochain_types::websocket::AllowedOrigins;
 use std::collections::HashMap;
+use std::net::{SocketAddr, ToSocketAddrs};
 use std::path::PathBuf;
 use tauri::utils::config::AppUrl;
 use tauri::Manager;
@@ -195,7 +197,7 @@ pub fn launch_tauri(
 
             // get public key of installed app and add it to the pubkey map used to verify provenance
             let mut ws =
-              match AdminWebsocket::connect(format!("ws://localhost:{}", admin_port)).await {
+              match AdminWebsocket::connect(SocketAddr::from(([127, 0, 0, 1], admin_port))).await {
                 Ok(ws) => ws,
                 Err(e) => panic!("Failed to connect to admin websocket: {:?}", e),
               };
@@ -314,9 +316,13 @@ pub fn launch_tauri(
 }
 
 async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
-  println!("ADMIN PORT: {}", admin_port);
+  println!("ADMIN PORT: ", admin_port);
+  let parsed_port = u16::from_str_radix(&admin_port.trim(), 10)
+    .map_err(|e| format!("Failed to parse admin port String to u16"))?;
+
   // Try to connect twice. This fixes the os(111) error for now that occurs when the conducor is not ready yet.
-  let mut ws = match AdminWebsocket::connect(format!("ws://localhost:{}", admin_port)).await {
+  let mut ws = match AdminWebsocket::connect(SocketAddr::from(([127, 0, 0, 1], parsed_port))).await
+  {
     Ok(ws) => ws,
     Err(e) => return Err(format!("Could not connect to admin websocket: {:?}", e)),
   };
@@ -332,7 +338,7 @@ async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
     } else {
       let free_port = portpicker::pick_unused_port().expect("No ports free");
 
-      ws.attach_app_interface(free_port)
+      ws.attach_app_interface(free_port, AllowedOrigins::Any)
         .await
         .or(Err(format!("Could not attach app websocket interface.")))?;
       free_port
