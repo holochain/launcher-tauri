@@ -7,7 +7,7 @@ use holochain_client::{AdminWebsocket, AgentPubKey};
 use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
 use holochain_types::websocket::AllowedOrigins;
 use std::collections::HashMap;
-use std::net::{SocketAddr, ToSocketAddrs};
+use std::net::SocketAddr;
 use std::path::PathBuf;
 use tauri::utils::config::AppUrl;
 use tauri::Manager;
@@ -316,9 +316,8 @@ pub fn launch_tauri(
 }
 
 async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
-  println!("ADMIN PORT: ", admin_port);
   let parsed_port = u16::from_str_radix(&admin_port.trim(), 10)
-    .map_err(|e| format!("Failed to parse admin port String to u16"))?;
+    .map_err(|e| format!("Failed to parse admin port String to u16: ${}", e))?;
 
   // Try to connect twice. This fixes the os(111) error for now that occurs when the conducor is not ready yet.
   let mut ws = match AdminWebsocket::connect(SocketAddr::from(([127, 0, 0, 1], parsed_port))).await
