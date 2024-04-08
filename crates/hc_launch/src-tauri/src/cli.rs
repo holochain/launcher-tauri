@@ -13,6 +13,7 @@ use holochain_conductor_api::conductor::paths::ConfigRootPath;
 use holochain_launcher_utils::window_builder::UISource;
 use holochain_trace::Output;
 use holochain_types::prelude::InstalledAppId;
+use holochain_types::websocket::AllowedOrigins;
 use std::path::{Path, PathBuf};
 use tokio::process::Child;
 
@@ -21,7 +22,7 @@ use crate::prepare_webapp;
 use holochain_cli_sandbox::cmds::{Create, Existing, NetworkCmd, NetworkType};
 
 #[derive(Debug, Parser)]
-#[command(version = "0.0.14 (holochain 0.3.0-beta-dev.34)")]
+#[command(version = "0.300.0-dev.0 (holochain 0.3.0-beta-dev.44)")]
 #[command(author, about, long_about = None)]
 /// Helper for launching holochain apps in a Holochain Launcher environment for testing and development purposes.
 ///
@@ -257,7 +258,7 @@ If you are sure that you want to use the production bootstrap server with hc lau
                     call: AdminRequestCli::InstallApp(install_app),
                   };
 
-                  holochain_cli_sandbox::calls::call(&self.holochain_path, call, Output::Log).await?;
+                  holochain_cli_sandbox::calls::call(&self.holochain_path, call, Vec::new(), Output::Log).await?;
 
                 } else {
                   // clean existing sandboxes
@@ -365,7 +366,7 @@ If you are sure that you want to use the production bootstrap server with hc lau
                         call: AdminRequestCli::InstallApp(install_app),
                       };
 
-                      holochain_cli_sandbox::calls::call(&self.holochain_path, call, Output::Log).await?;
+                      holochain_cli_sandbox::calls::call(&self.holochain_path, call, Vec::new(), Output::Log).await?;
 
                     } else {
                       // clean existing sandboxes
@@ -531,6 +532,7 @@ pub async fn run(
       &mut cmd,
       AddAppWs {
         port: Some(app_port),
+        allowed_origins: AllowedOrigins::Any,
       },
     )
     .await?;
