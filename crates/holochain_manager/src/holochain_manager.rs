@@ -6,7 +6,7 @@ use std::{fs, time::Duration};
 
 // NEW_VERSION change holochain_types version
 use holochain_client::{AdminWebsocket, AgentPubKey, AppInfo, InstallAppPayload};
-use holochain_types_0_2_6::prelude::{
+use holochain_types_0_2_7::prelude::{
   AppBundleSource, CellId, CloneCellId, DisableCloneCellPayload,
 };
 use lair_keystore_manager::utils::create_dir_if_necessary;
@@ -135,7 +135,6 @@ impl HolochainManager {
   }
 
   pub fn kill(mut self) -> Result<(), String> {
-    self.ws.close();
     self
       .command_child
       .kill()
