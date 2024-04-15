@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REQUIRED_HOLOCHAIN_VERSION="0.2.6"
+REQUIRED_HOLOCHAIN_VERSION="0.2.7"
 REQUIRED_LAIR_VERSION="0.4.2"
 
 # Check that this script is being run from the right location
