@@ -10,17 +10,17 @@ resolver = "2"
 
 [workspace.dependencies]
 # NEW_VERSION Update holochain dependencies here
-holochain = { version = "0.3.0-beta-dev.44" }
-holochain_cli_sandbox = "0.3.0-beta-dev.43"
+holochain = { version = "0.3.0-beta-dev.45" }
+holochain_cli_sandbox = "0.3.0-beta-dev.44"
 holochain_nonce = "0.3.0-beta-dev.26"
-holochain_types = "0.3.0-beta-dev.39"
+holochain_types = "0.3.0-beta-dev.40"
 holochain_util = { version = "0.3.0-beta-dev.6", features = [ "pw" ] }
-holochain_zome_types = "0.3.0-beta-dev.32"
-holochain_conductor_api = "0.3.0-beta-dev.43"
+holochain_zome_types = "0.3.0-beta-dev.33"
+holochain_conductor_api = "0.3.0-beta-dev.44"
 holochain_trace = "0.3.0-beta-dev.9"
-holochain_state = "0.3.0-beta-dev.42"
+holochain_state = "0.3.0-beta-dev.43"
 
-hdk = "0.3.0-beta-dev.29"
+hdk = "0.3.0-beta-dev.38"
 
 holochain_client = "0.5.0-dev.31"
 
