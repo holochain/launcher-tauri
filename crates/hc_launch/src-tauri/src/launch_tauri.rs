@@ -197,7 +197,7 @@ pub fn launch_tauri(
 
             // get public key of installed app and add it to the pubkey map used to verify provenance
             let mut ws =
-              match AdminWebsocket::connect(SocketAddr::from(([127, 0, 0, 1], admin_port))).await {
+              match AdminWebsocket::connect(SocketAddr::from(("localhost", admin_port))).await {
                 Ok(ws) => ws,
                 Err(e) => panic!("Failed to connect to admin websocket: {:?}", e),
               };
@@ -320,8 +320,7 @@ async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
     .map_err(|e| format!("Failed to parse admin port String to u16: ${}", e))?;
 
   // Try to connect twice. This fixes the os(111) error for now that occurs when the conducor is not ready yet.
-  let mut ws = match AdminWebsocket::connect(SocketAddr::from(([127, 0, 0, 1], parsed_port))).await
-  {
+  let mut ws = match AdminWebsocket::connect(SocketAddr::from(("localhost", parsed_port))).await {
     Ok(ws) => ws,
     Err(e) => return Err(format!("Could not connect to admin websocket: {:?}", e)),
   };
