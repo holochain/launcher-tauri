@@ -29,3 +29,5 @@ mr_bundle = "0.2.7"
 devhub_types = { git = "https://github.com/matthme/devhub-dnas", branch = "holochain-0.2.4-rc.0" }
 mere_memory_types = { git = "https://github.com/matthme/hc-zome-mere-memory", branch = "holochain-0.2.4-rc.0" }
 
+[http]
+timeout = 1000
