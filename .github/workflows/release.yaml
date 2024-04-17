@@ -128,6 +128,7 @@ jobs:
         if: matrix.platform == 'windows-2019'
         run: |
 
+          set HTTP_TIMEOUT=1000
           npm run build -- --verbose
 
           # NEW_VERSION change version number in filenames here wherever needed
