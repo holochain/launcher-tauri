@@ -140,7 +140,7 @@ jobs:
           CertUtil -hashfile "D:\a\launcher\launcher\target\release\bundle\nsis\Holochain Launcher Beta 2_0.11.6_x64-setup.nsis.zip" SHA256
           CertUtil -hashfile "D:\a\launcher\launcher\target\release\bundle\nsis\Holochain Launcher Beta 2_0.11.6_x64-setup.nsis.zip.sig" SHA256
 
-          dotnet tool install --global AzureSignTool
+          dotnet tool install --global --version 4.0.1 AzureSignTool
           # sign the .msi file
           AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v "D:\a\launcher\launcher\target\release\bundle\msi\Holochain Launcher Beta 2_0.11.6_x64_en-US.msi"
           # sign the .exe file
