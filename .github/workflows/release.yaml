@@ -9,8 +9,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # platform: [ubuntu-22.04]
-        platform: [windows-2019, macos-11, ubuntu-22.04]
+        platform: [windows-2019]
+        # platform: [windows-2019, macos-11, ubuntu-22.04]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -42,13 +42,16 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.4.2 lair_keystore
-          $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
-          Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.4.2-x86_64-pc-windows-msvc.exe
+          # cargo install --version 0.4.2 lair_keystore
+          # $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
+          # Copy-Item $LkPath -Destination src-tauri/bins/lair-keystore-v0.4.2-x86_64-pc-windows-msvc.exe
 
-          cargo install holochain --version 0.2.7 --locked --features sqlite-encrypted
-          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
-          Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.2.7-x86_64-pc-windows-msvc.exe
+          # cargo install holochain --version 0.2.7 --locked --features sqlite-encrypted
+          # $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          # Copy-Item $HcPath -Destination src-tauri/bins/holochain-v0.2.7-x86_64-pc-windows-msvc.exe
+
+          curl -L --output src-tauri/bins/lair-keystore-v0.4.2-x86_64-pc-windows-msvc.exe https://github.com/matthme/holochain-binaries/releases/download/lair-binaries-0.4.2/lair-keystore-v0.4.2-x86_64-pc-windows-msvc.exe
+          curl -L --output src-tauri/bins/holochain-v0.2.7-x86_64-pc-windows-msvc.exe https://github.com/matthme/holochain-binaries/releases/download/holochain-binaries-0.2.7/holochain-v0.2.7-x86_64-pc-windows-msvc.exe
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
