@@ -400,7 +400,7 @@ export default defineComponent({
     try {
       const result = await getVisibleHostsForZomeFunction(
         this.appWebsocket as AppWebsocket,
-        appStoreInfo,
+        appStoreInfo!,
         this.app.devhub_address.dna,
         "happ_library",
         "get_webhapp_package",
@@ -414,7 +414,7 @@ export default defineComponent({
     this.pollInterval = window.setInterval(async () => {
       const result = await getVisibleHostsForZomeFunction(
         this.appWebsocket as AppWebsocket,
-        appStoreInfo,
+        appStoreInfo!,
         this.app.devhub_address.dna,
         "happ_library",
         "get_webhapp_package",
@@ -453,7 +453,7 @@ export default defineComponent({
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const _happEntry = await remoteCallToDevHubHost<Entity<HappEntry>>(
               this.appWebsocket as AppWebsocket,
-              appStoreInfo,
+              appStoreInfo!,
               happLocator.dna_hash,
               host,
               "happ_library",
@@ -463,13 +463,13 @@ export default defineComponent({
 
             return getHappReleasesFromHost(
               this.appWebsocket as AppWebsocket,
-              appStoreInfo,
+              appStoreInfo!,
               host,
               happLocator
             );
           },
           this.appWebsocket as AppWebsocket,
-          appStoreInfo,
+          appStoreInfo!,
           happLocator.dna_hash,
           "happ_library",
           "get_happ_releases"
@@ -527,7 +527,7 @@ export default defineComponent({
                 (host) =>
                   remoteCallToDevHubHost<Entity<GUIReleaseEntry>>(
                     this.appWebsocket as AppWebsocket,
-                    appStoreInfo,
+                    appStoreInfo!,
                     devHubDnaHash,
                     host,
                     "happ_library",
@@ -535,7 +535,7 @@ export default defineComponent({
                     { id: guiReleaseHash }
                   ),
                 this.appWebsocket as AppWebsocket,
-                appStoreInfo,
+                appStoreInfo!,
                 devHubDnaHash,
                 "happ_library",
                 "get_gui_release"
@@ -603,12 +603,12 @@ export default defineComponent({
           });
           this.publisher = await getPublisher(
             this.appWebsocket,
-            appStoreInfo,
+            appStoreInfo!,
             this.app.publisher
           );
           const collectedBytes = await collectBytes(
             this.appWebsocket,
-            appStoreInfo,
+            appStoreInfo!,
             this.app.icon
           );
           this.imgSrcFetched = toSrc(
@@ -629,7 +629,7 @@ export default defineComponent({
         });
         this.publisher = await getPublisher(
           this.appWebsocket,
-          appStoreInfo,
+          appStoreInfo!,
           this.app.publisher
         );
       } catch (e) {

@@ -821,7 +821,7 @@ export async function remoteCallCascadeToAvailableHosts<T>(
 }
 
 export async function tryWithHosts<T>(
-  fn: (host: AgentPubKey) => T,
+  fn: (host: AgentPubKey) => Promise<T>,
   appWebsocket: AppWebsocket,
   appStoreApp: AppInfo,
   devhubDna: DnaHash,

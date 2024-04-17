@@ -386,7 +386,7 @@ export default defineComponent({
       });
 
       // console.log("@fetchApps: appStoreInfo: ", appStoreInfo);
-      const allCells = appStoreInfo.cell_info;
+      const allCells = appStoreInfo!.cell_info;
       // console.log("@fetchApps: allCells: ", allCells);
 
       const provisionedCells: [string, CellInfo | undefined][] = Object.entries(
@@ -410,7 +410,7 @@ export default defineComponent({
       try {
         allApps = await getAllApps(
           this.appWebsocket! as AppWebsocket,
-          appStoreInfo
+          appStoreInfo!
         );
       } catch (e) {
         console.error(`Error getting all apps: ${e}`);
@@ -474,7 +474,7 @@ export default defineComponent({
           this.loadingText = `Loading app icon from App Store...`;
           const collectedBytes = await collectBytes(
             this.appWebsocket,
-            appStoreInfo,
+            appStoreInfo!,
             appEntry.icon
           );
           this.selectedIconSrc = toSrc(
@@ -541,7 +541,7 @@ export default defineComponent({
             // );
           },
           this.appWebsocket as AppWebsocket,
-          appStoreInfo,
+          appStoreInfo!,
           releaseInfo.devhubDnaHash,
           "happ_library",
           "get_webhapp_package"

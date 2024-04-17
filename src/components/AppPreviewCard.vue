@@ -118,7 +118,7 @@ export default defineComponent({
 
     const collectedBytes = await collectBytes(
       this.appWebsocket,
-      appStoreInfo,
+      appStoreInfo!,
       iconHash
     );
     this.imgSrc = toSrc(collectedBytes, this.app.metadata.icon_mime_type);

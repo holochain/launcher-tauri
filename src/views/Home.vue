@@ -262,7 +262,7 @@ export default defineComponent({
             const happReleases: Array<HappReleaseEntry | undefined> =
               await getHappReleasesByActionHashes(
                 appWebsocket as AppWebsocket,
-                appstoreAppInfo,
+                appstoreAppInfo!,
                 devHubDnaHash,
                 actionHashes
               );
