@@ -3077,9 +3077,9 @@ dependencies = [
 
 [[package]]
 name = "holochain"
-version = "0.2.7"
+version = "0.2.8-rc.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64fd58538aff181a7f717dbf6e94f408c1a59f0d5f6c5f2c656b3b8eff702d38"
+checksum = "ddf6b5f7e3b9438e7bb725ab966acbdd3387ae56742dc076542bf4d31abfcb04"
 dependencies = [
  "anyhow",
  "async-recursion 0.3.2",
@@ -3278,9 +3278,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_cli_sandbox"
-version = "0.2.7"
+version = "0.2.8-rc.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17455ab7d127e6723a33900eb95cf169e80ca1756fa93b329115abc9f186ee37"
+checksum = "021f922fcd5a269660cf08db7601d04450adfe9ed9819a021d8a118679790873"
 dependencies = [
  "ansi_term",
  "anyhow",
@@ -3307,9 +3307,8 @@ dependencies = [
 
 [[package]]
 name = "holochain_client"
-version = "0.4.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51087c48ef0bcefd709dd57b97622c2fdacf7c2c8dd72ae2c5e0e810511b5040"
+version = "0.4.10"
+source = "git+https://github.com/matthme/holochain-client-rust?branch=bump/0.2.8-rc.0#b98e405b782e9aac40e264b67c63e90e12e460fa"
 dependencies = [
  "again",
  "anyhow",
@@ -3785,10 +3784,11 @@ dependencies = [
 
 [[package]]
 name = "holochain_websocket"
-version = "0.2.7"
+version = "0.2.8-rc.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f913d572413c43d3f09f75dcf9c666f172c12f35802aa35e8bce903f5d57507"
+checksum = "e236cb06343c3ba3ee0632599c12c4220bb085e5feacb36e9dd34c4cf4958b83"
 dependencies = [
+ "async-trait",
  "futures",
  "holochain_serialized_bytes",
  "serde",

@@ -40,7 +40,10 @@
         "icons/icon_priority_medium_32x32.png",
         "icons/32x32.png"
       ],
-      "externalBin": ["bins/holochain-v0.2.7", "bins/lair-keystore-v0.4.2"],
+      "externalBin": [
+        "bins/holochain-v0.2.8-rc.0",
+        "bins/lair-keystore-v0.4.2"
+      ],
       "copyright": "",
       "category": "DeveloperTool",
       "shortDescription": "",
