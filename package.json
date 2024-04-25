@@ -52,7 +52,7 @@
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "1.5.2",
+    "@tauri-apps/cli": "^1.5.12",
     "@types/lodash-es": "^4.17.6",
     "@types/mark.js": "8.11.8",
     "@types/node": "^18.7.10",

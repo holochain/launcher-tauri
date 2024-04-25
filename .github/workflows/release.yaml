@@ -10,7 +10,8 @@ jobs:
       fail-fast: false
       matrix:
         # platform: [windows-2019]
-        platform: [windows-2019, macos-11, ubuntu-22.04]
+        platform: [macos-11]
+        # platform: [windows-2019, macos-11, ubuntu-22.04]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
 
@@ -18,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 20
       - name: install Rust stable
@@ -32,7 +33,7 @@ jobs:
           go-version: "stable"
 
       - name: install app dependencies and info
-        run: npm install && npm run tauri info && npm install --save-dev @tauri-apps/cli@1.5.2
+        run: npm install && npm run tauri info && node -p "process.arch"
 
       - name: build libs
         run: npm run build -w @holochain/launcher-api-scripts
