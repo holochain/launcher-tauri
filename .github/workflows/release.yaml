@@ -20,7 +20,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 16
+          node-version: 20
       - name: install Rust stable
         uses: actions-rs/toolchain@v1
         with:
@@ -60,13 +60,20 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.4.2 lair_keystore
-          LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.4.2-x86_64-apple-darwin
+          # cargo install --version 0.4.2 lair_keystore
+          # LAIR_PATH=$(which lair-keystore)
+          # cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.4.2-x86_64-apple-darwin
 
-          cargo install holochain --version 0.2.8-rc.1 --locked --features sqlite-encrypted
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.2.8-rc.1-x86_64-apple-darwin
+          # cargo install holochain --version 0.2.8-rc.1 --locked --features sqlite-encrypted
+          # HOLOCHAIN_PATH=$(which holochain)
+          # cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.2.8-rc.1-x86_64-apple-darwin
+
+          curl -L --output src-tauri/bins/lair-keystore-v0.4.2-x86_64-apple-darwin https://github.com/matthme/holochain-binaries/releases/download/lair-binaries-0.4.2/lair-keystore-v0.4.2-x86_64-apple-darwin
+          curl -L --output src-tauri/bins/holochain-v0.2.8-rc.1-x86_64-apple-darwin https://github.com/matthme/holochain-binaries/releases/download/holochain-binaries-0.2.8-rc.1/holochain-v0.2.8-rc.1-x86_64-apple-darwin
+
+          chmod +x src-tauri/bins/lair-keystore-v0.4.2-x86_64-apple-darwin
+          chmod +x src-tauri/bins/holochain-v0.2.8-rc.1-x86_64-apple-darwin
+
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
@@ -89,15 +96,20 @@ jobs:
         run: |
           mkdir src-tauri/bins
 
-          cargo install --version 0.4.2 lair_keystore
-          LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.4.2-x86_64-unknown-linux-gnu
+          # cargo install --version 0.4.2 lair_keystore
+          # LAIR_PATH=$(which lair-keystore)
+          # cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.4.2-x86_64-unknown-linux-gnu
 
 
-          cargo install holochain --version 0.2.8-rc.1 --locked --features sqlite-encrypted
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.2.8-rc.1-x86_64-unknown-linux-gnu
+          # cargo install holochain --version 0.2.8-rc.1 --locked --features sqlite-encrypted
+          # HOLOCHAIN_PATH=$(which holochain)
+          # cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.2.8-rc.1-x86_64-unknown-linux-gnu
 
+          curl -L --output src-tauri/bins/lair-keystore-v0.4.2-x86_64-unknown-linux-gnu https://github.com/matthme/holochain-binaries/releases/download/lair-binaries-0.4.2/lair-keystore-v0.4.2-x86_64-unknown-linux-gnu
+          curl -L --output src-tauri/bins/holochain-v0.2.8-rc.1-x86_64-unknown-linux-gnu https://github.com/matthme/holochain-binaries/releases/download/holochain-binaries-0.2.8-rc.1/holochain-v0.2.8-rc.1-x86_64-unknown-linux-gnu
+
+          chmod +x src-tauri/bins/lair-keystore-v0.4.2-x86_64-unknown-linux-gnu
+          chmod +x src-tauri/bins/holochain-v0.2.8-rc.1-x86_64-unknown-linux-gnu
 
           # NEW_VERSION: install new holochain version and copy its binary to the tauri path
 
