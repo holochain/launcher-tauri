@@ -3,7 +3,7 @@
   windows_subsystem = "windows"
 )]
 
-use holochain_client::{AdminWebsocket, AgentPubKey};
+use holochain_client::{AdminWebsocket, AgentPubKey, IssueAppAuthenticationTokenPayload};
 use holochain_launcher_utils::window_builder::{happ_window_builder, UISource};
 use holochain_types::websocket::AllowedOrigins;
 use std::collections::HashMap;
@@ -133,6 +133,24 @@ pub fn launch_tauri(
 
             let app_handle = app.handle();
 
+            let mut ws =
+              match AdminWebsocket::connect(SocketAddr::from(([127, 0, 0, 1], admin_port))).await {
+                Ok(ws) => ws,
+                Err(e) => panic!("Failed to connect to admin websocket: {:?}", e),
+              };
+
+            let authentication_response = match ws
+              .issue_app_auth_token(IssueAppAuthenticationTokenPayload {
+                installed_app_id: app_id.clone(),
+                single_use: false,
+                expiry_seconds: 999999,
+              })
+              .await
+            {
+              Ok(response) => response,
+              Err(e) => panic!("Failed to issue app authentication token: {:?}", e),
+            };
+
             let mut window_builder = match ui_source.clone() {
               UISource::Path(ui_path) => happ_window_builder(
                 &app_handle,
@@ -144,6 +162,7 @@ pub fn launch_tauri(
                   .clone()
                   .join(format!("Conductor-{}-{}", app_counter, sanitized_app_id)),
                 app_port,
+                authentication_response.token,
                 admin_port,
                 false,
               ),
@@ -157,6 +176,7 @@ pub fn launch_tauri(
                   .clone()
                   .join(format!("Conductor-{}-{}", app_counter, sanitized_app_id)),
                 app_port,
+                authentication_response.token,
                 admin_port,
                 false,
               ),
@@ -196,12 +216,6 @@ pub fn launch_tauri(
             windows.push(window);
 
             // get public key of installed app and add it to the pubkey map used to verify provenance
-            let mut ws =
-              match AdminWebsocket::connect(SocketAddr::from(([127, 0, 0, 1], admin_port))).await {
-                Ok(ws) => ws,
-                Err(e) => panic!("Failed to connect to admin websocket: {:?}", e),
-              };
-
             let installed_apps = match ws.list_apps(None).await {
               Ok(apps) => apps,
               Err(e) => panic!("Failed to list apps : {:?}", e),
@@ -333,11 +347,11 @@ async fn get_app_websocket(admin_port: String) -> Result<u16, String> {
       .or(Err(format!("Could not list app websocket interfaces.")))?;
 
     if app_interfaces.len() > 0 {
-      app_interfaces[0]
+      app_interfaces[0].port
     } else {
       let free_port = portpicker::pick_unused_port().expect("No ports free");
 
-      ws.attach_app_interface(free_port, AllowedOrigins::Any)
+      ws.attach_app_interface(free_port, AllowedOrigins::Any, None)
         .await
         .or(Err(format!("Could not attach app websocket interface.")))?;
       free_port
