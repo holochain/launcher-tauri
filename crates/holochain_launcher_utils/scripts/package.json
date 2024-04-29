@@ -1,0 +1,17 @@
+{
+  "name": "holochain_launcher_utils",
+  "version": "1.0.0",
+  "description": "Scripts to inject into tauri windows",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "vite build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@holochain/client": "0.17.0-dev.11",
+    "@msgpack/msgpack": "^2.7.1",
+    "@tauri-apps/api": "^1.5.4"
+  }
+}

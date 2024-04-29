@@ -1,14 +1,14 @@
-use tauri::{ WindowUrl, window::WindowBuilder };
+use holochain_client::AppAuthenticationToken;
 use std::fs::read;
 use std::path::PathBuf;
-
+use tauri::{window::WindowBuilder, WindowUrl};
 
 pub enum UISource {
   Path(PathBuf),
   Port(u16),
 }
 
-impl Clone for UISource{
+impl Clone for UISource {
   fn clone(&self) -> Self {
     match self {
       UISource::Path(p) => UISource::Path(p.clone()),
@@ -24,22 +24,24 @@ pub fn happ_window_builder<'a>(
   app_id: String,
   window_label: String, // label used by tauri internally to distinguish different windows
   window_title: String, // label shown on the top bar of the window
-  ui_source: UISource, // source to the UI
+  ui_source: UISource,  // source to the UI
   local_storage_path: PathBuf,
   app_port: u16,
+  app_authentication_token: AppAuthenticationToken,
   admin_port: u16,
   show_404: bool, // whether to show a 404 message (true) if the index.html cannot be found or default to tauri's index.html (false)
 ) -> WindowBuilder<'a> {
-
-  let launcher_env_command = format!(r#"window.__HC_LAUNCHER_ENV__ = {{
+  let launcher_env_command = format!(
+    r#"window.__HC_LAUNCHER_ENV__ = {{
     "APP_INTERFACE_PORT": {},
     "ADMIN_INTERFACE_PORT": {},
-    "INSTALLED_APP_ID": "{}"
+    "INSTALLED_APP_ID": "{}",
+    "APP_INTERFACE_TOKEN": {:?},
   }}"#,
-    app_port,
-    admin_port,
-    app_id
+    app_port, admin_port, app_id, app_authentication_token
   );
+
+  let host_zome_call_signer = include_str!("../scripts/dist/holochain_launcher_utils.js");
 
   // listen for anchor clicks to route them to the open_url_cmd command for sanitization and
   // openig in system default browser. For macOS additionaly display a message when data is being
@@ -118,14 +120,12 @@ pub fn happ_window_builder<'a>(
 
   let url = match ui_source.clone() {
     UISource::Path(_path) => WindowUrl::App("".into()),
-    UISource::Port(port) => WindowUrl::External(format!("http://localhost:{}", port).parse().unwrap()),
+    UISource::Port(port) => {
+      WindowUrl::External(format!("http://localhost:{}", port).parse().unwrap())
+    }
   };
 
-  let mut window_builder = WindowBuilder::new(
-    app_handle,
-    window_label.clone(),
-    url
-  );
+  let mut window_builder = WindowBuilder::new(app_handle, window_label.clone(), url);
 
   // In the "real" launcher case, i.e. not served via localhost:
   if let UISource::Path(assets_path) = ui_source {
@@ -139,19 +139,18 @@ pub fn happ_window_builder<'a>(
             Ok(index_html) => {
               *mutable_response = index_html;
               response.set_mimetype(Some(String::from("text/html")));
-            }, // TODO! Check if there are better ways of dealing with errors here
+            } // TODO! Check if there are better ways of dealing with errors here
             Err(e) => {
               if show_404 {
                 *mutable_response = message_404.clone();
                 response.set_mimetype(Some(String::from("text/html")));
               }
               log::error!("Error reading the path of the UI's index.html: {:?}", e);
-            },
+            }
           }
-        },
+        }
         _ => {
           if uri.starts_with("tauri://localhost/") {
-
             let mut asset_file = &uri[18..]; // TODO! error handling: can index be out of bounds?
 
             // if uri is exactly "tauri://localhost/" redirect to index.html (otherwise it will try to redirect to the admin window's index.html)
@@ -180,24 +179,24 @@ pub fn happ_window_builder<'a>(
                 response.set_mimetype(mime_type.clone());
                 // println!("\nRequested file: {}", asset_file);
                 // println!("Detected mime type: {:?}\n", mime_type);
-              },
+              }
               Err(_e) => {
                 // println!("\n### ERROR ### Error reading asset file from path '{:?}'. Redirecting to 'index.html'. Error: {:?}.\nThis may be expected in case of push state routing.\n", asset_path, e);
                 let mutable_response = response.body_mut();
                 match read(index_path.clone()) {
-                  Ok(index_html) =>  {
+                  Ok(index_html) => {
                     *mutable_response = index_html;
                     response.set_mimetype(Some(String::from("text/html")));
-                  },
+                  }
                   Err(e) => {
                     if show_404 {
                       *mutable_response = message_404.clone();
                       response.set_mimetype(Some(String::from("text/html")));
                     }
                     log::error!("Error reading the path of the UI's index.html: {:?}", e);
-                  },
+                  }
                 }
-              },
+              }
             }
           }
         }
@@ -209,12 +208,8 @@ pub fn happ_window_builder<'a>(
     .disable_file_drop_handler()
     .data_directory(local_storage_path)
     .initialization_script(launcher_env_command.as_str())
+    .initialization_script(host_zome_call_signer)
     .initialization_script(anchor_event_listener)
     .initialization_script(zoom_on_scroll)
     .title(window_title)
-
 }
-
-
-
-

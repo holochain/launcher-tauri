@@ -10,23 +10,23 @@ resolver = "2"
 
 [workspace.dependencies]
 # NEW_VERSION Update holochain dependencies here
-holochain = { version = "0.3.0-beta-dev.45" }
-holochain_cli_sandbox = "0.3.0-beta-dev.44"
-holochain_nonce = "0.3.0-beta-dev.26"
-holochain_types = "0.3.0-beta-dev.40"
-holochain_util = { version = "0.3.0-beta-dev.6", features = [ "pw" ] }
-holochain_zome_types = "0.3.0-beta-dev.33"
-holochain_conductor_api = "0.3.0-beta-dev.44"
-holochain_trace = "0.3.0-beta-dev.9"
-holochain_state = "0.3.0-beta-dev.43"
+holochain = { version = "0.3.0-beta-dev.48" }
+holochain_cli_sandbox = "0.3.0-beta-dev.47"
+holochain_nonce = "0.3.0-beta-dev.27"
+holochain_types = "0.3.0-beta-dev.43"
+holochain_util = { version = "0.3.0-beta-dev.8", features = [ "pw" ] }
+holochain_zome_types = "0.3.0-beta-dev.36"
+holochain_conductor_api = "0.3.0-beta-dev.47"
+holochain_trace = "0.3.0-beta-dev.11"
+holochain_state = "0.3.0-beta-dev.46"
 
-hdk = "0.3.0-beta-dev.38"
+hdk = "0.3.0-beta-dev.41"
 
-holochain_client = "0.5.0-dev.31"
+holochain_client = "0.5.0-dev.32"
 
 lair_keystore_api = "0.4.4"
 
-mr_bundle = "0.3.0-beta-dev.8"
+mr_bundle = "0.3.0-beta-dev.10"
 
 devhub_types = { git = "https://github.com/matthme/devhub-dnas", branch = "holochain-0.3.0-beta-dev.20" }
 mere_memory_types = { git = "https://github.com/matthme/hc-zome-mere-memory", branch = "holochain-0.3.0-beta-dev.20" }

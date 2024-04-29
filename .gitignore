@@ -7,6 +7,9 @@ node_modules
 /default_apps
 /testing-apps
 
+api
+api_scripts
+
 # temporary files
 .hc*
 .hc_launch
