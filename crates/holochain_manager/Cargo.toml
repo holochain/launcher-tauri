@@ -14,9 +14,9 @@ holochain_client = { workspace = true }
 
 # NEW_VERSION add latest crates here
 
-holochain_conductor_api_0_3_0 = { package = "holochain_conductor_api", version = "0.3.0-beta-dev.34" }
-holochain_p2p_0_3_0 = { package = "holochain_p2p", version = "0.3.0-beta-dev.33" }
-holochain_types_0_3_0 = { package = "holochain_types", version = "0.3.0-beta-dev.31" }
+holochain_conductor_api_0_3_0 = { package = "holochain_conductor_api", version = "0.4.0-dev.1" }
+holochain_p2p_0_3_0 = { package = "holochain_p2p", version = "0.4.0-dev.1" }
+holochain_types_0_3_0 = { package = "holochain_types", version = "0.4.0-dev.1" }
 
 mr_bundle = { workspace = true }
 
