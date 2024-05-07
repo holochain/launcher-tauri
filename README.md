@@ -6,7 +6,7 @@ Feedback is welcome in the [issues section](https://github.com/holochain/launche
 
 ## Download Holochain Launcher
 
-| Operating System | [Latest Stable Release](https://github.com/holochain/launcher/releases/tag/v0.10.2)<br>(Holochain v0.1.6) | How to Install                          |
+| Operating System | [Latest Stable Release](https://github.com/holochain/launcher/releases/tag/v0.10.2)<br>(Holochain v0.2.6) | How to Install                          |
 | ---------------- | --------------------------- | --------------------------------------- |
 | Windows          | [Download](https://github.com/holochain/launcher/releases/download/v0.11.5/Holochain.Launcher.Beta.2_0.11.5_x64_en-US.msi)<br>          | [Instructions](docs/install-windows.md) |
 | macOS | [Download](https://github.com/holochain/launcher/releases/download/v0.11.5/Holochain.Launcher.Beta.2_0.11.5_x64.dmg) |  [Instructions](docs/install-macos.md) |
