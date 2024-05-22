@@ -3,55 +3,11 @@ on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
   push:
-    branches: [main, develop, holochain-weekly]
+    branches: [develop-0.3, holochain-0.3]
   pull_request:
-    branches: [main, develop, holochain-weekly]
+    branches: [develop-0.3, holochain-0.3]
 
 jobs:
-  testbuild:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "16.x"
-      - name: install Rust stable
-        uses: actions-rs/toolchain@v1
-        with:
-          override: true
-          toolchain: "1.71.1"
-      - name: install Go stable
-        uses: actions/setup-go@v4
-        with:
-          go-version: "stable"
-      - name: install webkit2gtk (ubuntu only)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-
-      - name: install Holochain
-        run: |
-          mkdir src-tauri/bins
-
-          cargo install --version 0.3.0 lair_keystore
-          LAIR_PATH=$(which lair-keystore)
-          cp $LAIR_PATH src-tauri/bins/lair-keystore-v0.3.0-x86_64-unknown-linux-gnu
-
-
-          cargo install holochain --version 0.3.0-beta-dev.34
-          HOLOCHAIN_PATH=$(which holochain)
-          cp $HOLOCHAIN_PATH src-tauri/bins/holochain-v0.3.0-beta-dev.34-x86_64-unknown-linux-gnu
-
-
-          # NEW_VERSION: install new holochain version and copy its binary to the tauri path
-
-      - name: install app dependencies and build it
-        run: npm install && npm run build
-        env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_0_2 }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-
   holochain_cli_launch:
     strategy:
       fail-fast: false
