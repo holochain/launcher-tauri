@@ -22,7 +22,7 @@ use crate::prepare_webapp;
 use holochain_cli_sandbox::cmds::{Create, Existing, NetworkCmd, NetworkType};
 
 #[derive(Debug, Parser)]
-#[command(version = "0.300.0-dev.1 (holochain 0.3.0-beta-dev.48)")]
+#[command(version = "0.300.0-dev.2 (holochain 0.3.1-rc.0)")]
 #[command(author, about, long_about = None)]
 /// Helper for launching holochain apps in a Holochain Launcher environment for testing and development purposes.
 ///
