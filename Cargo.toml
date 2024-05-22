@@ -19,4 +19,4 @@ holochain_client = "0.5.0-rc.1"
 
 lair_keystore_api = "0.4.4"
 
-mr_bundle = "0.3.0-beta-dev.10"
+mr_bundle = "0.3.1-rc.1"
