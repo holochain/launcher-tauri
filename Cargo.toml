@@ -8,11 +8,11 @@ resolver = "2"
 
 [workspace.dependencies]
 # NEW_VERSION Update holochain dependencies here
-holochain_cli_sandbox = "0.3.1-rc.0"
-holochain_types = "0.3.1-rc.0"
+holochain_cli_sandbox = "0.3.1-rc.1"
+holochain_types = "0.3.1-rc.1"
 holochain_util = { version = "0.3.1-rc.0", features = [ "pw" ] }
-holochain_zome_types = "0.3.1-rc.0"
-holochain_conductor_api = "0.3.1-rc.0"
+holochain_zome_types = "0.3.1-rc.1"
+holochain_conductor_api = "0.3.1-rc.1"
 holochain_trace = "0.3.1-rc.0"
 
 holochain_client = "0.5.0-rc.1"
