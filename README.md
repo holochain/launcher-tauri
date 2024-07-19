@@ -1,3 +1,7 @@
+> [!WARNING]
+> **This repository is no longer actively maintained. The latest version of Holochain launcher can be found [here](https://github.com/holochain/launcher)**.<br><br>
+> For the latest version of `hc launch`, the CLI to run holochain apps in development mode in tauri windows, head over to https://github.com/holochain/hc-launch
+
 # Holochain Launcher
 
 A cross-platform executable that launches a local Holochain conductor, and lets you install and run [Holochain](https://www.holochain.org) apps.
